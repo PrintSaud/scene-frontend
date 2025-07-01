@@ -10,7 +10,8 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const BASE_URL = "http://localhost:4001";
+
+  const BASE_URL = import.meta.env.VITE_BACKEND;
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -46,9 +47,20 @@ export default function SignupPage() {
   return (
     <div className="login-container">
       <h1 className="scene-logo">Join Scene 🎬</h1>
-      <p className="welcome-text">Create your account to log your films ✨</p>
 
-      {error && <p style={{ color: "#ff4d4d" }}>{error}</p>}
+      <p
+        className="welcome-text"
+        style={{
+          textAlign: "center",
+          fontSize: "16px",
+          marginBottom: "16px",
+          lineHeight: "1.5",
+        }}
+      >
+        Create your account to log your films ✨
+      </p>
+
+      {error && <p style={{ color: "#ff4d4d", textAlign: "center" }}>{error}</p>}
 
       <form onSubmit={handleSignup} className="login-form">
         <input
