@@ -8,7 +8,7 @@ export default function FullCastTab({ credits, navigate }) {
         display: "grid",
         gridTemplateColumns: "repeat(4, 1fr)",
         gap: "16px",
-        padding: "20px 30px 2px",
+        padding: "25px 30px 2px",
         margin: "0 auto",
         maxWidth: "100%",
       }}

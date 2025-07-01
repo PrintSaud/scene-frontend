@@ -1,15 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import "../styles/LoginPage.css";
 import { GoogleLogin } from "@react-oauth/google";
 import toast from "react-hot-toast";
 import { FaSpinner } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+
+  // 🔐 Auto-redirect if already logged in
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/home");
+    }
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -17,7 +28,7 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:4001/api/auth/login", {
+      const res = await axios.post(`${BASE_URL}/api/auth/login`, {
         email,
         password,
       });
@@ -89,48 +100,47 @@ export default function LoginPage() {
       <div className="or-separator">or</div>
 
       <div className="google-login">
-      <GoogleLogin
-  onSuccess={async (credentialResponse) => {
-    try {
-      const res = await fetch("http://localhost:4001/api/auth/google", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          credential: credentialResponse.credential,
-        }),
-      });
+        <GoogleLogin
+          onSuccess={async (credentialResponse) => {
+            try {
+              const res = await fetch(`${BASE_URL}/api/auth/google`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  credential: credentialResponse.credential,
+                }),
+              });
 
-      const data = await res.json();
-      console.log("✅ Google login response:", data);
+              const data = await res.json();
+              console.log("✅ Google login response:", data);
 
-      if (!data.token || !data.user) {
-        console.error("❌ Missing token or user in response");
-        toast.error("Google login failed. Please try again.");
-        return;
-      }
+              if (!data.token || !data.user) {
+                console.error("❌ Missing token or user in response");
+                toast.error("Google login failed. Please try again.");
+                return;
+              }
 
-      const mergedUser = {
-        ...data.user,
-        _id: data.user._id,
-        token: data.token,
-      };
+              const mergedUser = {
+                ...data.user,
+                _id: data.user._id,
+                token: data.token,
+              };
 
-      localStorage.setItem("user", JSON.stringify(mergedUser));
-      localStorage.setItem("token", data.token);
-      toast.success("Logged in with Google!");
-      window.location.href = "/home";
-    } catch (err) {
-      console.error("❌ Google login error:", err);
-      toast.error("Something went wrong with Google login.");
-    }
-  }}
-  onError={() => {
-    console.log("Google login failed");
-    toast.error("Google sign-in failed.");
-  }}
-  width="280"
-/>
-
+              localStorage.setItem("user", JSON.stringify(mergedUser));
+              localStorage.setItem("token", data.token);
+              toast.success("Logged in with Google!");
+              window.location.href = "/home";
+            } catch (err) {
+              console.error("❌ Google login error:", err);
+              toast.error("Something went wrong with Google login.");
+            }
+          }}
+          onError={() => {
+            console.log("Google login failed");
+            toast.error("Google sign-in failed.");
+          }}
+          width="280"
+        />
       </div>
 
       <div className="signup-row">

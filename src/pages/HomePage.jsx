@@ -11,6 +11,24 @@ export default function HomePage() {
   const [feedLogs, setFeedLogs] = useState([]);
 
   useEffect(() => {
+    async function fetchMovies() {
+      try {
+        const res = await fetch(
+          `https://api.themoviedb.org/3/trending/movie/week?api_key=${import.meta.env.VITE_TMDB_API_KEY}`
+        );
+        const data = await res.json();
+        setMovies(data.results || []);
+      } catch (err) {
+        console.error("Failed to fetch TMDB movies:", err);
+      }
+    }
+  
+    fetchMovies();
+  }, []);
+  
+  
+
+  useEffect(() => {
     const fetchFeed = async () => {
       const res = await axios.get(`${import.meta.env.VITE_BACKEND}/api/logs/feed/${user._id}`);
       setFeedLogs(res.data);
@@ -39,19 +57,6 @@ export default function HomePage() {
     } else {
       setUser(parsedUser);
     }
-
-    const getTrending = async () => {
-      try {
-        const { data } = await axios.get(`${backend}/api/movies/trending`);
-        console.log("🔥 Trending movies:", movies);
-        console.log("Trending movies response:", data);
-        setMovies(data);
-      } catch (err) {
-        console.error("Failed to fetch trending movies", err);
-      }
-    };
-
-    getTrending();
   }, []);
 
   if (!user) {
@@ -264,15 +269,14 @@ export default function HomePage() {
 >
   {Array.isArray(movies) && movies.length > 0 ? (
     movies.slice(0, 8).map((movie) => (
-      <img
-        key={movie.id}
-        src={
-            movie.poster
-              ? movie.poster
-              : "/default-poster.png"
-          }
-                   
-        alt={movie.title}
+        <img
+  key={movie.id}
+  src={
+    movie.poster_path
+      ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+      : "/default-poster.png"
+  }
+  alt={movie.title}
         style={{
           width: "100%",
           height: "310px",

@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Toaster } from 'react-hot-toast';
 import { socket } from './socket'; // ✅ Socket.IO
 import CreateListPage from "./pages/CreateListPage";
+import PrivateRoute from './components/PrivateRoute';
 
 // Pages
 import HomePage from './pages/HomePage';
@@ -93,8 +94,23 @@ function App() {
       <Toaster position="top-right" />
       <div className="min-h-screen pb-16 bg-[#0e0e0e]">
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/home" element={<HomePage />} />
+        <Route
+  path="/"
+  element={
+    <PrivateRoute>
+      <HomePage />
+    </PrivateRoute>
+  }
+/>
+<Route
+  path="/home"
+  element={
+    <PrivateRoute>
+      <HomePage />
+    </PrivateRoute>
+  }
+/>
+
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
