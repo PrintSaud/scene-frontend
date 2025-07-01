@@ -10,6 +10,10 @@ export default defineConfig({
     },
   },
   server: {
-    host: true, // 👈 This is the key line
+    host: true,
+  },
+  preview: {
+    port: process.env.PORT || 4000,
+    allowedHosts: ['scene-frontend-production.up.railway.app'], // ✅ fixes the blocked host issue
   },
 });
