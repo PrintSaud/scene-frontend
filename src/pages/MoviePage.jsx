@@ -1,0 +1,328 @@
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-hot-toast";
+import LogModal from "../components/modals/LogModal"; // update path if different
+
+// Components
+import MovieTopBar from "../components/movie/MovieTopBar";
+import MovieHeader from "../components/movie/MovieHeader";
+import MovieTabs from "../components/movie/MovieTabs";
+import MovieTrailer from "../components/movie/MovieTrailer";
+import ChangePosterModal from "../components/movie/ChangePosterModal";
+import AddMovieModal from "../components/lists/AddMovieModal";
+
+export default function MoviePage() {
+
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  const [movie, setMovie] = useState(null);
+  const [credits, setCredits] = useState(null);
+  const [trailerKey, setTrailerKey] = useState(null);
+  const [showTrailer, setShowTrailer] = useState(false);
+  const [providers, setProviders] = useState({});
+  const [selectedRegion, setSelectedRegion] = useState("SA");
+  const [isInWatchlist, setIsInWatchlist] = useState(false);
+  const [showPosterModal, setShowPosterModal] = useState(false);
+  const [posterOverride, setPosterOverride] = useState(null);
+  const [showAddToListModal, setShowAddToListModal] = useState(false);
+  const [activeTab, setActiveTab] = useState("watch");
+  const [friendLogs, setFriendLogs] = useState([]);
+  const [popularReviews, setPopularReviews] = useState([]);
+  const [scrollReady, setScrollReady] = useState(false);
+  const [showLogModal, setShowLogModal] = useState(false);
+
+  const backend = import.meta.env.VITE_BACKEND;
+  const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY;
+  const TMDB_IMG = "https://image.tmdb.org/t/p/original";
+  const TMDB_AVATAR = "https://image.tmdb.org/t/p/w185";
+
+  
+
+  const fetchLogs = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+      const headers = { Authorization: `Bearer ${token}` };
+  
+      const [popularRes, friendsRes] = await Promise.all([
+        axios.get(`${backend}/api/logs/movie/${id}/popular`, { headers }),
+        axios.get(`${backend}/api/logs/movie/${id}/friends`, { headers }),
+      ]);
+  
+      setPopularReviews(popularRes.data || []);
+      setFriendLogs(friendsRes.data || []);
+    } catch (err) {
+      console.error("❌ Failed to fetch logs:", err);
+    }
+  };
+  
+
+  // Scroll after fetch is complete
+  useEffect(() => {
+    if (scrollReady) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setScrollReady(false);
+    }
+  }, [scrollReady]);
+
+  // Fetch movie data
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
+          axios.get(`https://api.themoviedb.org/3/movie/${id}?api_key=${TMDB_KEY}&language=en-US`),
+          axios.get(`https://api.themoviedb.org/3/movie/${id}/credits?api_key=${TMDB_KEY}&language=en-US`),
+          axios.get(`https://api.themoviedb.org/3/movie/${id}/videos?api_key=${TMDB_KEY}&language=en-US`),
+          axios.get(`https://api.themoviedb.org/3/movie/${id}/watch/providers?api_key=${TMDB_KEY}`),
+        ]);
+
+        setMovie(movieRes.data);
+        setCredits(creditsRes.data);
+        setTrailerKey(
+          videoRes.data.results.find(v => v.type === "Trailer" && v.site === "YouTube")?.key || null
+        );
+        setProviders(providersRes.data.results || {});
+        setScrollReady(true); // ✅ Trigger scroll after content is ready
+      } catch (err) {
+        console.error("Failed to fetch movie:", err);
+      }
+    };
+
+    fetchData();
+  }, [id]);
+
+  useEffect(() => {
+    fetchLogs();
+  }, [id]);
+  
+
+  useEffect(() => {
+    if (!movie?.id) return;
+    const token = localStorage.getItem("token");
+    axios
+      .get(`${backend}/api/watchlist/status/${movie.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => setIsInWatchlist(res.data.inWatchlist))
+      .catch(() => {});
+  }, [movie]);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }, 100); // Delay a bit for content to be ready
+    return () => clearTimeout(timeout);
+  }, [id]);
+  
+
+  useEffect(() => {
+    if (!movie?.id) return;
+    axios
+      .get(`${backend}/api/posters/${movie.id}`)
+      .then(({ data }) => setPosterOverride(data.posterUrl))
+      .catch(() => {});
+  }, [movie]);
+
+  useEffect(() => {
+    const region = Intl.DateTimeFormat().resolvedOptions().locale.split("-")[1];
+    if (region && providers[region]) {
+      setSelectedRegion(region);
+    }
+  }, [providers]);
+
+  if (!movie || !credits) {
+    return (
+      <div style={{ color: "#fff", textAlign: "center", paddingTop: "100px" }}>
+        <p>Loading movie...</p>
+      </div>
+    );
+  }
+
+  const director = credits.crew.find((p) => p.job === "Director");
+  const starring = credits.cast.slice(0, 4);
+
+  return (
+<div
+  style={{
+    minHeight: '100vh',
+    overflowX: 'hidden',
+    backgroundColor: '#0e0e0e',
+    paddingBottom: '60px', // for bottom navbar spacing
+    color: '#fff'
+  }}
+>
+
+      <MovieTopBar
+        navigate={navigate}
+        movie={movie}
+        isInWatchlist={isInWatchlist}
+        setIsInWatchlist={setIsInWatchlist}
+        setShowPosterModal={setShowPosterModal}
+        setShowAddToListModal={setShowAddToListModal}
+      />
+
+      {/* 🎞 Backdrop */}
+      <div style={{ position: "relative", height: "300px", overflow: "hidden" }}>
+        <img
+          src={TMDB_IMG + movie.backdrop_path}
+          alt="Backdrop"
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            position: "absolute",
+            top: 0,
+            left: 0,
+            zIndex: 1,
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            background: "linear-gradient(to bottom, rgba(0, 0, 0, 0.3), #0e0e0e 90%)",
+            zIndex: 2,
+          }}
+        />
+      </div>
+
+      <MovieHeader
+        movie={movie}
+        posterOverride={posterOverride}
+        handleLogClick={() => setShowLogModal(true)}
+        handleWatchTrailer={() => {
+          if (!trailerKey) return toast.error("No trailer available");
+          setShowTrailer(true);
+        }}
+        handleSceneBotReview={() =>
+          navigate("/chat", {
+            state: {
+              prompt: `Can you write me a smart, fun review for the film "${movie.title}"?`,
+            },
+          })
+        }
+      />
+
+      {/* 📖 Overview */}
+      <div style={{ marginTop: "10px", padding: "0 24px" }}>
+        <h3 style={{ fontSize: "18px", marginBottom: "8px" }}>Overview</h3>
+        <p style={{ fontFamily: "Inter, sans-serif", fontSize: "14.5px", color: "#ddd", lineHeight: "1.7" }}>
+          {movie.overview}
+        </p>
+      </div>
+
+      {/* 🎬 Director & ⭐ Cast */}
+      <div style={{ marginTop: "40px", padding: "0 24px" }}>
+        <h3 style={{ fontSize: "18px", marginBottom: "10px" }}>Director</h3>
+        {director ? (
+          <div onClick={() => navigate(`/director/${director.id}`)} style={{ display: "flex", alignItems: "center", gap: "12px", cursor: "pointer", marginBottom: "28px" }}>
+            <img src={director.profile_path ? TMDB_AVATAR + director.profile_path : "/default-avatar.png"} alt={director.name} style={{ width: "85px", height: "135px", objectFit: "cover", borderRadius: "12px" }} />
+            <p style={{ fontFamily: "Inter", fontWeight: 600, fontSize: "15px" }}>{director.name}</p>
+          </div>
+        ) : (
+          <p style={{ color: "#888", fontStyle: "italic" }}>No director found</p>
+        )}
+
+        <h3 style={{ fontSize: "18px", marginBottom: "10px" }}>Starring</h3>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px" }}>
+          {starring.map((actor) => (
+            <div key={actor.id} onClick={() => navigate(`/actor/${actor.id}`)} style={{ cursor: "pointer", textAlign: "center" }}>
+              <img
+                src={actor.profile_path ? TMDB_AVATAR + actor.profile_path : "/default-avatar.png"}
+                alt={actor.name}
+                style={{ width: "85px", height: "135px", objectFit: "cover", borderRadius: "12px" }}
+              />
+              <p style={{ fontSize: "11.5px", marginTop: "6px", fontWeight: "500" }}>{actor.name}</p>
+              <p style={{ fontSize: "10.5px", color: "#aaa" }}>{actor.character}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 👀 Watched by Friends */}
+      <div style={{ marginTop: "48px", padding: "0 24px" }}>
+        <h3 style={{ fontSize: "18px", marginBottom: "12px" }}>Watched by Friends</h3>
+        {friendLogs.length === 0 ? (
+          <p style={{ color: "#888" }}>No friends have logged this film yet.</p>
+        ) : (
+          <>
+            {friendLogs.slice(0, 3).map((log) => (
+              <p key={log._id} style={{ fontSize: "14px", color: "#ccc", marginBottom: "6px" }}>
+                <strong style={{ color: "#fff" }}>{log.user.username}</strong>: {log.review?.slice(0, 60)}...
+              </p>
+            ))}
+            <button onClick={() => navigate(`/movie/${id}/friends`)} style={{ marginTop: "10px", background: "#111", color: "#fff", border: "1px solid #444", borderRadius: "6px", padding: "8px 12px", fontSize: "13px", fontWeight: "bold", cursor: "pointer" }}>
+              More →
+            </button>
+          </>
+        )}
+      </div>
+
+      {/* 📝 Popular Reviews */}
+      <div style={{ marginTop: "48px", padding: "0 24px" }}>
+        <h3 style={{ fontSize: "18px", marginBottom: "12px" }}>Popular Reviews</h3>
+        {popularReviews.length === 0 ? (
+          <p style={{ color: "#888" }}>No reviews yet.</p>
+        ) : (
+          <>
+            {popularReviews.slice(0, 3).map((log) => (
+              <p key={log._id} style={{ fontSize: "14px", color: "#ccc", marginBottom: "6px" }}>
+                <strong style={{ color: "#fff" }}>{log.user.username}</strong>: {log.review?.slice(0, 60)}...
+              </p>
+            ))}
+            <button onClick={() => navigate(`/movie/${id}/reviews`)} style={{ marginTop: "10px", background: "#111", color: "#fff", border: "1px solid #444", borderRadius: "6px", padding: "8px 12px", fontSize: "13px", fontWeight: "bold", cursor: "pointer" }}>
+              More →
+            </button>
+          </>
+        )}
+      </div>
+
+      <MovieTabs
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        credits={credits}
+        navigate={navigate}
+        movieId={movie.id}
+        providers={providers}
+        selectedRegion={selectedRegion}
+        setSelectedRegion={setSelectedRegion}
+        
+      />
+
+      {showTrailer && <MovieTrailer trailerKey={trailerKey} setShowTrailer={setShowTrailer} />}
+
+      {showPosterModal && (
+        <ChangePosterModal
+          movieId={movie.id}
+          onClose={() => {
+            setShowPosterModal(false);
+            window.location.reload();
+          }}
+        />
+      )}
+
+      {showAddToListModal && (
+        <AddMovieModal
+          movie={{
+            id: movie.id,
+            title: movie.title,
+            poster: posterOverride || `${TMDB_IMG}${movie.poster_path}`,
+          }}
+          onClose={() => setShowAddToListModal(false)}
+        />
+      )}
+{showLogModal && (
+  <LogModal
+    movie={movie}
+    onClose={() => setShowLogModal(false)}
+    refreshLogs={fetchLogs} // ✅ THIS must be passed
+  />
+)}
+    </div>
+  );
+}
