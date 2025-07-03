@@ -158,7 +158,7 @@ useEffect(() => {
   
     try {
       const res = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/upload/${user._id}/upload-avatar`, // ✅ route
+        `${backend}/api/upload/avatar/${user._id}`,
         formData,
         {
           headers: {
