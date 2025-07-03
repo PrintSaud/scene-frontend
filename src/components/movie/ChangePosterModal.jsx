@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { changePoster } from "../api/api";
+import axios from "../../../api/api";
+
 
 export default function ChangePosterModal({ movieId, onClose }) {
   const [posters, setPosters] = useState([]);
