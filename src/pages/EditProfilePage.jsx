@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../api/api";
-import MovieListSortable from "../components/MovieListSortable";
+import MovieListSortable from "../components/lists/MovieListSortable";
+
 
 import {
   DragDropContext,
