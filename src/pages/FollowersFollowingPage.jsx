@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "../api/api";
-
+import { backend } from "../config";
 
 export default function FollowersFollowingPage() {
   const { id } = useParams();
@@ -14,7 +14,7 @@ export default function FollowersFollowingPage() {
   const [profileUsername, setProfileUsername] = useState("User");
   const [currentUser, setCurrentUser] = useState(JSON.parse(localStorage.getItem("user")));
 
-  const backend = import.meta.env.VITE_BACKEND;
+
 
   useEffect(() => {
     const fetchUsers = async () => {

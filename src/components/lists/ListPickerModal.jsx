@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import axios from "../../api/api";
+import { backend } from "../config";
 
 export default function ListPickerModal({ movie, onClose }) {
   const [lists, setLists] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const user = JSON.parse(localStorage.getItem("user"));
-  const backend = import.meta.env.VITE_BACKEND;
+
 
   useEffect(() => {
     const fetchLists = async () => {

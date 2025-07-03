@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "../api/api";
 import filterMovies from "../utils/filterMovies";
 import { useNavigate } from "react-router-dom";
+import { backend } from "../config";
 
 export default function BackdropPickerPage() {
   const [query, setQuery] = useState("");
@@ -11,7 +12,7 @@ export default function BackdropPickerPage() {
   const [selectedBackdrop, setSelectedBackdrop] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const backend = import.meta.env.VITE_BACKEND;
+
   const navigate = useNavigate();
   const doneRef = useRef(null); // 👇 anchor for scroll
 

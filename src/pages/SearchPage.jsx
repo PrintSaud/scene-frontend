@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SearchFilterModal from "../components/SearchFilterModal";
 import filterMovies, { isQueryBanned } from "../utils/filterMovies";
+import { backend } from "../config";
 
 export default function SearchPage() {
   const [query, setQuery] = useState("");
@@ -26,7 +27,7 @@ export default function SearchPage() {
     try {
       setLoading(true);
       setError(null);
-      const backend = import.meta.env.VITE_BACKEND;
+
 
       if (activeTab === "films") {
         const apiKey = import.meta.env.VITE_TMDB_API_KEY;

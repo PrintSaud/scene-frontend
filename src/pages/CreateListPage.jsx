@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom";
 import axios from "../api/api";
 import AddMovieModal from "../components/lists/AddMovieModal";
 import MovieListSortable from "../components/lists/MovieListSortable";
+import { backend } from "../config";
 
 export default function CreateListPage() {
   const navigate = useNavigate();
-  const backend = import.meta.env.VITE_BACKEND;
+
   const user = JSON.parse(localStorage.getItem("user"));
 
   const [title, setTitle] = useState("");

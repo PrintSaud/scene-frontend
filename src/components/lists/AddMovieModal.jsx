@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { BLOCKED_MOVIE_IDS } from "../../utils/blockedMovies";
+import { backend } from "../config";
 
 export default function AddMovieModal({ onClose, onSelect, existing }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const TMDB = import.meta.env.VITE_TMDB_API_KEY;
 
 
   useEffect(() => {

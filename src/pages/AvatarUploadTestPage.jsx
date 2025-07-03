@@ -1,5 +1,6 @@
 // src/pages/AvatarUploadTestPage.jsx
 import React, { useState } from "react";
+import { backend } from "../config";
 
 export default function AvatarUploadTestPage() {
   const [file, setFile] = useState(null);
@@ -7,7 +8,7 @@ export default function AvatarUploadTestPage() {
   const [message, setMessage] = useState("");
 
   const user = JSON.parse(localStorage.getItem("user"));
-  const backend = import.meta.env.VITE_BACKEND;
+
 
   const handleUpload = async () => {
     if (!file || !user?._id) return;

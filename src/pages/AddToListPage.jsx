@@ -2,14 +2,14 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "../api/api"; // ✅ Using your centralized axios instance
 import toast from "react-hot-toast";
-
+import { backend } from "../config";
 export default function AddToListPage() {
   const { movieId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const [lists, setLists] = useState([]);
   const movie = location.state?.movie;
-  const backend = import.meta.env.VITE_BACKEND;
+ 
 
   useEffect(() => {
     const fetchLists = async () => {
