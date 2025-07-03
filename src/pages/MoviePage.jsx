@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import axios from 'axios';
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../api/api";
 import { toast } from "react-hot-toast";
 import LogModal from "../components/modals/LogModal"; // update path if different
+import { backend } from "../config";
 
 
 // Components
