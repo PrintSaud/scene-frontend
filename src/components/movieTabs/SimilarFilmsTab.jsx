@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import filterMovies from "../../utils/filterMovies";
+import { backend } from "../../config";
+
 
 export default function SimilarFilmsTab({ movieId, navigate }) {
   const [similarMovies, setSimilarMovies] = useState([]);

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "../api/api";
 import { toast } from "react-hot-toast";
 import LogModal from "../components/modals/LogModal"; // update path if different
+import { backend } from "../config";
 
 // Components
 import MovieTopBar from "../components/movie/MovieTopBar";

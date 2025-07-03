@@ -1,5 +1,8 @@
 // src/components/movieTabs/FullCastTab.jsx
 import React from "react";
+import { backend } from "../../config";
+
+
 
 export default function FullCastTab({ credits, navigate }) {
   return (

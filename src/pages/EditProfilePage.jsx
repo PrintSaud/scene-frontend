@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../api/api";
 import MovieListSortable from "../components/lists/MovieListSortable";
+import { backend } from "../config";
 
 
 import {

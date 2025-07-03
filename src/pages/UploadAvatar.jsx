@@ -3,6 +3,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../styles/LoginPage.css"; // reuse styling
+import { backend } from "../config";
 
 export default function UploadAvatar() {
   const [file, setFile] = useState(null);

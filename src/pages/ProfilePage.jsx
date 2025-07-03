@@ -8,9 +8,11 @@ import ProfileTabReviews from "../components/profile/ProfileTabReviews";
 import ProfileTabWatchlist from "../components/profile/ProfileTabWatchlist";
 import ProfileTabLists from "../components/profile/ProfileTabLists";
 import ProfileTabFilms from "../components/profile/ProfileTabFilms";
+import { backend } from "../config";
 
 export default function ProfilePage() {
   const stored = JSON.parse(localStorage.getItem("user") || "{}");
+  const token = localStorage.getItem("token"); // ✅ pulled directly
   const { id: paramId } = useParams();
   const id = paramId || stored._id;
   const isOwner = stored._id === id;
@@ -28,11 +30,9 @@ export default function ProfilePage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = stored.token;
-
     const fetchUser = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_BACKEND}/api/users/${id}`, {
+        const res = await fetch(`${backend}/api/users/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error("Failed to fetch user");
@@ -46,7 +46,7 @@ export default function ProfilePage() {
     const fetchLogs = async () => {
       if (!id || typeof id !== "string") return;
       try {
-        const res = await fetch(`${import.meta.env.VITE_BACKEND}/api/logs/user/${id}`);
+        const res = await fetch(`${backend}/api/logs/user/${id}`);
         if (!res.ok) throw new Error("Failed to fetch logs");
         const data = await res.json();
         setLogs(data);
@@ -59,7 +59,7 @@ export default function ProfilePage() {
       fetchUser();
       fetchLogs();
     }
-  }, [id]);
+  }, [id, token]);
 
   useEffect(() => {
     if (user && imgRef.current) {

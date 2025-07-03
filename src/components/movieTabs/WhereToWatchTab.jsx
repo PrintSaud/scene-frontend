@@ -1,5 +1,7 @@
 // src/components/movieTabs/WhereToWatchTab.jsx
 import React from "react";
+import { backend } from "../../config";
+
 
 export default function WhereToWatchTab({ providers, selectedRegion, setSelectedRegion }) {
   return (

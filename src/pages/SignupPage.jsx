@@ -32,7 +32,7 @@ export default function SignupPage() {
 
     if (valid) {
       try {
-        const res = await axios.get(`${BASE_URL}/api/auth/check-username?username=${val}`);
+        await axios.get(`${backend}/api/auth/check-username?username=${val}`);
         setUsernameTaken(!res.data.available);
       } catch (err) {
         console.error("Username check failed:", err);
@@ -51,7 +51,7 @@ export default function SignupPage() {
 
     if (valid) {
       try {
-        const res = await axios.get(`${BASE_URL}/api/auth/check-email?email=${val}`);
+        await axios.get(`${backend}/api/auth/check-email?email=${val}`);
         setEmailTaken(!res.data.available);
       } catch (err) {
         console.error("Email check failed:", err);
@@ -98,7 +98,7 @@ export default function SignupPage() {
     }
 
     try {
-      const res = await axios.post(`${BASE_URL}/api/auth/register`, {
+        const res = await axios.post(`${backend}/api/auth/register`, {
         name,
         username,
         email,

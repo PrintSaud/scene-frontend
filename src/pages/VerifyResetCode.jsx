@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import "../styles/LoginPage.css";
+import { backend } from "../config";
 
 export default function VerifyResetCode() {
   const [code, setCode] = useState("");

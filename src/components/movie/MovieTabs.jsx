@@ -3,6 +3,8 @@ import React from "react";
 import FullCastTab from "../movieTabs/FullCastTab";
 import SimilarFilmsTab from "../movieTabs/SimilarFilmsTab";
 import WhereToWatchTab from "../movieTabs/WhereToWatchTab";
+import { backend } from "../../config";
+
 
 export default function MovieTabs({
   activeTab,

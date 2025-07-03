@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "../../api/api";
-import { backend } from "../config";
+import { backend } from "../../config";
+
 
 export default function ListPickerModal({ movie, onClose }) {
   const [lists, setLists] = useState([]);

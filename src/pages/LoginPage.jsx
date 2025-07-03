@@ -39,7 +39,6 @@ export default function LoginPage() {
       };
 
       localStorage.setItem("user", JSON.stringify(mergedUser));
-      localStorage.setItem("token", res.data.token);
 
       toast.success("Logged in successfully!");
       window.location.href = "/home";

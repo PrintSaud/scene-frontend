@@ -5,6 +5,7 @@ import axios from "../api/api";
 import "../styles/LoginPage.css"; // reuse styling
 import toast from 'react-hot-toast';
 import { FaSpinner } from 'react-icons/fa';
+import { backend } from "../config";
 
 
 const handleSignup = async () => {

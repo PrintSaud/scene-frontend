@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../api/api"; // ✅ use your custom axios instance
+import { backend } from "../config";
 
 
 export default function HomePage() {

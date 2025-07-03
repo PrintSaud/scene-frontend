@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LogModal from "../components/LogModal";
 import axios from "../api/api";
+import { backend } from "../config";
 
 export default function FriendsActivityPage() {
   const [logs, setLogs] = useState([]);

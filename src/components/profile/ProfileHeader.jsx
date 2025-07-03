@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { HiDotsVertical } from "react-icons/hi";
 import toast from "react-hot-toast";
+import { backend } from "../../config";
 
 export default function ProfileHeader({ user, imgRef }) {
   const navigate = useNavigate();

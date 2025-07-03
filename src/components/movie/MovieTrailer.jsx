@@ -1,5 +1,7 @@
 // src/components/movie/MovieTrailer.jsx
 import React from "react";
+import { backend } from "../../config";
+
 
 export default function MovieTrailer({ trailerKey, setShowTrailer }) {
   return (

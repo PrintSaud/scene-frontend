@@ -2,6 +2,8 @@
 import React from "react";
 import { toast } from "react-hot-toast";
 import { toggleWatchlist } from "../../api/api";
+import { backend } from "../../config";
+
 
 
 export default function MovieTopBar({

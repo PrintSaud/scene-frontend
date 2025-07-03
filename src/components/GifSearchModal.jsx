@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import api from "../api/api";
-
-
+import { backend } from "../config";
 const GIPHY_API = "https://api.giphy.com/v1/gifs";
 const API_KEY = "Us8LunlcSYoy78SempDRQtVRJ87jOccq";
 

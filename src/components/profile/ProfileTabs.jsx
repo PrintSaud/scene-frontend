@@ -1,6 +1,8 @@
 import React from "react";
 import { useDrag } from "@use-gesture/react";
 import { useRef } from "react";
+import { backend } from "../../config";
+
 
 export default function ProfileTabs({ activeTab, setActiveTab }) {
   const tabs = ["Profile", "Reviews", "Watchlist", "Lists", "Films"];

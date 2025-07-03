@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "../api/api";
 import { actorAwards, directorAwards } from "../data/awardsData";
 import { saudiTalent } from "../data/saudiTalent";
+import { backend } from "../config";
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const TMDB_POSTER = "https://image.tmdb.org/t/p/w300";

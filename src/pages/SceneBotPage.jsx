@@ -1,5 +1,6 @@
 import React from "react";
 import SceneBotComponent from "../components/SceneBotComponent";
+import { backend } from "../config";
 
 export default function SceneBotPage() {
   return (

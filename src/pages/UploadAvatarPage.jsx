@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { backend } from "../config";
 
 export default function UploadAvatarPage() {
   const [file, setFile] = useState(null);

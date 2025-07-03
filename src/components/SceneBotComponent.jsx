@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { callSceneBot } from "../utils/callSceneBot";
 import { FiSend } from "react-icons/fi";
 import { funPrompts } from "../utils/funPrompts";
+import { backend } from "../config";
 
 export default function SceneBotComponent() {
   const [input, setInput] = useState("");

@@ -1,4 +1,6 @@
 import React from "react";
+import { backend } from "../../config";
+
 
 export default function ProfileTabReviews({ logs, filter, setFilter, navigate }) {
   const filtered = logs

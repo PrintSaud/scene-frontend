@@ -1,4 +1,6 @@
 import React from "react";
+import { backend } from "../../config";
+
 
 export default function ProfileTabFilms({ logs = [], navigate }) {
   const handleClick = (log) => {

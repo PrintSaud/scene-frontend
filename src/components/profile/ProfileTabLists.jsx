@@ -7,6 +7,7 @@ import {
   } from "../../api/api";
   
 import { useNavigate } from "react-router-dom";
+import { backend } from "../../config";
 
 export default function ProfileTabLists({ user, profileUserId }) {
   const [myLists, setMyLists] = useState([]);

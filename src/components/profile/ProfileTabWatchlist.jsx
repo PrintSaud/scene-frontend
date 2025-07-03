@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import api from "../../api/api";
 import { useNavigate } from "react-router-dom";
+import { backend } from "../../config";
+
 
 export default function ProfileTabWatchlist({
   user,

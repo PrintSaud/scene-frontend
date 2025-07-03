@@ -7,6 +7,8 @@ import { BiSolidFileGif } from "react-icons/bi";
 import GifSearchModal from "../GifSearchModal";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { backend } from "../../config";
+
 
 export default function LogModal({ movie, onClose, refreshLogs }) {
 

@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import api from "../api/api";
+import { backend } from "../../config";
+
 
 
 export default function FollowPage({ defaultTab }) {
