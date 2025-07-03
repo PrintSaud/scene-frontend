@@ -27,7 +27,7 @@ export default function UploadAvatarPage() {
 
     try {
       const res = await axios.post(
-        `${backend}/api/upload/${userId}/upload-avatar`,
+        `${backend}/api/upload/avatar/${userId}`,      
         formData,
         {
           headers: {
