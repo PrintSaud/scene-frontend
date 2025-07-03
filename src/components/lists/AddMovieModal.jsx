@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { BLOCKED_MOVIE_IDS } from "../../utils/blockedMovies";
-import { backend } from "../config";
+import { backend } from "../../config";
+
 
 export default function AddMovieModal({ onClose, onSelect, existing }) {
   const [query, setQuery] = useState("");
