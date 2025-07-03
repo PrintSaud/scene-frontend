@@ -40,6 +40,8 @@ export const deleteReply = (logId, replyId) => api.delete(`/api/logs/${logId}/re
 //
 // 📋 WATCHLIST
 //
+export const getWatchlistStatus = (movieId) =>
+    api.get(`/api/watchlist/status/${movieId}`);  
 export const toggleWatchlist = (movieId) => api.post(`/api/watchlist/toggle`, { movieId });
 export const getWatchlist = (userId) => api.get(`/api/watchlist/${userId}`);
 

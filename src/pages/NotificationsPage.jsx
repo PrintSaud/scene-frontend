@@ -1,22 +1,20 @@
 import React, { useEffect, useState } from "react";
-import axios from "../api/api";
+import axios from "../api/api"; // ✅ Token-aware instance
 import { format } from "timeago.js";
 import { useNavigate } from "react-router-dom";
 import { socket } from "../socket";
 import { toast } from "react-hot-toast";
-import { backend } from "../config"; // ✅ correct with named export
-
 
 export default function NotificationsPage({ setHasUnread }) {
   const [notifications, setNotifications] = useState([]);
-  const user = JSON.parse(localStorage.getItem("user"));
   const navigate = useNavigate();
+
+  const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const { data } = await axios.get(`${backend}/api/notifications`, {
-        });
+        const { data } = await axios.get("/api/notifications"); // ✅ Clean & token-ready
         setNotifications(data);
         if (setHasUnread) {
           const hasUnread = data.some((n) => !n.read);
@@ -43,9 +41,7 @@ export default function NotificationsPage({ setHasUnread }) {
 
   const handleClick = async (n) => {
     try {
-      await axios.patch(`${backend}/api/notifications/read-single/${n._id}`, {}, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
+      await axios.patch(`/api/notifications/read-single/${n._id}`); // ✅ Uses interceptor
 
       setNotifications((prev) =>
         prev.map((notif) => notif._id === n._id ? { ...notif, read: true } : notif)
@@ -71,8 +67,7 @@ export default function NotificationsPage({ setHasUnread }) {
 
   const markAllAsRead = async () => {
     try {
-      await axios.patch(`${backend}/api/notifications/read`, {}, {
-      });
+      await axios.patch("/api/notifications/read"); // ✅
       setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
       if (setHasUnread) setHasUnread(false);
     } catch (err) {
@@ -82,9 +77,7 @@ export default function NotificationsPage({ setHasUnread }) {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${backend}/api/notifications/${id}`, {
-      });
-
+      await axios.delete(`/api/notifications/${id}`); // ✅
       setNotifications((prev) => prev.filter((n) => n._id !== id));
       if (setHasUnread) {
         const anyUnread = notifications.some((n) => n._id !== id && !n.read);

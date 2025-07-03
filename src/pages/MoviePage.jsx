@@ -107,7 +107,7 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
   useEffect(() => {
     if (!movie?.id) return;
     const token = localStorage.getItem("token");
-    api.get(`/api/watchlist/status/${movie.id}`)
+    getWatchlistStatus(movie.id)
       .then((res) => setIsInWatchlist(res.data.inWatchlist))
       .catch(() => {});
   }, [movie]);
