@@ -1,12 +1,13 @@
 import React from "react";
 
-export default function ProfileTabProfile({ favoriteMovies = [], logs = [], navigate }) {
+export default function ProfileTabProfile({ favoriteMovies, logs = [], navigate }) {
   const recentlyWatched = logs
     .filter((log) => log.movie?.poster)
     .sort((a, b) => new Date(b.watchedAt) - new Date(a.watchedAt))
     .slice(0, 6);
 
   const handleLogClick = (log) => {
+    if (!navigate) return;
     if (log.review) {
       navigate(`/review/${log._id}`);
     } else {
@@ -14,10 +15,12 @@ export default function ProfileTabProfile({ favoriteMovies = [], logs = [], navi
     }
   };
 
+  const hasFavorites = favoriteMovies && favoriteMovies.length > 0;
+
   return (
     <>
       {/* 🎬 Favorite Movies */}
-      {favoriteMovies.length > 0 && (
+      {hasFavorites && (
         <div style={{ marginTop: "24px" }}>
           <h3 style={{ fontFamily: "Inter, sans-serif", fontSize: "16px", fontWeight: "600" }}>
             Favorite Movies
@@ -53,7 +56,7 @@ export default function ProfileTabProfile({ favoriteMovies = [], logs = [], navi
       {/* 🕒 Recently Watched */}
       {recentlyWatched.length > 0 && (
         <div style={{ marginTop: "32px" }}>
-          {/* 🔼 Header */}
+          {/* Header */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <h3 style={{ fontFamily: "Inter, sans-serif", fontSize: "16px", fontWeight: "600" }}>
               Recently Watched
@@ -73,7 +76,7 @@ export default function ProfileTabProfile({ favoriteMovies = [], logs = [], navi
             </a>
           </div>
 
-          {/* 🖼️ Posters */}
+          {/* Posters */}
           <div style={{ display: "flex", gap: "10px", marginTop: "10px", overflowX: "auto", paddingBottom: "4px" }}>
             {recentlyWatched.map((log) => (
               <div
@@ -91,16 +94,18 @@ export default function ProfileTabProfile({ favoriteMovies = [], logs = [], navi
                     borderRadius: "6px",
                   }}
                 />
-                <div
-                  style={{
-                    color: "#ccc",
-                    fontSize: "12px",
-                    textAlign: "center",
-                    marginTop: "4px",
-                  }}
-                >
-                  ⭐ {log.rating}
-                </div>
+                {log.rating && (
+                  <div
+                    style={{
+                      color: "#ccc",
+                      fontSize: "12px",
+                      textAlign: "center",
+                      marginTop: "4px",
+                    }}
+                  >
+                    ⭐ {log.rating}
+                  </div>
+                )}
               </div>
             ))}
           </div>

@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import {
+    getMyLists,
+    getSavedLists,
+    getPopularLists,
+    getFriendsLists,
+  } from "../../api/api";
+  
 import { useNavigate } from "react-router-dom";
 
 export default function ProfileTabLists({ user, profileUserId }) {
@@ -9,30 +15,19 @@ export default function ProfileTabLists({ user, profileUserId }) {
   const [friendsLists, setFriendsLists] = useState([]);
   const [activeSubTab, setActiveSubTab] = useState("My lists");
   const navigate = useNavigate();
-  const backend = import.meta.env.VITE_BACKEND;
 
-  const token = localStorage.getItem("token");
   const isOwner = user?._id === profileUserId;
 
   useEffect(() => {
     const fetchLists = async () => {
       try {
         const [myRes, savedRes, popularRes, friendsRes] = await Promise.all([
-          axios.get(`${backend}/api/lists/user/${profileUserId}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          isOwner
-            ? axios.get(`${backend}/api/lists/saved/me`, {
-                headers: { Authorization: `Bearer ${token}` },
-              })
-            : Promise.resolve({ data: [] }),
-          axios.get(`${backend}/api/lists/popular`),
-          isOwner
-            ? axios.get(`${backend}/api/lists/friends`, {
-                headers: { Authorization: `Bearer ${token}` },
-              })
-            : Promise.resolve({ data: [] }),
-        ]);
+            getMyLists(profileUserId),
+            isOwner ? getSavedLists() : Promise.resolve({ data: [] }),
+            getPopularLists(),
+            isOwner ? getFriendsLists() : Promise.resolve({ data: [] }),
+          ]);
+          
 
         const filteredMyLists = isOwner
           ? myRes.data

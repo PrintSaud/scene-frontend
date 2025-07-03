@@ -31,7 +31,7 @@ export default function UploadAvatar() {
   
     try {
       const res = await axios.post(
-        `http://localhost:4001/api/upload/${user.id}/upload-avatar`, // or user.id if needed
+  `${import.meta.env.VITE_BACKEND_URL}/api/upload/${user.id}/upload-avatar`,
         formData,
         {
           headers: {

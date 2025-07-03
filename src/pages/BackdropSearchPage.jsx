@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
+import axios from "../api/api";
 import filterMovies from "../utils/filterMovies";
 import { useNavigate } from "react-router-dom";
 

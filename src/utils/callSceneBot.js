@@ -16,10 +16,19 @@ export const callSceneBot = async (message, lang) => {
       });
   
       const data = await res.json();
-      return data.reply || "🤖 SceneBot had no answer.";
+      console.log("🧠 SceneBot data:", data); // ✅ Debug log
+  
+      if (!res.ok) {
+        console.error("❌ Backend error:", data);
+        return "🤖 SceneBot is currently unavailable.";
+      }
+  
+      // Ensure the reply is a string to avoid [object Object] bugs
+      const reply = typeof data.reply === "string" ? data.reply : String(data.reply || "");
+      return reply || "🤖 SceneBot had no answer.";
     } catch (err) {
       console.error("SceneBot Error:", err);
-      alert("SceneBot is currently unavailable. Please try again later.");
+      return "❌ SceneBot is currently unavailable. Please try again later.";
     }
   };
   

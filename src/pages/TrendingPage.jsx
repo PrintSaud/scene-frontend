@@ -4,7 +4,7 @@ import axios from "axios";
 
 export default function TrendingPage() {
   const [movies, setMovies] = useState([]);
-  const backend = import.meta.env.VITE_BACKEND;
+  const backend = import.meta.env.VITE_BACKEND_URL;
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,6 +19,7 @@ export default function TrendingPage() {
 
     fetchTrending();
   }, []);
+
 
   return (
     <div style={{ padding: "20px", color: "#fff", position: "relative" }}>

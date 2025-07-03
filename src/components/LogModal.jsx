@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { reactToLog, getLogById, addLogReply, deleteReply } from "../api/api";
 import GiphyModal from "./GiphyModal";
 
 export default function LogModal({ log, onClose }) {
@@ -19,14 +19,9 @@ export default function LogModal({ log, onClose }) {
 
   const handleReaction = async (emoji) => {
     try {
-      await axios.post(
-        `/api/logs/${log._id}/react`,
-        { emoji },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      const { data } = await axios.get(`/api/logs/single/${log._id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+        await reactToLog(log._id, emoji);
+const { data } = await getLogById(log._id);
+
       setReplies(data.replies);
     } catch (err) {
       console.error("Reaction failed:", err);
@@ -45,16 +40,8 @@ export default function LogModal({ log, onClose }) {
     }
 
     try {
-      const { data } = await axios.post(
-        `/api/logs/${log._id}/reply`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+        const { data } = await addLogReply(log._id, formData);
+
       setReplies(data.replies);
       setReplyText("");
       setImage(null);
@@ -66,12 +53,8 @@ export default function LogModal({ log, onClose }) {
 
   const handleDeleteReply = async (replyId) => {
     try {
-      const { data } = await axios.delete(
-        `/api/logs/${log._id}/reply/${replyId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+        const { data } = await deleteReply(log._id, replyId);
+
       setReplies(data.replies);
     } catch (err) {
       console.error("Delete failed:", err);

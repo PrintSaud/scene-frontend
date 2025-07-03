@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios from "../api/api";
+import MovieListSortable from "../components/MovieListSortable";
+
 import {
   DragDropContext,
   Droppable,
@@ -310,49 +312,19 @@ useEffect(() => {
           <label>Bio</label>
           <textarea value={bio} onChange={(e) => setBio(e.target.value)} style={{ ...inputStyle, height: "80px" }} />
         </div>
-  
-        {/* Favorite Films Drag Drop */}
-        <div style={{ marginTop: "24px" }}>
-          <h4>Favorite Films</h4>
-          <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId="favorites" direction="horizontal">
-              {(provided) => (
-                <div
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                  style={{ display: "flex", gap: "12px", marginTop: "12px", flexWrap: "wrap" }}
-                >
-                  {favoriteFilms.map((film, idx) => (
-                    <Draggable key={film.id} draggableId={film.id.toString()} index={idx}>
-                      {(provided) => (
-                        <img
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          src={film.poster}
-                          alt={film.title}
-                          style={{ ...posterStyle }}
-                        />
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                  <div style={addPosterStyle}>+</div>
-                </div>
-              )}
-            </Droppable>
-          </DragDropContext>
-  
-          <p style={{ fontSize: "12px", color: "#888", marginTop: "6px" }}>
-            Drag to reorder, click to replace
-          </p>
-        </div>
+
+{/* 🎬 Favorite Films - Drag & Drop */}
+<div style={{ marginTop: "24px" }}>
+  <h4>Favorite Films</h4>
+  <MovieListSortable movies={favoriteFilms} setMovies={setFavoriteFilms} />
+  <p style={{ fontSize: "12px", color: "#888", marginTop: "6px" }}>
+    Drag to reorder, click ❌ to remove
+  </p>
+</div>
+
   
         <div style={{ marginTop: "32px", color: "#ccc" }}>
           <p>Contact us</p>
-          <button style={{ color: "red", background: "none", border: "none", marginTop: "4px", cursor: "pointer" }}>
-            Log out
-          </button>
         </div>
   
         <div style={{ marginTop: "40px", display: "flex", alignItems: "center", gap: "12px" }}>

@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function ProfileTabFilms({ logs, navigate }) {
+export default function ProfileTabFilms({ logs = [], navigate }) {
   const handleClick = (log) => {
     if (log.review) {
       navigate(`/review/${log._id}`);
@@ -8,6 +8,10 @@ export default function ProfileTabFilms({ logs, navigate }) {
       navigate(`/movie/${log.movie?._id || log.movieId}`);
     }
   };
+
+  const sortedLogs = logs
+    .filter((log) => log.movie?.poster)
+    .sort((a, b) => new Date(b.watchedAt) - new Date(a.watchedAt));
 
   return (
     <div
@@ -18,26 +22,25 @@ export default function ProfileTabFilms({ logs, navigate }) {
         marginTop: "16px",
       }}
     >
-      {logs
-        .filter((log) => log.movie?.poster)
-        .sort((a, b) => new Date(b.watchedAt) - new Date(a.watchedAt))
-        .map((log) => (
-          <div
-            key={log._id}
-            onClick={() => handleClick(log)}
-            style={{ cursor: "pointer" }}
-          >
-            <img
-              src={log.movie?.poster}
-              alt={log.movie?.title}
-              style={{
-                width: "100%",
-                aspectRatio: "2/3",
-                objectFit: "cover",
-                borderRadius: "6px",
-              }}
-            />
-            {/* ⭐ Rating + 📝 Review icon */}
+      {sortedLogs.map((log) => (
+        <div
+          key={log._id}
+          onClick={() => handleClick(log)}
+          style={{ cursor: "pointer" }}
+        >
+          <img
+            src={log.movie?.customPoster || log.movie?.poster}
+            alt={log.movie?.title}
+            style={{
+              width: "100%",
+              aspectRatio: "2/3",
+              objectFit: "cover",
+              borderRadius: "6px",
+            }}
+          />
+
+          {/* ⭐ Rating + 📝 Review */}
+          {log.rating && (
             <div
               style={{
                 marginTop: "4px",
@@ -45,14 +48,16 @@ export default function ProfileTabFilms({ logs, navigate }) {
                 color: "#ddd",
                 display: "flex",
                 alignItems: "center",
+                justifyContent: "center",
                 gap: "6px",
               }}
             >
-              <span>⭐ {log.rating}</span>
+              ⭐ {log.rating}
               {log.review && <span>📝</span>}
             </div>
-          </div>
-        ))}
+          )}
+        </div>
+      ))}
     </div>
   );
 }

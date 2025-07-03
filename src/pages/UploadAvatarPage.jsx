@@ -7,7 +7,8 @@ export default function UploadAvatarPage() {
   const [message, setMessage] = useState("");
 
   const handleUpload = async () => {
-    const user = JSON.parse(localStorage.getItem("user"));
+    const user = JSON.parse(localStorage.getItem("user")) || null;
+if (!user || !user._id) return setMessage("❌ User not found.");
     const token = localStorage.getItem("token");
 
     const formData = new FormData();
@@ -15,7 +16,7 @@ export default function UploadAvatarPage() {
 
     try {
       const res = await axios.post(
-        `${import.meta.env.VITE_BACKEND}/api/upload/${user._id}/upload-avatar`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/upload/${user._id}/upload-avatar`,
         formData,
         {
           headers: {
@@ -43,7 +44,10 @@ export default function UploadAvatarPage() {
       <h2>Avatar Upload Test</h2>
 
       <img
-        src={preview || JSON.parse(localStorage.getItem("user"))?.avatar || "/default-avatar.png"}
+      src={
+        preview ||
+        (JSON.parse(localStorage.getItem("user"))?.avatar ?? "/default-avatar.png")
+      }      
         alt="Preview"
         style={{
           width: "100px",

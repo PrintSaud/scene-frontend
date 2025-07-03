@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../api/api";
 import "../styles/LoginPage.css";
 import { GoogleLogin } from "@react-oauth/google";
 import toast from "react-hot-toast";
@@ -12,7 +12,6 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
   // 🔐 Auto-redirect if already logged in
   useEffect(() => {
@@ -28,7 +27,7 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const res = await axios.post(`${BASE_URL}/api/auth/login`, {
+      const res = await axios.post(`/api/auth/login`, {
         email,
         password,
       });
@@ -103,15 +102,10 @@ export default function LoginPage() {
         <GoogleLogin
           onSuccess={async (credentialResponse) => {
             try {
-              const res = await fetch(`${BASE_URL}/api/auth/google`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  credential: credentialResponse.credential,
-                }),
+              const { data } = await axios.post(`/api/auth/google`, {
+                credential: credentialResponse.credential,
               });
-
-              const data = await res.json();
+              
               console.log("✅ Google login response:", data);
 
               if (!data.token || !data.user) {

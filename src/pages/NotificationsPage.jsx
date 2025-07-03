@@ -8,7 +8,7 @@ import { toast } from "react-hot-toast";
 export default function NotificationsPage({ setHasUnread }) {
   const [notifications, setNotifications] = useState([]);
   const user = JSON.parse(localStorage.getItem("user"));
-  const backend = import.meta.env.VITE_BACKEND;
+  const backend = import.meta.env.VITE_BACKEND_URL;
   const navigate = useNavigate();
 
   useEffect(() => {

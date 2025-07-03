@@ -1,7 +1,8 @@
 // src/components/movie/MovieTopBar.jsx
 import React from "react";
 import { toast } from "react-hot-toast";
-import axios from "axios";
+import { toggleWatchlist } from "../../api/api";
+
 
 export default function MovieTopBar({
   navigate,
@@ -11,7 +12,6 @@ export default function MovieTopBar({
   setShowPosterModal,
   setShowAddToListModal,
 }) {
-  const backend = import.meta.env.VITE_BACKEND;
   const TMDB_IMG = "https://image.tmdb.org/t/p/original";
 
   const handleToggleWatchlist = async () => {
@@ -19,11 +19,8 @@ export default function MovieTopBar({
       const token = localStorage.getItem("token");
       if (!token) return toast.error("Not logged in");
 
-      await axios.post(
-        `${backend}/api/watchlist/toggle`,
-        { movieId: movie.id },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await toggleWatchlist(movie.id);
+
 
       setIsInWatchlist(!isInWatchlist);
       toast.success(

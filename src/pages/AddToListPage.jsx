@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
+import axios from "../api/api"; // ✅ Using your centralized axios instance
 import toast from "react-hot-toast";
 
 export default function AddToListPage() {

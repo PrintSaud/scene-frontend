@@ -14,7 +14,7 @@ export default function SearchPage() {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const tabs = ["films", "users", "lists"];
+  const tabs = ["films",]; //"users", "lists "];
 
   const handleSearch = async (q) => {
     if (!q) return;

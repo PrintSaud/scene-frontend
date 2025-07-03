@@ -8,7 +8,7 @@ export default function ShareToFriendPage() {
     const { movieId } = useParams();
   console.log("📦 Movie ID from useParams:", movieId);
   const navigate = useNavigate();
-  const backend = import.meta.env.VITE_BACKEND;
+  const backend = import.meta.env.VITE_BACKEND_URL;
   const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
 

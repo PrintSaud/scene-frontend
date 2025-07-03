@@ -5,7 +5,7 @@ html, body, #root {
   height: 100%;
   margin: 0;
   padding: 0;
-  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  background: #111;
   color: #fff;
   font-family: 'Pixelify Sans', sans-serif;
 }

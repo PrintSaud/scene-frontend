@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import axios from "axios";
+import api from "../../api/api";
 import { useNavigate } from "react-router-dom";
 
 export default function ProfileTabWatchlist({
@@ -13,21 +13,15 @@ export default function ProfileTabWatchlist({
   profileUserId
 }) {
   const navigate = useNavigate();
-  const backend = import.meta.env.VITE_BACKEND;
-  const token = localStorage.getItem("token");
   const isOwner = user?._id === profileUserId;
 
   useEffect(() => {
     const fetchWatchlist = async () => {
       try {
-        const res = await axios.get(
-          `${backend}/api/users/${profileUserId}/watchlist?sort=${sortType}&order=${order}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const res = await api.get(
+            `/api/users/${profileUserId}/watchlist?sort=${sortType}&order=${order}`
+          );
+          
         const filtered = isOwner
           ? res.data
           : res.data.filter((movie) => !movie.isPrivate);

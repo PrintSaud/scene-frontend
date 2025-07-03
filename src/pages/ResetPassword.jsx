@@ -24,6 +24,8 @@ export default function ResetPassword() {
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const backend = import.meta.env.VITE_BACKEND_URL;
 
   const handleReset = async (e) => {
     e.preventDefault();
@@ -38,7 +40,8 @@ export default function ResetPassword() {
     const code = localStorage.getItem("resetCode");
 
     try {
-      await axios.put("http://localhost:4001/api/auth/reset-password", {
+await axios.put(`${backend}/api/auth/reset-password`, {
+
         email,
         code,
         password,

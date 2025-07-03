@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import ReactDOM from "react-dom";
+import { searchMoviesByTitle } from "../api/api";
 
 export default function BackdropSearchModalV2({ onSelect, onClose }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
-  const backend = import.meta.env.VITE_BACKEND;
+
 
   useEffect(() => {
     const delay = setTimeout(() => {
@@ -21,7 +22,7 @@ export default function BackdropSearchModalV2({ onSelect, onClose }) {
 
   const searchMovies = async (searchTerm) => {
     try {
-      const { data } = await axios.get(`${backend}/api/movies/search?q=${searchTerm}`);
+      const { data } = await searchMoviesByTitle(searchTerm);
       setResults(data.results || []);
     } catch (err) {
       console.error("Backdrop search error:", err);

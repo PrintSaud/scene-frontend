@@ -11,6 +11,8 @@ export default function PersonPage({ isDirector }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY;
+  const backend = import.meta.env.VITE_BACKEND_URL;
+
 
   const [person, setPerson] = useState(null);
   const [credits, setCredits] = useState([]);

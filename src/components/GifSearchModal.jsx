@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import axios from "axios";
+import api from "../api/api";
+
 
 const GIPHY_API = "https://api.giphy.com/v1/gifs";
 const API_KEY = "Us8LunlcSYoy78SempDRQtVRJ87jOccq";
@@ -38,7 +39,7 @@ export default function GifSearchModal({ onSelect, onClose }) {
   const fetchGIFs = async (query) => {
     if (query === "recent" && userId) {
       try {
-        const res = await axios.get(`/api/user/${userId}/recent-gifs`);
+        const res = await api.get(`/api/user/${userId}/recent-gifs`);
         const gifsArray = res.data?.recentGifs || [];
   
         setGifs(
@@ -95,10 +96,10 @@ export default function GifSearchModal({ onSelect, onClose }) {
   
     if (userId && gifUrl) {
       try {
-        await axios.post(`${import.meta.env.VITE_BACKEND}/api/users/gif/recent`, {
-          userId,
-          gifUrl,
-        });
+        await api.post(`/api/users/gif/recent`, {
+            userId,
+            gifUrl,
+          });          
       } catch (err) {
         console.error("Failed to save recent gif:", err);
       }

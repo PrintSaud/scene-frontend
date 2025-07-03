@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios from "../api/api";
 import { toast } from "react-hot-toast";
 import LogModal from "../components/modals/LogModal"; // update path if different
 
@@ -33,7 +33,6 @@ export default function MoviePage() {
   const [scrollReady, setScrollReady] = useState(false);
   const [showLogModal, setShowLogModal] = useState(false);
 
-  const backend = import.meta.env.VITE_BACKEND;
   const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY;
   const TMDB_IMG = "https://image.tmdb.org/t/p/original";
   const TMDB_AVATAR = "https://image.tmdb.org/t/p/w185";
@@ -71,12 +70,15 @@ export default function MoviePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
-          axios.get(`https://api.themoviedb.org/3/movie/${id}?api_key=${TMDB_KEY}&language=en-US`),
-          axios.get(`https://api.themoviedb.org/3/movie/${id}/credits?api_key=${TMDB_KEY}&language=en-US`),
-          axios.get(`https://api.themoviedb.org/3/movie/${id}/videos?api_key=${TMDB_KEY}&language=en-US`),
-          axios.get(`https://api.themoviedb.org/3/movie/${id}/watch/providers?api_key=${TMDB_KEY}`),
-        ]);
+        const TMDB_BASE = "https://api.themoviedb.org/3";
+
+const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
+  axios.get(`${TMDB_BASE}/movie/${id}?api_key=${TMDB_KEY}&language=en-US`),
+  axios.get(`${TMDB_BASE}/movie/${id}/credits?api_key=${TMDB_KEY}&language=en-US`),
+  axios.get(`${TMDB_BASE}/movie/${id}/videos?api_key=${TMDB_KEY}&language=en-US`),
+  axios.get(`${TMDB_BASE}/movie/${id}/watch/providers?api_key=${TMDB_KEY}`),
+]);
+
 
         setMovie(movieRes.data);
         setCredits(creditsRes.data);
@@ -306,16 +308,17 @@ export default function MoviePage() {
         />
       )}
 
-      {showAddToListModal && (
-        <AddMovieModal
-          movie={{
-            id: movie.id,
-            title: movie.title,
-            poster: posterOverride || `${TMDB_IMG}${movie.poster_path}`,
-          }}
-          onClose={() => setShowAddToListModal(false)}
-        />
-      )}
+{showAddToListModal && (
+  <ListPickerModal
+    movie={{
+      id: movie.id,
+      title: movie.title,
+      poster: posterOverride || `${TMDB_IMG}${movie.poster_path}`,
+    }}
+    onClose={() => setShowAddToListModal(false)}
+  />
+)}
+
 {showLogModal && (
   <LogModal
     movie={movie}

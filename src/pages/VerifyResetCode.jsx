@@ -17,7 +17,8 @@ export default function VerifyResetCode() {
     }
 
     try {
-      await axios.post("http://localhost:4001/api/auth/verify-reset-code", {
+        await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/verify-reset-code`, {
+
         email,
         code,
       });

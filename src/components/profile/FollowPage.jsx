@@ -2,14 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
+import api from "../api/api";
+
 
 export default function FollowPage({ defaultTab }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(defaultTab);
   const [users, setUsers] = useState([]);
-  const backend = import.meta.env.VITE_BACKEND;
 
   useEffect(() => {
     const fetchFollows = async () => {
@@ -18,7 +18,8 @@ export default function FollowPage({ defaultTab }) {
           activeTab === "followers"
             ? `/api/users/${id}/followers`
             : `/api/users/${id}/following`;
-        const { data } = await axios.get(`${backend}${endpoint}`);
+            const { data } = await api.get(endpoint);
+
         setUsers(data);
       } catch (err) {
         console.error("Failed to load follows", err);

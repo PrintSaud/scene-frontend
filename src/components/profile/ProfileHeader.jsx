@@ -1,15 +1,33 @@
-import React from "react";
-import { FaPen, FaShareAlt } from "react-icons/fa";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { HiDotsVertical } from "react-icons/hi";
+import toast from "react-hot-toast";
 
 export default function ProfileHeader({ user, imgRef }) {
   const navigate = useNavigate();
+  const stored = JSON.parse(localStorage.getItem("user") || "{}");
+  const isOwner = stored?._id === user?._id;
+
+  const [menuOpen, setMenuOpen] = useState(false);
   const isMobile = window.innerWidth <= 768;
   const backdropHeight = isMobile ? 180 : 300;
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    toast.success("Logged out!");
+    window.location.href = "/login";
+  };
+
+  const handleShare = () => {
+    navigator.clipboard.writeText(`${window.location.origin}/profile/${user._id}`);
+    toast.success("🔗 Profile link copied!");
+    setMenuOpen(false);
+  };
+
   return (
     <>
-      {/* BACKDROP + AVATAR OVERLAP */}
+      {/* BACKDROP */}
       <div
         style={{
           position: "relative",
@@ -32,21 +50,47 @@ export default function ProfileHeader({ user, imgRef }) {
         />
 
         {/* Top Right Buttons */}
-        <div style={{ position: "absolute", top: 20, right: 20, display: "flex", gap: "16px" }}>
-          <FaPen
-            style={iconStyle}
-            onClick={() => navigate("/edit-profile")}
-            onMouseEnter={(e) => (e.currentTarget.style.opacity = 1)}
-            onMouseLeave={(e) => (e.currentTarget.style.opacity = 0.8)}
-          />
-          <FaShareAlt
-            style={iconStyle}
-            onMouseEnter={(e) => (e.currentTarget.style.opacity = 1)}
-            onMouseLeave={(e) => (e.currentTarget.style.opacity = 0.8)}
-          />
-        </div>
+        {isOwner && (
+          <div style={{ position: "absolute", top: 20, right: 20 }}>
+            <HiDotsVertical
+              onClick={() => setMenuOpen((prev) => !prev)}
+              style={{ fontSize: "20px", color: "white", cursor: "pointer" }}
+            />
+            {menuOpen && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "24px",
+                  right: 0,
+                  background: "#111",
+                  border: "1px solid #333",
+                  borderRadius: "8px",
+                  padding: "8px",
+                  zIndex: 20,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "6px",
+                  width: "140px",
+                }}
+              >
+                <div
+                  onClick={() => navigate("/edit-profile")}
+                  style={menuItemStyle}
+                >
+                  ✏️ Edit Profile
+                </div>
+                <div onClick={handleShare} style={menuItemStyle}>
+                  📤 Share
+                </div>
+                <div onClick={handleLogout} style={menuItemStyle}>
+                  🚪 Log Out
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
-        {/* Avatar */}
+        {/* AVATAR */}
         <div
           style={{
             position: "absolute",
@@ -69,7 +113,7 @@ export default function ProfileHeader({ user, imgRef }) {
         </div>
       </div>
 
-      {/* Name + Username + Bio */}
+      {/* NAME + USERNAME */}
       <div
         style={{
           marginTop: "8px",
@@ -80,13 +124,13 @@ export default function ProfileHeader({ user, imgRef }) {
           gap: "4px",
         }}
       >
-        {(user.fullname || "CEO") && (
+        {user.name && (
           <div style={{ fontWeight: "600", fontSize: "14px", fontFamily: "Inter", color: "white" }}>
-            {user.fullname || "CEO"}
+            {user.name}
           </div>
         )}
         <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)", fontFamily: "Inter" }}>
-          @{user.username || "Saud"}
+          @{user.username}
         </div>
 
         {user.bio && (
@@ -114,14 +158,14 @@ export default function ProfileHeader({ user, imgRef }) {
           onClick={() => navigate(`/profile/${user._id}/following`)}
           style={{ cursor: "pointer" }}
         >
-          <strong>{user.following}</strong>
+          <strong>{user.following ?? 0}</strong>
           <div>Following</div>
         </div>
         <div
           onClick={() => navigate(`/profile/${user._id}/followers`)}
           style={{ cursor: "pointer" }}
         >
-          <strong>{user.followers}</strong>
+          <strong>{user.followers ?? 0}</strong>
           <div>Followers</div>
         </div>
         <div
@@ -131,7 +175,7 @@ export default function ProfileHeader({ user, imgRef }) {
           }}
           style={{ cursor: "pointer" }}
         >
-          <strong>{user.totalLogs}</strong>
+          <strong>{user.totalLogs ?? 0}</strong>
           <div>Films</div>
         </div>
       </div>
@@ -139,10 +183,12 @@ export default function ProfileHeader({ user, imgRef }) {
   );
 }
 
-const iconStyle = {
-  color: "#fff",
-  fontSize: "18px",
+const menuItemStyle = {
+  fontSize: "13px",
+  padding: "6px 10px",
+  background: "#1c1c1c",
+  borderRadius: "5px",
   cursor: "pointer",
+  color: "white",
   transition: "0.2s",
-  opacity: 0.8,
 };

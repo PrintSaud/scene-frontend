@@ -1,8 +1,7 @@
-// src/pages/FriendsActivityPage.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LogModal from "../components/LogModal";
-import axios from "axios";
+import axios from "../api/api";
 
 export default function FriendsActivityPage() {
   const [logs, setLogs] = useState([]);
@@ -20,33 +19,21 @@ export default function FriendsActivityPage() {
         });
         setLogs(data);
       } catch (err) {
-        const dummyLogs = Array.from({ length: 16 }).map((_, i) => ({
-          _id: i,
-          user: {
-            username: `user${i + 1}`,
-            avatar: "/default-avatar.png",
-          },
-          movie: {
-            title: `Movie ${i + 1}`,
-            poster: `https://image.tmdb.org/t/p/w500/${[
-              "vBZ0qvaRxqEhZwl6LWmruJqWE8Z",
-              "iwsMu0ehRPbtaSxqiaUDQB9qMWT",
-              "bQXAqRx2Fgc46uCVWgoPz5L5Dtr",
-              "6DrHO1jr3qVrViUO6s6kFiAGM7",
-            ][i % 4]}.jpg`,
-          },
-          createdAt: new Date().toISOString(),
-          review: i % 3 === 0 ? "I loved this movie!" : "",
-          rating: (Math.random() * 2 + 3).toFixed(1),
-        }));
-        setLogs(dummyLogs);
+        console.error("Failed to fetch logs:", err);
       }
     };
     fetchLogs();
   }, [filter]);
 
   return (
-    <div style={{ padding: "20px", color: "#fff" }}>
+    <div
+      style={{
+        padding: "20px",
+        color: "#fff",
+        backgroundColor: "#000", // ✅ FULL BLACK BACKGROUND
+        minHeight: "100vh",
+      }}
+    >
       {/* 🔙 Back to Home */}
       <button
         onClick={() => navigate("/home")}
@@ -66,7 +53,14 @@ export default function FriendsActivityPage() {
       </button>
 
       {/* Title */}
-      <h1 style={{ textAlign: "center", marginBottom: "20px", fontSize: "24px" }}>
+      <h1
+        style={{
+          textAlign: "center",
+          marginTop: "70px", // ⬇️ moved it down
+          marginBottom: "20px",
+          fontSize: "24px",
+        }}
+      >
         Your Friends Just Watched 👀
       </h1>
 
@@ -101,7 +95,7 @@ export default function FriendsActivityPage() {
         }}
       >
         {Array.isArray(logs) && logs.length > 0 ? (
-  logs.map((log) => (
+          logs.map((log) => (
             <div
               key={log._id}
               onClick={() => setSelectedLog(log)}
@@ -115,16 +109,16 @@ export default function FriendsActivityPage() {
                 cursor: "pointer",
               }}
             >
-                <img
-  src={log.customPoster || log.movie.poster}
-  alt="poster"
-  style={{
-    width: "100%",
-    aspectRatio: "2/3",
-    objectFit: "cover",
-    borderRadius: "10px",
-  }}
-/>
+              <img
+                src={log.customPoster || log.movie.poster}
+                alt="poster"
+                style={{
+                  width: "100%",
+                  aspectRatio: "2/3",
+                  objectFit: "cover",
+                  borderRadius: "10px",
+                }}
+              />
 
               {log.review && (
                 <div
@@ -143,11 +137,13 @@ export default function FriendsActivityPage() {
                 </div>
               )}
 
-              <div style={{ marginTop: "8px", fontSize: "14px" }}>
-                ⭐ {log.rating}/5
-              </div>
+              {log.rating && (
+                <div style={{ marginTop: "8px", fontSize: "14px" }}>
+                  ⭐ {log.rating}/5
+                </div>
+              )}
               <img
-                src={log.user.avatar}
+                src={log.user.avatar || "/default-avatar.png"}
                 alt="avatar"
                 style={{
                   width: "30px",
@@ -156,9 +152,7 @@ export default function FriendsActivityPage() {
                   marginTop: "6px",
                 }}
               />
-              <p style={{ fontSize: "12px", marginTop: "4px" }}>
-                {log.user.username}
-              </p>
+              <p style={{ fontSize: "12px", marginTop: "4px" }}>{log.user.username}</p>
             </div>
           ))
         ) : (

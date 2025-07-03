@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast';
 import { socket } from './socket'; // ✅ Socket.IO
 import CreateListPage from "./pages/CreateListPage";
 import PrivateRoute from './components/PrivateRoute';
+import { getNotifications } from "./api/api";
 
 // Pages
 import HomePage from './pages/HomePage';
@@ -34,11 +35,11 @@ import ShareToFriendPage from "./pages/ShareToFriendPage";
 import DirectorPage from "./pages/DirectorPage";
 import ActorPage from "./pages/ActorPage"; 
 import PersonPage from "./pages/PersonPage";
+import UploadAvatarPage from './pages/UploadAvatarPage';
 
 function App() {
   const location = useLocation();
   const [hasUnread, setHasUnread] = useState(false);
-  const backend = import.meta.env.VITE_BACKEND;
 
   let user = null;
   try {
@@ -53,10 +54,10 @@ function App() {
     if (!user?.token) return;
     const checkUnread = async () => {
       try {
-        const res = await axios.get(`${backend}/api/notifications/unread-count`, {
-          headers: { Authorization: `Bearer ${user.token}` },
-        });
-        setHasUnread(res.data.unreadCount > 0);
+        const res = await getNotifications();
+const unread = res.data.filter((n) => !n.read);
+setHasUnread(unread.length > 0);
+
       } catch (err) {
         console.error("❌ Failed to check unread notifs:", err);
       }
@@ -110,7 +111,6 @@ function App() {
     </PrivateRoute>
   }
 />
-
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -139,6 +139,7 @@ function App() {
           <Route path="/director/:id" element={<DirectorPage />} />
           <Route path="/actor/:id" element={<ActorPage />} />
           <Route path="/director/:id" element={<PersonPage isDirector={true} />} />
+          <Route path="/upload-avatar" element={<UploadAvatarPage />} />
         </Routes>
       </div>
       {shouldShowNav && <BottomNav hasUnread={hasUnread} />}

@@ -136,6 +136,22 @@ export default function SceneBotComponent() {
       fontFamily: "Inter, sans-serif",
       position: "relative",
     }}>
+        {/* ❓ Language Info Icon */}
+<div
+  onClick={() => alert(`🌍 To change language, just type:\n\nreply in "arabic"\nreply in "french"\nreply in "english"\n\nTo reset, type: reset language`)}
+  style={{
+    position: "absolute",
+    top: "18px",
+    right: "18px",
+    fontSize: "20px",
+    cursor: "pointer",
+    color: "#ccc",
+  }}
+  title="Language Info"
+>
+  ❓
+</div>
+
       {/* 🧠 Header */}
       <div style={{ padding: "24px 16px", fontSize: "20px", fontWeight: "600", textAlign: "center" }}>
         Scene’s Chatbot 🤖

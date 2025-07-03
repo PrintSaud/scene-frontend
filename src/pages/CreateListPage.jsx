@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios from "../api/api";
 import AddMovieModal from "../components/lists/AddMovieModal";
 import MovieListSortable from "../components/lists/MovieListSortable";
 

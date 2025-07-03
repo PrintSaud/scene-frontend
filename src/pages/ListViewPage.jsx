@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios from "../api/api";
+
 
 export default function ListViewPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const backend = import.meta.env.VITE_BACKEND;
   const user = JSON.parse(localStorage.getItem("user"));
 
   const [list, setList] = useState(null);

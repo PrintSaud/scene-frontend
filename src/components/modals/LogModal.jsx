@@ -13,7 +13,6 @@ export default function LogModal({ movie, onClose, refreshLogs }) {
   const [rating, setRating] = useState(0);
   const [rewatchCount, setRewatchCount] = useState(0);
   const [review, setReview] = useState("");
-  const [image, setImage] = useState(null);
   const [gifUrl, setGifUrl] = useState(null);
   const [showGifModal, setShowGifModal] = useState(false);
   const [uploadedImageFile, setUploadedImageFile] = useState(null);
@@ -27,7 +26,6 @@ export default function LogModal({ movie, onClose, refreshLogs }) {
       const movieId = movie?.id || movie?._id;
   
       const formData = new FormData();
-      formData.append("userId", user._id);
       formData.append("movieId", movieId);
       formData.append("review", review);
       formData.append("rating", rating.toString());
@@ -44,8 +42,10 @@ export default function LogModal({ movie, onClose, refreshLogs }) {
       await axios.post(`${import.meta.env.VITE_BACKEND}/api/logs/full`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // ✅ send token for protect
         },
       });
+      
   
       toast.success("🎬 Log submitted!");
       onClose();
@@ -197,41 +197,42 @@ export default function LogModal({ movie, onClose, refreshLogs }) {
           }}
         />
 
-        {(image || gifUrl) && (
-          <div style={{ marginTop: "8px", position: "relative" }}>
-            <img
-              src={image || gifUrl}
-              alt="preview"
-              style={{
-                maxWidth: "100%",
-                maxHeight: "160px",
-                borderRadius: "8px",
-                objectFit: "contain",
-              }}
-            />
-            <button
-              onClick={() => {
-                setImage(null);
-                setGifUrl(null);
-              }}
-              style={{
-                position: "absolute",
-                top: "-6px",
-                right: "-6px",
-                background: "#000",
-                color: "#fff",
-                border: "none",
-                borderRadius: "50%",
-                width: "22px",
-                height: "22px",
-                fontSize: "14px",
-                cursor: "pointer",
-              }}
-            >
-              ✕
-            </button>
-          </div>
-        )}
+{(uploadedImageFile || gifUrl) && (
+  <div style={{ marginTop: "8px", position: "relative" }}>
+    <img
+      src={uploadedImageFile ? URL.createObjectURL(uploadedImageFile) : gifUrl}
+      alt="preview"
+      style={{
+        maxWidth: "100%",
+        maxHeight: "160px",
+        borderRadius: "8px",
+        objectFit: "contain",
+      }}
+    />
+    <button
+      onClick={() => {
+        setUploadedImageFile(null);
+        setGifUrl(null);
+      }}
+      style={{
+        position: "absolute",
+        top: "-6px",
+        right: "-6px",
+        background: "#000",
+        color: "#fff",
+        border: "none",
+        borderRadius: "50%",
+        width: "22px",
+        height: "22px",
+        fontSize: "14px",
+        cursor: "pointer",
+      }}
+    >
+      ✕
+    </button>
+  </div>
+)}
+
       </div>
 
       {/* 📎 Upload Buttons */}

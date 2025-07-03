@@ -1,6 +1,7 @@
 // src/pages/ForgotPassword.jsx
 import { useState } from "react";
-import axios from "axios";
+import axios from "../api/api";
+
 import "../styles/LoginPage.css"; // reuse styling
 import toast from 'react-hot-toast';
 import { FaSpinner } from 'react-icons/fa';
@@ -31,7 +32,7 @@ export default function ForgotPassword() {
     setError("");
 
     try {
-      await axios.post("http://localhost:4001/api/auth/forgot-password", { email });
+        await axios.post("/api/auth/forgot-password", { email });
       localStorage.setItem("resetEmail", email); // save for next step
       setStatus("Reset code sent. Please check your email.");
       window.location.href = "/verify-code";

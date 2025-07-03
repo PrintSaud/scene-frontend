@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
+const backend = import.meta.env.VITE_BACKEND_URL;
+
+
 export default function ReviewPage() {
   const { logId } = useParams();
   const navigate = useNavigate();
@@ -11,9 +14,11 @@ export default function ReviewPage() {
   const [liked, setLiked] = useState(false);
 
   const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
-  
+  const user = JSON.parse(localStorage.getItem("user"));
+
   const handleDelete = async (logId) => {
-    await axios.delete(`${import.meta.env.VITE_BACKEND}/api/logs/${logId}`, {
+    await axios.delete(`${backend}/api/logs/${logId}`, {
+
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     });
     toast.success("Deleted");
@@ -24,7 +29,7 @@ export default function ReviewPage() {
   useEffect(() => {
     const fetchLog = async () => {
       try {
-        const { data } = await axios.get(`${import.meta.env.VITE_BACKEND}/api/logs/${logId}`);
+        const { data } = await axios.get(`${backend}/api/logs/${logId}`);
         setLog(data);
       } catch (err) {
         console.error("Failed to fetch log", err);
