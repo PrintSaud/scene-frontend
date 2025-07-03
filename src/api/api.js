@@ -1,11 +1,22 @@
 import axios from "axios";
 
-const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+import backend from "../config";
 
 const api = axios.create({
-  baseURL: BASE_URL,
-  withCredentials: true,
-});
+    baseURL: import.meta.env.VITE_BACKEND_URL,
+    // REMOVE withCredentials: true
+  });
+  
+
+// Automatically attach token to all requests
+api.interceptors.request.use((config) => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user?.token) {
+      config.headers.Authorization = `Bearer ${user.token}`;
+    }
+    return config;
+  });
+  
 
 //
 // 🧠 AUTH

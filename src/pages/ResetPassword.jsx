@@ -3,7 +3,7 @@ import axios from "axios";
 import "../styles/LoginPage.css";
 import toast from 'react-hot-toast';
 import { FaSpinner } from 'react-icons/fa';
-
+import backend from "../config";
 
 const handleSignup = async () => {
   setIsLoading(true);
@@ -25,7 +25,7 @@ export default function ResetPassword() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const backend = import.meta.env.VITE_BACKEND_URL;
+
 
   const handleReset = async (e) => {
     e.preventDefault();

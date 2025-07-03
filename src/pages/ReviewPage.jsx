@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-
-const backend = import.meta.env.VITE_BACKEND_URL;
+import backend from "../config";
 
 
 export default function ReviewPage() {

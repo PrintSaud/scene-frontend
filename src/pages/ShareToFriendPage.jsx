@@ -3,12 +3,12 @@ import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { FaArrowLeft } from "react-icons/fa";
+import backend from "../config";
 
 export default function ShareToFriendPage() {
     const { movieId } = useParams();
   console.log("📦 Movie ID from useParams:", movieId);
   const navigate = useNavigate();
-  const backend = import.meta.env.VITE_BACKEND_URL;
   const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
 

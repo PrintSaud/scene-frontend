@@ -4,11 +4,11 @@ import { format } from "timeago.js";
 import { useNavigate } from "react-router-dom";
 import { socket } from "../socket";
 import { toast } from "react-hot-toast";
+import backend from "../config";
 
 export default function NotificationsPage({ setHasUnread }) {
   const [notifications, setNotifications] = useState([]);
   const user = JSON.parse(localStorage.getItem("user"));
-  const backend = import.meta.env.VITE_BACKEND_URL;
   const navigate = useNavigate();
 
   useEffect(() => {

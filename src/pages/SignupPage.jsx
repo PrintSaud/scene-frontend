@@ -3,6 +3,7 @@ import axios from "axios";
 import "../styles/LoginPage.css";
 import toast from "react-hot-toast";
 import { FaSpinner } from "react-icons/fa";
+import backend from "../config";
 
 export default function SignupPage() {
   const [name, setName] = useState(""); // ✅ NEW
@@ -17,7 +18,7 @@ export default function SignupPage() {
   const [emailValid, setEmailValid] = useState(true);
   const [emailTaken, setEmailTaken] = useState(false);
 
-  const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+
 
   const isValidUsername = (username) => /^[a-z0-9_]{3,20}$/.test(username);
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaArrowLeft } from "react-icons/fa";
 import { actorAwards, directorAwards } from "../data/awardsData";
+import backend from "../config";
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const TMDB_PROFILE = "https://image.tmdb.org/t/p/w300";
@@ -11,7 +12,7 @@ export default function PersonPage({ isDirector }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY;
-  const backend = import.meta.env.VITE_BACKEND_URL;
+
 
 
   const [person, setPerson] = useState(null);
