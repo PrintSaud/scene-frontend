@@ -44,7 +44,7 @@ const { data } = await getLogById(log._id);
 
       setReplies(data.replies);
       setReplyText("");
-      setImage(null);
+      setUploadedImageFile(null);
       setShowAllReplies(true);
     } catch (err) {
       console.error("Reply failed:", err);

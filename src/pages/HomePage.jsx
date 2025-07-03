@@ -255,8 +255,8 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(2, 1fr)",
+          padding: "2px 0px",
           gap: "18px",
-          padding: "10px 0",
           justifyItems: "center",
         }}
       >
@@ -271,8 +271,11 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
               }
               alt={movie.title}
               style={{
-                width: "200px", // ✅ wider poster
-                height: "310px",
+                width: "170px",
+                maxWidth: "200px",
+                aspectRatio: "2 / 3",
+                height: "300px",
+                padding: "6px 0px",
                 borderRadius: "10px",
                 objectFit: "cover",
                 cursor: "pointer",

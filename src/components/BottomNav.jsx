@@ -13,6 +13,10 @@ export default function BottomNav({ hasUnread }) {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // 👇 Hide on certain pages like Upload Avatar
+  const hiddenRoutes = ["/upload-avatar"];
+  if (hiddenRoutes.includes(location.pathname)) return null;
+
   return (
     <div
       style={{

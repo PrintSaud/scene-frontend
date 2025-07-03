@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useParams, useNavigate } from "react-router-dom";
+import api from "../api/api"; // ✅ uses token + baseURL
 import { FaArrowLeft } from "react-icons/fa";
 import { actorAwards, directorAwards } from "../data/awardsData";
 import { backend } from "../config"; // ✅ correct with named export
+
 
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";

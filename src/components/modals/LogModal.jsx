@@ -40,12 +40,13 @@ export default function LogModal({ movie, onClose, refreshLogs }) {
         formData.append("image", uploadedImageFile);
       }
   
-      await axios.post(`${import.meta.env.VITE_BACKEND}/api/logs/full`, formData, {
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/logs/full`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // ✅ send token for protect
+          Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))?.token}`,
         },
       });
+      
       
   
       toast.success("🎬 Log submitted!");
@@ -193,7 +194,7 @@ export default function LogModal({ movie, onClose, refreshLogs }) {
             resize: "none",
             color: "#fff",
             fontSize: "14px",
-            minHeight: gifUrl || image ? "60px" : "100px",
+            minHeight: gifUrl || uploadedImageFile ? "60px" : "100px",
             outline: "none",
           }}
         />
@@ -297,7 +298,7 @@ export default function LogModal({ movie, onClose, refreshLogs }) {
         <GifSearchModal
           onSelect={(url) => {
             setGifUrl(url);
-            setImage(null);
+            setUploadedImageFile(null);
             setShowGifModal(false);
           }}
           onClose={() => setShowGifModal(false)}

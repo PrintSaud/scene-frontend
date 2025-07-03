@@ -8,17 +8,16 @@ const api = axios.create({
     // REMOVE withCredentials: true
   });
   
-
-// Automatically attach token to all requests
-api.interceptors.request.use((config) => {
+  api.interceptors.request.use((config) => {
     const user = JSON.parse(localStorage.getItem("user"));
-    if (user?.token) {
-      config.headers.Authorization = `Bearer ${user.token}`;
+    const token = user?.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   });
   
-
+  
 //
 // 🧠 AUTH
 //
@@ -81,8 +80,14 @@ export const sceneBotAsk = (message) => api.post("/api/scenebot", { message });
 //
 // 🎬 MOVIE EXTRAS (Change Poster, Backdrop, etc.)
 //
-export const changePoster = (movieId, posterUrl) =>
-  api.patch(`/api/posters/${movieId}`, { poster: posterUrl });
+export const changePoster = (movieId, { posterUrl }) => {
+    return api.post(`/api/posters/${movieId}`, { posterUrl }); // ✅
+  };
+  
+  
+  
+  
+  
 
 export const updateBackdrop = (userId, backdropUrl) =>
   api.patch(`/api/users/${userId}/backdrop`, { backdrop: backdropUrl });
@@ -98,7 +103,6 @@ export const updateProfile = (userId, data) => api.patch(`/api/users/${userId}`,
 export const searchMoviesByTitle = (query) =>
     api.get(`/api/movies/search?q=${query}`);
 //
-/// 
-
+/// poster change   
 //
 export default api;

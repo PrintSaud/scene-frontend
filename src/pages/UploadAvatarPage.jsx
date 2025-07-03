@@ -9,15 +9,25 @@ export default function UploadAvatarPage() {
 
   const handleUpload = async () => {
     const user = JSON.parse(localStorage.getItem("user")) || null;
-if (!user || !user._id) return setMessage("❌ User not found.");
+    const userId = user?._id || user?.id;
+    console.log("📦 User from localStorage:", user);
+
+    if (!user || !userId) {
+      console.warn("❌ User not found.");
+      setMessage("❌ User not found.");
+      return;
+    }
+
     const token = localStorage.getItem("token");
+    console.log("🔐 Token:", token);
 
     const formData = new FormData();
     formData.append("avatar", file);
+    console.log("📤 Uploading file:", file?.name);
 
     try {
       const res = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/upload/${user._id}/upload-avatar`,
+        `${backend}/api/upload/${userId}/upload-avatar`,
         formData,
         {
           headers: {
@@ -27,64 +37,87 @@ if (!user || !user._id) return setMessage("❌ User not found.");
         }
       );
 
+      console.log("✅ Upload success:", res.data);
+
       user.avatar = res.data.avatar;
       localStorage.setItem("user", JSON.stringify(user));
-
       setMessage("✅ Upload successful!");
+
       setTimeout(() => {
+        console.log("🚀 Redirecting to /home...");
         window.location.href = "/home";
       }, 1000);
     } catch (err) {
+      console.error("❌ Upload failed:", err);
       setMessage("❌ Upload failed.");
-      console.error(err);
     }
   };
 
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const imageSrc = preview || storedUser?.avatar || "/default-avatar.png";
+  console.log("🖼️ Image source:", imageSrc);
+
   return (
-    <div style={{ padding: "40px", textAlign: "center", color: "white" }}>
-      <h2>Avatar Upload Test</h2>
+    <div
+      style={{
+        minHeight: "50vh",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        color: "white",
+        textAlign: "center",
+        marginTop: "60px",
+      }}
+    >
+      <h2>Avatar Upload</h2>
 
-      <img
-      src={
-        preview ||
-        (JSON.parse(localStorage.getItem("user"))?.avatar ?? "/default-avatar.png")
-      }      
-        alt="Preview"
-        style={{
-          width: "100px",
-          height: "100px",
-          borderRadius: "50%",
-          marginBottom: "10px",
-          objectFit: "cover",
-          border: "2px solid white",
-        }}
-      />
+      {(preview || storedUser?.avatar) ? (
+        <img
+          src={imageSrc}
+          alt="Preview"
+          style={{
+            width: "100px",
+            height: "100px",
+            borderRadius: "50%",
+            marginBottom: "10px",
+            objectFit: "cover",
+            border: "2px solid white",
+          }}
+        />
+      ) : (
+        <div
+          style={{
+            width: "100px",
+            height: "100px",
+            borderRadius: "50%",
+            marginBottom: "10px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            border: "2px solid white",
+            color: "#aaa",
+            fontSize: "12px",
+          }}
+        >
+          No Image
+        </div>
+      )}
 
-      <br />
       <input
         type="file"
         accept="image/*"
         onChange={(e) => {
-          setFile(e.target.files[0]);
-          setPreview(URL.createObjectURL(e.target.files[0]));
+          const selected = e.target.files[0];
+          console.log("🖱️ File selected:", selected);
+          if (selected) {
+            setFile(selected);
+            setPreview(URL.createObjectURL(selected));
+          }
         }}
       />
       <br />
-      <button
-        onClick={handleUpload}
-        disabled={!file}
-        style={{
-          marginTop: "16px",
-          background: "#111",
-          color: "white",
-          padding: "8px 16px",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-        }}
-      >
-        Upload Avatar
-      </button>
+      <button onClick={handleUpload}>Upload Avatar</button>
 
       {message && (
         <p

@@ -95,7 +95,7 @@ export default function SceneBotComponent() {
     if (lang === "english" || lang === "arabic") return text;
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_BACKEND}/api/scenebot/translate`, {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/scenebot/translate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

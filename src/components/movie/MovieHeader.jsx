@@ -14,86 +14,95 @@ export default function MovieHeader({
 
   return (
     <div style={{ padding: "24px", marginTop: "-90px", position: "relative", zIndex: 3 }}>
-      <div style={{ display: "flex", gap: "20px", alignItems: "flex-start", flexWrap: "wrap" }}>
+<div
+  style={{
+    display: "flex",
+    gap: "16px",
+    alignItems: "flex-start",
+    flexWrap: "nowrap", // ✅ still needed to keep poster beside info
+    overflowX: "hidden", // ✅ remove scroll
+    maxWidth: "100%",    // ✅ don’t go outside screen
+  }}
+>
+
         <img
           src={posterOverride || `${TMDB_IMG}${movie.poster_path}`}
           alt="Poster"
           style={{ width: "150px", borderRadius: "8px" }}
         />
+<div style={{ flex: 1, minWidth: "220px", display: "flex", flexDirection: "column", gap: "8px" }}>
+  <div>
+    <h1 style={{ fontSize: "20px", fontWeight: "600", marginBottom: "2px" }}>{movie.title}</h1>
+    {movie.tagline && (
+      <p style={{ fontSize: "13px", fontStyle: "italic", color: "#aaa", marginBottom: "4px" }}>
+        {movie.tagline}
+      </p>
+    )}
+    <p style={{ fontSize: "12px", color: "#ccc", marginBottom: "2px" }}>
+      {movie.release_date?.slice(0, 4)} • {movie.runtime} min
+    </p>
+    <p style={{ fontSize: "12px", color: "#ccc", marginBottom: "8px" }}>
+      {movie.genres?.map((g) => g.name).join(", ")}
+    </p>
+  </div>
 
-        <div style={{ flex: 1, minWidth: "220px" }}>
-          <h1 style={{ fontSize: "32px", marginBottom: "8px" }}>{movie.title}</h1>
+  {/* 🎬 Buttons Row */}
+  <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+  <button
+    onClick={handleLogClick}
+    style={{
+      width: "80px",
+      background: "#111",
+      color: "#fff",
+      padding: "6px 8px",
+      borderRadius: "5px",
+      border: "1px solid #444",
+      fontWeight: "500",
+      fontSize: "11px",
+      cursor: "pointer",
+    }}
+  >
+    + Log
+  </button>
 
-          {movie.tagline && (
-            <p style={{ fontStyle: "italic", color: "#aaa", marginBottom: "8px" }}>
-              {movie.tagline}
-            </p>
-          )}
+  <button
+    onClick={handleWatchTrailer}
+    style={{
+      width: "80px",
+      background: "#111",
+      color: "#fff",
+      padding: "6px 8px",
+      borderRadius: "5px",
+      border: "1px solid #444",
+      fontWeight: "500",
+      fontSize: "11px",
+      cursor: "pointer",
+    }}
+  >
+    🎞️ Trailer
+  </button>
 
-          <p style={{ margin: "8px 0", color: "#ccc" }}>
-            {movie.release_date?.slice(0, 4)} • {movie.runtime} min
-          </p>
+  <button
+    onClick={handleSceneBotReview}
+    style={{
+      width: "167px",
+      background: "#111",
+      color: "#fff",
+      padding: "6px 8px",
+      borderRadius: "5px",
+      border: "1px solid #444",
+      fontWeight: "500",
+      fontSize: "11px",
+      cursor: "pointer",
+    }}
+  >
+    🤖 Ask SceneBot
+  </button>
+</div>
 
-          <p style={{ color: "#ccc", marginBottom: "20px" }}>
-            {movie.genres?.map((g) => g.name).join(", ")}
-          </p>
 
-          {/* 🎬 Log + Trailer */}
-          <div style={{ display: "flex", gap: "12px", marginBottom: "14px" }}>
-            <button
-              aria-label="Log this movie"
-              onClick={handleLogClick}
-              style={{
-                flex: 1,
-                background: "#111",
-                color: "#fff",
-                padding: "10px",
-                borderRadius: "6px",
-                border: "1px solid #444",
-                fontWeight: "bold",
-                fontSize: "16px",
-                cursor: "pointer",
-              }}
-            >
-              + Log
-            </button>
+</div>
 
-            <button
-              aria-label="Watch trailer"
-              onClick={handleWatchTrailer}
-              style={{
-                flex: 1,
-                background: "#111",
-                color: "#fff",
-                padding: "10px",
-                borderRadius: "6px",
-                border: "1px solid #444",
-                fontWeight: "bold",
-                cursor: "pointer",
-              }}
-            >
-              🎞️ Watch Trailer
-            </button>
-          </div>
-
-          {/* 🤖 SceneBot */}
-          <button
-            onClick={handleSceneBotReview}
-            style={{
-              width: "100%",
-              background: "#111",
-              color: "#fff",
-              padding: "10px",
-              borderRadius: "6px",
-              border: "1px solid #444",
-              fontWeight: "bold",
-              cursor: "pointer",
-              marginBottom: "20px",
-            }}
-          >
-            🤖 Ask SceneBot For a Review
-          </button>
-        </div>
       </div>
     </div>
   );

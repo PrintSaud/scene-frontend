@@ -17,7 +17,7 @@ export default function SignupPage() {
   const [emailValid, setEmailValid] = useState(true);
   const [emailTaken, setEmailTaken] = useState(false);
 
-  const isValidUsername = (username) => /^[a-z0-9_]{3,20}$/.test(username);
+  const isValidUsername = (username) => /^[a-zA-Z0-9_]{3,20}$/.test(username);
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleUsernameChange = async (e) => {
@@ -28,7 +28,7 @@ export default function SignupPage() {
 
     if (valid) {
       try {
-        const res = await api.get(`/api/auth/check-username?username=${val}`); // ✅ FIXED
+        const res = await api.get(`/api/auth/check-username?username=${val}`); 
         setUsernameTaken(!res.data.available);
       } catch (err) {
         console.error("Username check failed:", err);
@@ -80,10 +80,12 @@ export default function SignupPage() {
       const mergedUser = {
         ...res.data.user,
         _id: res.data.user._id,
+        name: res.data.user.name,
         token: res.data.token,
       };
-
+      
       localStorage.setItem("user", JSON.stringify(mergedUser));
+      
       localStorage.setItem("token", res.data.token);
 
       toast.success("Signed up successfully!");

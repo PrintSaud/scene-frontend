@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { HiDotsVertical } from "react-icons/hi";
 import toast from "react-hot-toast";
-import { backend } from "../../config";
 
 export default function ProfileHeader({ user, imgRef }) {
   const navigate = useNavigate();
   const stored = JSON.parse(localStorage.getItem("user") || "{}");
-  const isOwner = stored?._id === user?._id;
+const isOwner = (stored._id || stored.id) === user?._id;
+
 
   const [menuOpen, setMenuOpen] = useState(false);
   const isMobile = window.innerWidth <= 768;
@@ -34,15 +34,16 @@ export default function ProfileHeader({ user, imgRef }) {
           position: "relative",
           width: "100%",
           height: `${backdropHeight}px`,
-          backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.2), #0e0e0e), url(${user.profileBackdrop})`,
+          backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.2), #0e0e0e), url(${user.profileBackdrop || "/default-backdrop.jpg"})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           overflow: "hidden",
         }}
       >
+        {/* Hidden img for ColorThief */}
         <img
           ref={imgRef}
-          src={user.profileBackdrop}
+          src={user.profileBackdrop || "/default-backdrop.jpg"}
           alt="hidden"
           style={{ display: "none" }}
           onError={(e) => {
@@ -50,7 +51,7 @@ export default function ProfileHeader({ user, imgRef }) {
           }}
         />
 
-        {/* Top Right Buttons */}
+        {/* ⋯ Top Right Menu */}
         {isOwner && (
           <div style={{ position: "absolute", top: 20, right: 20 }}>
             <HiDotsVertical
@@ -74,10 +75,7 @@ export default function ProfileHeader({ user, imgRef }) {
                   width: "140px",
                 }}
               >
-                <div
-                  onClick={() => navigate("/edit-profile")}
-                  style={menuItemStyle}
-                >
+                <div onClick={() => navigate("/edit-profile")} style={menuItemStyle}>
                   ✏️ Edit Profile
                 </div>
                 <div onClick={handleShare} style={menuItemStyle}>
@@ -100,86 +98,119 @@ export default function ProfileHeader({ user, imgRef }) {
             zIndex: 2,
           }}
         >
-          <img
-            src={user.avatar}
-            alt="Avatar"
-            style={{
-              width: "80px",
-              height: "80px",
-              borderRadius: "50%",
-              objectFit: "cover",
-              border: "3px solid #0e0e0e",
-            }}
-          />
+          {user.avatar ? (
+            <img
+              src={user.avatar}
+              alt="Avatar"
+              style={{
+                width: "80px",
+                height: "80px",
+                borderRadius: "50%",
+                objectFit: "cover",
+                border: "3px solid #0e0e0e",
+              }}
+              onError={(e) => {
+                e.currentTarget.src = "/default-avatar.jpg";
+              }}
+            />
+          ) : (
+            <img
+              src="/default-avatar.jpg"
+              alt="Avatar"
+              style={{
+                width: "80px",
+                height: "80px",
+                borderRadius: "50%",
+                objectFit: "cover",
+                border: "3px solid #0e0e0e",
+              }}
+            />
+          )}
         </div>
       </div>
 
-      {/* NAME + USERNAME */}
-      <div
-        style={{
-          marginTop: "8px",
-          marginLeft: "16px",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-          gap: "4px",
-        }}
-      >
-        {user.name && (
-          <div style={{ fontWeight: "600", fontSize: "14px", fontFamily: "Inter", color: "white" }}>
-            {user.name}
-          </div>
-        )}
-        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)", fontFamily: "Inter" }}>
-          @{user.username}
-        </div>
+{/* NAME + USERNAME */}
+<div
+  style={{
+    marginTop: "8px",
+    marginLeft: "16px",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: user.bio ? "6px" : "2px",
+  }}
+>
+  {user.name && (
+    <div
+      style={{
+        fontWeight: "600",
+        fontSize: "14px",
+        fontFamily: "Inter",
+        color: "white",
+      }}
+    >
+      {user.name}
+    </div>
+  )}
+  <div
+    style={{
+      fontSize: "11px",
+      color: "rgba(255,255,255,0.6)",
+      fontFamily: "Inter",
+    }}
+  >
+    @{user.username}
+  </div>
 
-        {user.bio && (
-          <div style={{ color: "#aaa", fontSize: "13px", maxWidth: "300px", marginTop: "4px" }}>
-            {user.bio}
-          </div>
-        )}
-      </div>
+  {user.bio && (
+    <div
+      style={{
+        color: "#aaa",
+        fontSize: "13px",
+        maxWidth: "300px",
+        lineHeight: "1.4",
+        marginTop: "2px",
+      }}
+    >
+      {user.bio}
+    </div>
+  )}
+</div>
+<div
+  style={{
+    display: "flex",
+    justifyContent: "center",
+    gap: "40px",
+    fontSize: "14px",
+    marginTop: "28px",
+    marginBottom: "8px",
+    opacity: 0.9,
+    textAlign: "center",
+    padding: "0px 7px 5px",
+  }}
+>
+  <div onClick={() => navigate(`/profile/${user._id}/following`)} style={{ cursor: "pointer" }}>
+    <strong>{user.followingCount ?? 0}</strong>
+    <div>Following</div>
+  </div>
 
-      {/* STATS */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          gap: "40px",
-          fontSize: "14px",
-          marginTop: "28px",
-          marginBottom: "8px",
-          opacity: 0.9,
-          textAlign: "center",
-          padding: "0px 7px 5px",
-        }}
-      >
-        <div
-          onClick={() => navigate(`/profile/${user._id}/following`)}
-          style={{ cursor: "pointer" }}
-        >
-          <strong>{user.following ?? 0}</strong>
-          <div>Following</div>
-        </div>
-        <div
-          onClick={() => navigate(`/profile/${user._id}/followers`)}
-          style={{ cursor: "pointer" }}
-        >
-          <strong>{user.followers ?? 0}</strong>
-          <div>Followers</div>
-        </div>
-        <div
-          onClick={() => {
-            const event = new CustomEvent("navigateToFilms");
-            window.dispatchEvent(event);
-          }}
-          style={{ cursor: "pointer" }}
-        >
-          <strong>{user.totalLogs ?? 0}</strong>
-          <div>Films</div>
-        </div>
-      </div>
+  <div onClick={() => navigate(`/profile/${user._id}/followers`)} style={{ cursor: "pointer" }}>
+    <strong>{user.followerCount ?? 0}</strong>
+    <div>Followers</div>
+  </div>
+
+  <div
+    onClick={() => {
+      const event = new CustomEvent("navigateToFilms");
+      window.dispatchEvent(event);
+    }}
+    style={{ cursor: "pointer" }}
+  >
+    <strong>{user.totalLogs || 0}</strong>
+    <div>Films</div>
+  </div>
+</div>
+
     </>
   );
 }

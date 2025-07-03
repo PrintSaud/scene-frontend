@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast';
 import { socket } from './socket'; // ✅ Socket.IO
 import CreateListPage from "./pages/CreateListPage";
 import PrivateRoute from './components/PrivateRoute';
+import PublicRoute from './components/PublicRoute';
 import { getNotifications } from "./api/api";
 
 // Pages
@@ -54,8 +55,9 @@ function App() {
     if (!user?.token) return;
     const checkUnread = async () => {
       try {
-        const res = await getNotifications();
-const unread = res.data.filter((n) => !n.read);
+        const res = await getNotifications(); // ✅ keep this
+console.log("✅ Token test:", user?.token);
+const unread = res.data.notifications?.filter((n) => !n.read) || [];
 setHasUnread(unread.length > 0);
 
       } catch (err) {
@@ -96,6 +98,23 @@ setHasUnread(unread.length > 0);
       <div className="min-h-screen pb-16 bg-[#0e0e0e]">
         <Routes>
         <Route
+  path="/login"
+  element={
+    <PublicRoute>
+      <LoginPage />
+    </PublicRoute>
+  }
+/>
+
+<Route
+  path="/signup"
+  element={
+    <PublicRoute>
+      <SignupPage />
+    </PublicRoute>
+  } 
+  ></Route>
+  <Route
   path="/"
   element={
     <PrivateRoute>
@@ -103,6 +122,7 @@ setHasUnread(unread.length > 0);
     </PrivateRoute>
   }
 />
+
 <Route
   path="/home"
   element={
@@ -111,8 +131,7 @@ setHasUnread(unread.length > 0);
     </PrivateRoute>
   }
 />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
+
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/verify-code" element={<VerifyResetCode />} />
           <Route path="/reset-password" element={<ResetPassword />} />

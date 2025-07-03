@@ -6,7 +6,7 @@ export const callSceneBot = async (message, lang) => {
       // 🌐 Fallback to saved language if not explicitly passed
       const preferredLang = lang || localStorage.getItem("sceneLang") || "english";
   
-      const res = await fetch(`${import.meta.env.VITE_BACKEND}/api/scenebot`, {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/scenebot`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

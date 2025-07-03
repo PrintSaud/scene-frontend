@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "../../api/api"; // ✅
 import { backend } from "../../config";
+import { changePoster } from "../../api/api";
+
 
 
 
@@ -99,7 +101,7 @@ export default function ChangePosterModal({ movieId, onClose }) {
         <h3
           style={{
             color: "#fff",
-            marginBottom: "20px",
+            marginBottom: "5px",
             textAlign: "center",
             fontSize: "18px",
           }}
@@ -112,7 +114,8 @@ export default function ChangePosterModal({ movieId, onClose }) {
             display: "grid",
             gridTemplateColumns: "repeat(3, 1fr)",
             gap: "12px",
-            padding: "0 12px",
+            width: "350px",
+            padding: "10px 6px",
           }}
         >
           {posters.map((poster) => (
@@ -133,13 +136,15 @@ export default function ChangePosterModal({ movieId, onClose }) {
           ))}
         </div>
 
+      
         <div
-          ref={scrollRef}
-          style={{
-            marginTop: "32px",
-            textAlign: "center",
-          }}
-        >
+        ref={scrollRef}
+        style={{
+          marginTop: "48px",
+          paddingBottom: "80px", // ✅ Extra scrollable room
+          textAlign: "center",
+        }}
+      >
           <button
             onClick={handleSave}
             disabled={!selectedPoster || loading}

@@ -8,16 +8,11 @@ import ProfileTabReviews from "../components/profile/ProfileTabReviews";
 import ProfileTabWatchlist from "../components/profile/ProfileTabWatchlist";
 import ProfileTabLists from "../components/profile/ProfileTabLists";
 import ProfileTabFilms from "../components/profile/ProfileTabFilms";
-import { getUserProfile } from "../api/api"; // or "../api" if default
-
+import api, { getUserProfile } from "../api/api";
 
 export default function ProfilePage() {
-  const stored = JSON.parse(localStorage.getItem("user") || "{}");
-  const token = localStorage.getItem("token"); // ✅ pulled directly
+  const navigate = useNavigate();
   const { id: paramId } = useParams();
-  const id = paramId || stored._id;
-  const isOwner = stored._id === id;
-
   const [activeTab, setActiveTab] = useState("Profile");
   const [user, setUser] = useState(null);
   const [logs, setLogs] = useState([]);
@@ -26,40 +21,53 @@ export default function ProfilePage() {
   const [sortType, setSortType] = useState("added");
   const [order, setOrder] = useState("desc");
   const [listRefreshKey, setListRefreshKey] = useState(0);
-
+  const [stored, setStored] = useState(null);
   const imgRef = useRef();
-  const navigate = useNavigate();
 
+  // ✅ Load user from localStorage
   useEffect(() => {
+    try {
+      const raw = localStorage.getItem("user");
+      const parsed = raw ? JSON.parse(raw) : null;
+      if (!parsed?._id) throw new Error("Missing _id");
+      setStored(parsed);
+    } catch (err) {
+      console.warn("❌ Invalid local user — redirecting to login");
+      navigate("/login");
+    }
+  }, [navigate]);
+
+  const id = paramId || stored?._id;
+  const isOwner = stored?._id === id;
+
+
+  // 🚀 Fetch profile + logs
+  useEffect(() => {
+    if (!id) return;
+
     const fetchUser = async () => {
       try {
         const res = await getUserProfile(id);
-        if (!res.ok) throw new Error("Failed to fetch user");
-        const data = await res.json();
-        setUser(data);
+        setUser(res.data);
       } catch (err) {
-        console.error("Failed to fetch profile", err);
+        console.error("❌ Failed to fetch profile:", err);
       }
     };
 
     const fetchLogs = async () => {
-      if (!id || typeof id !== "string") return;
       try {
-        const res = await fetch(`${backend}/api/logs/user/${id}`);
-        if (!res.ok) throw new Error("Failed to fetch logs");
-        const data = await res.json();
-        setLogs(data);
+        const res = await api.get(`/api/logs/user/${id}`);
+        setLogs(res.data);
       } catch (err) {
-        console.error("Failed to fetch logs", err);
+        console.error("❌ Failed to fetch logs:", err);
       }
     };
 
-    if (id) {
-      fetchUser();
-      fetchLogs();
-    }
-  }, [id, token]);
+    fetchUser();
+    fetchLogs();
+  }, [id]);
 
+  // 🎨 Dominant color from backdrop
   useEffect(() => {
     if (user && imgRef.current) {
       const colorThief = new ColorThief();
@@ -69,13 +77,13 @@ export default function ProfilePage() {
           const color = colorThief.getColor(imgRef.current);
           document.documentElement.style.setProperty("--scene-theme", `rgb(${color.join(",")})`);
         } catch (err) {
-          console.error("ColorThief failed:", err);
+          console.error("🎨 ColorThief failed:", err);
         }
       };
     }
   }, [user]);
 
-  if (!user) return <div>Loading...</div>;
+  if (!user) return <div style={{ color: "white", padding: "20px" }}>Loading...</div>;
 
   return (
     <div style={{ backgroundColor: "#0e0e0e", color: "white", minHeight: "100vh", paddingBottom: "100px" }}>
@@ -116,3 +124,4 @@ export default function ProfilePage() {
     </div>
   );
 }
+

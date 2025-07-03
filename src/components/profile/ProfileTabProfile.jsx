@@ -1,12 +1,13 @@
 import React from "react";
 import { backend } from "../../config";
 
-
 export default function ProfileTabProfile({ favoriteMovies, logs = [], navigate }) {
-  const recentlyWatched = logs
-    .filter((log) => log.movie?.poster)
-    .sort((a, b) => new Date(b.watchedAt) - new Date(a.watchedAt))
-    .slice(0, 6);
+  const recentlyWatched = Array.isArray(logs)
+    ? logs
+        .filter((log) => log.movie?.poster)
+        .sort((a, b) => new Date(b.watchedAt) - new Date(a.watchedAt))
+        .slice(0, 6)
+    : [];
 
   const handleLogClick = (log) => {
     if (!navigate) return;
@@ -22,7 +23,7 @@ export default function ProfileTabProfile({ favoriteMovies, logs = [], navigate 
   return (
     <>
       {/* 🎬 Favorite Movies */}
-      {hasFavorites && (
+      {hasFavorites ? (
         <div style={{ marginTop: "24px" }}>
           <h3 style={{ fontFamily: "Inter, sans-serif", fontSize: "16px", fontWeight: "600" }}>
             Favorite Movies
@@ -53,33 +54,43 @@ export default function ProfileTabProfile({ favoriteMovies, logs = [], navigate 
             ))}
           </div>
         </div>
+      ) : (
+        <p style={{ color: "#888", marginTop: "20px" }}>No favorite movies yet.</p>
       )}
 
       {/* 🕒 Recently Watched */}
-      {recentlyWatched.length > 0 && (
+      {recentlyWatched.length > 0 ? (
         <div style={{ marginTop: "32px" }}>
-          {/* Header */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <h3 style={{ fontFamily: "Inter, sans-serif", fontSize: "16px", fontWeight: "600" }}>
               Recently Watched
             </h3>
-            <a
-              href="#films"
+            <button
+              onClick={() => {
+                const event = new CustomEvent("navigateToFilms");
+                window.dispatchEvent(event);
+              }}
               style={{
                 background: "none",
                 border: "none",
                 color: "#ccc",
                 fontSize: "13px",
                 cursor: "pointer",
-                textDecoration: "none",
               }}
             >
               More →
-            </a>
+            </button>
           </div>
 
-          {/* Posters */}
-          <div style={{ display: "flex", gap: "10px", marginTop: "10px", overflowX: "auto", paddingBottom: "4px" }}>
+          <div
+            style={{
+              display: "flex",
+              gap: "10px",
+              marginTop: "10px",
+              overflowX: "auto",
+              paddingBottom: "4px",
+            }}
+          >
             {recentlyWatched.map((log) => (
               <div
                 key={log._id}
@@ -112,6 +123,8 @@ export default function ProfileTabProfile({ favoriteMovies, logs = [], navigate 
             ))}
           </div>
         </div>
+      ) : (
+        <p style={{ color: "#888", marginTop: "20px" }}>No recent logs yet.</p>
       )}
     </>
   );

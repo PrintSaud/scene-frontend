@@ -11,7 +11,7 @@ export default function FullCastTab({ credits, navigate }) {
         display: "grid",
         gridTemplateColumns: "repeat(4, 1fr)",
         gap: "16px",
-        padding: "25px 30px 2px",
+        padding: "25px 25px 2px",
         margin: "0 auto",
         maxWidth: "100%",
       }}
@@ -30,7 +30,7 @@ export default function FullCastTab({ credits, navigate }) {
             }
             alt={actor.name}
             style={{
-                width: "80px",
+                width: "70px",
                 height: "135px",
                 objectFit: "cover",
                 borderRadius: "12px",

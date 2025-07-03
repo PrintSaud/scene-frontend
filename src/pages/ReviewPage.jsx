@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../api/api";
-import { backend } from "../config"; // ✅ correct with named export
-
-
+import { backend } from "../config";
+import toast from "react-hot-toast";
 
 export default function ReviewPage() {
   const { logId } = useParams();
@@ -19,9 +18,8 @@ export default function ReviewPage() {
   const handleDelete = async (logId) => {
     await api.delete(`/api/logs/${logId}`);
     toast.success("Deleted");
-    refreshLogs(); // Re-fetch logs
+    navigate("/"); // Or refresh feed, etc
   };
-  
 
   useEffect(() => {
     const fetchLog = async () => {
@@ -61,13 +59,15 @@ export default function ReviewPage() {
       </div>
 
       {/* User Info */}
-      <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
-        <img src={log.user.avatar} alt="avatar" style={{ width: "30px", height: "30px", borderRadius: "50%" }} />
-        <strong style={{ fontSize: "14px", color: "rgba(255,255,255,0.9)" }}>@{log.user.username}</strong>
-        <span style={{ marginLeft: "auto", fontSize: "14px", color: "#ffc107", fontWeight: "bold" }}>
-          {log.rating?.toFixed(1)} / 5.0
-        </span>
-      </div>
+      {log.user && (
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
+          <img src={log.user.avatar} alt="avatar" style={{ width: "30px", height: "30px", borderRadius: "50%" }} />
+          <strong style={{ fontSize: "14px", color: "rgba(255,255,255,0.9)" }}>@{log.user.username}</strong>
+          <span style={{ marginLeft: "auto", fontSize: "14px", color: "#ffc107", fontWeight: "bold" }}>
+            {log.rating?.toFixed(1)} / 5.0
+          </span>
+        </div>
+      )}
 
       {/* Title + Review */}
       <h2 style={{ fontSize: "18px", margin: "12px 0 6px" }}>{log.movie?.title}</h2>
@@ -79,37 +79,39 @@ export default function ReviewPage() {
           onClick={() => setLiked(!liked)}
           style={{ cursor: "pointer", color: liked ? "#ff4d4d" : "#ccc", fontWeight: "500" }}
         >
-          ❤️ {liked ? log.likes + 1 : log.likes} likes
+          ❤️ {liked ? (log.likes || 0) + 1 : log.likes || 0} likes
         </span>
       </div>
 
       {/* More Reviews by User */}
-      <div style={{ marginTop: "40px" }}>
-        <h4 style={{ color: "#fff", marginBottom: "12px" }}>
-          More by <span style={{ color: "#888" }}>@{log.user.username}</span>
-        </h4>
-        <div style={{ display: "flex", gap: "10px", overflowX: "auto" }}>
-          {moreReviews.map((review) => {
-            const reviewPoster = review.movie?.customPoster || TMDB_IMG + review.movie?.poster;
-            return (
-              <img
-                key={review._id}
-                src={reviewPoster}
-                alt={review.movie?.title}
-                style={{ width: "90px", height: "135px", borderRadius: "6px", flexShrink: 0 }}
-                onClick={() => navigate(`/review/${review._id}`)}
-              />
-            );
-          })}
-          {user._id === log.user._id && (
-  <div style={{ display: "flex", gap: "10px", marginTop: "12px" }}>
-    <button onClick={() => openEditModal(log)}>✏️ Edit</button>
-    <button onClick={() => handleDelete(log._id)}>🗑️ Delete</button>
-  </div>
-)}
+      {log.user && (
+        <div style={{ marginTop: "40px" }}>
+          <h4 style={{ color: "#fff", marginBottom: "12px" }}>
+            More by <span style={{ color: "#888" }}>@{log.user.username}</span>
+          </h4>
+          <div style={{ display: "flex", gap: "10px", overflowX: "auto" }}>
+            {moreReviews.map((review) => {
+              const reviewPoster = review.movie?.customPoster || TMDB_IMG + review.movie?.poster;
+              return (
+                <img
+                  key={review._id}
+                  src={reviewPoster}
+                  alt={review.movie?.title}
+                  style={{ width: "90px", height: "135px", borderRadius: "6px", flexShrink: 0 }}
+                  onClick={() => navigate(`/review/${review._id}`)}
+                />
+              );
+            })}
+          </div>
 
+          {user?._id === log.user._id && (
+            <div style={{ display: "flex", gap: "10px", marginTop: "12px" }}>
+              <button onClick={() => openEditModal(log)}>✏️ Edit</button>
+              <button onClick={() => handleDelete(log._id)}>🗑️ Delete</button>
+            </div>
+          )}
         </div>
-      </div>
+      )}
     </div>
   );
 }

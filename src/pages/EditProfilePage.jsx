@@ -60,7 +60,13 @@ ReactModal.setAppElement("#root");
 
 export default function EditProfilePage() {
     const stored = localStorage.getItem("user");
-const user = stored ? JSON.parse(stored) : null;
+const rawUser = stored ? JSON.parse(stored) : null;
+
+const user = {
+  ...rawUser,
+  _id: rawUser?._id || rawUser?.id || "", // Ensure _id always exists
+};
+
 
 const token = user?.token;
 
@@ -123,17 +129,19 @@ useEffect(() => {
         
       };
 
-      await axios.patch(`${import.meta.env.VITE_BACKEND}/api/users/${user._id}`, updatedUser, {
+      await axios.patch(`${backend}/api/users/${user._id}`, updatedUser, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-
-        
       });
       
-
+      // 🧠 UPDATE localStorage
+      localStorage.setItem("user", JSON.stringify({ ...user, ...updatedUser }));
+      
       alert("Profile updated!");
       navigate(`/profile/${user._id}`);
+      
+
 
     } catch (err) {
       console.error("❌ Failed to update profile", err);
@@ -144,30 +152,35 @@ useEffect(() => {
   const handleAvatarUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
+  
     const formData = new FormData();
-    formData.append("image", file);
-
+    formData.append("avatar", file); // ✅ key must be 'avatar'
+  
     try {
-      const res = await axios.post(`${import.meta.env.VITE_BACKEND}/api/upload/avatar`, formData, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      setAvatar(res.data.url);
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/upload/${user._id}/upload-avatar`, // ✅ route
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+  
+      setAvatar(res.data.avatar); // ✅ backend returns avatar: url
     } catch (err) {
       console.error("Avatar upload failed", err);
       alert("Upload failed.");
     }
   };
+  
 
   const searchTMDBMovies = async () => {
     if (!searchQuery) return;
   
     try {
-      const res = await axios.get(`${import.meta.env.VITE_BACKEND}/api/movies/search?q=${searchQuery}`);
+      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/movies/search?q=${searchQuery}`);
   
       const bannedWords = ["porn", "sex", "nude", "xxx", "hentai", "fetish"];
       const indianLangs = ["hi", "ta", "te", "ml", "kn", "bn", "pa", "ur"];
@@ -207,7 +220,7 @@ useEffect(() => {
   
   const fetchMovieBackdrops = async (tmdbId) => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_BACKEND}/api/movies/${tmdbId}`);
+      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/movies/${tmdbId}`);
       const backdrops = res.data.backdrops || [];
       const formatted = backdrops.map(
         (img) => `https://image.tmdb.org/t/p/original${img}`
@@ -326,12 +339,9 @@ useEffect(() => {
 
   
         <div style={{ marginTop: "32px", color: "#ccc" }}>
-          <p>Contact us</p>
         </div>
   
         <div style={{ marginTop: "40px", display: "flex", alignItems: "center", gap: "12px" }}>
-          <span style={{ fontSize: "18px" }}>✖️</span>
-          <input disabled value={`@${username}`} style={{ ...inputStyle, color: "#888" }} />
         </div>
       </div>
   

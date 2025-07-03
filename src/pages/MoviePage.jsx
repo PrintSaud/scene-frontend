@@ -239,7 +239,7 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
               <img
                 src={actor.profile_path ? TMDB_AVATAR + actor.profile_path : "/default-avatar.png"}
                 alt={actor.name}
-                style={{ width: "85px", height: "135px", objectFit: "cover", borderRadius: "12px" }}
+                style={{ width: "75px", height: "135px", objectFit: "cover", borderRadius: "12px" }}
               />
               <p style={{ fontSize: "11.5px", marginTop: "6px", fontWeight: "500" }}>{actor.name}</p>
               <p style={{ fontSize: "10.5px", color: "#aaa" }}>{actor.character}</p>
