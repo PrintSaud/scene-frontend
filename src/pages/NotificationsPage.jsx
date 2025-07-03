@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../api/api";
 import { format } from "timeago.js";
 import { useNavigate } from "react-router-dom";
 import { socket } from "../socket";
@@ -16,7 +16,6 @@ export default function NotificationsPage({ setHasUnread }) {
     const fetchNotifications = async () => {
       try {
         const { data } = await axios.get(`${backend}/api/notifications`, {
-          headers: { Authorization: `Bearer ${user.token}` },
         });
         setNotifications(data);
         if (setHasUnread) {
@@ -73,7 +72,6 @@ export default function NotificationsPage({ setHasUnread }) {
   const markAllAsRead = async () => {
     try {
       await axios.patch(`${backend}/api/notifications/read`, {}, {
-        headers: { Authorization: `Bearer ${user.token}` },
       });
       setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
       if (setHasUnread) setHasUnread(false);
@@ -85,7 +83,6 @@ export default function NotificationsPage({ setHasUnread }) {
   const handleDelete = async (id) => {
     try {
       await axios.delete(`${backend}/api/notifications/${id}`, {
-        headers: { Authorization: `Bearer ${user.token}` },
       });
 
       setNotifications((prev) => prev.filter((n) => n._id !== id));

@@ -32,8 +32,8 @@ export default function SignupPage() {
 
     if (valid) {
       try {
-        await axios.get(`${backend}/api/auth/check-username?username=${val}`);
-        setUsernameTaken(!res.data.available);
+        const res = await axios.get(`${backend}/api/auth/check-username?username=${val}`);
+setUsernameTaken(!res.data.available);
       } catch (err) {
         console.error("Username check failed:", err);
         setUsernameTaken(false); // fail open
@@ -51,8 +51,8 @@ export default function SignupPage() {
 
     if (valid) {
       try {
-        await axios.get(`${backend}/api/auth/check-email?email=${val}`);
-        setEmailTaken(!res.data.available);
+        const res = await axios.get(`${backend}/api/auth/check-email?email=${val}`);
+setEmailTaken(!res.data.available);
       } catch (err) {
         console.error("Email check failed:", err);
         setEmailTaken(false);

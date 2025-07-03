@@ -26,12 +26,11 @@ export default function CreateListPage() {
     formData.append("image", file);
 
     try {
-      const { data } = await axios.post(`${backend}/api/upload/list-cover`, formData, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
+        const { data } = await axios.post(`${backend}/api/upload/list-cover`, formData, {
+            headers: {
+              "Content-Type": "multipart/form-data", // ✅ Keep this only
+            },
+          });          
       setCoverImage(data.url);
     } catch (err) {
       console.error("❌ Upload failed", err);

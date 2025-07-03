@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "../api/api";
+import api from "../api/api";
 import { toast } from "react-hot-toast";
 import LogModal from "../components/modals/LogModal"; // update path if different
-import { backend } from "../config";
+
 
 // Components
 import MovieTopBar from "../components/movie/MovieTopBar";
@@ -47,9 +47,10 @@ export default function MoviePage() {
       const headers = { Authorization: `Bearer ${token}` };
   
       const [popularRes, friendsRes] = await Promise.all([
-        axios.get(`${backend}/api/logs/movie/${id}/popular`, { headers }),
-        axios.get(`${backend}/api/logs/movie/${id}/friends`, { headers }),
+        api.get(`/api/logs/movie/${id}/popular`),
+        api.get(`/api/logs/movie/${id}/friends`),
       ]);
+      
   
       setPopularReviews(popularRes.data || []);
       setFriendLogs(friendsRes.data || []);
@@ -104,10 +105,7 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
   useEffect(() => {
     if (!movie?.id) return;
     const token = localStorage.getItem("token");
-    axios
-      .get(`${backend}/api/watchlist/status/${movie.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+    api.get(`/api/watchlist/status/${movie.id}`)
       .then((res) => setIsInWatchlist(res.data.inWatchlist))
       .catch(() => {});
   }, [movie]);

@@ -8,7 +8,8 @@ import ProfileTabReviews from "../components/profile/ProfileTabReviews";
 import ProfileTabWatchlist from "../components/profile/ProfileTabWatchlist";
 import ProfileTabLists from "../components/profile/ProfileTabLists";
 import ProfileTabFilms from "../components/profile/ProfileTabFilms";
-import { backend } from "../config";
+import { getUserProfile } from "../api/api"; // or "../api" if default
+
 
 export default function ProfilePage() {
   const stored = JSON.parse(localStorage.getItem("user") || "{}");
@@ -32,9 +33,7 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch(`${backend}/api/users/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await getUserProfile(id);
         if (!res.ok) throw new Error("Failed to fetch user");
         const data = await res.json();
         setUser(data);

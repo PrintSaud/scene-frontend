@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "../api/api"; // ✅ use your custom axios instance
-import { backend } from "../config";
+import api from "../api/api";
 
 
 export default function HomePage() {
@@ -81,7 +80,7 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
   useEffect(() => {
     const fetchFeed = async () => {
       if (!user?._id) return;
-      const res = await axios.get(`${import.meta.env.VITE_BACKEND}/api/logs/feed/${user._id}`);
+      const res = await api.get(`/api/logs/feed/${user._id}`);
       setFeedLogs(res.data);
     };
     fetchFeed();

@@ -29,9 +29,7 @@ export default function ListViewPage() {
 
   const handleLike = async () => {
     try {
-      await axios.post(`${backend}/api/lists/${id}/like`, {}, {
-        headers: { Authorization: `Bearer ${user.token}` }
-      });
+        await axios.post(`${backend}/api/lists/${id}/like`);
       setIsLiked(!isLiked);
       // Optional: Refresh likes count without refetch
       setList((prev) => ({

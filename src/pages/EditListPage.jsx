@@ -50,8 +50,8 @@ export default function EditListPage() {
       };
 
       await axios.patch(`${backend}/api/lists/${id}`, payload, {
-        headers: { Authorization: `Bearer ${user.token}` },
       });
+      
 
       navigate(`/list/${id}`);
     } catch (err) {
@@ -65,7 +65,6 @@ export default function EditListPage() {
     if (!confirm) return;
     try {
       await axios.delete(`${backend}/api/lists/${id}`, {
-        headers: { Authorization: `Bearer ${user.token}` },
       });
       navigate("/profile");
     } catch (err) {
@@ -82,12 +81,9 @@ export default function EditListPage() {
     formData.append("image", file);
 
     try {
-      const { data } = await axios.post(`${backend}/api/upload/list-cover`, formData, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
+        const { data } = await axios.post(`${backend}/api/upload/list-cover`, formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });          
       setCoverImage(data.url);
     } catch (err) {
       console.error("❌ Upload failed", err);

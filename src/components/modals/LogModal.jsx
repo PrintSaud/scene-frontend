@@ -18,7 +18,6 @@ export default function LogModal({ movie, onClose, refreshLogs }) {
   const [gifUrl, setGifUrl] = useState(null);
   const [showGifModal, setShowGifModal] = useState(false);
   const [uploadedImageFile, setUploadedImageFile] = useState(null);
-  const user = JSON.parse(localStorage.getItem("user")); // or from context if using
   const movieId = movie?.id || movie?._id;
   
 

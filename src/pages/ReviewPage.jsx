@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api/api";
 import { backend } from "../config"; // ✅ correct with named export
 
 
@@ -17,10 +17,7 @@ export default function ReviewPage() {
   const user = JSON.parse(localStorage.getItem("user"));
 
   const handleDelete = async (logId) => {
-    await axios.delete(`${backend}/api/logs/${logId}`, {
-
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-    });
+    await api.delete(`/api/logs/${logId}`);
     toast.success("Deleted");
     refreshLogs(); // Re-fetch logs
   };
@@ -29,7 +26,7 @@ export default function ReviewPage() {
   useEffect(() => {
     const fetchLog = async () => {
       try {
-        const { data } = await axios.get(`${backend}/api/logs/${logId}`);
+        const { data } = await api.get(`/api/logs/${logId}`);
         setLog(data);
       } catch (err) {
         console.error("Failed to fetch log", err);
