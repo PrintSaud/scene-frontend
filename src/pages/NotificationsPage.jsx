@@ -4,7 +4,8 @@ import { format } from "timeago.js";
 import { useNavigate } from "react-router-dom";
 import { socket } from "../socket";
 import { toast } from "react-hot-toast";
-import backend from "../config";
+import { backend } from "../config"; // ✅ correct with named export
+
 
 export default function NotificationsPage({ setHasUnread }) {
   const [notifications, setNotifications] = useState([]);

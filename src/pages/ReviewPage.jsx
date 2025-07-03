@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import backend from "../config";
+import { backend } from "../config"; // ✅ correct with named export
+
 
 
 export default function ReviewPage() {

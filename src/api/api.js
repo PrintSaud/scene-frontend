@@ -1,6 +1,7 @@
 import axios from "axios";
 
-import backend from "../config";
+import { backend } from "../config"; // ✅ correct with named export
+
 
 const api = axios.create({
     baseURL: import.meta.env.VITE_BACKEND_URL,

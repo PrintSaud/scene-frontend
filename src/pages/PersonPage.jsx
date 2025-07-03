@@ -3,7 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaArrowLeft } from "react-icons/fa";
 import { actorAwards, directorAwards } from "../data/awardsData";
-import backend from "../config";
+import { backend } from "../config"; // ✅ correct with named export
+
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const TMDB_PROFILE = "https://image.tmdb.org/t/p/w300";

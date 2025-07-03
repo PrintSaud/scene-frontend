@@ -3,7 +3,8 @@ import axios from "axios";
 import "../styles/LoginPage.css";
 import toast from "react-hot-toast";
 import { FaSpinner } from "react-icons/fa";
-import backend from "../config";
+import { backend } from "../config"; // ✅ correct with named export
+
 
 export default function SignupPage() {
   const [name, setName] = useState(""); // ✅ NEW

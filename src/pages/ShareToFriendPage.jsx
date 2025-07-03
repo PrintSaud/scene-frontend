@@ -3,7 +3,8 @@ import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { FaArrowLeft } from "react-icons/fa";
-import backend from "../config";
+import { backend } from "../config"; // ✅ correct with named export
+
 
 export default function ShareToFriendPage() {
     const { movieId } = useParams();
