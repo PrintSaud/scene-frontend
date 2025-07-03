@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint ."
+    "lint": "eslint .",
+     "start": "vite preview --port 8080"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
