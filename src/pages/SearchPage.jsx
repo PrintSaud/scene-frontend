@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import SearchFilterModal from "../components/SearchFilterModal";
 import filterMovies, { isQueryBanned } from "../utils/filterMovies";
 import { backend } from "../config";
+import { BLOCKED_MOVIE_IDS } from "../utils/blockedMovies";
 
 export default function SearchPage() {
   const [query, setQuery] = useState("");
