@@ -101,16 +101,17 @@ export default function ProfilePage() {
           />
         )}
         {activeTab === "Watchlist" && (
-          <ProfileTabWatchlist
-            user={user}
-            sortType={sortType}
-            setSortType={setSortType}
-            order={order}
-            setOrder={setOrder}
-            watchlist={watchlist}
-            setWatchlist={setWatchlist}
-          />
-        )}
+  <ProfileTabWatchlist
+    user={user}
+    sortType={sortType}
+    setSortType={setSortType}
+    order={order}
+    setOrder={setOrder}
+    watchList={watchlist}
+    setWatchList={setWatchlist}
+    profileUserId={id}
+  />
+)}
         {activeTab === "Lists" && (
           <ProfileTabLists
             user={stored}
