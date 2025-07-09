@@ -113,9 +113,16 @@ export default function ProfileTabWatchlist({
                   cursor: "pointer",
                   objectFit: "cover",
                 }}
-                onClick={() =>
-                  navigate(`/movie/${movie.tmdbId || movie.id}`)
-                }
+                onClick={() => {
+                    const tmdbId = Number(movie.tmdbId || movie.id);
+                    if (!tmdbId || isNaN(tmdbId)) {
+                      console.warn("❌ Invalid TMDB ID:", movie);
+                      toast.error("This movie has no valid TMDB ID.");
+                      return;
+                    }
+                    navigate(`/movie/${tmdbId}`);
+                  }}
+                  
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.src = "/default-poster.jpg";
