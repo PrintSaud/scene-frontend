@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import api from "../../api/api";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { backend } from "../../config";
 
 export default function ProfileTabWatchlist({
   user,
@@ -23,6 +24,7 @@ export default function ProfileTabWatchlist({
         const res = await api.get(
           `/api/users/${profileUserId}/watchlist?sort=${sortType}&order=${order}`
         );
+        console.log("🔔 FINAL RESPONSE:", movieDetails);
 
         const filtered = isOwner
           ? res.data
@@ -100,6 +102,7 @@ export default function ProfileTabWatchlist({
         >
           {watchList.map((movie) => {
             // 🔧 Safe fallback for poster
+            console.log("👀 MOVIE OBJECT:", movie);
             let image = "/default-poster.jpg";
 
             if (movie.poster_path) {
