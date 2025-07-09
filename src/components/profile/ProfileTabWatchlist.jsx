@@ -119,14 +119,16 @@ export default function ProfileTabWatchlist({
                   objectFit: "cover",
                 }}
                 onClick={() => {
-                  const tmdbId = Number(movie.tmdbId || movie.id);
-                  if (!tmdbId || isNaN(tmdbId)) {
-                    console.warn("❌ Invalid TMDB ID:", movie);
-                    toast.error("This movie has no valid TMDB ID.");
-                    return;
-                  }
-                  navigate(`/movie/${tmdbId}`);
-                }}
+                    const rawId = movie.tmdbId || movie.id;
+                    const tmdbId = Number(String(rawId).replace(/[^\d]/g, ""));
+                    if (!tmdbId || isNaN(tmdbId)) {
+                      console.warn("❌ Invalid TMDB ID:", movie);
+                      toast.error("This movie has no valid TMDB ID.");
+                      return;
+                    }
+                    navigate(`/movie/${tmdbId}`);
+                  }}
+                  
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.src = "/default-poster.jpg";
