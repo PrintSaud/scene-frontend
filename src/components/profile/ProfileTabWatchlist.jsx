@@ -24,7 +24,8 @@ export default function ProfileTabWatchlist({
         const res = await api.get(
           `/api/users/${profileUserId}/watchlist?sort=${sortType}&order=${order}`
         );
-        console.log("🔔 FINAL RESPONSE:", movieDetails);
+        console.log("🔔 FINAL RESPONSE:", res.data);
+
 
         const filtered = isOwner
           ? res.data
