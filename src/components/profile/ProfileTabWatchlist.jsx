@@ -112,7 +112,7 @@ export default function ProfileTabWatchlist({
                   width: "100%",
                   aspectRatio: "2/3",
                   objectFit: "cover",
-                  borderRadius: "4", // Optional: sharp edges for a full grid look
+                  borderRadius: "6px", // Optional: sharp edges for a full grid look
                   cursor: "pointer",
                 }}
                 onClick={() => {
