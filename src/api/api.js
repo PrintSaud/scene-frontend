@@ -1,20 +1,20 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: import.meta.env.VITE_BACKEND_URL || "https://scene-backend-production.up.railway.app",
+  baseURL: import.meta.env.VITE_BACKEND_URL || "https://scene-backend-production.up.railway.app",
 });
 
+// ✅ Automatically add token to every request
 api.interceptors.request.use((config) => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const token = user?.token;
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    console.log("👉 API REQUEST:", config.method, config.url);
-    return config;
-  });
-  
-  
+  const user = JSON.parse(localStorage.getItem("user"));
+  const token = user?.token;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  console.log("👉 API REQUEST:", config.method, config.url, config.headers.Authorization || "No token");
+  return config;
+});
+
 //
 // 🧠 AUTH
 //
@@ -26,7 +26,13 @@ export const logout = () => api.post("/api/auth/logout");
 //
 // 🎞️ LOGS (Reviews / Ratings / Replies / Reactions)
 //
-export const createLog = (data) => api.post("/api/logs/full", data);
+export const createLog = (data) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  console.log("📦 createLog user:", user);
+  console.log("📦 createLog token:", user?.token);
+  return api.post("/api/logs/full", data);
+};
+
 export const getLogsFeed = () => api.get("/api/logs/feed");
 export const getLogById = (logId) => api.get(`/api/logs/${logId}`);
 export const addLogReply = (logId, data) => api.post(`/api/logs/${logId}/reply`, data);
@@ -36,8 +42,7 @@ export const deleteReply = (logId, replyId) => api.delete(`/api/logs/${logId}/re
 //
 // 📋 WATCHLIST
 //
-export const getWatchlistStatus = (movieId) =>
-    api.get(`/api/watchlist/status/${movieId}`);  
+export const getWatchlistStatus = (movieId) => api.get(`/api/watchlist/status/${movieId}`);
 export const toggleWatchlist = (movieId) => api.post(`/api/watchlist/toggle`, { movieId });
 export const getWatchlist = (userId) => api.get(`/api/watchlist/${userId}`);
 
@@ -77,17 +82,9 @@ export const sceneBotAsk = (message) => api.post("/api/scenebot", { message });
 //
 // 🎬 MOVIE EXTRAS (Change Poster, Backdrop, etc.)
 //
-export const changePoster = (movieId, { posterUrl }) => {
-    return api.post(`/api/posters/${movieId}`, { posterUrl }); // ✅
-  };
-  
-  
-  
-  
-  
+export const changePoster = (movieId, { posterUrl }) => api.post(`/api/posters/${movieId}`, { posterUrl });
 
-export const updateBackdrop = (userId, backdropUrl) =>
-  api.patch(`/api/users/${userId}/backdrop`, { backdrop: backdropUrl });
+export const updateBackdrop = (userId, backdropUrl) => api.patch(`/api/users/${userId}/backdrop`, { backdrop: backdropUrl });
 
 //
 // 🧑‍🤝‍🧑 USER
@@ -95,11 +92,10 @@ export const updateBackdrop = (userId, backdropUrl) =>
 export const getUserProfile = (userId) => api.get(`/api/users/${userId}`);
 export const followUser = (userId, targetId) => api.post(`/api/users/${userId}/follow/${targetId}`);
 export const updateProfile = (userId, data) => api.patch(`/api/users/${userId}`, data);
-// 
-// SEARCH 
-export const searchMoviesByTitle = (query) =>
-    api.get(`/api/movies/search?q=${query}`);
+
 //
-/// poster change   
+// 🔍 SEARCH
 //
+export const searchMoviesByTitle = (query) => api.get(`/api/movies/search?q=${query}`);
+
 export default api;
