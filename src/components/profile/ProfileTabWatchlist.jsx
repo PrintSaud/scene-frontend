@@ -42,7 +42,7 @@ export default function ProfileTabWatchlist({
             flexWrap: "wrap",
             gap: "8px",
             marginBottom: "12px",
-            padding: "0 12px", // ✅ Only padding for filters, not for posters
+            padding: "6px 12px", // ✅ Only padding for filters, not for posters
           }}
         >
           <select
