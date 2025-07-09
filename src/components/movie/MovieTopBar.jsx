@@ -18,8 +18,10 @@ export default function MovieTopBar({
 
   const handleToggleWatchlist = async () => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) return toast.error("Not logged in");
+        const user = JSON.parse(localStorage.getItem("user"));
+const token = user?.token;
+if (!token) return toast.error("Not logged in");
+
 
       await toggleWatchlist(movie.id);
 
