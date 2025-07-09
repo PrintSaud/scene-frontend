@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import api from "../../api/api";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast"; // ✅ Added to fix "toast is not defined"
 
 export default function ProfileTabWatchlist({
   user,
@@ -62,6 +63,8 @@ export default function ProfileTabWatchlist({
               minWidth: "130px",
             }}
           >
+            <option value="recent">Recently Added</option>
+            <option value="last">Last Added</option>
             <option value="title">Title</option>
             <option value="release">Release Date</option>
             <option value="rating">Rating</option>
@@ -81,8 +84,8 @@ export default function ProfileTabWatchlist({
               minWidth: "130px",
             }}
           >
-            <option value="asc">⬆ Ascending</option>
             <option value="desc">⬇ Descending</option>
+            <option value="asc">⬆ Ascending</option>
           </select>
         </div>
       )}
@@ -97,9 +100,11 @@ export default function ProfileTabWatchlist({
           }}
         >
           {watchList.map((movie) => {
-            const hasPoster = movie.poster_path || movie.poster;
-            const image = hasPoster
-              ? `${TMDB_IMG}${movie.poster_path || movie.poster}`
+            const posterPath = movie.poster_path || movie.poster;
+            const image = posterPath?.startsWith("http")
+              ? posterPath
+              : posterPath
+              ? `${TMDB_IMG}${posterPath}`
               : "/default-poster.jpg";
 
             return (
@@ -114,15 +119,14 @@ export default function ProfileTabWatchlist({
                   objectFit: "cover",
                 }}
                 onClick={() => {
-                    const tmdbId = Number(movie.tmdbId || movie.id);
-                    if (!tmdbId || isNaN(tmdbId)) {
-                      console.warn("❌ Invalid TMDB ID:", movie);
-                      toast.error("This movie has no valid TMDB ID.");
-                      return;
-                    }
-                    navigate(`/movie/${tmdbId}`);
-                  }}
-                  
+                  const tmdbId = Number(movie.tmdbId || movie.id);
+                  if (!tmdbId || isNaN(tmdbId)) {
+                    console.warn("❌ Invalid TMDB ID:", movie);
+                    toast.error("This movie has no valid TMDB ID.");
+                    return;
+                  }
+                  navigate(`/movie/${tmdbId}`);
+                }}
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.src = "/default-poster.jpg";
