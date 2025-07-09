@@ -14,6 +14,7 @@ api.interceptors.request.use((config) => {
     return config;
   });
   
+  
 //
 // 🧠 AUTH
 //
@@ -25,7 +26,7 @@ export const logout = () => api.post("/api/auth/logout");
 //
 // 🎞️ LOGS (Reviews / Ratings / Replies / Reactions)
 //
-export const createLog = (data) => api.post("/api/logs", data);
+export const createLog = (data) => api.post("/api/logs/full", data);
 export const getLogsFeed = () => api.get("/api/logs/feed");
 export const getLogById = (logId) => api.get(`/api/logs/${logId}`);
 export const addLogReply = (logId, data) => api.post(`/api/logs/${logId}/reply`, data);
