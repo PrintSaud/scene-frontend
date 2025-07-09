@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import api from "../../api/api";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { backend } from "../../config";
 
 export default function ProfileTabWatchlist({
   user,
@@ -26,7 +25,6 @@ export default function ProfileTabWatchlist({
         );
         console.log("🔔 FINAL RESPONSE:", res.data);
 
-
         const filtered = isOwner
           ? res.data
           : res.data.filter((movie) => !movie.isPrivate);
@@ -42,7 +40,6 @@ export default function ProfileTabWatchlist({
 
   return (
     <div style={{ padding: "16px" }}>
-      {/* 📊 Filters (centered) */}
       {isOwner && (
         <div
           style={{
@@ -92,18 +89,15 @@ export default function ProfileTabWatchlist({
         </div>
       )}
 
-      {/* 🎬 Watchlist Grid */}
       {watchList?.length > 0 ? (
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "12px",
+            gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+            gap: "8px",
           }}
         >
           {watchList.map((movie) => {
-            // 🔧 Safe fallback for poster
-            console.log("👀 MOVIE OBJECT:", movie);
             let image = "/default-poster.jpg";
 
             if (movie.poster_path) {
@@ -123,6 +117,7 @@ export default function ProfileTabWatchlist({
                 alt={movie.title}
                 style={{
                   width: "100%",
+                  aspectRatio: "2/3",
                   borderRadius: "12px",
                   cursor: "pointer",
                   objectFit: "cover",
