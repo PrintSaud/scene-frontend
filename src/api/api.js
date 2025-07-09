@@ -1,21 +1,17 @@
 import axios from "axios";
 
-import { backend } from "../config"; // ✅ correct with named export
-
-
 const api = axios.create({
-    baseURL: import.meta.env.VITE_BACKEND_URL,
-    // REMOVE withCredentials: true
-  });
-  
-  api.interceptors.request.use((config) => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const token = user?.token;
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  });
+  baseURL: import.meta.env.VITE_BACKEND_URL || "https://scene-backend-production.up.railway.app/api",
+});
+
+api.interceptors.request.use((config) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const token = user?.token;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
   
   
 //
