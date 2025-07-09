@@ -189,12 +189,12 @@ const isOwner = (stored._id || stored.id) === user?._id;
     padding: "0px 7px 5px",
   }}
 >
-  <div onClick={() => navigate(`/profile/${user._id}/following`)} style={{ cursor: "pointer" }}>
+  <div onClick={() => navigate(`/profile/${user._id}/following`)} style={{ cursor: "pointer",       fontFamily: "Inter", }}>
     <strong>{user.followingCount ?? 0}</strong>
     <div>Following</div>
   </div>
 
-  <div onClick={() => navigate(`/profile/${user._id}/followers`)} style={{ cursor: "pointer" }}>
+  <div onClick={() => navigate(`/profile/${user._id}/followers`)} style={{ cursor: "pointer",       fontFamily: "Inter", }}>
     <strong>{user.followerCount ?? 0}</strong>
     <div>Followers</div>
   </div>
@@ -204,7 +204,7 @@ const isOwner = (stored._id || stored.id) === user?._id;
       const event = new CustomEvent("navigateToFilms");
       window.dispatchEvent(event);
     }}
-    style={{ cursor: "pointer" }}
+    style={{ cursor: "pointer",       fontFamily: "Inter", }}
   >
     <strong>{user.totalLogs || 0}</strong>
     <div>Films</div>
