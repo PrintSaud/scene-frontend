@@ -18,23 +18,23 @@ export default function MovieTopBar({
 
   const handleToggleWatchlist = async () => {
     try {
-        const user = JSON.parse(localStorage.getItem("user"));
-const token = user?.token;
-if (!token) return toast.error("Not logged in");
-
-
-      await toggleWatchlist(movie.id);
-
-
+      const user = JSON.parse(localStorage.getItem("user"));
+      const token = user?.token;
+      if (!token) return toast.error("Not logged in");
+  
+      const movieId = Number(movie.id || movie._id);
+      await toggleWatchlist(movieId);
+  
       setIsInWatchlist(!isInWatchlist);
       toast.success(
         isInWatchlist ? "Removed from Watchlist" : "Added to Watchlist"
       );
     } catch (err) {
-      console.error("Watchlist error:", err);
+      console.error("❌ Watchlist error:", err.response?.data || err.message);
       toast.error("Failed to update watchlist");
     }
   };
+  
 
   const [showOptions, setShowOptions] = React.useState(false);
 
