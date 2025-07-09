@@ -100,13 +100,18 @@ export default function ProfileTabWatchlist({
           }}
         >
           {watchList.map((movie) => {
-            const posterPath = movie.poster_path || movie.poster;
-            const image = posterPath?.startsWith("http")
-              ? posterPath
-              : posterPath
-              ? `${TMDB_IMG}${posterPath}`
-              : "/default-poster.jpg";
+            let image = "/default-poster.jpg"; // fallback
 
+            if (movie.poster_path) {
+              image = `${TMDB_IMG}${movie.poster_path}`;
+            } else if (movie.poster && typeof movie.poster === "string") {
+              // full URL or relative path
+              if (movie.poster.startsWith("http")) {
+                image = movie.poster;
+              } else {
+                image = `${TMDB_IMG}${movie.poster}`;
+              }
+            }
             return (
               <img
                 key={movie.id || movie._id}
@@ -120,15 +125,18 @@ export default function ProfileTabWatchlist({
                 }}
                 onClick={() => {
                     const rawId = movie.tmdbId || movie.id;
-                    const tmdbId = Number(String(rawId).replace(/[^\d]/g, ""));
+                    const cleanedId = String(rawId).replace(/[^\d]/g, ""); // remove all non-numbers
+                    const tmdbId = Number(cleanedId);
+                  
                     if (!tmdbId || isNaN(tmdbId)) {
                       console.warn("❌ Invalid TMDB ID:", movie);
                       toast.error("This movie has no valid TMDB ID.");
                       return;
                     }
+                  
                     navigate(`/movie/${tmdbId}`);
                   }}
-                  
+
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.src = "/default-poster.jpg";
