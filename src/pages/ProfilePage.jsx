@@ -38,8 +38,7 @@ export default function ProfilePage() {
   }, [navigate]);
 
   const id = paramId || stored?._id;
-  const isOwner = stored?._id === id;
-
+  const isOwner = stored?._id === String(id);
 
   // 🚀 Fetch profile + logs
   useEffect(() => {
@@ -83,6 +82,13 @@ export default function ProfilePage() {
     }
   }, [user]);
 
+  // 🔄 Global listener for refreshing lists
+  useEffect(() => {
+    const refresh = () => setListRefreshKey((prev) => prev + 1);
+    window.addEventListener("refreshMyLists", refresh);
+    return () => window.removeEventListener("refreshMyLists", refresh);
+  }, []);
+
   if (!user) return <div style={{ color: "white", padding: "20px" }}>Loading...</div>;
 
   return (
@@ -101,17 +107,17 @@ export default function ProfilePage() {
           />
         )}
         {activeTab === "Watchlist" && (
-  <ProfileTabWatchlist
-    user={user}
-    sortType={sortType}
-    setSortType={setSortType}
-    order={order}
-    setOrder={setOrder}
-    watchList={watchlist}
-    setWatchList={setWatchlist}
-    profileUserId={id}
-  />
-)}
+          <ProfileTabWatchlist
+            user={user}
+            sortType={sortType}
+            setSortType={setSortType}
+            order={order}
+            setOrder={setOrder}
+            watchList={watchlist}
+            setWatchList={setWatchlist}
+            profileUserId={id}
+          />
+        )}
         {activeTab === "Lists" && (
           <ProfileTabLists
             user={stored}
@@ -125,4 +131,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-

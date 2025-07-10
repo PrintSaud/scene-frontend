@@ -7,7 +7,6 @@ import { backend } from "../config";
 
 export default function CreateListPage() {
   const navigate = useNavigate();
-
   const user = JSON.parse(localStorage.getItem("user"));
 
   const [title, setTitle] = useState("");
@@ -26,11 +25,9 @@ export default function CreateListPage() {
     formData.append("image", file);
 
     try {
-        const { data } = await axios.post(`${backend}/api/upload/list-cover`, formData, {
-            headers: {
-              "Content-Type": "multipart/form-data", // ✅ Keep this only
-            },
-          });          
+      const { data } = await axios.post(`${backend}/api/upload/list-cover`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       setCoverImage(data.url);
     } catch (err) {
       console.error("❌ Upload failed", err);
@@ -54,21 +51,20 @@ export default function CreateListPage() {
           poster: m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : "",
         })),
       };
-  
+
       const { data } = await axios.post(`${backend}/api/lists`, payload, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-  
-      // ✅ After creating, go directly to profile so lists auto-refresh
-      navigate(`/profile/${user._id}`);
-  
+
+      // ✅ After creating, dispatch global event and go back
+      window.dispatchEvent(new Event("refreshMyLists"));
+      navigate(-1);
+
     } catch (err) {
       console.error("❌ Failed to create list", err);
       alert("Failed to create list.");
     }
   };
-  
-  
 
   return (
     <div style={{ background: "#0e0e0e", color: "white", minHeight: "100vh", paddingBottom: "80px" }}>
@@ -124,44 +120,40 @@ export default function CreateListPage() {
         </label>
 
         {/* Movie List */}
-{/* Movie List */}
-<div>
-  <h4 style={{ marginTop: "20px" }}>🎬 Movies in this list:</h4>
-  {movies.length === 0 ? (
-    <p style={{ color: "#888" }}>No movies added yet.</p>
-  ) : isRanked ? (
-    <MovieListSortable movies={movies} setMovies={setMovies} />
-  ) : (
-    <ul style={{ marginTop: "8px", paddingLeft: "0" }}>
-      {movies.map((movie) => (
-        <li key={movie.id} style={{ marginBottom: "8px",fontFamily: "Inter, sans-serif", listStyle: "none" }}>
-          {movie.title}
-          <button
-            onClick={() => setMovies(movies.filter((m) => m.id !== movie.id))}
-            style={{ marginLeft: "8px", color: "#f55", background: "none", border: "none" }}
-          >
-            ❌
-          </button>
-        </li>
-      ))}
-    </ul>
-  )}
-</div>
+        <div>
+          <h4 style={{ marginTop: "20px" }}>🎬 Movies in this list:</h4>
+          {movies.length === 0 ? (
+            <p style={{ color: "#888" }}>No movies added yet.</p>
+          ) : isRanked ? (
+            <MovieListSortable movies={movies} setMovies={setMovies} />
+          ) : (
+            <ul style={{ marginTop: "8px", paddingLeft: "0" }}>
+              {movies.map((movie) => (
+                <li key={movie.id} style={{ marginBottom: "8px", fontFamily: "Inter, sans-serif", listStyle: "none" }}>
+                  {movie.title}
+                  <button
+                    onClick={() => setMovies(movies.filter((m) => m.id !== movie.id))}
+                    style={{ marginLeft: "8px", color: "#f55", background: "none", border: "none" }}
+                  >
+                    ❌
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
 
-
-<button onClick={() => setShowModal(true)} style={btnStyle}>
-  ➕ Add Movie
-</button>
+        <button onClick={() => setShowModal(true)} style={btnStyle}>➕ Add Movie</button>
       </div>
 
-      {/* Modal placeholder */}
+      {/* Modal */}
       {showModal && (
-  <AddMovieModal
-    onClose={() => setShowModal(false)}
-    onSelect={(movie) => setMovies([...movies, movie])}
-    existing={movies}
-  />
-)}
+        <AddMovieModal
+          onClose={() => setShowModal(false)}
+          onSelect={(movie) => setMovies([...movies, movie])}
+          existing={movies}
+        />
+      )}
     </div>
   );
 }
