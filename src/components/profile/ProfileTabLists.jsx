@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   getMyLists,
+  getUserLists,
   getSavedLists,
   getPopularLists,
   getFriendsLists,
@@ -22,7 +23,7 @@ export default function ProfileTabLists({ user, profileUserId, refreshTrigger })
     const fetchLists = async () => {
       try {
         const [myRes, savedRes, popularRes, friendsRes] = await Promise.all([
-          isOwner ? getMyLists() : getMyLists(profileUserId),
+          isOwner ? getMyLists() : getUserLists(profileUserId),  // ✅ FIXED HERE
           isOwner ? getSavedLists() : Promise.resolve({ data: [] }),
           getPopularLists(),
           isOwner ? getFriendsLists() : Promise.resolve({ data: [] }),
@@ -42,7 +43,7 @@ export default function ProfileTabLists({ user, profileUserId, refreshTrigger })
     };
 
     fetchLists();
-  }, [profileUserId, isOwner, refreshTrigger]); // ✅ Add refreshTrigger here!
+  }, [profileUserId, isOwner, refreshTrigger]);
 
   const getDisplayedLists = () => {
     switch (activeSubTab) {
@@ -142,11 +143,7 @@ export default function ProfileTabLists({ user, profileUserId, refreshTrigger })
             <img
               src={list.coverImage}
               alt={list.title}
-              style={{
-                width: "100%",
-                height: "140px",
-                objectFit: "cover",
-              }}
+              style={{ width: "100%", height: "140px", objectFit: "cover" }}
             />
             <div style={{ padding: "10px" }}>
               <div
