@@ -59,15 +59,15 @@ export default function CreateListPage() {
         headers: { Authorization: `Bearer ${user.token}` },
       });
   
-      // Trigger refresh on return to Profile
-      window.dispatchEvent(new Event("refreshMyLists"));
+      // ✅ After creating, go directly to profile so lists auto-refresh
+      navigate(`/profile/${user._id}`);
   
-      navigate(`/list/${data._id}`);
     } catch (err) {
       console.error("❌ Failed to create list", err);
       alert("Failed to create list.");
     }
   };
+  
   
 
   return (

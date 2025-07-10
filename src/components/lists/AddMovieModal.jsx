@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { BLOCKED_MOVIE_IDS } from "../../utils/blockedMovies";
 import { backend } from "../../config";
+import filterMovies, { isQueryBanned } from "../utils/filterMovies";
 
 const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
@@ -22,17 +23,34 @@ export default function AddMovieModal({ onClose, onSelect, existing }) {
     setLoading(true);
     try {
       const { data } = await axios.get(
-        `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(term)}`
+        `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(term)}&include_adult=false&language=en-US`
       );
-
-      const filtered = (data.results || []).filter(
+  
+      let filtered = (data.results || []).filter(
         (movie) =>
           movie.poster_path &&
           !movie.adult &&
           movie.vote_count > 10 &&
           !BLOCKED_MOVIE_IDS.includes(movie.id)
       );
-
+  
+      if (filtered.length === 0 && !isNaN(term)) {
+        // fallback: fetch by ID
+        const res = await axios.get(
+          `https://api.themoviedb.org/3/movie/${term}?api_key=${TMDB_KEY}&language=en-US`
+        );
+        const movie = res.data;
+        if (
+          movie &&
+          movie.poster_path &&
+          !movie.adult &&
+          movie.vote_count > 10 &&
+          !BLOCKED_MOVIE_IDS.includes(movie.id)
+        ) {
+          filtered = [movie];
+        }
+      }
+  
       setResults(filtered);
     } catch (err) {
       console.error("TMDB search failed", err);
@@ -40,6 +58,7 @@ export default function AddMovieModal({ onClose, onSelect, existing }) {
       setLoading(false);
     }
   };
+  
 
   const handleAdd = (movie) => {
     if (existing.some((m) => m.id === movie.id)) return;

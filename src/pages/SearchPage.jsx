@@ -151,7 +151,8 @@ export default function SearchPage() {
         {results.length === 0 && <p>No results yet.</p>}
 
         {activeTab === "films" && (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: "14px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
+           gap: "14px", justifyContent: "center", }}>
             {results.map((movie) => (
               <div
                 key={movie.id}

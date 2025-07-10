@@ -40,20 +40,22 @@ export default function LogModal({ movie, onClose, refreshLogs }) {
         formData.append("image", uploadedImageFile);
       }
   
-      await createLog(formData);  // ✅ Use global api helper here!
+      await createLog(formData);  // Submit log first
+  
+      // ✅ After logging, remove from watchlist if present
+      const user = JSON.parse(localStorage.getItem("user"));
+      await axios.delete(`${backend}/api/watchlist/${user._id}/watchlist/${movieId}`);
   
       toast.success("🎬 Log submitted!");
       onClose();
       refreshLogs?.();      
+  
     } catch (err) {
       console.error("❌ Log submit failed:", err);
       toast.error("Failed to log this movie.");
     }
   };
   
-  
-
-
   const handleStarClick = (index, isHalf) => {
     const newRating = isHalf ? index + 0.5 : index + 1;
     setRating(newRating);
