@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { BLOCKED_MOVIE_IDS } from "../../utils/blockedMovies";
 import { backend } from "../../config";
-import filterMovies, { isQueryBanned } from "../utils/filterMovies";
+import filterMovies from "../../utils/filterMovies";
+
 
 const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
