@@ -29,6 +29,10 @@ export default function ProfileTabLists({ user, profileUserId, refreshTrigger })
           isOwner ? getFriendsLists() : Promise.resolve({ data: [] }),
         ]);
 
+        console.log("🔥 myRes.data", myRes.data);
+        console.log("🔥 isOwner", isOwner);
+        console.log("🔥 profileUserId", profileUserId);
+
         const filteredMyLists = isOwner
           ? myRes.data
           : myRes.data.filter((list) => !list.isPrivate);
