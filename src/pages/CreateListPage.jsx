@@ -46,10 +46,15 @@ export default function CreateListPage() {
         isPrivate,
         isRanked,
         movies: movies.map((m) => ({
-          id: m.id,
-          title: m.title,
-          poster: m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : "",
-        })),
+            id: m.id,
+            title: m.title,
+            poster:
+              m.poster?.startsWith("http")
+                ? m.poster // Already a full URL (maybe from AddMovieModal)
+                : m.poster_path
+                ? m.poster_path // Just save the TMDB path directly for consistency
+                : "",
+          })),          
       };
 
       const { data } = await axios.post(`${backend}/api/lists`, payload, {

@@ -162,14 +162,13 @@ export default function ListViewPage() {
     gap: "12px"
   }}>
     {list.movies.map((movie, index) => {
-      const posterUrl =
-        movie.poster && movie.poster.startsWith("http")
+        const posterUrl =
+        movie.poster?.startsWith("http")
           ? movie.poster
           : movie.poster
           ? `${TMDB_IMG}${movie.poster}`
-          : movie.poster_path
-          ? `${TMDB_IMG}${movie.poster_path}`
           : "/default-poster.jpg";
+      
 
       return (
         <div
