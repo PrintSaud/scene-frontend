@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "../api/api";
 import { backend } from "../config";
 
-
 export default function ListViewPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -29,9 +28,8 @@ export default function ListViewPage() {
 
   const handleLike = async () => {
     try {
-        await axios.post(`${backend}/api/lists/${id}/like`);
+      await axios.post(`${backend}/api/lists/${id}/like`);
       setIsLiked(!isLiked);
-      // Optional: Refresh likes count without refetch
       setList((prev) => ({
         ...prev,
         likes: isLiked
@@ -67,7 +65,6 @@ export default function ListViewPage() {
             height: "80px",
             background: "linear-gradient(to bottom, rgba(0,0,0,0) 0%, #0e0e0e 100%)"
           }} />
-          {/* Back + Edit */}
           <button
             onClick={() => navigate(-1)}
             style={{
@@ -154,37 +151,42 @@ export default function ListViewPage() {
         </div>
       </div>
 
-      {/* Movies */}
+      {/* Movies as poster grid */}
       <div style={{ padding: "0 16px" }}>
         <h3 style={{ marginBottom: "12px" }}>🎬 {list.isRanked ? "Ranked Movies" : "Movies"}:</h3>
-        <ul style={{ paddingLeft: 0 }}>
-        {list.movies.map((movie, index) => (
-  <li
-    key={movie.id}
-    style={{
-      listStyle: "none",
-      marginBottom: "12px",
-      display: "flex",
-      alignItems: "center",
-      gap: "12px",
-      background: "#1a1a1a",
-      borderRadius: "6px",
-      padding: "8px",
-    }}
-  >
-    {movie.poster && (
-      <img
-        src={movie.customPoster || movie.poster}
-        alt={movie.title}
-        style={{ width: "40px", borderRadius: "4px" }}
-      />
-    )}
-    <span style={{ fontFamily: "Inter, sans-serif", fontSize: "15px" }}>
-      <strong>{list.isRanked ? `${index + 1}.` : "•"}</strong> {movie.title}
-    </span>
-  </li>
-))}
-        </ul>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
+          gap: "12px"
+        }}>
+          {list.movies.map((movie, index) => (
+            <div
+              key={movie.id}
+              onClick={() => navigate(`/movie/${movie.id}`)}
+              style={{ cursor: "pointer", textAlign: "center" }}
+            >
+              <img
+                src={movie.customPoster || movie.poster}
+                alt={movie.title}
+                style={{
+                  width: "100%",
+                  height: "140px",
+                  objectFit: "cover",
+                  borderRadius: "8px",
+                  marginBottom: "4px"
+                }}
+              />
+              <div style={{
+                fontSize: "12px",
+                color: "#fff",
+                fontFamily: "Inter, sans-serif",
+                lineHeight: "1.2"
+              }}>
+                {list.isRanked ? `${index + 1}. ` : ""}{movie.title}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
