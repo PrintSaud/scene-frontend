@@ -7,6 +7,7 @@ import { BiSolidFileGif } from "react-icons/bi";
 import GifSearchModal from "../GifSearchModal";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { createLog } from "../../api/api";  // ✅ Import it at top!
 import { backend } from "../../config";
 
 
@@ -19,13 +20,9 @@ export default function LogModal({ movie, onClose, refreshLogs }) {
   const [showGifModal, setShowGifModal] = useState(false);
   const [uploadedImageFile, setUploadedImageFile] = useState(null);
   const movieId = movie?.id || movie?._id;
-  
 
   const handleLogSubmit = async () => {
     try {
-      const user = JSON.parse(localStorage.getItem("user"));
-      const movieId = movie?.id || movie?._id;
-  
       const formData = new FormData();
       formData.append("movieId", movieId);
       formData.append("review", review);
@@ -34,29 +31,26 @@ export default function LogModal({ movie, onClose, refreshLogs }) {
       formData.append("watchedAt", new Date().toISOString());
       formData.append("gif", gifUrl || "");
       formData.append("title", movie.title || "Untitled");
-      formData.append("poster", movie.poster || `https://image.tmdb.org/t/p/w500${movie.poster_path}`);
+      formData.append(
+        "poster",
+        movie.poster || `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+      );
   
       if (uploadedImageFile) {
         formData.append("image", uploadedImageFile);
       }
   
-      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/logs/full`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))?.token}`,
-        },
-      });
-      
-      
+      await createLog(formData);  // ✅ Use global api helper here!
   
       toast.success("🎬 Log submitted!");
       onClose();
-      refreshLogs?.(); // ✅ refresh logs on close      
+      refreshLogs?.();      
     } catch (err) {
-      console.error(err);
+      console.error("❌ Log submit failed:", err);
       toast.error("Failed to log this movie.");
     }
   };
+  
   
 
 
