@@ -70,18 +70,17 @@ export default function ListViewPage() {
                 <button
         onClick={() => navigate(-1)}
         style={{
-          background: "rgba(0,0,0,0.5)",
-          border: "none",
-          borderRadius: "50%",
-          width: "32px",
-          height: "32px",
-          color: "#fff",
-          fontSize: "18px",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
+            position: "absolute",
+            top: "16px",
+            left: "16px",
+            background: "#1a1a1a",
+            color: "white",
+            padding: "6px 12px",
+            borderRadius: "6px",
+            border: "1px solid #444",
+            fontSize: "12px",
+            zIndex: 2
+          }}
       >
         ←
       </button>
@@ -180,7 +179,7 @@ export default function ListViewPage() {
                   alt={movie.title}
                   style={{
                     width: "100%",
-                    height: "160px",  // Taller posters
+                    height: "200px",  // Taller posters
                     objectFit: "cover",
                     borderRadius: "8px",
                     marginBottom: "4px"
