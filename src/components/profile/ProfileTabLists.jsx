@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
 import {
-    getMyLists,
-    getSavedLists,
-    getPopularLists,
-    getFriendsLists,
-  } from "../../api/api";
-  
+  getMyLists,
+  getSavedLists,
+  getPopularLists,
+  getFriendsLists,
+} from "../../api/api";
 import { useNavigate } from "react-router-dom";
 import { backend } from "../../config";
 
-export default function ProfileTabLists({ user, profileUserId }) {
+export default function ProfileTabLists({ user, profileUserId, refreshTrigger }) {
   const [myLists, setMyLists] = useState([]);
   const [savedLists, setSavedLists] = useState([]);
   const [popularLists, setPopularLists] = useState([]);
@@ -21,32 +20,29 @@ export default function ProfileTabLists({ user, profileUserId }) {
 
   useEffect(() => {
     const fetchLists = async () => {
-        try {
-          const [myRes, savedRes, popularRes, friendsRes] = await Promise.all([
-            isOwner ? getMyLists() : getMyLists(profileUserId), // FIXED: handle properly below
-            isOwner ? getSavedLists() : Promise.resolve({ data: [] }),
-            getPopularLists(),
-            isOwner ? getFriendsLists() : Promise.resolve({ data: [] }),
-          ]);
-      
-          const filteredMyLists = isOwner
-            ? myRes.data
-            : myRes.data.filter((list) => !list.isPrivate);
-      
-          setMyLists(filteredMyLists);
-          setSavedLists(savedRes.data);
-          setPopularLists(popularRes.data);
-          setFriendsLists(friendsRes.data);
-        } catch (err) {
-          console.error("❌ Failed to fetch lists", err);
-        }
-      };
-      
+      try {
+        const [myRes, savedRes, popularRes, friendsRes] = await Promise.all([
+          isOwner ? getMyLists() : getMyLists(profileUserId),
+          isOwner ? getSavedLists() : Promise.resolve({ data: [] }),
+          getPopularLists(),
+          isOwner ? getFriendsLists() : Promise.resolve({ data: [] }),
+        ]);
 
-    const refresh = () => fetchLists();
-    window.addEventListener("refreshMyLists", refresh);
-    return () => window.removeEventListener("refreshMyLists", refresh);
-  }, [profileUserId, isOwner]);
+        const filteredMyLists = isOwner
+          ? myRes.data
+          : myRes.data.filter((list) => !list.isPrivate);
+
+        setMyLists(filteredMyLists);
+        setSavedLists(savedRes.data);
+        setPopularLists(popularRes.data);
+        setFriendsLists(friendsRes.data);
+      } catch (err) {
+        console.error("❌ Failed to fetch lists", err);
+      }
+    };
+
+    fetchLists();
+  }, [profileUserId, isOwner, refreshTrigger]); // ✅ Add refreshTrigger here!
 
   const getDisplayedLists = () => {
     switch (activeSubTab) {

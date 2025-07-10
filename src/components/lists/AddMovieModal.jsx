@@ -27,28 +27,16 @@ export default function AddMovieModal({ onClose, onSelect, existing }) {
         `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(term)}&include_adult=false&language=en-US`
       );
   
-      let filtered = (data.results || []).filter(
-        (movie) =>
-          movie.poster_path &&
-          !movie.adult &&
-          movie.vote_count > 10 &&
-          !BLOCKED_MOVIE_IDS.includes(movie.id)
-      );
+      let filtered = filterMovies(data.results || []);
   
       if (filtered.length === 0 && !isNaN(term)) {
-        // fallback: fetch by ID
         const res = await axios.get(
           `https://api.themoviedb.org/3/movie/${term}?api_key=${TMDB_KEY}&language=en-US`
         );
         const movie = res.data;
-        if (
-          movie &&
-          movie.poster_path &&
-          !movie.adult &&
-          movie.vote_count > 10 &&
-          !BLOCKED_MOVIE_IDS.includes(movie.id)
-        ) {
-          filtered = [movie];
+        const single = filterMovies([movie]);
+        if (single.length > 0) {
+          filtered = single;
         }
       }
   
@@ -59,6 +47,7 @@ export default function AddMovieModal({ onClose, onSelect, existing }) {
       setLoading(false);
     }
   };
+  
   
 
   const handleAdd = (movie) => {
