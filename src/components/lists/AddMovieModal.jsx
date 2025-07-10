@@ -3,13 +3,12 @@ import axios from "axios";
 import { BLOCKED_MOVIE_IDS } from "../../utils/blockedMovies";
 import { backend } from "../../config";
 
+const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
 export default function AddMovieModal({ onClose, onSelect, existing }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
-
-
 
   useEffect(() => {
     const delay = setTimeout(() => {
@@ -23,7 +22,7 @@ export default function AddMovieModal({ onClose, onSelect, existing }) {
     setLoading(true);
     try {
       const { data } = await axios.get(
-        `https://api.themoviedb.org/3/search/movie?api_key=${TMDB}&query=${term}`
+        `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(term)}`
       );
 
       const filtered = (data.results || []).filter(
@@ -50,21 +49,19 @@ export default function AddMovieModal({ onClose, onSelect, existing }) {
 
   return (
     <div
-    style={{
+      style={{
         position: "fixed",
         top: 0,
         left: 0,
         right: 0,
         bottom: 0,
-        zIndex: 9999, // ⬅️ make sure it's top layer
+        zIndex: 9999,
         padding: "24px",
-        paddingBottom: "100px", // ⬅️ breathing room for nav
+        paddingBottom: "100px",
         background: "rgba(0,0,0,0.95)",
         overflowY: "scroll",
       }}
-      
     >
-      {/* Header */}
       <div style={{ marginBottom: "16px", display: "flex", alignItems: "center" }}>
         <button onClick={onClose} style={backBtn}>← Back</button>
         <input
