@@ -49,6 +49,9 @@ export const getWatchlist = (userId) => api.get(`/api/watchlist/${userId}`);
 //
 // 📚 LISTS
 //
+
+// 📚 LISTS
+export const getUserLists = (userId) => api.get(`/api/lists/user/${userId}`);
 export const createList = (data) => api.post("/api/lists", data);
 export const editList = (listId, data) => api.patch(`/api/lists/${listId}`, data);
 export const deleteList = (listId) => api.delete(`/api/lists/${listId}`);
@@ -59,6 +62,7 @@ export const getPopularLists = () => api.get("/api/lists/popular");
 export const getFriendsLists = () => api.get("/api/lists/friends");
 export const toggleSaveList = (listId) => api.post(`/api/lists/${listId}/save`);
 export const likeList = (listId) => api.post(`/api/lists/${listId}/like`);
+
 
 //
 // 🗳️ POLLS

@@ -21,29 +21,27 @@ export default function ProfileTabLists({ user, profileUserId }) {
 
   useEffect(() => {
     const fetchLists = async () => {
-      try {
-        const [myRes, savedRes, popularRes, friendsRes] = await Promise.all([
-            getMyLists(profileUserId),
+        try {
+          const [myRes, savedRes, popularRes, friendsRes] = await Promise.all([
+            isOwner ? getMyLists() : getMyLists(profileUserId), // FIXED: handle properly below
             isOwner ? getSavedLists() : Promise.resolve({ data: [] }),
             getPopularLists(),
             isOwner ? getFriendsLists() : Promise.resolve({ data: [] }),
           ]);
-          
-
-        const filteredMyLists = isOwner
-          ? myRes.data
-          : myRes.data.filter((list) => !list.isPrivate);
-
-        setMyLists(filteredMyLists);
-        setSavedLists(savedRes.data);
-        setPopularLists(popularRes.data);
-        setFriendsLists(friendsRes.data);
-      } catch (err) {
-        console.error("❌ Failed to fetch lists", err);
-      }
-    };
-
-    fetchLists();
+      
+          const filteredMyLists = isOwner
+            ? myRes.data
+            : myRes.data.filter((list) => !list.isPrivate);
+      
+          setMyLists(filteredMyLists);
+          setSavedLists(savedRes.data);
+          setPopularLists(popularRes.data);
+          setFriendsLists(friendsRes.data);
+        } catch (err) {
+          console.error("❌ Failed to fetch lists", err);
+        }
+      };
+      
 
     const refresh = () => fetchLists();
     window.addEventListener("refreshMyLists", refresh);

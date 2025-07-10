@@ -6,3 +6,33 @@ export const BLOCKED_MOVIE_IDS =
     323260 , 324558, 28567, 323372, 677640, 10497, 481, 158693, 323430, 5336, 192483, 84565, 
     114587, 95757, 328662, 102497, 109863, 42446, 41669, 11334, 61272, 29653, 769234, 583911,
      84365, 422585 ]
+
+     const bannedWords = ["sex", "porn", "nude", "hot", "xxx", "hentai", "naked", "ass", "boobs", "pussy", "penis", "dick", "Porno", "Erotic", "horny", "Pornography", "Naked", "erotic"];
+     
+     export function isQueryBanned(query) {
+       const lower = query.toLowerCase();
+       return bannedWords.some((word) => lower.includes(word));
+     }
+     
+     export default function filterMovies(movies) {
+       return movies.filter((movie) => {
+         const isBlocked = blockedIds.includes(movie.id);
+         const isLowRatedJapanese = movie.original_language === "ja" && movie.vote_count < 2500;
+         const indianLangs = ["hi", "ta", "te", "ml", "kn", "bn", "pa", "ur"];
+         const isIndian = indianLangs.includes(movie.original_language);
+         const otherLangs = ["zh", "fr", "de", "ru", "ko"];
+         const isArabic = movie.original_language === "ar";
+         const isForeignLowRated = !isArabic && otherLangs.includes(movie.original_language) && movie.vote_count < 5000;
+     
+         return (
+           movie.vote_count > 10 &&
+           movie.poster_path &&
+           !movie.adult &&
+           !isBlocked &&
+           !isLowRatedJapanese &&
+           !isIndian &&
+           !isForeignLowRated
+         );
+       });
+     }
+     
