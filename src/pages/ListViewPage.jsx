@@ -3,6 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "../api/api";
 import { backend } from "../config";
 
+const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
+
 export default function ListViewPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -65,23 +67,24 @@ export default function ListViewPage() {
             height: "80px",
             background: "linear-gradient(to bottom, rgba(0,0,0,0) 0%, #0e0e0e 100%)"
           }} />
-          <button
-            onClick={() => navigate(-1)}
-            style={{
-              position: "absolute",
-              top: "16px",
-              left: "16px",
-              background: "#1a1a1a",
-              color: "white",
-              padding: "6px 12px",
-              borderRadius: "6px",
-              border: "1px solid #444",
-              fontSize: "12px",
-              zIndex: 2
-            }}
-          >
-            ← Back
-          </button>
+                <button
+        onClick={() => navigate(-1)}
+        style={{
+          background: "rgba(0,0,0,0.5)",
+          border: "none",
+          borderRadius: "50%",
+          width: "32px",
+          height: "32px",
+          color: "#fff",
+          fontSize: "18px",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        ←
+      </button>
           {isOwner && (
             <button
               onClick={() => navigate(`/list/${id}/edit`)}
@@ -159,33 +162,41 @@ export default function ListViewPage() {
           gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
           gap: "12px"
         }}>
-          {list.movies.map((movie, index) => (
-            <div
-              key={movie.id}
-              onClick={() => navigate(`/movie/${movie.id}`)}
-              style={{ cursor: "pointer", textAlign: "center" }}
-            >
-              <img
-                src={movie.customPoster || movie.poster}
-                alt={movie.title}
-                style={{
-                  width: "100%",
-                  height: "140px",
-                  objectFit: "cover",
-                  borderRadius: "8px",
-                  marginBottom: "4px"
-                }}
-              />
-              <div style={{
-                fontSize: "12px",
-                color: "#fff",
-                fontFamily: "Inter, sans-serif",
-                lineHeight: "1.2"
-              }}>
-                {list.isRanked ? `${index + 1}. ` : ""}{movie.title}
+          {list.movies.map((movie, index) => {
+            const posterUrl = movie.poster
+              ? movie.poster.startsWith("http")
+                ? movie.poster
+                : `${TMDB_IMG}${movie.poster}`
+              : "/default-poster.jpg";
+
+            return (
+              <div
+                key={movie.id}
+                onClick={() => navigate(`/movie/${movie.id}`)}
+                style={{ cursor: "pointer", textAlign: "center" }}
+              >
+                <img
+                  src={posterUrl}
+                  alt={movie.title}
+                  style={{
+                    width: "100%",
+                    height: "160px",  // Taller posters
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                    marginBottom: "4px"
+                  }}
+                />
+                <div style={{
+                  fontSize: "12px",
+                  color: "#fff",
+                  fontFamily: "Inter, sans-serif",
+                  lineHeight: "1.2"
+                }}>
+                  {list.isRanked ? `${index + 1}. ` : ""}{movie.title}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

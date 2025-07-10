@@ -33,10 +33,18 @@ export default function ProfileTabReviews({ logs, filter, setFilter, navigate })
 
       {/* 📝 Reviews */}
       {filtered.map((log) => {
-        const poster =
-          log.movie?.customPoster ||
-          log.movie?.poster ||
-          (log.movie?.poster_path ? TMDB_IMG + log.movie.poster_path : "/default-poster.png");
+        let poster = "/default-poster.png";
+        if (log.movie) {
+          if (log.movie.customPoster) {
+            poster = log.movie.customPoster;
+          } else if (log.movie.poster) {
+            poster = log.movie.poster.startsWith("http")
+              ? log.movie.poster
+              : `${TMDB_IMG}${log.movie.poster}`;
+          } else if (log.movie.poster_path) {
+            poster = `${TMDB_IMG}${log.movie.poster_path}`;
+          }
+        }
 
         return (
           <div
