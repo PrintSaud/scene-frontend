@@ -167,7 +167,7 @@ export default function ProfileHeader({
 
 {/* FOLLOW BUTTON */}
 {!isOwner && (
-  <div style={{ display: "flex", justifyContent: "flex-end", padding: "0 16px", marginTop: "-8px" }}>
+  <div style={{ display: "flex", justifyContent: "flex-end", padding: "0 16px", marginTop: "-98px" }}>
     <button
       onClick={handleFollow}
       style={{

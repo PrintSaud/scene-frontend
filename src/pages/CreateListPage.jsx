@@ -4,6 +4,7 @@ import axios from "../api/api";
 import AddMovieModal from "../components/lists/AddMovieModal";
 import MovieListSortable from "../components/lists/MovieListSortable";
 import { backend } from "../config";
+import toast from "react-hot-toast";
 
 export default function CreateListPage() {
   const navigate = useNavigate();
@@ -31,13 +32,18 @@ export default function CreateListPage() {
       setCoverImage(data.url);
     } catch (err) {
       console.error("❌ Upload failed", err);
-      alert("Upload failed.");
+      toast.error("Upload failed.");
     }
   };
 
-  const canSave = title.trim().length > 0 && movies.length > 0;
+  const canSave = title.trim().length > 0 && coverImage && movies.length > 0;
 
   const handleSave = async () => {
+    if (!coverImage) {
+      toast.error("Please upload a cover image before saving.");
+      return;
+    }
+
     try {
       const payload = {
         title,
@@ -46,28 +52,27 @@ export default function CreateListPage() {
         isPrivate,
         isRanked,
         movies: movies.map((m) => ({
-            id: m.id,
-            title: m.title,
-            poster:
-              m.poster?.startsWith("http")
-                ? m.poster // Already a full URL (maybe from AddMovieModal)
-                : m.poster_path
-                ? m.poster_path // Just save the TMDB path directly for consistency
-                : "",
-          })),          
+          id: m.id,
+          title: m.title,
+          poster:
+            m.poster?.startsWith("http")
+              ? m.poster
+              : m.poster_path
+              ? m.poster_path
+              : "",
+        })),
       };
 
-      const { data } = await axios.post(`${backend}/api/lists`, payload, {
+      await axios.post(`${backend}/api/lists`, payload, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
 
-      // ✅ After creating, dispatch global event and go back
       window.dispatchEvent(new Event("refreshMyLists"));
+      toast.success("✅ List created!");
       navigate(-1);
-
     } catch (err) {
       console.error("❌ Failed to create list", err);
-      alert("Failed to create list.");
+      toast.error("Failed to create list.");
     }
   };
 
@@ -102,7 +107,7 @@ export default function CreateListPage() {
         {!coverImage ? (
           <div style={{ marginTop: "12px" }}>
             <label htmlFor="cover-upload" style={uploadLabel}>
-              ⬆️ Upload a cover image
+              ⬆️ Upload a cover image (required)
             </label>
             <input type="file" id="cover-upload" accept="image/*" style={{ display: "none" }} onChange={handleCoverUpload} />
           </div>

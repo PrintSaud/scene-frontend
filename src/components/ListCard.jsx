@@ -1,6 +1,7 @@
-// src/components/ListCard.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
+
+const FALLBACK_COVER = "/default-list-cover.jpg";  // Add a fallback image path if needed
 
 export default function ListCard({ list }) {
   const navigate = useNavigate();
@@ -22,15 +23,20 @@ export default function ListCard({ list }) {
       onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
       onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
     >
+      {/* Cover Image with fallback */}
       <img
-        src={list.coverImage}
+        src={list.coverImage || FALLBACK_COVER}
         alt={list.title}
         style={{
           width: "100%",
           height: "120px",
           objectFit: "cover",
+          backgroundColor: "#333",  // In case no image loads, this provides a nice background
         }}
+        onError={(e) => (e.currentTarget.src = FALLBACK_COVER)}
       />
+
+      {/* Info section */}
       <div style={{ padding: "8px 12px", color: "#fff", fontSize: "13px" }}>
         <div
           style={{
