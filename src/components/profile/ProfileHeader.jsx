@@ -165,25 +165,26 @@ export default function ProfileHeader({
         )}
       </div>
 
-      {/* FOLLOW BUTTON */}
-      {!isOwner && (
-        <div style={{ display: "flex", justifyContent: "flex-end", padding: "0 16px", marginTop: "1px" }}>
-          <button
-            onClick={handleFollow}
-            style={{
-              background: isFollowing ? "#333" : "#1a1a1a",
-              color: "white",
-              border: "1px solid #555",
-              borderRadius: "6px",
-              padding: "4px 12px",
-              fontSize: "13px",
-              cursor: "pointer"
-            }}
-          >
-            {isFollowing ? "Following" : "Follow"}
-          </button>
-        </div>
-      )}
+{/* FOLLOW BUTTON */}
+{!isOwner && (
+  <div style={{ display: "flex", justifyContent: "flex-end", padding: "0 16px", marginTop: "-8px" }}>
+    <button
+      onClick={handleFollow}
+      style={{
+        background: isFollowing ? "#333" : "#1a1a1a",
+        color: "white",
+        border: "1px solid #555",
+        borderRadius: "6px",
+        padding: "4px 12px",
+        fontSize: "13px",
+        cursor: "pointer"
+      }}
+    >
+      {isFollowing ? "Following" : "Follow"}
+    </button>
+  </div>
+)}
+
 
       {/* STATS */}
       <div
