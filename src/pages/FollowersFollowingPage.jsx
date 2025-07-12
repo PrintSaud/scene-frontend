@@ -120,14 +120,15 @@ export default function FollowersFollowingPage() {
         <ul style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
           {users.map((u) => (
             <li
-              key={u._id}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                justifyContent: "flex-start",  // ensure alignment left
-              }}
-            >
+            key={u._id}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",  // Fix: space between avatar+username and follow btn
+              gap: "12px"
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <img
                 src={u.avatar}
                 alt={u.username}
@@ -139,27 +140,26 @@ export default function FollowersFollowingPage() {
                 }}
               />
               <div style={{ fontSize: "13px", fontWeight: "600" }}>{u.username}</div>
-
-              {/* Spacer to push button far right */}
-              <div style={{ flex: 1 }} />
-
-              {u._id !== currentUser._id && (
-                <button
-                  onClick={() => toggleFollow(u._id)}
-                  style={{
-                    padding: "4px 10px",
-                    borderRadius: "20px",
-                    fontSize: "12px",
-                    background: currentUser.following.includes(u._id) ? "#222" : "#fff",
-                    color: currentUser.following.includes(u._id) ? "#fff" : "#000",
-                    border: "1px solid #444",
-                    cursor: "pointer",
-                  }}
-                >
-                  {currentUser.following.includes(u._id) ? "Unfollow" : "Follow"}
-                </button>
-              )}
-            </li>
+            </div>
+          
+            {u._id !== currentUser._id && (
+              <button
+                onClick={() => toggleFollow(u._id)}
+                style={{
+                  padding: "4px 10px",
+                  borderRadius: "20px",
+                  fontSize: "12px",
+                  background: currentUser.following.includes(u._id) ? "#222" : "#fff",
+                  color: currentUser.following.includes(u._id) ? "#fff" : "#000",
+                  border: "1px solid #444",
+                  cursor: "pointer",
+                }}
+              >
+                {currentUser.following.includes(u._id) ? "Unfollow" : "Follow"}
+              </button>
+            )}
+          </li>
+          
           ))}
         </ul>
       )}
