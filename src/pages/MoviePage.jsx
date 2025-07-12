@@ -123,11 +123,23 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
 
   useEffect(() => {
     if (!movie?.id) return;
-    axios
-      .get(`${backend}/api/posters/${movie.id}`)
-      .then(({ data }) => setPosterOverride(data.posterUrl))
-      .catch(() => {});
+  
+    const fetchPoster = async () => {
+      try {
+        const { data } = await axios.get(`${backend}/api/posters/${movie.id}`);
+        if (data?.posterUrl) {
+          setPosterOverride(data.posterUrl);
+        } else {
+          setPosterOverride(null); // No custom poster exists
+        }
+      } catch (err) {
+        setPosterOverride(null); // API returned 404 or failed → fallback to TMDB poster later
+      }
+    };
+  
+    fetchPoster();
   }, [movie]);
+  
 
   useEffect(() => {
     const region = Intl.DateTimeFormat().resolvedOptions().locale.split("-")[1];
