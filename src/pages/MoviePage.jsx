@@ -6,6 +6,7 @@ import { toast } from "react-hot-toast";
 import LogModal from "../components/modals/LogModal"; // update path if different
 import { backend } from "../config";
 import { getWatchlistStatus } from "../api/api";
+import ListPickerModal from "../components/lists/ListPickerModal";
 
 
 // Components
