@@ -47,11 +47,15 @@ export default function ProfileTabReviews({ logs, filter, setFilter, navigate })
       {/* 📝 Reviews */}
       {filtered.map((log) => {
         let poster = "/default-poster.png";
-        if (log.poster) {
+
+        if (log.posterOverride) {
+          poster = log.posterOverride;
+        } else if (log.poster) {
           poster = log.poster.startsWith("http")
             ? log.poster
             : `${TMDB_IMG}${log.poster}`;
         }
+        
 
         return (
           <div
