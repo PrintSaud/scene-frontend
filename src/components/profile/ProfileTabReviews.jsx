@@ -49,22 +49,17 @@ export default function ProfileTabReviews({ logs, filter, setFilter, navigate })
       {filtered.map((log) => {
         let poster = "/default-poster.png";
         if (log.movie) {
-          if (log.movie.posterOverride) {
-            poster = log.movie.posterOverride;
-          } else if (log.movie.customPoster) {
-            poster = log.movie.customPoster;
-          } else if (log.movie.poster) {
-            poster = log.movie.poster.startsWith("http")
-              ? log.movie.poster
-              : `${TMDB_IMG}${log.movie.poster}`;
-          } else if (log.movie.poster_path) {
-            poster = `${TMDB_IMG}${log.movie.poster_path}`;
-          }
+          poster = log.movie.posterOverride
+            || log.movie.customPoster
+            || (log.movie.poster_path ? `${TMDB_IMG}${log.movie.poster_path}` : null)
+            || (log.movie.poster
+              ? (log.movie.poster.startsWith("http")
+                ? log.movie.poster
+                : `${TMDB_IMG}${log.movie.poster}`)
+              : null)
+            || "/default-poster.png";
         }
         
-          
-        
-
         return (
           <div
             key={log._id}
@@ -79,7 +74,7 @@ export default function ProfileTabReviews({ logs, filter, setFilter, navigate })
           >
   
 {/* 📅 Relative timestamp in top right */}
-<div style={{ position: "absolute", top: "24px", right: "12px", fontSize: "11px", color: "#888", fontFamily: "Inter, sans-serif", }}>
+<div style={{ position: "absolute", top: "28px", right: "12px", fontSize: "11px", color: "#888", fontFamily: "Inter, sans-serif", }}>
   {getRelativeTime(log.watchedAt)}
 </div>
 
