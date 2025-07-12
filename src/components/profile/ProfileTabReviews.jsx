@@ -49,18 +49,20 @@ export default function ProfileTabReviews({ logs, filter, setFilter, navigate })
       {filtered.map((log) => {
         let poster = "/default-poster.png";
         if (log.movie) {
-          if (log.movie.customPoster) {
-            poster = log.movie.customPoster;
-          } else if (log.movie.posterOverride) {
+          if (log.movie.posterOverride) {
             poster = log.movie.posterOverride;
-          } else if (log.movie.poster_path) {
-            poster = `${TMDB_IMG}${log.movie.poster_path}`;
+          } else if (log.movie.customPoster) {
+            poster = log.movie.customPoster;
           } else if (log.movie.poster) {
             poster = log.movie.poster.startsWith("http")
               ? log.movie.poster
               : `${TMDB_IMG}${log.movie.poster}`;
+          } else if (log.movie.poster_path) {
+            poster = `${TMDB_IMG}${log.movie.poster_path}`;
           }
         }
+        
+          
         
 
         return (
@@ -77,7 +79,7 @@ export default function ProfileTabReviews({ logs, filter, setFilter, navigate })
           >
   
 {/* 📅 Relative timestamp in top right */}
-<div style={{ position: "absolute", top: "22px", right: "12px", fontSize: "11px", color: "#888" }}>
+<div style={{ position: "absolute", top: "22px", right: "12px", fontSize: "11px", color: "#888", fontFamily: "Inter, sans-serif", }}>
   {getRelativeTime(log.watchedAt)}
 </div>
 
