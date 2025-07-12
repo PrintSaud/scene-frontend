@@ -79,7 +79,7 @@ export default function ProfileTabReviews({ logs, filter, setFilter, navigate })
           >
   
 {/* 📅 Relative timestamp in top right */}
-<div style={{ position: "absolute", top: "22px", right: "12px", fontSize: "11px", color: "#888", fontFamily: "Inter, sans-serif", }}>
+<div style={{ position: "absolute", top: "24px", right: "12px", fontSize: "11px", color: "#888", fontFamily: "Inter, sans-serif", }}>
   {getRelativeTime(log.watchedAt)}
 </div>
 
