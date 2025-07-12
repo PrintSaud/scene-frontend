@@ -84,12 +84,13 @@ export default function ListViewPage() {
           background: "linear-gradient(to bottom, rgba(0,0,0,0) 0%, #0e0e0e 100%)"
         }} />
 
-        <button
-          onClick={() => navigate(-1)}
-          style={headerBtn}
-        >
-          ←
-        </button>
+<button
+  onClick={() => navigate(-1)}
+  style={{ ...headerBtn, left: "16px" }}
+>
+  ←
+</button>
+
 
         {isOwner ? (
           <button
