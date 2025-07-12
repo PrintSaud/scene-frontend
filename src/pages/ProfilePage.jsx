@@ -116,23 +116,30 @@ export default function ProfilePage() {
       <ProfileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {!isOwner && (
-    <div style={{ display: "flex", justifyContent: "flex-end", padding: "0 16px", marginTop: "-40px", marginBottom: "10px" }}>
-      <button
-        onClick={handleFollow}
-        style={{
-          background: isFollowing ? "#333" : "#1a1a1a",
-          color: "white",
-          border: "1px solid #555",
-          borderRadius: "6px",
-          padding: "4px 12px",
-          fontSize: "13px",
-          cursor: "pointer"
-        }}
-      >
-        {isFollowing ? "Following" : "Follow"}
-      </button>
-    </div>
-  )}
+  <div
+    style={{
+      position: "absolute",
+      top: "140px", // Adjust as needed for your avatar/header layout
+      right: "16px",
+      zIndex: 3
+    }}
+  >
+    <button
+      onClick={handleFollow}
+      style={{
+        background: isFollowing ? "#333" : "#1a1a1a",
+        color: "white",
+        border: "1px solid #555",
+        borderRadius: "6px",
+        padding: "4px 12px",
+        fontSize: "13px",
+        cursor: "pointer"
+      }}
+    >
+      {isFollowing ? "Following" : "Follow"}
+    </button>
+  </div>
+)}
 
       <div style={{ padding: "0 16px" }}>
         {activeTab === "Profile" && <ProfileTabProfile logs={logs} />}
