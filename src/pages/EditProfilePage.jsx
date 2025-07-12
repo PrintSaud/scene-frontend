@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "../api/api";
 import MovieListSortable from "../components/lists/MovieListSortable";
 import { backend } from "../config";
+import toast from "react-hot-toast";
 
 
 import {
@@ -138,14 +139,15 @@ useEffect(() => {
       // 🧠 UPDATE localStorage
       localStorage.setItem("user", JSON.stringify({ ...user, ...updatedUser }));
       
-      alert("Profile updated!");
+      toast.success("✅ Profile updated!");
       navigate(`/profile/${user._id}`);
       
 
 
     } catch (err) {
       console.error("❌ Failed to update profile", err);
-      alert("Something went wrong.");
+      toast.error("❌ Failed to update profile.");
+
     }
   };
 
@@ -168,10 +170,12 @@ useEffect(() => {
         }
       );
   
-      setAvatar(res.data.avatar); // ✅ backend returns avatar: url
+      setAvatar(res.data.avatar);
+      toast.success("✅ Avatar uploaded!"); // ✅ backend returns avatar: url
     } catch (err) {
       console.error("Avatar upload failed", err);
-      alert("Upload failed.");
+      toast.error("❌ Avatar upload failed.");
+
     }
   };
   

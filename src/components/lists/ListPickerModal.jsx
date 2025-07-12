@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "../../api/api";
 import { backend } from "../../config";
+import toast from "react-hot-toast";
 
 
 export default function ListPickerModal({ movie, onClose }) {
@@ -40,15 +41,16 @@ export default function ListPickerModal({ movie, onClose }) {
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
-
+  
       window.dispatchEvent(new Event("refreshMyLists"));
-      alert("✅ Added to list!");
+      toast.success("✅ Added to list!");  // ✅ Nice toast
       onClose();
     } catch (err) {
       console.error("❌ Failed to add movie to list", err);
-      alert("❌ Failed to add movie.");
+      toast.error("❌ Failed to add movie.");  // ✅ Error toast too
     }
   };
+  
 
   return (
     <div
