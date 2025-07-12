@@ -1,7 +1,8 @@
 import React from "react";
 import { FaStar, FaRegStar, FaStarHalfAlt } from "react-icons/fa";
 
-const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
+const TMDB_IMG = "https://image.tmdb.org/t/p/w300";
+
 
 const getRelativeTime = (date) => {
     const diff = Date.now() - new Date(date).getTime();
