@@ -94,7 +94,7 @@ const isOwner = (stored._id || stored.id) === user?._id;
   style={{
     position: "absolute",
     left: "16px",
-    bottom: "-20px",  // moved slightly down (was -10px)
+    bottom: "-30px",  // moved slightly down (was -10px)
     zIndex: 2,
   }}
 >
