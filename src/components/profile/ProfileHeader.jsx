@@ -89,44 +89,31 @@ const isOwner = (stored._id || stored.id) === user?._id;
           </div>
         )}
 
-        {/* AVATAR */}
-        <div
-          style={{
-            position: "absolute",
-            left: "16px",
-            bottom: "-10px",
-            zIndex: 2,
-          }}
-        >
-          {user.avatar ? (
-            <img
-              src={user.avatar}
-              alt="Avatar"
-              style={{
-                width: "80px",
-                height: "80px",
-                borderRadius: "50%",
-                objectFit: "cover",
-                border: "3px solid #0e0e0e",
-              }}
-              onError={(e) => {
-                e.currentTarget.src = "/default-avatar.jpg";
-              }}
-            />
-          ) : (
-            <img
-              src="/default-avatar.jpg"
-              alt="Avatar"
-              style={{
-                width: "80px",
-                height: "80px",
-                borderRadius: "50%",
-                objectFit: "cover",
-                border: "3px solid #0e0e0e",
-              }}
-            />
-          )}
-        </div>
+{/* AVATAR */}
+<div
+  style={{
+    position: "absolute",
+    left: "16px",
+    bottom: "-20px",  // moved slightly down (was -10px)
+    zIndex: 2,
+  }}
+>
+  <img
+    src={user.avatar || "/default-avatar.jpg"}
+    alt="Avatar"
+    style={{
+      width: "70px",  // was 80px → smaller
+      height: "70px",
+      borderRadius: "50%",
+      objectFit: "cover",
+      border: "2px solid #0e0e0e",
+    }}
+    onError={(e) => {
+      e.currentTarget.src = "/default-avatar.jpg";
+    }}
+  />
+</div>
+
       </div>
 
 {/* NAME + USERNAME */}

@@ -119,7 +119,7 @@ export default function ProfilePage() {
   <div
     style={{
       position: "absolute",
-      top: "140px", // Adjust as needed for your avatar/header layout
+      top: "120px", // Adjust as needed for your avatar/header layout
       right: "16px",
       zIndex: 3
     }}
