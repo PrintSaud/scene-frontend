@@ -109,38 +109,32 @@ export default function ProfilePage() {
 
 
   
-
   return (
     <div style={{ backgroundColor: "#0e0e0e", color: "white", minHeight: "100vh", paddingBottom: "100px" }}>
       <ProfileHeader user={user} navigate={navigate} imgRef={imgRef} />
-      <ProfileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
-
+  
+      {/* Clean follow button placement below header and before tabs */}
       {!isOwner && (
-  <div
-    style={{
-      position: "absolute",
-      top: "120px", // Adjust as needed for your avatar/header layout
-      right: "16px",
-      zIndex: 3
-    }}
-  >
-    <button
-      onClick={handleFollow}
-      style={{
-        background: isFollowing ? "#333" : "#1a1a1a",
-        color: "white",
-        border: "1px solid #555",
-        borderRadius: "6px",
-        padding: "4px 12px",
-        fontSize: "13px",
-        cursor: "pointer"
-      }}
-    >
-      {isFollowing ? "Following" : "Follow"}
-    </button>
-  </div>
-)}
-
+        <div style={{ display: "flex", justifyContent: "flex-end", padding: "8px 16px" }}>
+          <button
+            onClick={handleFollow}
+            style={{
+              background: isFollowing ? "#333" : "#1a1a1a",
+              color: "white",
+              border: "1px solid #555",
+              borderRadius: "6px",
+              padding: "4px 12px",
+              fontSize: "13px",
+              cursor: "pointer"
+            }}
+          >
+            {isFollowing ? "Following" : "Follow"}
+          </button>
+        </div>
+      )}
+  
+      <ProfileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+  
       <div style={{ padding: "0 16px" }}>
         {activeTab === "Profile" && <ProfileTabProfile logs={logs} />}
         {activeTab === "Reviews" && (
@@ -175,4 +169,5 @@ export default function ProfilePage() {
       </div>
     </div>
   );
+  
 }
