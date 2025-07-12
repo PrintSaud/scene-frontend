@@ -3,6 +3,19 @@ import { FaStar, FaRegStar, FaStarHalfAlt } from "react-icons/fa";
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 
+const getRelativeTime = (date) => {
+    const diff = Date.now() - new Date(date).getTime();
+    const min = Math.floor(diff / 60000);
+    const hr = Math.floor(diff / 3600000);
+    const day = Math.floor(diff / 86400000);
+  
+    if (min < 1) return "Just now";
+    if (min < 60) return `${min}min`;
+    if (hr < 24) return `${hr}h`;
+    return `${day}d`;
+  };
+  
+
 export default function ProfileTabReviews({ logs, filter, setFilter, navigate }) {
   const filtered = logs
     .filter((log) => log.review)
@@ -38,14 +51,17 @@ export default function ProfileTabReviews({ logs, filter, setFilter, navigate })
         if (log.movie) {
           if (log.movie.customPoster) {
             poster = log.movie.customPoster;
+          } else if (log.movie.posterOverride) {
+            poster = log.movie.posterOverride;
+          } else if (log.movie.poster_path) {
+            poster = `${TMDB_IMG}${log.movie.poster_path}`;
           } else if (log.movie.poster) {
             poster = log.movie.poster.startsWith("http")
               ? log.movie.poster
               : `${TMDB_IMG}${log.movie.poster}`;
-          } else if (log.movie.poster_path) {
-            poster = `${TMDB_IMG}${log.movie.poster_path}`;
           }
         }
+        
 
         return (
           <div
@@ -59,10 +75,12 @@ export default function ProfileTabReviews({ logs, filter, setFilter, navigate })
               position: "relative",
             }}
           >
-            {/* 📅 Timestamp in top right */}
-            <div style={{ position: "absolute", top: "10px", right: "12px", fontSize: "11px", color: "#888" }}>
-              {new Date(log.watchedAt).toLocaleDateString()}
-            </div>
+  
+{/* 📅 Relative timestamp in top right */}
+<div style={{ position: "absolute", top: "22px", right: "12px", fontSize: "11px", color: "#888" }}>
+  {getRelativeTime(log.watchedAt)}
+</div>
+
 
             {/* 🎬 Movie poster + review */}
             <div style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
