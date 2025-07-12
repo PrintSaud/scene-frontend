@@ -128,7 +128,7 @@ export default function FollowersFollowingPage() {
               }}
             >
               {/* Avatar + username left aligned */}
-              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <div style={{ display: "flex", alignItems: "left", gap: "12px" }}>
                 <img
                   src={u.avatar || "/default-avatar.jpg"}
                   alt={u.username}
