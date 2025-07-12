@@ -3,19 +3,17 @@ import { FaStar, FaRegStar, FaStarHalfAlt } from "react-icons/fa";
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w300";
 
-
 const getRelativeTime = (date) => {
-    const diff = Date.now() - new Date(date).getTime();
-    const min = Math.floor(diff / 60000);
-    const hr = Math.floor(diff / 3600000);
-    const day = Math.floor(diff / 86400000);
-  
-    if (min < 1) return "Just now";
-    if (min < 60) return `${min}min`;
-    if (hr < 24) return `${hr}h`;
-    return `${day}d`;
-  };
-  
+  const diff = Date.now() - new Date(date).getTime();
+  const min = Math.floor(diff / 60000);
+  const hr = Math.floor(diff / 3600000);
+  const day = Math.floor(diff / 86400000);
+
+  if (min < 1) return "Just now";
+  if (min < 60) return `${min}min`;
+  if (hr < 24) return `${hr}h`;
+  return `${day}d`;
+};
 
 export default function ProfileTabReviews({ logs, filter, setFilter, navigate }) {
   const filtered = logs
@@ -49,18 +47,12 @@ export default function ProfileTabReviews({ logs, filter, setFilter, navigate })
       {/* 📝 Reviews */}
       {filtered.map((log) => {
         let poster = "/default-poster.png";
-        if (log.movie) {
-          poster = log.movie.posterOverride
-            || log.movie.customPoster
-            || (log.movie.poster_path ? `${TMDB_IMG}${log.movie.poster_path}` : null)
-            || (log.movie.poster
-              ? (log.movie.poster.startsWith("http")
-                ? log.movie.poster
-                : `${TMDB_IMG}${log.movie.poster}`)
-              : null)
-            || "/default-poster.png";
+        if (log.poster) {
+          poster = log.poster.startsWith("http")
+            ? log.poster
+            : `${TMDB_IMG}${log.poster}`;
         }
-        
+
         return (
           <div
             key={log._id}
@@ -73,18 +65,25 @@ export default function ProfileTabReviews({ logs, filter, setFilter, navigate })
               position: "relative",
             }}
           >
-  
-{/* 📅 Relative timestamp in top right */}
-<div style={{ position: "absolute", top: "20px", right: "12px", fontSize: "11px", color: "#888", fontFamily: "Inter, sans-serif", }}>
-  {getRelativeTime(log.watchedAt)}
-</div>
-
+            {/* 📅 Relative timestamp in top right */}
+            <div
+              style={{
+                position: "absolute",
+                top: "20px",
+                right: "12px",
+                fontSize: "11px",
+                color: "#888",
+                fontFamily: "Inter, sans-serif",
+              }}
+            >
+              {getRelativeTime(log.watchedAt)}
+            </div>
 
             {/* 🎬 Movie poster + review */}
             <div style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
               <img
                 src={poster}
-                alt={log.movie?.title}
+                alt={log.title}
                 style={{
                   width: "100px",
                   height: "150px",
@@ -93,9 +92,9 @@ export default function ProfileTabReviews({ logs, filter, setFilter, navigate })
                 }}
               />
               <div style={{ flex: 1 }}>
-                <h4 style={{ margin: 0, color: "#fff", fontSize: "15px" }}>{log.movie?.title}</h4>
+                <h4 style={{ margin: 0, color: "#fff", fontSize: "15px" }}>{log.title}</h4>
 
-                {/* ⭐ Rating (same style as LogModal) */}
+                {/* ⭐ Rating */}
                 <div style={{ display: "flex", gap: "3px", marginTop: "4px", fontSize: "18px" }}>
                   {[...Array(5)].map((_, i) => {
                     const isFull = i + 1 <= log.rating;
@@ -114,7 +113,7 @@ export default function ProfileTabReviews({ logs, filter, setFilter, navigate })
                   })}
                 </div>
 
-                {/* 📝 Review next to poster */}
+                {/* 📝 Review text */}
                 <p
                   style={{
                     color: "#ccc",
@@ -133,14 +132,26 @@ export default function ProfileTabReviews({ logs, filter, setFilter, navigate })
               <img
                 src={log.image}
                 alt="uploaded"
-                style={{ width: "100%", borderRadius: "10px", maxHeight: "220px", objectFit: "cover", marginTop: "10px" }}
+                style={{
+                  width: "100%",
+                  borderRadius: "10px",
+                  maxHeight: "220px",
+                  objectFit: "cover",
+                  marginTop: "10px",
+                }}
               />
             )}
             {log.gif && (
               <img
                 src={log.gif}
                 alt="gif"
-                style={{ width: "100%", borderRadius: "10px", maxHeight: "220px", objectFit: "cover", marginTop: "10px" }}
+                style={{
+                  width: "100%",
+                  borderRadius: "10px",
+                  maxHeight: "220px",
+                  objectFit: "cover",
+                  marginTop: "10px",
+                }}
               />
             )}
 
@@ -156,7 +167,9 @@ export default function ProfileTabReviews({ logs, filter, setFilter, navigate })
             >
               <span>❤️ {log.likes || 0} likes</span>
               {log.replies?.length > 0 && (
-                <span>💬 {log.replies.length} {log.replies.length === 1 ? "reply" : "replies"}</span>
+                <span>
+                  💬 {log.replies.length} {log.replies.length === 1 ? "reply" : "replies"}
+                </span>
               )}
             </div>
           </div>
