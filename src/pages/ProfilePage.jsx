@@ -23,6 +23,7 @@ export default function ProfilePage() {
   const [listRefreshKey, setListRefreshKey] = useState(0);
   const [stored, setStored] = useState(null);
   const imgRef = useRef();
+  const [isFollowing, setIsFollowing] = useState(false);
 
   // ✅ Load user from localStorage
   useEffect(() => {
@@ -66,6 +67,21 @@ export default function ProfilePage() {
     fetchLogs();
   }, [id]);
 
+  useEffect(() => {
+    if (stored && user) {
+      setIsFollowing(user.followers?.includes(stored._id));
+    }
+  }, [user, stored]);
+  
+  const handleFollow = async () => {
+    try {
+      await api.post(`/api/users/${stored._id}/follow/${user._id}`);
+      setIsFollowing(!isFollowing);
+    } catch (err) {
+      console.error("❌ Failed to follow/unfollow:", err);
+    }
+  };
+  
   // 🎨 Dominant color from backdrop
   useEffect(() => {
     if (user && imgRef.current) {
@@ -91,10 +107,32 @@ export default function ProfilePage() {
 
   if (!user) return <div style={{ color: "white", padding: "20px" }}>Loading...</div>;
 
+
+  
+
   return (
     <div style={{ backgroundColor: "#0e0e0e", color: "white", minHeight: "100vh", paddingBottom: "100px" }}>
       <ProfileHeader user={user} navigate={navigate} imgRef={imgRef} />
       <ProfileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+
+      {!isOwner && (
+    <div style={{ display: "flex", justifyContent: "flex-end", padding: "0 16px", marginTop: "-40px", marginBottom: "10px" }}>
+      <button
+        onClick={handleFollow}
+        style={{
+          background: isFollowing ? "#333" : "#1a1a1a",
+          color: "white",
+          border: "1px solid #555",
+          borderRadius: "6px",
+          padding: "4px 12px",
+          fontSize: "13px",
+          cursor: "pointer"
+        }}
+      >
+        {isFollowing ? "Following" : "Follow"}
+      </button>
+    </div>
+  )}
 
       <div style={{ padding: "0 16px" }}>
         {activeTab === "Profile" && <ProfileTabProfile logs={logs} />}
