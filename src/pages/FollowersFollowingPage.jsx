@@ -14,20 +14,13 @@ export default function FollowersFollowingPage() {
   const [profileUsername, setProfileUsername] = useState("User");
   const [currentUser, setCurrentUser] = useState(JSON.parse(localStorage.getItem("user")));
 
-
-
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const res = await axios.get(`${backend}/api/users/${id}/${activeTab}`, {
-          headers: {
-            Authorization: `Bearer ${currentUser.token}`,
-          },
+          headers: { Authorization: `Bearer ${currentUser.token}` }
         });
-
-        // Debug check
         console.log("🔥 res.data:", res.data);
-
         const userArray = res.data.followers || res.data.following || [];
         setUsers(userArray);
         setProfileUsername(res.data.user?.username || "User");
@@ -36,22 +29,17 @@ export default function FollowersFollowingPage() {
         setUsers([]);
       }
     };
-
     fetchUsers();
   }, [activeTab, id]);
 
   const toggleFollow = async (targetId) => {
     try {
       await axios.post(`${backend}/api/users/${currentUser._id}/follow/${targetId}`, null, {
-        headers: {
-          Authorization: `Bearer ${currentUser.token}`,
-        },
+        headers: { Authorization: `Bearer ${currentUser.token}` }
       });
-
       const updatedFollowing = currentUser.following.includes(targetId)
         ? currentUser.following.filter((id) => id !== targetId)
         : [...currentUser.following, targetId];
-
       const updatedUser = { ...currentUser, following: updatedFollowing };
       setCurrentUser(updatedUser);
       localStorage.setItem("user", JSON.stringify(updatedUser));
@@ -62,7 +50,7 @@ export default function FollowersFollowingPage() {
 
   return (
     <div style={{ background: "#000", minHeight: "100vh", padding: "24px", color: "#fff" }}>
-      {/* Back button + Title */}
+      {/* Back + title */}
       <div style={{ position: "relative", marginBottom: "20px", height: "24px" }}>
         <button
           onClick={() => navigate(-1)}
@@ -125,21 +113,36 @@ export default function FollowersFollowingPage() {
         </button>
       </div>
 
-      {/* Users */}
+      {/* Users list */}
       {users.length === 0 ? (
         <div style={{ textAlign: "center", color: "#888" }}>No users found.</div>
       ) : (
         <ul style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
           {users.map((u) => (
-            <li key={u._id} style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <li
+              key={u._id}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                justifyContent: "flex-start",  // ensure alignment left
+              }}
+            >
               <img
                 src={u.avatar}
                 alt={u.username}
-                style={{ width: "40px", height: "40px", borderRadius: "50%", objectFit: "cover" }}
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                }}
               />
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: "13px", fontWeight: "600" }}>{u.username}</div>
-              </div>
+              <div style={{ fontSize: "13px", fontWeight: "600" }}>{u.username}</div>
+
+              {/* Spacer to push button far right */}
+              <div style={{ flex: 1 }} />
+
               {u._id !== currentUser._id && (
                 <button
                   onClick={() => toggleFollow(u._id)}
