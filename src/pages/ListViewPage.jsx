@@ -4,6 +4,7 @@ import axios from "../api/api";
 import { backend } from "../config";
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
+const FALLBACK_COVER = "https://image.tmdb.org/t/p/original/your-default-cover.jpg"; // optional fallback image URL
 
 export default function ListViewPage() {
   const { id } = useParams();
@@ -51,61 +52,91 @@ export default function ListViewPage() {
 
   return (
     <div style={{ background: "#0e0e0e", minHeight: "100vh", color: "white", paddingBottom: "80px" }}>
-      {/* Cover */}
-      {list.coverImage && (
-        <div style={{ position: "relative", height: "220px", overflow: "hidden" }}>
-          <img
-            src={list.coverImage}
-            alt="cover"
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-          />
-          <div style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: "80px",
-            background: "linear-gradient(to bottom, rgba(0,0,0,0) 0%, #0e0e0e 100%)"
-          }} />
-                <button
-        onClick={() => navigate(-1)}
-        style={{
-            position: "absolute",
-            top: "16px",
-            left: "16px",
-            background: "#1a1a1a",
-            color: "white",
-            padding: "6px 12px",
-            borderRadius: "6px",
-            border: "1px solid #444",
-            fontSize: "12px",
-            zIndex: 2
-          }}
-      >
-        ←
-      </button>
-          {isOwner && (
-            <button
-              onClick={() => navigate(`/list/${id}/edit`)}
-              style={{
-                position: "absolute",
-                top: "16px",
-                right: "16px",
-                background: "#1a1a1a",
-                color: "white",
-                padding: "6px 12px",
-                borderRadius: "6px",
-                border: "1px solid #444",
-                fontSize: "12px",
-                zIndex: 2
-              }}
-            >
-              Edit
-            </button>
-          )}
-        </div>
-      )}
+        {/* Cover */}
+<div style={{ position: "relative", height: "220px", overflow: "hidden", background: list.coverImage ? "none" : "#1a1a1a" }}>
+  {list.coverImage ? (
+    <img
+      src={list.coverImage}
+      alt="cover"
+      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+    />
+  ) : (
+    <div style={{ width: "100%", height: "100%" }} />  // Empty block if no image but keeps layout
+  )}
 
+  <div style={{
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: "80px",
+    background: "linear-gradient(to bottom, rgba(0,0,0,0) 0%, #0e0e0e 100%)"
+  }} />
+
+  <button
+    onClick={() => navigate(-1)}
+    style={{
+      position: "absolute",
+      top: "16px",
+      left: "16px",
+      background: "#1a1a1a",
+      color: "white",
+      padding: "6px 12px",
+      borderRadius: "6px",
+      border: "1px solid #444",
+      fontSize: "12px",
+      zIndex: 2
+    }}
+  >
+    ←
+  </button>
+
+  {isOwner ? (
+  <button
+    onClick={() => navigate(`/list/${id}/edit`)}
+    style={{
+      position: "absolute",
+      top: "16px",
+      right: "16px",
+      background: "#1a1a1a",
+      color: "white",
+      padding: "6px 12px",
+      borderRadius: "6px",
+      border: "1px solid #444",
+      fontSize: "12px",
+      zIndex: 2
+    }}
+  >
+    Edit
+  </button>
+) : (
+  <button
+    onClick={async () => {
+      try {
+        await axios.post(`${backend}/api/lists/${id}/save`);
+        alert("List saved!"); // or use toast
+      } catch (err) {
+        console.error("Failed to save list:", err);
+      }
+    }}
+    style={{
+      position: "absolute",
+      top: "16px",
+      right: "16px",
+      background: "#1a1a1a",
+      color: "white",
+      padding: "6px 12px",
+      borderRadius: "6px",
+      border: "1px solid #444",
+      fontSize: "12px",
+      zIndex: 2
+    }}
+  >
+    Save
+  </button>
+)}
+
+</div>
       {/* Content */}
       <div style={{ padding: "16px" }}>
         <h2 style={{
@@ -126,24 +157,26 @@ export default function ListViewPage() {
         }}>
           {list.description}
         </p>
-
         <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", color: "#aaa" }}>
-          <img
-            src={list.user.avatar}
-            alt="avatar"
-            style={{ width: "28px", height: "28px", borderRadius: "50%" }}
-          />
-          <span style={{ fontFamily: "Inter, sans-serif" }}>@{list.user.username}</span>
+  <div
+    style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}
+    onClick={() => navigate(`/profile/${list.user._id}`)}
+  >
+    <img
+      src={list.user.avatar}
+      alt="avatar"
+      style={{ width: "28px", height: "28px", borderRadius: "50%" }}
+    />
+    <span style={{ fontFamily: "Inter, sans-serif" }}>@{list.user.username}</span>
+  </div>
 
-          <div style={{ marginLeft: "auto", textAlign: "right" }}>
-            <div style={{ fontFamily: "Inter, sans-serif", fontSize: "13px", color: "#aaa" }}>
-              {new Date(list.createdAt).toLocaleDateString()}
-            </div>
-            <div style={{ fontSize: "13px", color: "#aaa", marginTop: "2px" }}>
-              ❤️ {list.likes?.length || 0} {list.likes?.length === 1 ? "like" : "likes"}
-            </div>
-          </div>
-        </div>
+  <div style={{ marginLeft: "auto", textAlign: "right" }}>
+    <div style={{ fontSize: "13px", color: "#aaa" }}>
+      ❤️ {list.likes?.length || 0} {list.likes?.length === 1 ? "like" : "likes"}
+    </div>
+  </div>
+</div>
+
 
         {/* Like Button */}
         <div style={{ marginTop: "16px" }}>
