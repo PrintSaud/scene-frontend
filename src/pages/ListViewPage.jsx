@@ -163,42 +163,41 @@ export default function ListViewPage() {
           gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
           gap: "12px"
         }}>
-          {list.movies.map((movie, index) => {
-            const posterUrl =
-              movie.poster?.startsWith("http")
-                ? movie.poster
-                : movie.poster
-                ? `${TMDB_IMG}${movie.poster}`
-                : "/default-poster.jpg";
+            {list.movies.map((movie, index) => {
+  const posterUrl =
+    movie.posterOverride ||
+    (movie.poster?.startsWith("/") ? `${TMDB_IMG}${movie.poster}` : movie.poster) ||
+    "/default-poster.jpg";
 
-            return (
-              <div
-                key={movie.id}
-                onClick={() => navigate(`/movie/${movie.id}`)}
-                style={{ cursor: "pointer", textAlign: "center" }}
-              >
-                <img
-                  src={posterUrl}
-                  alt={movie.title}
-                  style={{
-                    width: "100%",
-                    height: "180px",
-                    objectFit: "cover",
-                    borderRadius: "8px",
-                    marginBottom: "4px"
-                  }}
-                />
-                <div style={{
-                  fontSize: "12px",
-                  color: "#fff",
-                  fontFamily: "Inter, sans-serif",
-                  lineHeight: "1.2"
-                }}>
-                  {list.isRanked ? `${index + 1}. ` : ""}{movie.title}
-                </div>
-              </div>
-            );
-          })}
+  return (
+    <div
+      key={movie.id}
+      onClick={() => navigate(`/movie/${movie.id}`)}
+      style={{ cursor: "pointer", textAlign: "center" }}
+    >
+      <img
+        src={posterUrl}
+        alt={movie.title}
+        style={{
+          width: "100%",
+          height: "180px",
+          objectFit: "cover",
+          borderRadius: "8px",
+          marginBottom: "4px"
+        }}
+      />
+      <div style={{
+        fontSize: "12px",
+        color: "#fff",
+        fontFamily: "Inter, sans-serif",
+        lineHeight: "1.2"
+      }}>
+        {list.isRanked ? `${index + 1}. ` : ""}{movie.title}
+      </div>
+    </div>
+  );
+})}
+
         </div>
       </div>
     </div>
