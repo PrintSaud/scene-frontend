@@ -20,7 +20,6 @@ export default function FollowersFollowingPage() {
         const res = await axios.get(`${backend}/api/users/${id}/${activeTab}`, {
           headers: { Authorization: `Bearer ${currentUser.token}` }
         });
-        console.log("🔥 res.data:", res.data);
         const userArray = res.data.followers || res.data.following || [];
         setUsers(userArray);
         setProfileUsername(res.data.user?.username || "User");
@@ -120,46 +119,47 @@ export default function FollowersFollowingPage() {
         <ul style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
           {users.map((u) => (
             <li
-            key={u._id}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",  // Fix: space between avatar+username and follow btn
-              gap: "12px"
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <img
-                src={u.avatar}
-                alt={u.username}
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "50%",
-                  objectFit: "cover",
-                }}
-              />
-              <div style={{ fontSize: "13px", fontWeight: "600" }}>{u.username}</div>
-            </div>
-          
-            {u._id !== currentUser._id && (
-              <button
-                onClick={() => toggleFollow(u._id)}
-                style={{
-                  padding: "4px 10px",
-                  borderRadius: "20px",
-                  fontSize: "12px",
-                  background: currentUser.following.includes(u._id) ? "#222" : "#fff",
-                  color: currentUser.following.includes(u._id) ? "#fff" : "#000",
-                  border: "1px solid #444",
-                  cursor: "pointer",
-                }}
-              >
-                {currentUser.following.includes(u._id) ? "Unfollow" : "Follow"}
-              </button>
-            )}
-          </li>
-          
+              key={u._id}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "4px 0",
+              }}
+            >
+              {/* Avatar + username left aligned */}
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <img
+                  src={u.avatar || "/default-avatar.jpg"}
+                  alt={u.username}
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                  }}
+                />
+                <span style={{ fontSize: "13px", fontWeight: "600" }}>{u.username}</span>
+              </div>
+
+              {/* Follow/Unfollow button right aligned */}
+              {u._id !== currentUser._id && (
+                <button
+                  onClick={() => toggleFollow(u._id)}
+                  style={{
+                    padding: "4px 10px",
+                    borderRadius: "20px",
+                    fontSize: "12px",
+                    background: currentUser.following.includes(u._id) ? "#222" : "#fff",
+                    color: currentUser.following.includes(u._id) ? "#fff" : "#000",
+                    border: "1px solid #444",
+                    cursor: "pointer",
+                  }}
+                >
+                  {currentUser.following.includes(u._id) ? "Unfollow" : "Follow"}
+                </button>
+              )}
+            </li>
           ))}
         </ul>
       )}
