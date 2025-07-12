@@ -25,7 +25,6 @@ export default function ProfilePage() {
   const imgRef = useRef();
   const [isFollowing, setIsFollowing] = useState(false);
 
-  // ✅ Load user from localStorage
   useEffect(() => {
     try {
       const raw = localStorage.getItem("user");
@@ -41,7 +40,6 @@ export default function ProfilePage() {
   const id = paramId || stored?._id;
   const isOwner = stored?._id === String(id);
 
-  // 🚀 Fetch profile + logs
   useEffect(() => {
     if (!id) return;
 
@@ -72,7 +70,7 @@ export default function ProfilePage() {
       setIsFollowing(user.followers?.includes(stored._id));
     }
   }, [user, stored]);
-  
+
   const handleFollow = async () => {
     try {
       await api.post(`/api/users/${stored._id}/follow/${user._id}`);
@@ -81,8 +79,7 @@ export default function ProfilePage() {
       console.error("❌ Failed to follow/unfollow:", err);
     }
   };
-  
-  // 🎨 Dominant color from backdrop
+
   useEffect(() => {
     if (user && imgRef.current) {
       const colorThief = new ColorThief();
@@ -98,7 +95,6 @@ export default function ProfilePage() {
     }
   }, [user]);
 
-  // 🔄 Global listener for refreshing lists
   useEffect(() => {
     const refresh = () => setListRefreshKey((prev) => prev + 1);
     window.addEventListener("refreshMyLists", refresh);
@@ -107,34 +103,19 @@ export default function ProfilePage() {
 
   if (!user) return <div style={{ color: "white", padding: "20px" }}>Loading...</div>;
 
-
-  
   return (
     <div style={{ backgroundColor: "#0e0e0e", color: "white", minHeight: "100vh", paddingBottom: "100px" }}>
-      <ProfileHeader user={user} navigate={navigate} imgRef={imgRef} />
-  
-      {/* Clean follow button placement below header and before tabs */}
-      {!isOwner && (
-        <div style={{ display: "flex", justifyContent: "flex-end", padding: "8px 16px" }}>
-          <button
-            onClick={handleFollow}
-            style={{
-              background: isFollowing ? "#333" : "#1a1a1a",
-              color: "white",
-              border: "1px solid #555",
-              borderRadius: "6px",
-              padding: "4px 12px",
-              fontSize: "13px",
-              cursor: "pointer"
-            }}
-          >
-            {isFollowing ? "Following" : "Follow"}
-          </button>
-        </div>
-      )}
-  
+      <ProfileHeader
+        user={user}
+        navigate={navigate}
+        imgRef={imgRef}
+        isOwner={isOwner}
+        isFollowing={isFollowing}
+        handleFollow={handleFollow}
+      />
+
       <ProfileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
-  
+
       <div style={{ padding: "0 16px" }}>
         {activeTab === "Profile" && <ProfileTabProfile logs={logs} />}
         {activeTab === "Reviews" && (
@@ -169,5 +150,4 @@ export default function ProfilePage() {
       </div>
     </div>
   );
-  
 }

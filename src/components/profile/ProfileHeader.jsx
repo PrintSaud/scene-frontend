@@ -3,12 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { HiDotsVertical } from "react-icons/hi";
 import toast from "react-hot-toast";
 
-export default function ProfileHeader({ user, imgRef }) {
+export default function ProfileHeader({
+  user,
+  imgRef,
+  isOwner,
+  isFollowing,
+  handleFollow,
+}) {
   const navigate = useNavigate();
-  const stored = JSON.parse(localStorage.getItem("user") || "{}");
-const isOwner = (stored._id || stored.id) === user?._id;
-
-
   const [menuOpen, setMenuOpen] = useState(false);
   const isMobile = window.innerWidth <= 768;
   const backdropHeight = isMobile ? 180 : 300;
@@ -89,115 +91,135 @@ const isOwner = (stored._id || stored.id) === user?._id;
           </div>
         )}
 
-{/* AVATAR */}
-<div
-  style={{
-    position: "absolute",
-    left: "16px",
-    bottom: "-5px",  // moved slightly down (was -10px)
-    zIndex: 2,
-  }}
->
-  <img
-    src={user.avatar || "/default-avatar.jpg"}
-    alt="Avatar"
-    style={{
-      width: "70px",  // was 80px → smaller
-      height: "70px",
-      borderRadius: "50%",
-      objectFit: "cover",
-      border: "2px solid #0e0e0e",
-    }}
-    onError={(e) => {
-      e.currentTarget.src = "/default-avatar.jpg";
-    }}
-  />
-</div>
-
+        {/* AVATAR */}
+        <div
+          style={{
+            position: "absolute",
+            left: "16px",
+            bottom: "0px", // moved fully to show properly
+            zIndex: 2,
+          }}
+        >
+          <img
+            src={user.avatar || "/default-avatar.jpg"}
+            alt="Avatar"
+            style={{
+              width: "70px",
+              height: "70px",
+              borderRadius: "50%",
+              objectFit: "cover",
+              border: "2px solid #0e0e0e",
+            }}
+            onError={(e) => {
+              e.currentTarget.src = "/default-avatar.jpg";
+            }}
+          />
+        </div>
       </div>
 
-{/* NAME + USERNAME */}
-<div
-  style={{
-    marginTop: "8px",
-    marginLeft: "16px",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-start",
-    gap: user.bio ? "6px" : "2px",
-  }}
->
-  {user.name && (
-    <div
-      style={{
-        fontWeight: "600",
-        fontSize: "14px",
-        fontFamily: "Inter",
-        color: "white",
-      }}
-    >
-      {user.name}
-    </div>
-  )}
-  <div
-    style={{
-      fontSize: "11px",
-      color: "rgba(255,255,255,0.6)",
-      fontFamily: "Inter",
-    }}
-  >
-    @{user.username}
-  </div>
+      {/* NAME + USERNAME + BIO */}
+      <div
+        style={{
+          marginTop: "8px",
+          marginLeft: "16px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+          gap: user.bio ? "6px" : "2px",
+        }}
+      >
+        {user.name && (
+          <div
+            style={{
+              fontWeight: "600",
+              fontSize: "14px",
+              fontFamily: "Inter",
+              color: "white",
+            }}
+          >
+            {user.name}
+          </div>
+        )}
+        <div
+          style={{
+            fontSize: "11px",
+            color: "rgba(255,255,255,0.6)",
+            fontFamily: "Inter",
+          }}
+        >
+          @{user.username}
+        </div>
 
-  {user.bio && (
-    <div
-      style={{
-        color: "#aaa",
-        fontSize: "13px",
-        maxWidth: "300px",
-        lineHeight: "1.4",
-        marginTop: "2px",
-      }}
-    >
-      {user.bio}
-    </div>
-  )}
-</div>
-<div
-  style={{
-    display: "flex",
-    justifyContent: "center",
-    gap: "40px",
-    fontSize: "14px",
-    marginTop: "28px",
-    marginBottom: "8px",
-    opacity: 0.9,
-    textAlign: "center",
-    padding: "0px 7px 5px",
-  }}
->
-  <div onClick={() => navigate(`/profile/${user._id}/following`)} style={{ cursor: "pointer",       fontFamily: "Inter", }}>
-    <strong>{user.followingCount ?? 0}</strong>
-    <div>Following</div>
-  </div>
+        {user.bio && (
+          <div
+            style={{
+              color: "#aaa",
+              fontSize: "13px",
+              maxWidth: "300px",
+              lineHeight: "1.4",
+              marginTop: "2px",
+            }}
+          >
+            {user.bio}
+          </div>
+        )}
+      </div>
 
-  <div onClick={() => navigate(`/profile/${user._id}/followers`)} style={{ cursor: "pointer",       fontFamily: "Inter", }}>
-    <strong>{user.followerCount ?? 0}</strong>
-    <div>Followers</div>
-  </div>
+      {/* FOLLOW BUTTON */}
+      {!isOwner && (
+        <div style={{ display: "flex", justifyContent: "flex-end", padding: "0 16px", marginTop: "8px" }}>
+          <button
+            onClick={handleFollow}
+            style={{
+              background: isFollowing ? "#333" : "#1a1a1a",
+              color: "white",
+              border: "1px solid #555",
+              borderRadius: "6px",
+              padding: "4px 12px",
+              fontSize: "13px",
+              cursor: "pointer"
+            }}
+          >
+            {isFollowing ? "Following" : "Follow"}
+          </button>
+        </div>
+      )}
 
-  <div
-    onClick={() => {
-      const event = new CustomEvent("navigateToFilms");
-      window.dispatchEvent(event);
-    }}
-    style={{ cursor: "pointer",       fontFamily: "Inter", }}
-  >
-    <strong>{user.totalLogs || 0}</strong>
-    <div>Films</div>
-  </div>
-</div>
+      {/* STATS */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "40px",
+          fontSize: "14px",
+          marginTop: "20px",
+          marginBottom: "8px",
+          opacity: 0.9,
+          textAlign: "center",
+          padding: "0px 7px 5px",
+        }}
+      >
+        <div onClick={() => navigate(`/profile/${user._id}/following`)} style={{ cursor: "pointer", fontFamily: "Inter" }}>
+          <strong>{user.followingCount ?? 0}</strong>
+          <div>Following</div>
+        </div>
 
+        <div onClick={() => navigate(`/profile/${user._id}/followers`)} style={{ cursor: "pointer", fontFamily: "Inter" }}>
+          <strong>{user.followerCount ?? 0}</strong>
+          <div>Followers</div>
+        </div>
+
+        <div
+          onClick={() => {
+            const event = new CustomEvent("navigateToFilms");
+            window.dispatchEvent(event);
+          }}
+          style={{ cursor: "pointer", fontFamily: "Inter" }}
+        >
+          <strong>{user.totalLogs || 0}</strong>
+          <div>Films</div>
+        </div>
+      </div>
     </>
   );
 }
