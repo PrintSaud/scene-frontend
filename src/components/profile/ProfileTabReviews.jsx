@@ -34,16 +34,10 @@ export default function ProfileTabReviews({ logs, filter, setFilter, navigate })
       {/* 📝 Reviews */}
       {filtered.map((log) => {
         let poster = "/default-poster.png";
-        if (log.movie) {
-          if (log.movie.customPoster) {
-            poster = log.movie.customPoster;
-          } else if (log.movie.poster) {
-            poster = log.movie.poster.startsWith("http")
-              ? log.movie.poster
-              : `${TMDB_IMG}${log.movie.poster}`;
-          } else if (log.movie.poster_path) {
-            poster = `${TMDB_IMG}${log.movie.poster_path}`;
-          }
+        if (log.posterOverride) {
+          poster = log.posterOverride;
+        } else if (log.movie?.poster_path) {
+          poster = `${TMDB_IMG}${log.movie.poster_path}`;
         }
 
         return (
@@ -51,84 +45,87 @@ export default function ProfileTabReviews({ logs, filter, setFilter, navigate })
             key={log._id}
             onClick={() => navigate(`/review/${log._id}`)}
             style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "12px",
               backgroundColor: "#181818",
               padding: "12px",
               borderRadius: "10px",
               cursor: "pointer",
+              position: "relative",
             }}
           >
-            {/* 🎬 Movie + Rating */}
+            {/* 🕑 Timestamp */}
+            <div style={{
+              position: "absolute",
+              top: "8px",
+              right: "12px",
+              fontSize: "11px",
+              color: "#888",
+              fontFamily: "Inter, sans-serif",
+            }}>
+              {new Date(log.watchedAt).toLocaleDateString()}
+            </div>
+
+            {/* 🎬 Poster + Details side by side */}
             <div style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
               <img
                 src={poster}
                 alt={log.movie?.title}
                 style={{
-                  width: "80px",
-                  height: "120px",
+                  width: "90px",
+                  height: "135px",
                   objectFit: "cover",
-                  borderRadius: "6px",
+                  borderRadius: "8px",
                 }}
               />
-              <div>
+              <div style={{ flex: 1 }}>
                 <h4 style={{ margin: 0, color: "#fff", fontSize: "15px" }}>{log.movie?.title}</h4>
-                <div style={{ margin: "4px 0", color: "#b16ce6", fontSize: "13px", fontWeight: "500" }}>
-                  {log.rating?.toFixed(1)} / 5.0
+
+                {/* ⭐ Rating as stars */}
+                <div style={{ margin: "6px 0" }}>
+                  {[1,2,3,4,5].map((i) => (
+                    <span key={i} style={{ color: i <= Math.round(log.rating) ? '#FFD700' : '#444', fontSize: "14px" }}>
+                      ★
+                    </span>
+                  ))}
                 </div>
-                <p
-                  style={{
-                    color: "#ccc",
-                    fontSize: "13px",
-                    fontFamily: "Inter, sans-serif",
-                    margin: 0,
-                  }}
-                >
-                  {new Date(log.watchedAt).toLocaleDateString()}
+
+                {/* Review text */}
+                <p style={{
+                  color: "#ccc",
+                  fontSize: "13px",
+                  fontFamily: "Inter, sans-serif",
+                  marginTop: "6px",
+                  marginBottom: 0,
+                  whiteSpace: "pre-wrap",
+                }}>
+                  {log.review}
                 </p>
               </div>
             </div>
-
-            {/* 📝 Review Snippet */}
-            <p
-              style={{
-                color: "#ccc",
-                fontSize: "13px",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                display: "-webkit-box",
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: "vertical",
-                marginTop: "-6px",
-              }}
-            >
-              {log.review}
-            </p>
 
             {/* 🎁 GIF or Image */}
             {log.image && (
               <img
                 src={log.image}
                 alt="uploaded"
-                style={{ width: "100%", borderRadius: "10px", maxHeight: "220px", objectFit: "cover" }}
+                style={{ width: "100%", borderRadius: "10px", maxHeight: "220px", objectFit: "cover", marginTop: "12px" }}
               />
             )}
             {log.gif && (
               <img
                 src={log.gif}
                 alt="gif"
-                style={{ width: "100%", borderRadius: "10px", maxHeight: "220px", objectFit: "cover" }}
+                style={{ width: "100%", borderRadius: "10px", maxHeight: "220px", objectFit: "cover", marginTop: "12px" }}
               />
             )}
 
-            {/* 🔥 Likes + 💬 Replies */}
+            {/* 🔥 Likes + Replies */}
             <div
               style={{
                 display: "flex",
                 justifyContent: "space-between",
                 color: "#999",
                 fontSize: "12px",
+                marginTop: "10px",
               }}
             >
               <span>❤️ {log.likes || 0} likes</span>

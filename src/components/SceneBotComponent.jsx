@@ -66,6 +66,8 @@ export default function SceneBotComponent() {
 
     const lang = forcedLang || localStorage.getItem("sceneLang") || "english";
     const result = await callSceneBot(question, lang);
+    const replyText = typeof result === 'object' && result.reply ? result.reply : result;
+
 
     setLoading(false);
 
@@ -77,8 +79,8 @@ export default function SceneBotComponent() {
 
       let i = 0;
       const typeChar = () => {
-        if (i < result.length) {
-          updated[updated.length - 1].text += result[i];
+        if (i < replyText.length) {
+            updated[updated.length - 1].text += replyText[i];          
           setMessages([...updated]);
           i++;
           setTimeout(typeChar, 15);
@@ -141,12 +143,13 @@ export default function SceneBotComponent() {
 <div
   onClick={() => alert(`🌍 To change language, just type:\n\nreply in "arabic"\nreply in "french"\nreply in "english"\n\nTo reset, type: reset language`)}
   style={{
-    position: "absolute",
+    position: "fixed",
     top: "18px",
     right: "18px",
     fontSize: "20px",
     cursor: "pointer",
     color: "#ccc",
+    zIndex: "1000",
   }}
   title="Language Info"
 >
