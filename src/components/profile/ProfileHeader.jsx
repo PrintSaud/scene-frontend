@@ -56,22 +56,23 @@ export default function ProfileHeader({
         {/* Back button when not owner */}
         {!isOwner && (
           <button
-            onClick={() => navigate(-1)}
-            style={{
-              position: "absolute",
-              top: "16px",
-              left: "16px",
-              background: "#1a1a1a",
-              color: "white",
-              padding: "6px 12px",
-              borderRadius: "6px",
-              border: "1px solid #444",
-              fontSize: "12px",
-              zIndex: 2,
-            }}
-          >
-            ← Back
-          </button>
+          onClick={() => navigate(-1)}
+          style={{
+            background: "rgba(0,0,0,0.5)",
+            border: "none",
+            borderRadius: "50%",
+            width: "32px",
+            height: "32px",
+            color: "#fff",
+            fontSize: "18px",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          ←
+        </button>
         )}
 
         {/* ⋯ Top Right Menu */}
@@ -160,6 +161,7 @@ export default function ProfileHeader({
               fontSize: "12px",
               cursor: "pointer",
               height: "28px",
+              marginTop: "-6px",  
             }}
           >
             {isFollowing ? "Following" : "Follow"}
