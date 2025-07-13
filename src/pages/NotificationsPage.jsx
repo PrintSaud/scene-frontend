@@ -41,17 +41,17 @@ export default function NotificationsPage({ setHasUnread }) {
 
   const handleClick = async (n) => {
     try {
-      await axios.patch(`/api/notifications/read-single/${n._id}`); // ✅ Uses interceptor
-
+      await axios.patch(`/api/notifications/read-single/${n._id}`);
+  
       setNotifications((prev) =>
         prev.map((notif) => notif._id === n._id ? { ...notif, read: true } : notif)
       );
-
+  
       if (setHasUnread) {
         const anyUnread = notifications.some((notif) => notif._id !== n._id && !notif.read);
         setHasUnread(anyUnread);
       }
-
+  
       // 📩 Smart routing
       if (n.type === "follow") {
         navigate(`/profile/${n.from?._id}`);
@@ -59,11 +59,17 @@ export default function NotificationsPage({ setHasUnread }) {
         navigate(`/review/${n.relatedId}`);
       } else if (n.type === "suggest_movie") {
         navigate(`/movie/${n.relatedId}`);
+      } else if (n.type === "share-list") {
+        navigate(`/list/${n.listId}`);  // ✅ ADD THIS LINE
+      } else if (n.type === "share-movie") {
+        navigate(`/movie/${n.movieId}`);  // Optional: support share-movie too!
       }
+  
     } catch (err) {
       console.error("Failed to mark notification as read", err);
     }
   };
+  
 
   const markAllAsRead = async () => {
     try {
