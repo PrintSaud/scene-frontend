@@ -1,5 +1,6 @@
 import React from "react";
 import { FaStar, FaRegStar, FaStarHalfAlt } from "react-icons/fa";
+import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w300";
 
@@ -159,23 +160,36 @@ export default function ProfileTabReviews({ logs, filter, setFilter, navigate })
               />
             )}
 
-            {/* 🔥 Likes + 💬 Replies */}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                color: "#999",
-                fontSize: "12px",
-                marginTop: "10px",
-              }}
-            >
-              <span>❤️ {log.likes || 0} likes</span>
-              {log.replies?.length > 0 && (
-                <span>
-                  💬 {log.replies.length} {log.replies.length === 1 ? "reply" : "replies"}
-                </span>
-              )}
-            </div>
+{/* 🔥 Likes + 💬 Replies */}
+<div
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: "10px",
+  }}
+>
+  {/* ❤️ Likes */}
+  <div
+    style={{ display: "flex", alignItems: "center", gap: "4px", cursor: "pointer" }}
+    onClick={() => handleLike(log._id)}
+  >
+    {log.isLiked ? (
+      <AiFillHeart style={{ fontSize: "14px", color: "#B327F6" }} />
+    ) : (
+      <AiOutlineHeart style={{ fontSize: "14px", color: "#999" }} />
+    )}
+    <span style={{ fontSize: "13px", color: "#999" }}>{log.likes || 0}</span>
+  </div>
+
+  {/* 💬 Replies */}
+  {log.replies?.length > 0 && (
+    <span style={{ fontSize: "12px", color: "#999" }}>
+      💬 {log.replies.length} {log.replies.length === 1 ? "reply" : "replies"}
+    </span>
+  )}
+</div>
+
           </div>
         );
       })}
