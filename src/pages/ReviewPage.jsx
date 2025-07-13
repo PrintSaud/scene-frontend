@@ -1,3 +1,4 @@
+// ⭐ Full updated ReviewPage we built together:
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { IoArrowBack } from "react-icons/io5";
@@ -5,12 +6,12 @@ import { HiDotsVertical } from "react-icons/hi";
 import { FaHeart } from "react-icons/fa";
 import toast from "react-hot-toast";
 import axios from "../api/api";
-import { likeLog, likeReply } from "../api/api"; // ✅ API hooks for likes
+import { likeLog, likeReply } from "../api/api";
 import { backend } from "../config";
 import StarRating from "../components/StarRating";
 
 export default function ReviewPage() {
-  const { id } = useParams(); // review/log ID
+  const { id } = useParams();
   const navigate = useNavigate();
   const [review, setReview] = useState(null);
   const [replies, setReplies] = useState([]);
@@ -69,33 +70,20 @@ export default function ReviewPage() {
     }
   };
 
-  const handleReply = () => {
-    navigate(`/reply/${id}`);
-  };
-
-  const handleProfile = (userId) => {
-    navigate(`/profile/${userId}`);
-  };
-
-  const handleMoreReviewsClick = (reviewId) => {
-    navigate(`/review/${reviewId}`);
-  };
-
-  const handleMenu = () => {
-    // TODO: open action sheet/modal for edit/delete/share/copy/change-backdrop
-  };
+  const handleReply = () => navigate(`/reply/${id}`);
+  const handleProfile = (userId) => navigate(`/profile/${userId}`);
+  const handleMoreReviewsClick = (reviewId) => navigate(`/review/${reviewId}`);
+  const handleMenu = () => {}; // TODO
 
   if (!review) return null;
 
-  const posterUrl = review.poster || "/default-poster.jpg"; // fallback
-  const backdropUrl =
-    review.movie?.backdrop_path
-      ? `https://image.tmdb.org/t/p/original${review.movie.backdrop_path}`
-      : "/default-backdrop.jpg";
+  const posterUrl = review.poster || "/default-poster.jpg";
+  const backdropUrl = review.movie?.backdrop_path
+    ? `https://image.tmdb.org/t/p/original${review.movie.backdrop_path}`
+    : "/default-backdrop.jpg";
 
   return (
     <div style={{ backgroundColor: "#0e0e0e", color: "#fff", minHeight: "100vh" }}>
-      {/* 🔙 Back + ⋯ Menu */}
       <div style={{ position: "absolute", top: 16, left: 16, zIndex: 10 }}>
         <IoArrowBack size={24} onClick={() => navigate(-1)} />
       </div>
@@ -103,20 +91,10 @@ export default function ReviewPage() {
         <HiDotsVertical size={24} onClick={handleMenu} />
       </div>
 
-      {/* 🎬 Movie Backdrop */}
-      <img
-        src={backdropUrl}
-        alt="Backdrop"
-        style={{ width: "100%", height: "auto", maxHeight: 200, objectFit: "cover" }}
-      />
+      <img src={backdropUrl} alt="Backdrop" style={{ width: "100%", maxHeight: 200, objectFit: "cover" }} />
 
-      {/* 📦 Main Review Block */}
       <div style={{ display: "flex", padding: "16px", gap: "12px" }}>
-        <img
-          src={posterUrl}
-          alt="Poster"
-          style={{ width: 80, borderRadius: 8 }}
-        />
+        <img src={posterUrl} alt="Poster" style={{ width: 80, borderRadius: 8 }} />
         <div style={{ flex: 1 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -146,35 +124,14 @@ export default function ReviewPage() {
             </div>
           </div>
           <p style={{ marginTop: 8 }}>{review.review}</p>
-          {review.image && (
-            <img
-              src={review.image}
-              alt="Attached"
-              style={{ width: "100%", borderRadius: 8, marginTop: 8 }}
-            />
-          )}
-          {review.gif && (
-            <img
-              src={review.gif}
-              alt="GIF"
-              style={{ width: "100%", borderRadius: 8, marginTop: 8 }}
-            />
-          )}
+          {review.image && <img src={review.image} alt="Attached" style={{ width: "100%", borderRadius: 8, marginTop: 8 }} />}
+          {review.gif && <img src={review.gif} alt="GIF" style={{ width: "100%", borderRadius: 8, marginTop: 8 }} />}
         </div>
       </div>
 
-      {/* 💬 Replies */}
       <div style={{ padding: "0 16px" }}>
         {replies.slice(0, 2).map((r) => (
-          <div
-            key={r._id}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginBottom: 8,
-            }}
-          >
+          <div key={r._id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <img
                 src={r.avatar}
@@ -199,38 +156,18 @@ export default function ReviewPage() {
             />
           </div>
         ))}
-        {replies.length > 2 && (
-          <button onClick={() => navigate(`/reply/${id}`)}>Show more replies →</button>
-        )}
+        {replies.length > 2 && <button onClick={() => navigate(`/reply/${id}`)}>Show more replies →</button>}
       </div>
 
-      {/* 📝 More reviews by user */}
       <div style={{ padding: "16px" }}>
         <h4>More reviews by @{review.user.username}</h4>
         {moreReviews.map((r) => (
-          <div
-            key={r._id}
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              gap: "8px",
-              marginBottom: 12,
-              cursor: "pointer",
-            }}
-            onClick={() => handleMoreReviewsClick(r._id)}
-          >
-            <img
-              src={r.posterOverride || "/default-poster.jpg"}
-              alt="Poster"
-              style={{ width: 60, borderRadius: 6 }}
-            />
+          <div key={r._id} style={{ display: "flex", alignItems: "flex-start", gap: "8px", marginBottom: 12, cursor: "pointer" }} onClick={() => handleMoreReviewsClick(r._id)}>
+            <img src={r.posterOverride || "/default-poster.jpg"} alt="Poster" style={{ width: 60, borderRadius: 6 }} />
             <div>
               <StarRating rating={r.rating} />
               {r.review && (
-                <p>
-                  {r.review.split(" ").slice(0, 15).join(" ")}
-                  {r.review.split(" ").length > 15 && "…read more"}
-                </p>
+                <p>{r.review.split(" ").slice(0, 15).join(" ")} {r.review.split(" ").length > 15 && "…read more"}</p>
               )}
               {r.gif && <p>GIF 🎬</p>}
               {r.image && <p>📷 Image</p>}
