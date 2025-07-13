@@ -4,7 +4,7 @@ export default function ReviewBody({ review }) {
   return (
     <div style={{ padding: "0 16px" }}>
       {review.review ? (
-        <p style={{ marginTop: 8 }}>{review.review}</p>
+        <p style={{ marginTop: 8, fontFamily: "Inter, sans-serif" }}>{review.review}</p>
       ) : (
         <p style={{ marginTop: 8, color: "#888" }}>No review text.</p>
       )}

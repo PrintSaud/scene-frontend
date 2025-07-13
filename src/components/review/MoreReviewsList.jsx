@@ -2,10 +2,13 @@ import React from "react";
 import StarRating from "../StarRating";
 
 export default function MoreReviewsList({ reviews, onClick }) {
+  // Only show reviews that have non-empty review text
+  const filteredReviews = reviews.filter(r => r.review && r.review.trim().length > 0);
+
   return (
     <div style={{ padding: "16px" }}>
       <h4>More reviews</h4>
-      {reviews.map((r) => (
+      {filteredReviews.map((r) => (
         <div
           key={r._id}
           style={{ display: "flex", alignItems: "flex-start", gap: "8px", marginBottom: 12, cursor: "pointer" }}
@@ -18,14 +21,10 @@ export default function MoreReviewsList({ reviews, onClick }) {
           />
           <div>
             <StarRating rating={r.rating} />
-            {r.review && (
-              <p>
-                {r.review.split(" ").slice(0, 15).join(" ")}
-                {r.review.split(" ").length > 15 && "…read more"}
-              </p>
-            )}
-            {r.gif && <p>GIF 🎬</p>}
-            {r.image && <p>📷 Image</p>}
+            <p style={{ fontFamily: "Inter, sans-serif" }}>
+              {r.review.split(" ").slice(0, 15).join(" ")}
+              {r.review.split(" ").length > 15 && "…read more"}
+            </p>
           </div>
         </div>
       ))}
