@@ -156,12 +156,13 @@ export default function ReviewPage() {
               <span>{r.text}</span>
             </div>
             <FaHeart
-  onClick={handleLike}
+  onClick={() => handleReplyLike(r._id)}
   style={{
     cursor: "pointer",
-    color: (Array.isArray(review.likes) ? review.likes : []).includes(user._id) ? "red" : "white",
+    color: (Array.isArray(r.likes) ? r.likes : []).includes(user._id) ? "red" : "white",
   }}
 />
+
 
           </div>
         ))}
