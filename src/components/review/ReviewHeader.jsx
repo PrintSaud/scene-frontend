@@ -14,6 +14,14 @@ export default function ReviewHeader({ review, userId, onLike, onReply, onProfil
     ? `https://image.tmdb.org/t/p/original${review.movie.backdrop_path}`
     : "/default-backdrop.jpg";
 
+  const avatarUrl = review.user?.avatar && review.user.avatar.startsWith("http")
+    ? review.user.avatar
+    : "/default-avatar.jpg";
+
+  const timestamp = review.createdAt
+    ? new Date(review.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+    : "";
+
   return (
     <>
       {/* Backdrop with fade-down */}
@@ -26,24 +34,28 @@ export default function ReviewHeader({ review, userId, onLike, onReply, onProfil
           height: "70%",
           background: "linear-gradient(to top, #0e0e0e, transparent)"
         }} />
-        {/* Go to film button moved down slightly */}
-        <button
-          style={{
-            position: "absolute",
-            bottom: 20,
-            right: 12,
-            background: "#fff",
-            color: "#000",
-            fontSize: 12,
-            padding: "4px 8px",
-            borderRadius: 4,
-            border: "none",
-            cursor: "pointer"
-          }}
-          onClick={() => navigate(`/movie/${review.movie?.id || review.movie}`)}
-        >
-          Go to film
-        </button>
+        {/* "Go to film" button → white text, transparent bg, a bit lower */}
+        <div style={{ position: "absolute", bottom: 20, right: 12, textAlign: "right" }}>
+          <button
+            style={{
+              background: "transparent",
+              border: "none",
+              color: "#fff",
+              fontSize: 12,
+              padding: 0,
+              cursor: "pointer",
+              fontFamily: "Inter, sans-serif"
+            }}
+            onClick={() => navigate(`/movie/${review.movie?.id || review.movie}`)}
+          >
+            Go to film
+          </button>
+          {timestamp && (
+            <div style={{ fontSize: 11, color: "#aaa", marginTop: 2 }}>
+              {timestamp}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* User + review text */}
@@ -52,7 +64,7 @@ export default function ReviewHeader({ review, userId, onLike, onReply, onProfil
           <>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <img
-                src={review.user.avatar}
+                src={avatarUrl}
                 alt="Avatar"
                 style={{ width: 28, height: 28, borderRadius: "50%", cursor: "pointer" }}
                 onClick={() => onProfile(review.user._id)}
@@ -69,14 +81,12 @@ export default function ReviewHeader({ review, userId, onLike, onReply, onProfil
                 @{review.user.username}
               </span>
             </div>
-            {/* Rating under username */}
             <div style={{ marginTop: 4 }}>
               <StarRating rating={review.rating} />
             </div>
           </>
         )}
 
-        {/* Review text */}
         {review.review && (
           <p style={{
             marginTop: 8,
@@ -88,7 +98,6 @@ export default function ReviewHeader({ review, userId, onLike, onReply, onProfil
           </p>
         )}
 
-        {/* Optional image or GIF */}
         {review.image && (
           <img src={review.image} alt="Attached" style={{ width: "100%", borderRadius: 8, marginTop: 8 }} />
         )}
@@ -99,7 +108,7 @@ export default function ReviewHeader({ review, userId, onLike, onReply, onProfil
         {/* Like + Reply under review, far right */}
         <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", marginTop: 8, gap: "12px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-            <span onClick={onLike} style={{ cursor: "pointer", fontSize: "20px" }}>
+            <span onClick={onLike} style={{ cursor: "pointer", fontSize: "20px", position: "relative", top: "1px" }}>
               {(review.likes || []).includes(userId) ? (
                 <AiFillHeart style={{ color: "#B327F6" }} />
               ) : (
