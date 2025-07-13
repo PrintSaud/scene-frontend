@@ -1,4 +1,3 @@
-// ⭐ Full updated ReviewPage we built together:
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { IoArrowBack } from "react-icons/io5";
@@ -9,6 +8,7 @@ import axios from "../api/api";
 import { likeLog, likeReply } from "../api/api";
 import { backend } from "../config";
 import StarRating from "../components/StarRating";
+
 
 export default function ReviewPage() {
   const { id } = useParams();
