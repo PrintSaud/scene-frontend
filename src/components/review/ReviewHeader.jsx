@@ -35,7 +35,7 @@ export default function ReviewHeader({ review, userId, onLike, onReply, onProfil
           background: "linear-gradient(to top, #0e0e0e, transparent)"
         }} />
         {/* "Go to film" button → white text, transparent bg, a bit lower */}
-        <div style={{ position: "absolute", bottom: 20, right: 12, textAlign: "right" }}>
+        <div style={{ position: "absolute", bottom: 30, right: 10, textAlign: "right" }}>
           <button
             style={{
               background: "transparent",
@@ -108,7 +108,7 @@ export default function ReviewHeader({ review, userId, onLike, onReply, onProfil
         {/* Like + Reply under review, far right */}
         <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", marginTop: 8, gap: "12px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-            <span onClick={onLike} style={{ cursor: "pointer", fontSize: "20px", position: "relative", top: "1px" }}>
+            <span onClick={onLike} style={{ cursor: "pointer", fontSize: "20px", position: "relative", top: "3px" }}>
               {(review.likes || []).includes(userId) ? (
                 <AiFillHeart style={{ color: "#B327F6" }} />
               ) : (
