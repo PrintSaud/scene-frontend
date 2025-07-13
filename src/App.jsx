@@ -154,6 +154,7 @@ setHasUnread(unread.length > 0);
           <Route path="/profile/:id/followers" element={<FollowersFollowingPage />} />
           <Route path="/profile/:id/following" element={<FollowersFollowingPage />} />
           <Route path="/movie/:id" element={<MoviePage />} />
+          <Route path="/share-list/:id" element={<ShareListPage />} />
           <Route path="/add-to-list/:movieId" element={<AddToListPage />} />
           <Route path="/share/:movieId" element={<ShareToFriendPage />} />
           <Route path="/director/:id" element={<DirectorPage />} />
