@@ -9,7 +9,7 @@ export default function ReviewHeader({ review, userId, onLike, onReply, onProfil
 
   const backdropUrl = review.movie?.backdrop_path
     ? `https://image.tmdb.org/t/p/original${review.movie.backdrop_path}`
-    : review.backdrop || "/default-backdrop.jpg";
+    : "/default-backdrop.jpg"; // Safe fallback
 
   return (
     <>
@@ -43,7 +43,7 @@ export default function ReviewHeader({ review, userId, onLike, onReply, onProfil
                     <span
                       style={{
                         fontFamily: "Inter, sans-serif",
-                        fontSize: 14,
+                        fontSize: 11,
                         opacity: 0.8,
                         cursor: "pointer"
                       }}
@@ -57,37 +57,38 @@ export default function ReviewHeader({ review, userId, onLike, onReply, onProfil
                   </div>
                 </>
               ) : (
-                <span style={{ fontSize: "13px", color: "#888" }}>Unknown user</span>
+                <span style={{ fontSize: "10px", color: "#888" }}>Unknown user</span>
               )}
             </div>
 
-            {/* Like button like ListViewPage */}
-            <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-              <span onClick={onLike} style={{ cursor: "pointer", fontSize: "24px" }}>
-                {(review.likes || []).includes(userId) ? (
-                  <AiFillHeart style={{ color: "#B327F6" }} />
-                ) : (
-                  <AiOutlineHeart />
-                )}
-              </span>
-              <span style={{ fontSize: "14px" }}>{review.likes?.length || 0}</span>
-            </div>
+            {/* Like + Reply button together */}
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                <span onClick={onLike} style={{ cursor: "pointer", fontSize: "24px" }}>
+                  {(review.likes || []).includes(userId) ? (
+                    <AiFillHeart style={{ color: "#B327F6" }} />
+                  ) : (
+                    <AiOutlineHeart />
+                  )}
+                </span>
+                <span style={{ fontSize: "14px" }}>{review.likes?.length || 0}</span>
+              </div>
 
-            <button
-              style={{
-                marginLeft: "8px",
-                background: "transparent",
-                border: "1px solid #555",
-                borderRadius: 4,
-                padding: "4px 8px",
-                fontSize: 12,
-                fontFamily: "Inter, sans-serif",
-                cursor: "pointer"
-              }}
-              onClick={onReply}
-            >
-              Reply
-            </button>
+              <button
+                style={{
+                  background: "transparent",
+                  border: "1px solid #555",
+                  borderRadius: 4,
+                  padding: "4px 8px",
+                  fontSize: 12,
+                  fontFamily: "Inter, sans-serif",
+                  cursor: "pointer"
+                }}
+                onClick={onReply}
+              >
+                Reply
+              </button>
+            </div>
           </div>
         </div>
       </div>
