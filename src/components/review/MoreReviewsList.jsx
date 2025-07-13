@@ -20,7 +20,7 @@ export default function MoreReviewsList({ reviews, onClick }) {
           />
           <div>
             <StarRating rating={r.rating} />
-            <p style={{ fontFamily: "Inter, sans-serif", fontSize: 13 }}>
+            <p style={{ fontFamily: "Inter, sans-serif", fontSize: 10 }}>
               {r.review.split(" ").slice(0, 15).join(" ")}
               {r.review.split(" ").length > 15 && "…read more"}
             </p>

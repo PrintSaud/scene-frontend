@@ -7,7 +7,7 @@ export default function ReviewBody({ review }) {
         <p style={{ 
           marginTop: 8, 
           fontFamily: "Inter, sans-serif", 
-          fontSize: 10,  // 🔹 Slightly smaller font than default (you can set to 13 if you want even smaller)
+          fontSize: 12,  // 🔹 Slightly smaller font than default (you can set to 13 if you want even smaller)
           lineHeight: "1.4" 
         }}>
           {review.review}
