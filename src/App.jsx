@@ -142,7 +142,7 @@ setHasUnread(unread.length > 0);
           <Route path="/search" element={<SearchPage />} />
           <Route path="/profile/:id" element={<ProfilePage />} />
           <Route path="/profile/" element={<ProfilePage />} />
-          <Route path="/review/:logId" element={<ReviewPage />} />
+          <Route path="/review/:id" element={<ReviewPage />} />
           <Route path="/edit-profile" element={<EditProfilePage />} />
           <Route path="/choose-backdrop" element={<BackdropSearchPage />} />
           <Route path="/avatar-upload-test" element={<AvatarUploadTestPage />} />
