@@ -37,6 +37,7 @@ import DirectorPage from "./pages/DirectorPage";
 import ActorPage from "./pages/ActorPage"; 
 import PersonPage from "./pages/PersonPage";
 import UploadAvatarPage from './pages/UploadAvatarPage';
+import ShareListPage from './pages/ShareListPage';
 
 function App() {
   const location = useLocation();
