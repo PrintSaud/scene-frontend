@@ -15,7 +15,8 @@ export default function ReviewPage() {
   const [review, setReview] = useState(null);
   const [replies, setReplies] = useState([]);
   const [moreReviews, setMoreReviews] = useState([]);
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = JSON.parse(localStorage.getItem("user")) || {};
+  const userId = user._id;
 
   const fetchData = async () => {
     try {
@@ -23,9 +24,13 @@ export default function ReviewPage() {
       setReview(data);
       setReplies(data.replies || []);
       if (data.user?._id) {
-        const res = await axios.get(`${backend}/api/logs/user/${data.user._id}`);
-        const filtered = res.data.filter((r) => r._id !== id);
-        setMoreReviews(filtered.slice(0, 3));
+        try {
+          const res = await axios.get(`${backend}/api/logs/user/${data.user._id}`);
+          const filtered = res.data.filter((r) => r._id !== id);
+          setMoreReviews(filtered.slice(0, 3));
+        } catch (err) {
+          console.warn("Failed to load more reviews.");
+        }
       }
     } catch (err) {
       console.error(err);
@@ -38,13 +43,14 @@ export default function ReviewPage() {
   }, [id]);
 
   const handleLike = async () => {
+    if (!userId) return toast.error("You must be logged in to like.");
     try {
       await likeLog(id);
       setReview((prev) => ({
         ...prev,
-        likes: prev.likes?.includes(user._id)
-          ? prev.likes.filter((uid) => uid !== user._id)
-          : [...(prev.likes || []), user._id],
+        likes: (prev.likes || []).includes(userId)
+          ? (prev.likes || []).filter((uid) => uid !== userId)
+          : [...(prev.likes || []), userId],
       }));
     } catch (err) {
       toast.error("Failed to like.");
@@ -52,6 +58,7 @@ export default function ReviewPage() {
   };
 
   const handleReplyLike = async (replyId) => {
+    if (!userId) return toast.error("You must be logged in to like.");
     try {
       await likeReply(id, replyId);
       setReplies((prev) =>
@@ -59,9 +66,9 @@ export default function ReviewPage() {
           r._id === replyId
             ? {
                 ...r,
-                likes: r.likes?.includes(user._id)
-                  ? r.likes.filter((uid) => uid !== user._id)
-                  : [...(r.likes || []), user._id],
+                likes: (r.likes || []).includes(userId)
+                  ? (r.likes || []).filter((uid) => uid !== userId)
+                  : [...(r.likes || []), userId],
               }
             : r
         )
@@ -72,7 +79,7 @@ export default function ReviewPage() {
   };
 
   const handleReply = () => navigate(`/reply/${id}`);
-  const handleProfile = (userId) => navigate(`/profile/${userId}`);
+  const handleProfile = (profileId) => navigate(`/profile/${profileId}`);
   const handleMoreReviewsClick = (reviewId) => navigate(`/review/${reviewId}`);
   const handleMenu = () => {}; // TODO
 
@@ -125,45 +132,56 @@ export default function ReviewPage() {
                 onClick={handleLike}
                 style={{
                   cursor: "pointer",
-                  color: review.likes?.includes(user._id) ? "red" : "white",
+                  color: (review.likes || []).includes(userId) ? "red" : "white",
                 }}
               />
               <button onClick={handleReply}>Reply</button>
             </div>
           </div>
-          <p style={{ marginTop: 8 }}>{review.review}</p>
-          {review.image && <img src={review.image} alt="Attached" style={{ width: "100%", borderRadius: 8, marginTop: 8 }} />}
-          {review.gif && <img src={review.gif} alt="GIF" style={{ width: "100%", borderRadius: 8, marginTop: 8 }} />}
+
+          {review.review ? (
+            <p style={{ marginTop: 8 }}>{review.review}</p>
+          ) : (
+            <p style={{ marginTop: 8, color: "#888" }}>No review text.</p>
+          )}
+
+          {review.image && (
+            <img src={review.image} alt="Attached" style={{ width: "100%", borderRadius: 8, marginTop: 8 }} />
+          )}
+          {review.gif && (
+            <img src={review.gif} alt="GIF" style={{ width: "100%", borderRadius: 8, marginTop: 8 }} />
+          )}
         </div>
       </div>
 
       <div style={{ padding: "0 16px" }}>
         {replies.slice(0, 2).map((r) => (
-          <div key={r._id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+          <div
+            key={r._id}
+            style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}
+          >
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <img
                 src={r.avatar}
                 alt="Avatar"
                 style={{ width: 24, height: 24, borderRadius: "50%", cursor: "pointer" }}
-                onClick={() => handleProfile(r.userId)}
+                onClick={() => handleProfile(r.user?._id || r.userId)}
               />
               <span
                 style={{ cursor: "pointer", fontWeight: "bold" }}
-                onClick={() => handleProfile(r.userId)}
+                onClick={() => handleProfile(r.user?._id || r.userId)}
               >
                 @{r.username}
               </span>
               <span>{r.text}</span>
             </div>
             <FaHeart
-  onClick={() => handleReplyLike(r._id)}
-  style={{
-    cursor: "pointer",
-    color: (Array.isArray(r.likes) ? r.likes : []).includes(user._id) ? "red" : "white",
-  }}
-/>
-
-
+              onClick={() => handleReplyLike(r._id)}
+              style={{
+                cursor: "pointer",
+                color: (Array.isArray(r.likes) ? r.likes : []).includes(userId) ? "red" : "white",
+              }}
+            />
           </div>
         ))}
         {replies.length > 2 && <button onClick={() => navigate(`/reply/${id}`)}>Show more replies →</button>}
@@ -179,18 +197,25 @@ export default function ReviewPage() {
             style={{ display: "flex", alignItems: "flex-start", gap: "8px", marginBottom: 12, cursor: "pointer" }}
             onClick={() => handleMoreReviewsClick(r._id)}
           >
-            <img src={r.posterOverride || "/default-poster.jpg"} alt="Poster" style={{ width: 60, borderRadius: 6 }} />
+            <img
+              src={r.posterOverride || r.poster || "/default-poster.jpg"}
+              alt="Poster"
+              style={{ width: 60, borderRadius: 6 }}
+            />
             <div>
               <StarRating rating={r.rating} />
               {r.review && (
-                <p>{r.review.split(" ").slice(0, 15).join(" ")} {r.review.split(" ").length > 15 && "…read more"}</p>
+                <p>
+                  {r.review.split(" ").slice(0, 15).join(" ")}
+                  {r.review.split(" ").length > 15 && "…read more"}
+                </p>
               )}
               {r.gif && <p>GIF 🎬</p>}
               {r.image && <p>📷 Image</p>}
             </div>
           </div>
         ))}
-        {moreReviews.length > 3 && <button>show more…</button>}
+        {moreReviews.length > 3 && <button onClick={() => navigate(`/profile/${review.user._id}`)}>show more…</button>}
       </div>
     </div>
   );
