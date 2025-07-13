@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "../api/api";
 import { backend } from "../config";
 import toast from "react-hot-toast";
-import { BsHeart, BsHeartFill } from "react-icons/bs";
+import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";  // replace BsHeart
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const FALLBACK_COVER = "/default-list-cover.jpg";
@@ -93,6 +93,17 @@ export default function ListViewPage() {
           style={{ width: "100%", height: "100%", objectFit: "cover" }}
           onError={(e) => (e.currentTarget.src = FALLBACK_COVER)}
         />
+
+          {/* 🔥 Fade-down overlay */}
+  <div style={{
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: "100px",
+    background: "linear-gradient(to bottom, rgba(0,0,0,0) 0%, #0e0e0e 100%)",
+    zIndex: 1
+  }} />
 
         <div
           style={{
@@ -237,11 +248,11 @@ export default function ListViewPage() {
             <span style={{ fontFamily: "Inter, sans-serif" }}>@{list.user.username}</span>
           </div>
           <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "4px" }}>
-            <span onClick={handleLike} style={{ cursor: "pointer", fontSize: "24px" }}>
-              {isLiked ? <BsHeartFill color="#a970ff" /> : <BsHeart />}
-            </span>
-            <span style={{ fontSize: "14px" }}>{list.likes?.length || 0}</span>
-          </div>
+  <span onClick={handleLike} style={{ cursor: "pointer", fontSize: "24px" }}>
+    {isLiked ? <AiFillHeart style={{ color: "#B327F6" }} /> : <AiOutlineHeart />}
+  </span>
+  <span style={{ fontSize: "14px" }}>{list.likes?.length || 0}</span>
+</div>
         </div>
       </div>
 
