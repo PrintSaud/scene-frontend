@@ -53,29 +53,33 @@ export default function ProfileHeader({
           }}
         />
 
-        {/* Back button when not owner */}
+        {/* Back button styled like MoviePage when not owner */}
         {!isOwner && (
           <button
-          onClick={() => navigate(-1)}
-          style={{
-            background: "rgba(0,0,0,0.5)",
-            border: "none",
-            borderRadius: "50%",
-            width: "32px",
-            height: "32px",
-            color: "#fff",
-            fontSize: "18px",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          ←
-        </button>
+            onClick={() => navigate(-1)}
+            style={{
+              position: "absolute",
+              top: "16px",
+              left: "16px",
+              background: "#1a1a1a",
+              border: "1px solid #333",
+              borderRadius: "50%",
+              width: "32px",
+              height: "32px",
+              color: "#fff",
+              fontSize: "16px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              zIndex: 2
+            }}
+          >
+            ←
+          </button>
         )}
 
-        {/* ⋯ Top Right Menu */}
+        {/* ⋯ Top Right Menu for owner */}
         {isOwner && (
           <div style={{ position: "absolute", top: 20, right: 20 }}>
             <HiDotsVertical
@@ -126,7 +130,7 @@ export default function ProfileHeader({
         </div>
       </div>
 
-      {/* NAME + USERNAME + FOLLOW BUTTON (SAME ROW) */}
+      {/* NAME + USERNAME + FOLLOW BUTTON */}
       <div
         style={{
           marginTop: "8px",
@@ -148,7 +152,7 @@ export default function ProfileHeader({
           </div>
         </div>
 
-        {/* FOLLOW BUTTON */}
+        {/* FOLLOW BUTTON with upward adjustment */}
         {!isOwner && (
           <button
             onClick={handleFollow}
@@ -161,7 +165,7 @@ export default function ProfileHeader({
               fontSize: "12px",
               cursor: "pointer",
               height: "28px",
-              marginTop: "-6px",  
+              marginTop: "-8px"  // ⬅️ slightly higher than before
             }}
           >
             {isFollowing ? "Following" : "Follow"}
