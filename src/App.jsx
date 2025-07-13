@@ -20,7 +20,7 @@ import FriendsActivityPage from "./pages/FriendsActivityPage";
 import TrendingPage from "./pages/TrendingPage";
 import SearchPage from './pages/SearchPage';
 import ProfilePage from "./pages/ProfilePage";
-import ReviewPage from "./pages/ReviewPage";
+import ReviewPage from "./components/review/ReviewPage";
 import BackdropSearchPage from "./pages/BackdropSearchPage";
 import AvatarUploadTestPage from "./pages/AvatarUploadTestPage";
 import EditProfilePage from "./pages/EditProfilePage";
