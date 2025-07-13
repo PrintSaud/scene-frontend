@@ -8,6 +8,7 @@ import {
 } from "../../api/api";
 import { useNavigate } from "react-router-dom";
 import { backend } from "../../config";
+import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 
 export default function ProfileTabLists({ user, profileUserId, refreshTrigger }) {
   const [myLists, setMyLists] = useState([]);
@@ -166,9 +167,22 @@ export default function ProfileTabLists({ user, profileUserId, refreshTrigger })
               <div style={{ color: "#aaa", fontSize: "12px", marginTop: "4px" }}>
                 @{list.user?.username || "unknown"}
               </div>
-              <div style={{ fontSize: "12px", color: "#bbb", marginTop: "4px" }}>
-                ❤️ {list.likes?.length || 0} {list.likes?.length === 1 ? "like" : "likes"}
-              </div>
+              <div
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "4px",
+    marginTop: "4px",
+  }}
+>
+  {list.likes?.includes(user?._id) ? (
+    <AiFillHeart style={{ fontSize: "14px", color: "#B327F6" }} />
+  ) : (
+    <AiOutlineHeart style={{ fontSize: "14px", color: "#999" }} />
+  )}
+  <span style={{ fontSize: "12px", color: "#bbb" }}>{list.likes?.length || 0}</span>
+</div>
+
             </div>
           </div>
         ))}
