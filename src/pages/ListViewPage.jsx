@@ -77,8 +77,9 @@ export default function ListViewPage() {
   
 
   const handleShare = () => {
-    navigate(`/share/${id}`);
+    navigate(`/share-list/${id}`);
   };
+  
 
   if (!list) {
     return <div style={{ color: "white", padding: "20px" }}>Loading...</div>;
