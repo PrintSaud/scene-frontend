@@ -9,7 +9,6 @@ import { likeLog, likeReply } from "../api/api";
 import { backend } from "../config";
 import StarRating from "../components/StarRating";
 
-
 export default function ReviewPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -23,9 +22,11 @@ export default function ReviewPage() {
       const { data } = await axios.get(`${backend}/api/logs/${id}`);
       setReview(data);
       setReplies(data.replies || []);
-      const res = await axios.get(`${backend}/api/logs/user/${data.user._id}`);
-      const filtered = res.data.filter((r) => r._id !== id);
-      setMoreReviews(filtered.slice(0, 3));
+      if (data.user?._id) {
+        const res = await axios.get(`${backend}/api/logs/user/${data.user._id}`);
+        const filtered = res.data.filter((r) => r._id !== id);
+        setMoreReviews(filtered.slice(0, 3));
+      }
     } catch (err) {
       console.error(err);
       toast.error("Failed to load review.");
@@ -98,19 +99,26 @@ export default function ReviewPage() {
         <div style={{ flex: 1 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <img
-                src={review.user.avatar}
-                alt="Avatar"
-                style={{ width: 30, height: 30, borderRadius: "50%", cursor: "pointer" }}
-                onClick={() => handleProfile(review.user._id)}
-              />
-              <span
-                style={{ cursor: "pointer", fontWeight: "bold" }}
-                onClick={() => handleProfile(review.user._id)}
-              >
-                @{review.user.username}
-              </span>
+              {review.user ? (
+                <>
+                  <img
+                    src={review.user.avatar}
+                    alt="Avatar"
+                    style={{ width: 30, height: 30, borderRadius: "50%", cursor: "pointer" }}
+                    onClick={() => handleProfile(review.user._id)}
+                  />
+                  <span
+                    style={{ cursor: "pointer", fontWeight: "bold" }}
+                    onClick={() => handleProfile(review.user._id)}
+                  >
+                    @{review.user.username}
+                  </span>
+                </>
+              ) : (
+                <span style={{ fontSize: "13px", color: "#888" }}>Unknown user</span>
+              )}
             </div>
+
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
               <StarRating rating={review.rating} />
               <FaHeart
@@ -160,9 +168,15 @@ export default function ReviewPage() {
       </div>
 
       <div style={{ padding: "16px" }}>
-        <h4>More reviews by @{review.user.username}</h4>
+        <h4>
+          More reviews by @{review.user ? review.user.username : "unknown"}
+        </h4>
         {moreReviews.map((r) => (
-          <div key={r._id} style={{ display: "flex", alignItems: "flex-start", gap: "8px", marginBottom: 12, cursor: "pointer" }} onClick={() => handleMoreReviewsClick(r._id)}>
+          <div
+            key={r._id}
+            style={{ display: "flex", alignItems: "flex-start", gap: "8px", marginBottom: 12, cursor: "pointer" }}
+            onClick={() => handleMoreReviewsClick(r._id)}
+          >
             <img src={r.posterOverride || "/default-poster.jpg"} alt="Poster" style={{ width: 60, borderRadius: 6 }} />
             <div>
               <StarRating rating={r.rating} />
