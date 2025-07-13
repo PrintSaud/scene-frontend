@@ -159,6 +159,7 @@ setHasUnread(unread.length > 0);
           <Route path="/actor/:id" element={<ActorPage />} />
           <Route path="/director/:id" element={<PersonPage isDirector={true} />} />
           <Route path="/upload-avatar" element={<UploadAvatarPage />} />
+          <Route path="/share/:id" element={<ShareListPage />} />
         </Routes>
       </div>
       {shouldShowNav && <BottomNav hasUnread={hasUnread} />}

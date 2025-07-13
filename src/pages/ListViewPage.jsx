@@ -63,17 +63,18 @@ export default function ListViewPage() {
   };
 
   const handleDelete = async () => {
-    if (window.confirm("Delete this list?")) {
-      try {
-        await axios.delete(`${backend}/api/lists/${id}`);
-        toast.success("List deleted");
-        navigate(-1);
-      } catch (err) {
-        console.error("Failed to delete list:", err);
-        toast.error("Could not delete.");
-      }
+    const confirmDelete = window.confirm("Are you sure you want to delete this list?");
+    if (!confirmDelete) return;
+    try {
+      await axios.delete(`${backend}/api/lists/${id}`);
+      toast.success("List deleted!");
+      navigate(`/profile/${user._id}`);
+    } catch (err) {
+      console.error("❌ Failed to delete list", err);
+      toast.error("Failed to delete list.");
     }
   };
+  
 
   const handleShare = () => {
     navigate(`/share/${id}`);
