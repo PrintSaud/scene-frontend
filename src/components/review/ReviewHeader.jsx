@@ -17,20 +17,20 @@ export default function ReviewHeader({ review, userId, onLike, onReply, onProfil
   return (
     <>
       {/* Backdrop with fade-down */}
-      <div style={{ position: "relative", width: "100%", height: 200, overflow: "hidden" }}>
+      <div style={{ position: "relative", width: "100%", height: 220, overflow: "hidden", marginBottom: -30 }}>
         <img src={backdropUrl} alt="Backdrop" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
         <div style={{
           position: "absolute",
           bottom: 0,
           width: "100%",
-          height: "60%",
+          height: "70%",
           background: "linear-gradient(to top, #0e0e0e, transparent)"
         }} />
-        {/* Go to film button */}
+        {/* Go to film button moved down slightly */}
         <button
           style={{
             position: "absolute",
-            bottom: 12,
+            bottom: 20,
             right: 12,
             background: "#fff",
             color: "#000",
@@ -46,29 +46,34 @@ export default function ReviewHeader({ review, userId, onLike, onReply, onProfil
         </button>
       </div>
 
-      {/* User + review text block */}
-      <div style={{ padding: "12px 16px" }}>
+      {/* User + review text */}
+      <div style={{ padding: "0 16px" }}>
         {review.user && (
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <img
-              src={review.user.avatar}
-              alt="Avatar"
-              style={{ width: 28, height: 28, borderRadius: "50%", cursor: "pointer" }}
-              onClick={() => onProfile(review.user._id)}
-            />
-            <span
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontSize: 13,
-                opacity: 0.9,
-                cursor: "pointer"
-              }}
-              onClick={() => onProfile(review.user._id)}
-            >
-              @{review.user.username}
-            </span>
-            <StarRating rating={review.rating} />
-          </div>
+          <>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <img
+                src={review.user.avatar}
+                alt="Avatar"
+                style={{ width: 28, height: 28, borderRadius: "50%", cursor: "pointer" }}
+                onClick={() => onProfile(review.user._id)}
+              />
+              <span
+                style={{
+                  fontFamily: "Inter, sans-serif",
+                  fontSize: 13,
+                  opacity: 0.9,
+                  cursor: "pointer"
+                }}
+                onClick={() => onProfile(review.user._id)}
+              >
+                @{review.user.username}
+              </span>
+            </div>
+            {/* Rating under username */}
+            <div style={{ marginTop: 4 }}>
+              <StarRating rating={review.rating} />
+            </div>
+          </>
         )}
 
         {/* Review text */}
@@ -91,7 +96,7 @@ export default function ReviewHeader({ review, userId, onLike, onReply, onProfil
           <img src={review.gif} alt="GIF" style={{ width: "100%", borderRadius: 8, marginTop: 8 }} />
         )}
 
-        {/* Like + Reply placement under review, far right */}
+        {/* Like + Reply under review, far right */}
         <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", marginTop: 8, gap: "12px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
             <span onClick={onLike} style={{ cursor: "pointer", fontSize: "20px" }}>

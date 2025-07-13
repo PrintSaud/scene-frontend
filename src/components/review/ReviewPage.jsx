@@ -6,9 +6,7 @@ import toast from "react-hot-toast";
 import axios from "../../api/api";
 import { likeLog, likeReply } from "../../api/api";
 import { backend } from "../../config";
-import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import ReviewHeader from "./ReviewHeader";
-import ReviewBody from "./ReviewBody";
 import ReplyList from "./ReplyList";
 import MoreReviewsList from "./MoreReviewsList";
 
@@ -70,7 +68,7 @@ export default function ReviewPage() {
             ? {
                 ...r,
                 likes: (r.likes || []).includes(userId)
-                  ? (r.likes || []).filter((uid) => uid !== userId)
+                  ? r.likes.filter((uid) => uid !== userId)
                   : [...(r.likes || []), userId],
               }
             : r
@@ -111,7 +109,7 @@ export default function ReviewPage() {
         onProfile={handleProfile}
       />
 
-      <ReviewBody review={review} />
+      {/* 🔥 Removed ReviewBody since ReviewHeader already renders text */}
 
       <ReplyList
         replies={replies}
