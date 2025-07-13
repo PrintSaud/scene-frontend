@@ -1,13 +1,19 @@
 import React from "react";
-import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 
 export default function ReviewBody({ review }) {
   return (
     <div style={{ padding: "0 16px" }}>
       {review.review ? (
-        <p style={{ marginTop: 8, fontFamily: "Inter, sans-serif" }}>{review.review}</p>
+        <p style={{ 
+          marginTop: 8, 
+          fontFamily: "Inter, sans-serif", 
+          fontSize: 10,  // 🔹 Slightly smaller font than default (you can set to 13 if you want even smaller)
+          lineHeight: "1.4" 
+        }}>
+          {review.review}
+        </p>
       ) : (
-        <p style={{ marginTop: 8, color: "#888" }}>No review text.</p>
+        <p style={{ marginTop: 8, color: "#888", fontSize: 14 }}>No review text.</p>
       )}
 
       {review.image && (
@@ -20,3 +26,4 @@ export default function ReviewBody({ review }) {
     </div>
   );
 }
+

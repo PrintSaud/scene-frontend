@@ -27,7 +27,9 @@ export default function ReviewHeader({ review, userId, onLike, onReply, onProfil
 
       {/* Card */}
       <div style={{ display: "flex", padding: "16px", gap: "12px" }}>
-        <img src={posterUrl} alt="Poster" style={{ width: 100, borderRadius: 8, cursor: "pointer" }} onClick={() => onProfile(review.movie?._id)} />
+        <img src={posterUrl} alt="Poster" style={{ width: 100, borderRadius: 8, cursor: "pointer" }} 
+        onClick={() => navigate(`/movie/${review.movie?.id || review.movie}`)}
+ />
         <div style={{ flex: 1 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
@@ -61,34 +63,37 @@ export default function ReviewHeader({ review, userId, onLike, onReply, onProfil
               )}
             </div>
 
-            {/* Like + Reply button together */}
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                <span onClick={onLike} style={{ cursor: "pointer", fontSize: "24px" }}>
-                  {(review.likes || []).includes(userId) ? (
-                    <AiFillHeart style={{ color: "#B327F6" }} />
-                  ) : (
-                    <AiOutlineHeart />
-                  )}
-                </span>
-                <span style={{ fontSize: "14px" }}>{review.likes?.length || 0}</span>
-              </div>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "4px" }}>
+  {/* Like icon + count */}
+  <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+    <span onClick={onLike} style={{ cursor: "pointer", fontSize: "20px" }}>
+      {(review.likes || []).includes(userId) ? (
+        <AiFillHeart style={{ color: "#B327F6" }} />
+      ) : (
+        <AiOutlineHeart />
+      )}
+    </span>
+    <span style={{ fontSize: "13px" }}>{review.likes?.length || 0}</span>
+  </div>
 
-              <button
-                style={{
-                  background: "transparent",
-                  border: "1px solid #555",
-                  borderRadius: 4,
-                  padding: "4px 8px",
-                  fontSize: 12,
-                  fontFamily: "Inter, sans-serif",
-                  cursor: "pointer"
-                }}
-                onClick={onReply}
-              >
-                Reply
-              </button>
-            </div>
+  {/* Reply button below */}
+  <button
+    style={{
+      background: "transparent",
+      border: "1px solid #555",
+      borderRadius: 4,
+      padding: "4px 8px",
+      fontSize: 12,
+      fontFamily: "Inter, sans-serif",
+      color: "#fff",  // White text
+      cursor: "pointer"
+    }}
+    onClick={onReply}
+  >
+    Reply
+  </button>
+</div>
+
           </div>
         </div>
       </div>

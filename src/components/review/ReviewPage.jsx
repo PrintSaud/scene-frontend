@@ -89,7 +89,13 @@ export default function ReviewPage() {
   if (!review) return null;
 
   return (
-    <div style={{ backgroundColor: "#0e0e0e", color: "#fff", minHeight: "100vh" }}>
+    <div style={{ 
+      backgroundColor: "#0e0e0e", 
+      color: "#fff", 
+      height: "100vh", 
+      overflowY: "auto",
+      position: "relative"  // Ensure absolute children respect this context!
+    }}>
       {/* Back & Menu */}
       <div style={{ position: "absolute", top: 16, left: 16, zIndex: 10 }}>
         <IoArrowBack size={24} onClick={() => navigate(-1)} />
