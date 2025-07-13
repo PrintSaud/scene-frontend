@@ -97,7 +97,6 @@ export default function EditListPage() {
       <div style={{ display: "flex", justifyContent: "space-between", padding: "16px" }}>
         <button onClick={() => navigate(-1)} style={btnStyle}>← Back</button>
         <div style={{ display: "flex", gap: "10px" }}>
-          <button onClick={handleDelete} style={deleteBtn}>🗑️ Delete</button>
           <button
             onClick={handleSave}
             style={{ ...btnStyle, opacity: canSave ? 1 : 0.5 }}

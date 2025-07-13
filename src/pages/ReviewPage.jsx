@@ -1,117 +1,244 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import api from "../api/api";
-import { backend } from "../config";
+import { IoArrowBack } from "react-icons/io5";
+import { HiDotsVertical } from "react-icons/hi";
+import { FaHeart } from "react-icons/fa";
 import toast from "react-hot-toast";
+import axios from "../api/api";
+import { likeLog, likeReply } from "../api/api"; // ✅ API hooks for likes
+import { backend } from "../config";
+import StarRating from "../components/StarRating";
 
 export default function ReviewPage() {
-  const { logId } = useParams();
+  const { id } = useParams(); // review/log ID
   const navigate = useNavigate();
-
-  const [log, setLog] = useState(null);
+  const [review, setReview] = useState(null);
+  const [replies, setReplies] = useState([]);
   const [moreReviews, setMoreReviews] = useState([]);
-  const [liked, setLiked] = useState(false);
-
-  const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
   const user = JSON.parse(localStorage.getItem("user"));
 
-  const handleDelete = async (logId) => {
-    await api.delete(`/api/logs/${logId}`);
-    toast.success("Deleted");
-    navigate("/"); // Or refresh feed, etc
+  const fetchData = async () => {
+    try {
+      const { data } = await axios.get(`${backend}/api/logs/${id}`);
+      setReview(data);
+      setReplies(data.replies || []);
+      const res = await axios.get(`${backend}/api/logs/user/${data.user._id}`);
+      const filtered = res.data.filter((r) => r._id !== id);
+      setMoreReviews(filtered.slice(0, 3));
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to load review.");
+    }
   };
 
   useEffect(() => {
-    const fetchLog = async () => {
-      try {
-        const { data } = await api.get(`/api/logs/${logId}`);
-        setLog(data);
-      } catch (err) {
-        console.error("Failed to fetch log", err);
-      }
-    };
+    fetchData();
+  }, [id]);
 
-    fetchLog();
-  }, [logId]);
+  const handleLike = async () => {
+    try {
+      await likeLog(id);
+      setReview((prev) => ({
+        ...prev,
+        likes: prev.likes?.includes(user._id)
+          ? prev.likes.filter((uid) => uid !== user._id)
+          : [...(prev.likes || []), user._id],
+      }));
+    } catch (err) {
+      toast.error("Failed to like.");
+    }
+  };
 
-  if (!log) return <div style={{ color: "white", padding: "20px" }}>Loading...</div>;
+  const handleReplyLike = async (replyId) => {
+    try {
+      await likeReply(id, replyId);
+      setReplies((prev) =>
+        prev.map((r) =>
+          r._id === replyId
+            ? {
+                ...r,
+                likes: r.likes?.includes(user._id)
+                  ? r.likes.filter((uid) => uid !== user._id)
+                  : [...(r.likes || []), user._id],
+              }
+            : r
+        )
+      );
+    } catch (err) {
+      toast.error("Failed to like reply.");
+    }
+  };
 
-  const customPoster = log.movie?.customPoster;
-  const defaultPoster = TMDB_IMG + log.movie?.poster;
-  const poster = customPoster || defaultPoster || "/default-poster.png";
+  const handleReply = () => {
+    navigate(`/reply/${id}`);
+  };
+
+  const handleProfile = (userId) => {
+    navigate(`/profile/${userId}`);
+  };
+
+  const handleMoreReviewsClick = (reviewId) => {
+    navigate(`/review/${reviewId}`);
+  };
+
+  const handleMenu = () => {
+    // TODO: open action sheet/modal for edit/delete/share/copy/change-backdrop
+  };
+
+  if (!review) return null;
+
+  const posterUrl = review.poster || "/default-poster.jpg"; // fallback
+  const backdropUrl =
+    review.movie?.backdrop_path
+      ? `https://image.tmdb.org/t/p/original${review.movie.backdrop_path}`
+      : "/default-backdrop.jpg";
 
   return (
-    <div style={{ backgroundColor: "#0e0e0e", minHeight: "100vh", color: "white", padding: "16px" }}>
-      <button
-        onClick={() => navigate(-1)}
-        style={{ background: "none", border: "none", color: "#aaa", marginBottom: "16px", fontSize: "14px" }}
-      >
-        ← Back
-      </button>
+    <div style={{ backgroundColor: "#0e0e0e", color: "#fff", minHeight: "100vh" }}>
+      {/* 🔙 Back + ⋯ Menu */}
+      <div style={{ position: "absolute", top: 16, left: 16, zIndex: 10 }}>
+        <IoArrowBack size={24} onClick={() => navigate(-1)} />
+      </div>
+      <div style={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}>
+        <HiDotsVertical size={24} onClick={handleMenu} />
+      </div>
 
-      {/* Poster */}
-      <div style={{ display: "flex", justifyContent: "center" }}>
+      {/* 🎬 Movie Backdrop */}
+      <img
+        src={backdropUrl}
+        alt="Backdrop"
+        style={{ width: "100%", height: "auto", maxHeight: 200, objectFit: "cover" }}
+      />
+
+      {/* 📦 Main Review Block */}
+      <div style={{ display: "flex", padding: "16px", gap: "12px" }}>
         <img
-          src={poster}
-          alt={log.movie?.title}
-          style={{ width: "180px", borderRadius: "12px", marginBottom: "16px" }}
+          src={posterUrl}
+          alt="Poster"
+          style={{ width: 80, borderRadius: 8 }}
         />
-      </div>
-
-      {/* User Info */}
-      {log.user && (
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
-          <img src={log.user.avatar} alt="avatar" style={{ width: "30px", height: "30px", borderRadius: "50%" }} />
-          <strong style={{ fontSize: "14px", color: "rgba(255,255,255,0.9)" }}>@{log.user.username}</strong>
-          <span style={{ marginLeft: "auto", fontSize: "14px", color: "#ffc107", fontWeight: "bold" }}>
-            {log.rating?.toFixed(1)} / 5.0
-          </span>
-        </div>
-      )}
-
-      {/* Title + Review */}
-      <h2 style={{ fontSize: "18px", margin: "12px 0 6px" }}>{log.movie?.title}</h2>
-      <p style={{ fontSize: "15px", color: "#ccc", lineHeight: "1.7" }}>{log.review}</p>
-
-      {/* Likes */}
-      <div style={{ display: "flex", gap: "20px", marginTop: "14px", alignItems: "center" }}>
-        <span
-          onClick={() => setLiked(!liked)}
-          style={{ cursor: "pointer", color: liked ? "#ff4d4d" : "#ccc", fontWeight: "500" }}
-        >
-          ❤️ {liked ? (log.likes || 0) + 1 : log.likes || 0} likes
-        </span>
-      </div>
-
-      {/* More Reviews by User */}
-      {log.user && (
-        <div style={{ marginTop: "40px" }}>
-          <h4 style={{ color: "#fff", marginBottom: "12px" }}>
-            More by <span style={{ color: "#888" }}>@{log.user.username}</span>
-          </h4>
-          <div style={{ display: "flex", gap: "10px", overflowX: "auto" }}>
-            {moreReviews.map((review) => {
-              const reviewPoster = review.movie?.customPoster || TMDB_IMG + review.movie?.poster;
-              return (
-                <img
-                  key={review._id}
-                  src={reviewPoster}
-                  alt={review.movie?.title}
-                  style={{ width: "90px", height: "135px", borderRadius: "6px", flexShrink: 0 }}
-                  onClick={() => navigate(`/review/${review._id}`)}
-                />
-              );
-            })}
-          </div>
-
-          {user?._id === log.user._id && (
-            <div style={{ display: "flex", gap: "10px", marginTop: "12px" }}>
-              <button onClick={() => openEditModal(log)}>✏️ Edit</button>
-              <button onClick={() => handleDelete(log._id)}>🗑️ Delete</button>
+        <div style={{ flex: 1 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <img
+                src={review.user.avatar}
+                alt="Avatar"
+                style={{ width: 30, height: 30, borderRadius: "50%", cursor: "pointer" }}
+                onClick={() => handleProfile(review.user._id)}
+              />
+              <span
+                style={{ cursor: "pointer", fontWeight: "bold" }}
+                onClick={() => handleProfile(review.user._id)}
+              >
+                @{review.user.username}
+              </span>
             </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <StarRating rating={review.rating} />
+              <FaHeart
+                onClick={handleLike}
+                style={{
+                  cursor: "pointer",
+                  color: review.likes?.includes(user._id) ? "red" : "white",
+                }}
+              />
+              <button onClick={handleReply}>Reply</button>
+            </div>
+          </div>
+          <p style={{ marginTop: 8 }}>{review.review}</p>
+          {review.image && (
+            <img
+              src={review.image}
+              alt="Attached"
+              style={{ width: "100%", borderRadius: 8, marginTop: 8 }}
+            />
+          )}
+          {review.gif && (
+            <img
+              src={review.gif}
+              alt="GIF"
+              style={{ width: "100%", borderRadius: 8, marginTop: 8 }}
+            />
           )}
         </div>
-      )}
+      </div>
+
+      {/* 💬 Replies */}
+      <div style={{ padding: "0 16px" }}>
+        {replies.slice(0, 2).map((r) => (
+          <div
+            key={r._id}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: 8,
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <img
+                src={r.avatar}
+                alt="Avatar"
+                style={{ width: 24, height: 24, borderRadius: "50%", cursor: "pointer" }}
+                onClick={() => handleProfile(r.userId)}
+              />
+              <span
+                style={{ cursor: "pointer", fontWeight: "bold" }}
+                onClick={() => handleProfile(r.userId)}
+              >
+                @{r.username}
+              </span>
+              <span>{r.text}</span>
+            </div>
+            <FaHeart
+              onClick={() => handleReplyLike(r._id)}
+              style={{
+                cursor: "pointer",
+                color: r.likes?.includes(user._id) ? "red" : "white",
+              }}
+            />
+          </div>
+        ))}
+        {replies.length > 2 && (
+          <button onClick={() => navigate(`/reply/${id}`)}>Show more replies →</button>
+        )}
+      </div>
+
+      {/* 📝 More reviews by user */}
+      <div style={{ padding: "16px" }}>
+        <h4>More reviews by @{review.user.username}</h4>
+        {moreReviews.map((r) => (
+          <div
+            key={r._id}
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              gap: "8px",
+              marginBottom: 12,
+              cursor: "pointer",
+            }}
+            onClick={() => handleMoreReviewsClick(r._id)}
+          >
+            <img
+              src={r.posterOverride || "/default-poster.jpg"}
+              alt="Poster"
+              style={{ width: 60, borderRadius: 6 }}
+            />
+            <div>
+              <StarRating rating={r.rating} />
+              {r.review && (
+                <p>
+                  {r.review.split(" ").slice(0, 15).join(" ")}
+                  {r.review.split(" ").length > 15 && "…read more"}
+                </p>
+              )}
+              {r.gif && <p>GIF 🎬</p>}
+              {r.image && <p>📷 Image</p>}
+            </div>
+          </div>
+        ))}
+        {moreReviews.length > 3 && <button>show more…</button>}
+      </div>
     </div>
   );
 }

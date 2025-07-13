@@ -38,6 +38,11 @@ export const getLogById = (logId) => api.get(`/api/logs/${logId}`);
 export const addLogReply = (logId, data) => api.post(`/api/logs/${logId}/reply`, data);
 export const reactToLog = (logId, emoji) => api.post(`/api/logs/${logId}/react`, { emoji });
 export const deleteReply = (logId, replyId) => api.delete(`/api/logs/${logId}/reply/${replyId}`);
+// Likes for reviews/logs
+export const likeLog = (logId) => api.post(`/api/logs/${logId}/like`);
+
+// Likes for replies
+export const likeReply = (logId, replyId) => api.post(`/api/logs/${logId}/replies/${replyId}/like`);
 
 //
 // 📋 WATCHLIST
