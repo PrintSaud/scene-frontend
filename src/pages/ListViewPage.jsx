@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "../api/api";
 import { backend } from "../config";
 import toast from "react-hot-toast";
-import { BsThreeDots, BsHeart, BsHeartFill } from "react-icons/bs";
+import { BsHeart, BsHeartFill } from "react-icons/bs";
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const FALLBACK_COVER = "/default-list-cover.jpg";
@@ -16,7 +16,7 @@ export default function ListViewPage() {
   const [list, setList] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
-  const [showMenu, setShowMenu] = useState(false);
+  const [showOptions, setShowOptions] = useState(false);
 
   useEffect(() => {
     const fetchList = async () => {
@@ -33,6 +33,8 @@ export default function ListViewPage() {
     };
     fetchList();
   }, [id]);
+
+  const isOwner = user && list?.user._id === user._id;
 
   const handleLike = async () => {
     try {
@@ -81,8 +83,6 @@ export default function ListViewPage() {
     return <div style={{ color: "white", padding: "20px" }}>Loading...</div>;
   }
 
-  const isOwner = user && list.user._id === user._id;
-
   return (
     <div style={{ background: "#0e0e0e", minHeight: "100vh", color: "white", paddingBottom: "80px" }}>
       {/* Cover */}
@@ -94,49 +94,110 @@ export default function ListViewPage() {
           onError={(e) => (e.currentTarget.src = FALLBACK_COVER)}
         />
 
-        <div style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: "80px",
-          background: "linear-gradient(to bottom, rgba(0,0,0,0) 0%, #0e0e0e 100%)"
-        }} />
-
-        <button onClick={() => navigate(-1)} style={{ ...headerBtn, left: "16px" }}>
-          ←
-        </button>
-
-        <div style={{ position: "absolute", right: "16px", top: "16px" }}>
-          <button onClick={() => setShowMenu(!showMenu)} style={{ background: "none", border: "none", color: "white", fontSize: "20px" }}>
-            <BsThreeDots />
+        <div
+          style={{
+            position: "absolute",
+            top: "16px",
+            left: "16px",
+            right: "16px",
+            zIndex: 10,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          {/* 🔙 Back */}
+          <button
+            onClick={() => navigate(-1)}
+            style={{
+              background: "rgba(0,0,0,0.5)",
+              border: "none",
+              borderRadius: "50%",
+              width: "32px",
+              height: "32px",
+              color: "#fff",
+              fontSize: "18px",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            ←
           </button>
-          {showMenu && (
-            <div style={{
-              position: "absolute",
-              right: 0,
-              top: "28px",
-              background: "#1a1a1a",
-              border: "1px solid #333",
-              borderRadius: "8px",
-              zIndex: 5,
-              minWidth: "150px",
-              overflow: "hidden"
-            }}>
-              {isOwner ? (
-                <>
-                  <div style={menuItem} onClick={() => navigate(`/list/${id}/edit`)}>Edit List</div>
-                  <div style={menuItem} onClick={handleShare}>Share to Friend</div>
-                  <div style={menuItem} onClick={handleDelete}>Delete List</div>
-                </>
-              ) : (
-                <>
-                  <div style={menuItem} onClick={handleShare}>Share to Friend</div>
-                  <div style={menuItem} onClick={handleSave}>{isSaved ? "Unsave" : "Save"}</div>
-                </>
-              )}
-            </div>
-          )}
+
+          {/* ⋯ Options */}
+          <div style={{ position: "relative" }}>
+            <button
+              onClick={() => setShowOptions((prev) => !prev)}
+              style={{
+                background: "rgba(0,0,0,0.5)",
+                border: "none",
+                borderRadius: "50%",
+                width: "32px",
+                height: "32px",
+                color: "#fff",
+                fontSize: "22px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              ⋯
+            </button>
+
+            {showOptions && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "38px",
+                  right: "0",
+                  background: "#1a1a1a",
+                  border: "1px solid #333",
+                  borderRadius: "12px",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
+                  padding: "12px 0",
+                  width: "180px",
+                  zIndex: 20,
+                }}
+              >
+                {(isOwner
+                  ? [
+                      { label: "✏️ Edit List", onClick: () => navigate(`/list/${id}/edit`) },
+                      { label: "📤 Share to Friend", onClick: handleShare },
+                      { label: "🗑️ Delete List", onClick: handleDelete },
+                    ]
+                  : [
+                      { label: "📤 Share to Friend", onClick: handleShare },
+                      { label: isSaved ? "✅ Saved" : "💾 Save List", onClick: handleSave },
+                    ]
+                ).map((item, index) => (
+                  <div
+                    key={index}
+                    onClick={() => {
+                      item.onClick();
+                      setShowOptions(false);
+                    }}
+                    style={{
+                      padding: "10px 16px",
+                      cursor: "pointer",
+                      fontSize: "14.5px",
+                      fontWeight: "500",
+                      color: "#fff",
+                      fontFamily: "Inter",
+                      transition: "0.2s",
+                      whiteSpace: "nowrap",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "#2a2a2a")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                  >
+                    {item.label}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -176,7 +237,7 @@ export default function ListViewPage() {
             <span style={{ fontFamily: "Inter, sans-serif" }}>@{list.user.username}</span>
           </div>
           <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "4px" }}>
-            <span onClick={handleLike} style={{ cursor: "pointer", fontSize: "18px" }}>
+            <span onClick={handleLike} style={{ cursor: "pointer", fontSize: "24px" }}>
               {isLiked ? <BsHeartFill color="#a970ff" /> : <BsHeart />}
             </span>
             <span style={{ fontSize: "14px" }}>{list.likes?.length || 0}</span>
@@ -231,24 +292,3 @@ export default function ListViewPage() {
     </div>
   );
 }
-
-const headerBtn = {
-  position: "absolute",
-  top: "16px",
-  background: "#1a1a1a",
-  color: "white",
-  padding: "6px 12px",
-  borderRadius: "6px",
-  border: "1px solid #444",
-  fontSize: "12px",
-  zIndex: 2
-};
-
-const menuItem = {
-  padding: "10px 12px",
-  cursor: "pointer",
-  fontSize: "14px",
-  fontFamily: "Inter, sans-serif",
-  borderBottom: "1px solid #333"
-};
-
