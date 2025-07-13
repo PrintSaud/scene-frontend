@@ -14,7 +14,8 @@ export default function ReviewHeader({ review, userId, onLike, onReply, onProfil
     ? `https://image.tmdb.org/t/p/original${review.movie.backdrop_path}`
     : "/default-backdrop.jpg";
 
-  const avatarUrl = review.user?.avatar && review.user.avatar.startsWith("http")
+  // ✅ More permissive avatar fallback (supports relative paths from backend)
+  const avatarUrl = review.user?.avatar
     ? review.user.avatar
     : "/default-avatar.jpg";
 
@@ -34,8 +35,8 @@ export default function ReviewHeader({ review, userId, onLike, onReply, onProfil
           height: "70%",
           background: "linear-gradient(to top, #0e0e0e, transparent)"
         }} />
-        {/* "Go to film" button → white text, transparent bg, a bit lower */}
-        <div style={{ position: "absolute", bottom: 30, right: 10, textAlign: "right" }}>
+        {/* "Go to film" button → white text, transparent bg, positioned properly */}
+        <div style={{ position: "absolute", bottom: 30, right: 15, textAlign: "right" }}>
           <button
             style={{
               background: "transparent",
@@ -50,6 +51,7 @@ export default function ReviewHeader({ review, userId, onLike, onReply, onProfil
           >
             Go to film
           </button>
+          {/* Timestamp below button */}
           {timestamp && (
             <div style={{ fontSize: 11, color: "#aaa", marginTop: 2 }}>
               {timestamp}
@@ -108,7 +110,7 @@ export default function ReviewHeader({ review, userId, onLike, onReply, onProfil
         {/* Like + Reply under review, far right */}
         <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", marginTop: 8, gap: "12px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-            <span onClick={onLike} style={{ cursor: "pointer", fontSize: "20px", position: "relative", top: "3px" }}>
+            <span onClick={onLike} style={{ cursor: "pointer", fontSize: "20px", position: "relative", top: "1px" }}>
               {(review.likes || []).includes(userId) ? (
                 <AiFillHeart style={{ color: "#B327F6" }} />
               ) : (
