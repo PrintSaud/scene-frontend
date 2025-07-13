@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function ReviewHeader({ review, userId, onLike, onReply, onProfile }) {
   const navigate = useNavigate();
+  const logTimestamp = review.createdAt ? formatTimestamp(review.createdAt) : "";
 
   const posterUrl = review.poster && review.poster.startsWith("http")
     ? review.poster
@@ -15,17 +16,25 @@ export default function ReviewHeader({ review, userId, onLike, onReply, onProfil
     ? `https://image.tmdb.org/t/p/original${review.movie.backdrop_path}`
     : "/default-backdrop.jpg";
 
-  // 🔥 Determine timestamp display
-  let logTimestamp = "";
-  if (review.createdAt) {
-    const created = parseISO(review.createdAt);
-    const daysAgo = differenceInDays(new Date(), created);
-    if (daysAgo > 7) {
-      logTimestamp = format(created, "MMMM d, yyyy");
-    } else {
-      logTimestamp = `${formatDistanceToNowStrict(created)} ago`;
-    }
-  }
+    function formatTimestamp(dateString) {
+        const date = new Date(dateString);
+        const diffDays = (Date.now() - date.getTime()) / (1000 * 60 * 60 * 24);
+      
+        if (diffDays > 7) {
+          return date.toLocaleDateString("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric"
+          });
+        } else {
+          const diffHours = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60));
+          if (diffHours < 1) return "just now";
+          if (diffHours === 1) return "1 hour ago";
+          if (diffHours < 24) return `${diffHours} hours ago`;
+          return `${Math.floor(diffHours / 24)} days ago`;
+        }
+      }
+      
 
   return (
     <>
