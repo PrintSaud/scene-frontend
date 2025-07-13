@@ -78,38 +78,39 @@ export default function ShareListPage() {
       </div>
 
       {/* Friends List */}
-      <div style={{ padding: "0 16px" }}>
-        {friends.length === 0 ? (
-          <div style={{ textAlign: "center", marginTop: "40px", color: "#bbb" }}>
-            You have no mutual followers yet.
-          </div>
-        ) : (
-          friends.map((f) => (
-            <div
-              key={f._id}
-              onClick={() => handleSelect(f._id)}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                padding: "10px 0",
-                borderBottom: "1px solid #222",
-                cursor: "pointer",
-                background: selected.includes(f._id) ? "#222" : "transparent",
-              }}
-            >
-              <img
-                src={f.avatar}
-                alt="avatar"
-                style={{ width: "36px", height: "36px", borderRadius: "50%", marginRight: "12px" }}
-              />
-              <span>@{f.username}</span>
-              {selected.includes(f._id) && (
-                <span style={{ marginLeft: "auto", fontSize: "16px", color: "#a970ff" }}>✔</span>
-              )}
-            </div>
-          ))
+      <div style={{ padding: "0" }}>
+  {friends.length === 0 ? (
+    <div style={{ textAlign: "center", marginTop: "40px", color: "#bbb" }}>
+      You have no mutual followers yet.
+    </div>
+  ) : (
+    friends.map((f) => (
+      <div
+        key={f._id}
+        onClick={() => handleSelect(f._id)}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          padding: "10px 16px",  // ✅ Moved padding here
+          borderBottom: "1px solid #222",
+          cursor: "pointer",
+          background: selected.includes(f._id) ? "#222" : "transparent",
+        }}
+      >
+        <img
+          src={f.avatar}
+          alt="avatar"
+          style={{ width: "36px", height: "36px", borderRadius: "50%", marginRight: "12px" }}
+        />
+        <span>@{f.username}</span>
+        {selected.includes(f._id) && (
+          <span style={{ marginLeft: "auto", fontSize: "16px", color: "#a970ff" }}>✔</span>
         )}
       </div>
+    ))
+  )}
+</div>
+
     </div>
   );
 }
