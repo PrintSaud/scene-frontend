@@ -1,6 +1,6 @@
 import React from "react";
 import StarRating from "../StarRating";
-import { FaHeart } from "react-icons/fa";
+import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 
 export default function ReviewHeader({ review, userId, onLike, onReply, onProfile }) {
   const posterUrl = review.poster && review.poster.startsWith("http")
@@ -9,7 +9,7 @@ export default function ReviewHeader({ review, userId, onLike, onReply, onProfil
 
   const backdropUrl = review.movie?.backdrop_path
     ? `https://image.tmdb.org/t/p/original${review.movie.backdrop_path}`
-    : "/default-backdrop.jpg";
+    : review.backdrop || "/default-backdrop.jpg";
 
   return (
     <>
@@ -27,9 +27,9 @@ export default function ReviewHeader({ review, userId, onLike, onReply, onProfil
 
       {/* Card */}
       <div style={{ display: "flex", padding: "16px", gap: "12px" }}>
-        <img src={posterUrl} alt="Poster" style={{ width: 80, borderRadius: 8 }} />
+        <img src={posterUrl} alt="Poster" style={{ width: 100, borderRadius: 8, cursor: "pointer" }} onClick={() => onProfile(review.movie?._id)} />
         <div style={{ flex: 1 }}>
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
               {review.user ? (
                 <>
@@ -43,7 +43,7 @@ export default function ReviewHeader({ review, userId, onLike, onReply, onProfil
                     <span
                       style={{
                         fontFamily: "Inter, sans-serif",
-                        fontWeight: 400,
+                        fontSize: 14,
                         opacity: 0.8,
                         cursor: "pointer"
                       }}
@@ -61,25 +61,33 @@ export default function ReviewHeader({ review, userId, onLike, onReply, onProfil
               )}
             </div>
 
-            {/* Like button styled like ListViewPage */}
-            <button
-              onClick={onLike}
-              style={{
-                background: "none",
-                border: "1px solid #fff",
-                borderRadius: "50%",
-                width: 28,
-                height: 28,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                opacity: (review.likes || []).includes(userId) ? 1 : 0.5
-              }}
-            >
-              <FaHeart size={14} style={{ color: (review.likes || []).includes(userId) ? "red" : "#fff" }} />
-            </button>
+            {/* Like button like ListViewPage */}
+            <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+              <span onClick={onLike} style={{ cursor: "pointer", fontSize: "24px" }}>
+                {(review.likes || []).includes(userId) ? (
+                  <AiFillHeart style={{ color: "#B327F6" }} />
+                ) : (
+                  <AiOutlineHeart />
+                )}
+              </span>
+              <span style={{ fontSize: "14px" }}>{review.likes?.length || 0}</span>
+            </div>
 
-            <button onClick={onReply}>Reply</button>
+            <button
+              style={{
+                marginLeft: "8px",
+                background: "transparent",
+                border: "1px solid #555",
+                borderRadius: 4,
+                padding: "4px 8px",
+                fontSize: 12,
+                fontFamily: "Inter, sans-serif",
+                cursor: "pointer"
+              }}
+              onClick={onReply}
+            >
+              Reply
+            </button>
           </div>
         </div>
       </div>

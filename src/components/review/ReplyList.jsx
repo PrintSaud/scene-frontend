@@ -1,5 +1,6 @@
 import React from "react";
 import { FaHeart } from "react-icons/fa";
+import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 
 export default function ReplyList({ replies, userId, reviewId, onReplyLike, onProfile }) {
   return (
@@ -11,28 +12,25 @@ export default function ReplyList({ replies, userId, reviewId, onReplyLike, onPr
               src={r.avatar}
               alt="Avatar"
               style={{ width: 24, height: 24, borderRadius: "50%", cursor: "pointer" }}
-              onClick={() => onProfile(r.user?._id || r.userId)}
+              onClick={() => onProfile(r.userId)}
             />
             <span
-              style={{ cursor: "pointer", fontWeight: "bold" }}
-              onClick={() => onProfile(r.user?._id || r.userId)}
+              style={{ cursor: "pointer", fontWeight: "bold", fontFamily: "Inter, sans-serif", fontSize: 14 }}
+              onClick={() => onProfile(r.userId)}
             >
               @{r.username}
             </span>
-            <span>{r.text}</span>
+            <span style={{ fontFamily: "Inter, sans-serif", fontSize: 14 }}>{r.text}</span>
           </div>
           <FaHeart
             onClick={() => onReplyLike(r._id)}
             style={{
               cursor: "pointer",
-              color: (Array.isArray(r.likes) ? r.likes : []).includes(userId) ? "red" : "white",
+              color: (Array.isArray(r.likes) ? r.likes : []).includes(userId) ? "red" : "white"
             }}
           />
         </div>
       ))}
-      {replies.length > 2 && (
-        <button onClick={() => onProfile(reviewId)}>Show more replies →</button>
-      )}
     </div>
   );
 }
