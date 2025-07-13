@@ -174,11 +174,10 @@ export default function ProfileHeader({
         color: "white",
         border: "1px solid #555",
         borderRadius: "6px",
-        padding: "4px 12px",
+        padding: "2px 12px",
         fontSize: "12px",
         cursor: "pointer",
-        height: "54px",
-        zIndex: 2,
+        height: "34px",
       }}
     >
       {isFollowing ? "Following" : "Follow"}
