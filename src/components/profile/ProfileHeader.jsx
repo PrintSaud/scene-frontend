@@ -117,57 +117,56 @@ export default function ProfileHeader({
         </div>
       </div>
 
-      {/* NAME + USERNAME + BIO */}
+      {/* NAME + USERNAME + FOLLOW BUTTON */}
+<div
+  style={{
+    marginTop: "8px",
+    marginLeft: "16px",
+    marginRight: "16px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+  }}
+>
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+    {user.name && (
       <div
         style={{
-          marginTop: "8px",
-          marginLeft: "16px",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-          gap: user.bio ? "6px" : "2px",
+          fontWeight: "600",
+          fontSize: "14px",
+          fontFamily: "Inter",
+          color: "white",
         }}
       >
-        {user.name && (
-          <div
-            style={{
-              fontWeight: "600",
-              fontSize: "14px",
-              fontFamily: "Inter",
-              color: "white",
-            }}
-          >
-            {user.name}
-          </div>
-        )}
-        <div
-          style={{
-            fontSize: "11px",
-            color: "rgba(255,255,255,0.6)",
-            fontFamily: "Inter",
-          }}
-        >
-          @{user.username}
-        </div>
-
-        {user.bio && (
-          <div
-            style={{
-              color: "#aaa",
-              fontSize: "13px",
-              maxWidth: "300px",
-              lineHeight: "1.4",
-              marginTop: "2px",
-            }}
-          >
-            {user.bio}
-          </div>
-        )}
+        {user.name}
       </div>
+    )}
+    <div
+      style={{
+        fontSize: "11px",
+        color: "rgba(255,255,255,0.6)",
+        fontFamily: "Inter",
+      }}
+    >
+      @{user.username}
+    </div>
+    {user.bio && (
+      <div
+        style={{
+          color: "#aaa",
+          fontSize: "13px",
+          maxWidth: "300px",
+          lineHeight: "1.4",
+          marginTop: "4px",
+        }}
+      >
+        {user.bio}
+      </div>
+    )}
+  </div>
 
-{/* FOLLOW BUTTON */}
-{!isOwner && (
-  <div style={{ display: "flex", justifyContent: "flex-end", padding: "0 16px", marginTop: "-8px" }}>
+  {/* FOLLOW BUTTON at same row far right */}
+  {!isOwner && (
     <button
       onClick={handleFollow}
       style={{
@@ -177,13 +176,15 @@ export default function ProfileHeader({
         borderRadius: "6px",
         padding: "4px 12px",
         fontSize: "13px",
-        cursor: "pointer"
+        cursor: "pointer",
+        height: "28px",
       }}
     >
       {isFollowing ? "Following" : "Follow"}
     </button>
-  </div>
-)}
+  )}
+</div>
+
 
 
       {/* STATS */}

@@ -135,70 +135,75 @@ export default function ProfilePage() {
       />
 
       {/* 3-dots menu for not-owner */}
-      {!isOwner && (
-        <div style={{ position: "absolute", top: "16px", right: "16px", zIndex: 10 }}>
-          <div style={{ position: "relative" }}>
-            <button
-              onClick={() => setShowOptions(!showOptions)}
-              style={{
-                background: "rgba(0,0,0,0.5)",
-                border: "none",
-                borderRadius: "50%",
-                width: "32px",
-                height: "32px",
-                color: "#fff",
-                fontSize: "22px",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              ⋯
-            </button>
+{!isOwner && (
+  <div style={{ position: "absolute", top: "16px", right: "16px", zIndex: 10 }}>
+    <div style={{ position: "relative" }}>
+      <button
+        onClick={() => setShowOptions(!showOptions)}
+        style={{
+          background: "rgba(0,0,0,0.5)",
+          border: "none",
+          borderRadius: "50%",
+          width: "32px",
+          height: "32px",
+          color: "#fff",
+          fontSize: "22px",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        ⋯
+      </button>
 
-            {showOptions && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: "38px",
-                  right: "0",
-                  background: "#1a1a1a",
-                  border: "1px solid #333",
-                  borderRadius: "12px",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
-                  padding: "12px 0",
-                  width: "200px",
-                  zIndex: 20,
-                }}
-              >
-                <div
-                  onClick={() => {
-                    handleCopyLink();
-                    setShowOptions(false);
-                  }}
-                  style={menuItemStyle}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = "#2a2a2a")}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                >
-                  📤 Share Profile
-                </div>
-                <div
-                  onClick={() => {
-                    handleRemoveFollower();
-                    setShowOptions(false);
-                  }}
-                  style={menuItemStyle}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = "#2a2a2a")}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                >
-                  ❌ Remove Follower
-                </div>
-              </div>
-            )}
+      {showOptions && (
+        <div
+          style={{
+            position: "absolute",
+            top: "38px",
+            right: "0",
+            background: "#1a1a1a",
+            border: "1px solid #333",
+            borderRadius: "12px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
+            padding: "12px 0",
+            width: "200px",
+            zIndex: 20,
+          }}
+        >
+          <div
+            onClick={() => {
+              handleCopyLink();
+              setShowOptions(false);
+            }}
+            style={menuItemStyle}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "#2a2a2a")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+          >
+            📤 Share Profile
           </div>
+
+          {/* ✅ Only show if profile user is following you */}
+          {user.following?.includes(stored._id) && (
+            <div
+              onClick={() => {
+                handleRemoveFollower();
+                setShowOptions(false);
+              }}
+              style={menuItemStyle}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#2a2a2a")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+            >
+              ❌ Remove Follower
+            </div>
+          )}
         </div>
       )}
+    </div>
+  </div>
+)}
+
 
       <ProfileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
