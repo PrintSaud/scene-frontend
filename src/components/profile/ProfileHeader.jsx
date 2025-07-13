@@ -53,6 +53,27 @@ export default function ProfileHeader({
           }}
         />
 
+        {/* Back button when not owner */}
+        {!isOwner && (
+          <button
+            onClick={() => navigate(-1)}
+            style={{
+              position: "absolute",
+              top: "16px",
+              left: "16px",
+              background: "#1a1a1a",
+              color: "white",
+              padding: "6px 12px",
+              borderRadius: "6px",
+              border: "1px solid #444",
+              fontSize: "12px",
+              zIndex: 2,
+            }}
+          >
+            ← Back
+          </button>
+        )}
+
         {/* ⋯ Top Right Menu */}
         {isOwner && (
           <div style={{ position: "absolute", top: 20, right: 20 }}>
@@ -77,29 +98,16 @@ export default function ProfileHeader({
                   width: "140px",
                 }}
               >
-                <div onClick={() => navigate("/edit-profile")} style={menuItemStyle}>
-                  ✏️ Edit Profile
-                </div>
-                <div onClick={handleShare} style={menuItemStyle}>
-                  📤 Share
-                </div>
-                <div onClick={handleLogout} style={menuItemStyle}>
-                  🚪 Log Out
-                </div>
+                <div onClick={() => navigate("/edit-profile")} style={menuItemStyle}>✏️ Edit Profile</div>
+                <div onClick={handleShare} style={menuItemStyle}>📤 Share</div>
+                <div onClick={handleLogout} style={menuItemStyle}>🚪 Log Out</div>
               </div>
             )}
           </div>
         )}
 
         {/* AVATAR */}
-        <div
-          style={{
-            position: "absolute",
-            left: "16px",
-            bottom: "0px", // moved fully to show properly
-            zIndex: 2,
-          }}
-        >
+        <div style={{ position: "absolute", left: "16px", bottom: "0px", zIndex: 2 }}>
           <img
             src={user.avatar || "/default-avatar.jpg"}
             alt="Avatar"
@@ -117,75 +125,63 @@ export default function ProfileHeader({
         </div>
       </div>
 
-      {/* NAME + USERNAME + FOLLOW BUTTON */}
-<div
-  style={{
-    marginTop: "8px",
-    marginLeft: "16px",
-    marginRight: "16px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-  }}
->
-  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-    {user.name && (
+      {/* NAME + USERNAME + FOLLOW BUTTON (SAME ROW) */}
       <div
         style={{
-          fontWeight: "600",
-          fontSize: "14px",
-          fontFamily: "Inter",
-          color: "white",
+          marginTop: "8px",
+          marginLeft: "16px",
+          marginRight: "16px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
         }}
       >
-        {user.name}
+        <div>
+          {user.name && (
+            <div style={{ fontWeight: "600", fontSize: "14px", fontFamily: "Inter", color: "white" }}>
+              {user.name}
+            </div>
+          )}
+          <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)", fontFamily: "Inter" }}>
+            @{user.username}
+          </div>
+        </div>
+
+        {/* FOLLOW BUTTON */}
+        {!isOwner && (
+          <button
+            onClick={handleFollow}
+            style={{
+              background: isFollowing ? "#333" : "#1a1a1a",
+              color: "white",
+              border: "1px solid #555",
+              borderRadius: "6px",
+              padding: "4px 12px",
+              fontSize: "12px",
+              cursor: "pointer",
+              height: "28px",
+            }}
+          >
+            {isFollowing ? "Following" : "Follow"}
+          </button>
+        )}
       </div>
-    )}
-    <div
-      style={{
-        fontSize: "11px",
-        color: "rgba(255,255,255,0.6)",
-        fontFamily: "Inter",
-      }}
-    >
-      @{user.username}
-    </div>
-    {user.bio && (
-      <div
-        style={{
-          color: "#aaa",
-          fontSize: "13px",
-          maxWidth: "300px",
-          lineHeight: "1.4",
-          marginTop: "4px",
-        }}
-      >
-        {user.bio}
-      </div>
-    )}
-  </div>
 
-  {/* FOLLOW BUTTON at same row far right */}
-  {!isOwner && (
-    <button
-      onClick={handleFollow}
-      style={{
-        background: isFollowing ? "#333" : "#1a1a1a",
-        color: "white",
-        border: "1px solid #555",
-        borderRadius: "6px",
-        padding: "2px 12px",
-        fontSize: "12px",
-        cursor: "pointer",
-        height: "34px",
-      }}
-    >
-      {isFollowing ? "Following" : "Follow"}
-    </button>
-  )}
-</div>
-
-
+      {/* BIO */}
+      {user.bio && (
+        <div
+          style={{
+            marginLeft: "16px",
+            marginTop: "4px",
+            color: "#aaa",
+            fontSize: "13px",
+            fontFamily: "Inter, sans-serif",
+            lineHeight: "1.4",
+          }}
+        >
+          {user.bio}
+        </div>
+      )}
 
       {/* STATS */}
       <div
