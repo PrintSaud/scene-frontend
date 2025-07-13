@@ -175,9 +175,9 @@ export default function ProfileHeader({
         border: "1px solid #555",
         borderRadius: "6px",
         padding: "4px 12px",
-        fontSize: "13px",
+        fontSize: "10px",
         cursor: "pointer",
-        height: "28px",
+        height: "34px",
       }}
     >
       {isFollowing ? "Following" : "Follow"}
