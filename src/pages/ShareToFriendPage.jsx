@@ -183,35 +183,38 @@ export default function ShareToFriendPage() {
       </div>
 
       {mutualFollowers.length === 0 ? (
-        <p style={{ color: "#aaa", textAlign: "center", marginTop: "50px" }}>
-          You have no mutual followers yet.
-        </p>
-      ) : (
-        mutualFollowers.map((u) => (
-          <div
-            key={u._id}
-            onClick={() => toggleSelect(u._id)}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              padding: "10px",
-              marginBottom: "8px",
-              background: selected.includes(u._id) ? "#222" : "#111",
-              borderRadius: "6px",
-              cursor: "pointer",
-              gap: "12px",
-            }}
-          >
-            <img
-              src={u.avatar || "/default-avatar.png"}
-              alt={u.username}
-              style={{ width: 40, height: 40, borderRadius: "50%" }}
-            />
-            <span>@{u.username}</span>
-            {selected.includes(u._id) && <span style={{ marginLeft: "auto" }}>✅</span>}
-          </div>
-        ))
-      )}
+  <p style={{ color: "#aaa", textAlign: "center", marginTop: "50px" }}>
+    You have no mutual followers yet.
+  </p>
+) : (
+  <div style={{ padding: "0 16px" }}>
+    {mutualFollowers.map((u) => (
+      <div
+        key={u._id}
+        onClick={() => toggleSelect(u._id)}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          padding: "10px 0",
+          borderBottom: "1px solid #222",
+          cursor: "pointer",
+          background: selected.includes(u._id) ? "#222" : "transparent",
+        }}
+      >
+        <img
+          src={u.avatar || "/default-avatar.png"}
+          alt="avatar"
+          style={{ width: "36px", height: "36px", borderRadius: "50%", marginRight: "12px" }}
+        />
+        <span>@{u.username}</span>
+        {selected.includes(u._id) && (
+          <span style={{ marginLeft: "auto", fontSize: "16px", color: "#a970ff" }}>✔</span>
+        )}
+      </div>
+    ))}
+  </div>
+)}
+
     </div>
   );
 }
