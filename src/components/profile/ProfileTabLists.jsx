@@ -23,15 +23,11 @@ export default function ProfileTabLists({ user, profileUserId, refreshTrigger })
     const fetchLists = async () => {
       try {
         const [myRes, savedRes, popularRes, friendsRes] = await Promise.all([
-          isOwner ? getMyLists() : getUserLists(profileUserId),  // ✅ FIXED HERE
+          isOwner ? getMyLists() : getUserLists(profileUserId),
           isOwner ? getSavedLists() : Promise.resolve({ data: [] }),
           getPopularLists(),
           isOwner ? getFriendsLists() : Promise.resolve({ data: [] }),
         ]);
-
-        console.log("🔥 myRes.data", myRes.data);
-        console.log("🔥 isOwner", isOwner);
-        console.log("🔥 profileUserId", profileUserId);
 
         const filteredMyLists = isOwner
           ? myRes.data
@@ -66,6 +62,11 @@ export default function ProfileTabLists({ user, profileUserId, refreshTrigger })
 
   const displayedLists = getDisplayedLists();
 
+  // 🔔 Define tabs conditionally
+  const subTabs = isOwner
+    ? ["My lists", "Saved", "Popular", "Friends"]
+    : ["My lists", "Saved", "Popular"];
+
   return (
     <>
       {/* Sub Tabs */}
@@ -79,7 +80,7 @@ export default function ProfileTabLists({ user, profileUserId, refreshTrigger })
           marginBottom: "20px",
         }}
       >
-        {["My lists", "Saved", "Popular", "Friends"].map((label) => (
+        {subTabs.map((label) => (
           <button
             key={label}
             onClick={() => setActiveSubTab(label)}
