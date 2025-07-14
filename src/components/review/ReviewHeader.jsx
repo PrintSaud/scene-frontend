@@ -16,10 +16,6 @@ export default function ReviewHeader({
   const navigate = useNavigate();
   const [showOptions, setShowOptions] = useState(false);
 
-  const posterUrl = review.poster && review.poster.startsWith("http")
-    ? review.poster
-    : "/default-poster.jpg";
-
   const backdropUrl = review.movie?.backdrop_path
     ? `https://image.tmdb.org/t/p/original${review.movie.backdrop_path}`
     : "/default-backdrop.jpg";
@@ -52,8 +48,18 @@ export default function ReviewHeader({
           background: "linear-gradient(to top, #0e0e0e, transparent)"
         }} />
 
-        {/* Top bar: back + options */}
-        <div style={{ position: "absolute", top: 12, left: 12, right: 12, display: "flex", justifyContent: "space-between", alignItems: "center", zIndex: 3 }}>
+        {/* Sticky Top bar */}
+        <div style={{
+          position: "sticky",
+          top: 12,
+          left: 12,
+          right: 12,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          zIndex: 10,
+          padding: "0 12px"
+        }}>
           {/* Back button */}
           <button
             onClick={() => navigate(-1)}
@@ -146,7 +152,7 @@ export default function ReviewHeader({
         </div>
 
         {/* Go to Movie */}
-        <div style={{ position: "absolute", bottom: 35, right: 6, textAlign: "right" }}>
+        <div style={{ position: "absolute", bottom: 40, right: 14, textAlign: "right" }}>
           <button
             style={{
               background: "rgba(100, 100, 100, 0.6)",
@@ -196,10 +202,15 @@ export default function ReviewHeader({
             </div>
 
             {/* Rating + timestamp aligned */}
-            <div style={{ marginTop: 4, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{
+              marginTop: 4,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between"
+            }}>
               <StarRating rating={review.rating} />
               {timestamp && (
-                <div style={{ fontSize: 11, color: "#aaa", marginLeft: 8 }}>
+                <div style={{ fontSize: 11, color: "#aaa" }}>
                   {timestamp}
                 </div>
               )}
