@@ -145,8 +145,8 @@ export default function ReviewHeader({
           </div>
         </div>
 
-        {/* Go to film */}
-        <div style={{ position: "absolute", bottom: 30, right: 8, textAlign: "right" }}>
+        {/* Go to Movie */}
+        <div style={{ position: "absolute", bottom: 35, right: 6, textAlign: "right" }}>
           <button
             style={{
               background: "rgba(100, 100, 100, 0.6)",
@@ -160,7 +160,7 @@ export default function ReviewHeader({
             }}
             onClick={() => navigate(`/movie/${review.movie?.id || review.movie}`)}
           >
-            Go to film
+            Go to Movie
           </button>
         </div>
       </div>

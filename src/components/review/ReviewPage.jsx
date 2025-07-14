@@ -87,20 +87,12 @@ export default function ReviewPage() {
   if (!review) return null;
 
   return (
-    <div style={{ 
-      backgroundColor: "#0e0e0e", 
-      color: "#fff", 
-      height: "100vh", 
-      overflowY: "auto",
+    <div style={{
+      backgroundColor: "#0e0e0e",
+      color: "#fff",
+      minHeight: "100vh"  // ensure it fills screen but allows natural flow
     }}>
-      {/* Back & Menu */}
-      <div style={{ position: "absolute", top: 16, left: 16, zIndex: 10 }}>
-        <IoArrowBack size={24} onClick={() => navigate(-1)} />
-      </div>
-      <div style={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}>
-        <HiDotsVertical size={24} onClick={handleMenu} />
-      </div>
-
+  
       <ReviewHeader
         review={review}
         userId={userId}
@@ -108,9 +100,7 @@ export default function ReviewPage() {
         onReply={handleReply}
         onProfile={handleProfile}
       />
-
-      {/* 🔥 Removed ReviewBody since ReviewHeader already renders text */}
-
+  
       <ReplyList
         replies={replies}
         userId={userId}
@@ -118,11 +108,12 @@ export default function ReviewPage() {
         onReplyLike={handleReplyLike}
         onProfile={handleProfile}
       />
-
+  
       <MoreReviewsList
         reviews={moreReviews}
         onClick={handleMoreReviewsClick}
       />
     </div>
   );
+  
 }
