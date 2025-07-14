@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import StarRating from "../StarRating";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
@@ -8,9 +8,13 @@ export default function ReviewHeader({
   userId,
   onLike,
   onReply,
-  onProfile
+  onProfile,
+  onChangeBackdrop,
+  onEdit,
+  onDelete
 }) {
   const navigate = useNavigate();
+  const [showOptions, setShowOptions] = useState(false);
 
   const backdropUrl = review.movie?.backdrop_path
     ? `https://image.tmdb.org/t/p/original${review.movie.backdrop_path}`
@@ -23,6 +27,13 @@ export default function ReviewHeader({
   const timestamp = review.createdAt
     ? new Date(review.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })
     : "";
+
+  const isOwner = review.user?._id === userId;
+
+  const handleShare = () => {
+    navigator.clipboard.writeText(`${window.location.origin}/review/${review._id}`);
+    setShowOptions(false);
+  };
 
   return (
     <>
@@ -37,7 +48,108 @@ export default function ReviewHeader({
           background: "linear-gradient(to top, #0e0e0e, transparent)"
         }} />
 
-        {/* Go to Movie */}
+        {/* Top buttons */}
+        <div style={{
+          position: "absolute",
+          top: 12,
+          left: 12,
+          right: 12,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          zIndex: 5
+        }}>
+          <button
+            onClick={() => navigate(-1)}
+            style={{
+              background: "rgba(0,0,0,0.5)",
+              border: "none",
+              borderRadius: "50%",
+              width: "32px",
+              height: "32px",
+              color: "#fff",
+              fontSize: "18px",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+          >
+            ←
+          </button>
+
+          <div style={{ position: "relative" }}>
+            <button
+              onClick={() => setShowOptions((prev) => !prev)}
+              style={{
+                background: "rgba(0,0,0,0.5)",
+                border: "none",
+                borderRadius: "50%",
+                width: "32px",
+                height: "32px",
+                color: "#fff",
+                fontSize: "22px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              ⋯
+            </button>
+
+            {showOptions && (
+              <div style={{
+                position: "absolute",
+                top: "38px",
+                right: "0",
+                background: "#1a1a1a",
+                border: "1px solid #333",
+                borderRadius: "12px",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
+                padding: "12px 0",
+                width: "200px",
+                zIndex: 20
+              }}>
+                {(isOwner
+                  ? [
+                      { label: "🎨 Change Backdrop", onClick: onChangeBackdrop },
+                      { label: "✏️ Edit Review/Log", onClick: onEdit },
+                      { label: "🗑️ Delete Review/Log", onClick: onDelete },
+                      { label: "🔗 Copy Link", onClick: handleShare }
+                    ]
+                  : [
+                      { label: "🔗 Copy Link", onClick: handleShare }
+                    ]
+                ).map((item, index) => (
+                  <div
+                    key={index}
+                    onClick={() => {
+                      item.onClick();
+                      setShowOptions(false);
+                    }}
+                    style={{
+                      padding: "10px 16px",
+                      cursor: "pointer",
+                      fontSize: "14.5px",
+                      fontWeight: "500",
+                      color: "#fff",
+                      fontFamily: "Inter",
+                      transition: "0.2s",
+                      whiteSpace: "nowrap"
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "#2a2a2a")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                  >
+                    {item.label}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Go to Movie button */}
         <div style={{ position: "absolute", bottom: 40, right: 14, textAlign: "right" }}>
           <button
             style={{
@@ -57,7 +169,7 @@ export default function ReviewHeader({
         </div>
       </div>
 
-      {/* Content section */}
+      {/* Content section (unchanged) */}
       <div style={{ padding: "0 16px", position: "relative", zIndex: 2 }}>
         {review.user && (
           <>
