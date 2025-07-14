@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import StarRating from "../StarRating";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
@@ -8,13 +8,9 @@ export default function ReviewHeader({
   userId,
   onLike,
   onReply,
-  onProfile,
-  onChangeBackdrop,
-  onEdit,
-  onDelete
+  onProfile
 }) {
   const navigate = useNavigate();
-  const [showOptions, setShowOptions] = useState(false);
 
   const backdropUrl = review.movie?.backdrop_path
     ? `https://image.tmdb.org/t/p/original${review.movie.backdrop_path}`
@@ -28,13 +24,6 @@ export default function ReviewHeader({
     ? new Date(review.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })
     : "";
 
-  const isOwner = review.user?._id === userId;
-
-  const handleShare = () => {
-    navigator.clipboard.writeText(`${window.location.origin}/review/${review._id}`);
-    setShowOptions(false);
-  };
-
   return (
     <>
       {/* Backdrop section */}
@@ -47,109 +36,6 @@ export default function ReviewHeader({
           height: "70%",
           background: "linear-gradient(to top, #0e0e0e, transparent)"
         }} />
-
-        {/* Sticky Top bar */}
-        <div style={{
-          position: "sticky",
-          top: 12,
-          left: 12,
-          right: 12,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          zIndex: 10,
-          padding: "0 12px"
-        }}>
-          {/* Back button */}
-          <button
-            onClick={() => navigate(-1)}
-            style={{
-              background: "rgba(0,0,0,0.5)",
-              border: "none",
-              borderRadius: "50%",
-              width: "32px",
-              height: "32px",
-              color: "#fff",
-              fontSize: "18px",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-          >
-            ←
-          </button>
-
-          {/* 3-dots menu */}
-          <div style={{ position: "relative" }}>
-            <button
-              onClick={() => setShowOptions((prev) => !prev)}
-              style={{
-                background: "rgba(0,0,0,0.5)",
-                border: "none",
-                borderRadius: "50%",
-                width: "32px",
-                height: "32px",
-                color: "#fff",
-                fontSize: "22px",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center"
-              }}
-            >
-              ⋯
-            </button>
-
-            {showOptions && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: "38px",
-                  right: "0",
-                  background: "#1a1a1a",
-                  border: "1px solid #333",
-                  borderRadius: "12px",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
-                  padding: "12px 0",
-                  width: "200px",
-                  zIndex: 20
-                }}
-              >
-                {(isOwner
-                  ? [
-                      { label: "🎨 Change Backdrop", onClick: onChangeBackdrop },
-                      { label: "✏️ Edit Review/Log", onClick: onEdit },
-                      { label: "🗑️ Delete Review/Log", onClick: onDelete },
-                      { label: "🔗 Copy Link", onClick: handleShare }
-                    ]
-                  : [
-                      { label: "🔗 Copy Link", onClick: handleShare }
-                    ]
-                ).map((item, index) => (
-                  <div
-                    key={index}
-                    onClick={item.onClick}
-                    style={{
-                      padding: "10px 16px",
-                      cursor: "pointer",
-                      fontSize: "14.5px",
-                      fontWeight: "500",
-                      color: "#fff",
-                      fontFamily: "Inter",
-                      transition: "0.2s",
-                      whiteSpace: "nowrap"
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = "#2a2a2a")}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                  >
-                    {item.label}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
 
         {/* Go to Movie */}
         <div style={{ position: "absolute", bottom: 40, right: 14, textAlign: "right" }}>
@@ -201,7 +87,6 @@ export default function ReviewHeader({
               </span>
             </div>
 
-            {/* Rating + timestamp aligned */}
             <div style={{
               marginTop: 4,
               display: "flex",
@@ -236,7 +121,6 @@ export default function ReviewHeader({
           <img src={review.gif} alt="GIF" style={{ width: "100%", borderRadius: 8, marginTop: 8 }} />
         )}
 
-        {/* Likes and reply */}
         <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", marginTop: 8, gap: "12px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
             <span onClick={onLike} style={{ cursor: "pointer", fontSize: "20px", position: "relative", top: "1px" }}>
