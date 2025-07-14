@@ -14,7 +14,6 @@ export default function ReviewPage() {
   const [review, setReview] = useState(null);
   const [replies, setReplies] = useState([]);
   const [moreReviews, setMoreReviews] = useState([]);
-  const [showOptions, setShowOptions] = useState(false);
   const user = JSON.parse(localStorage.getItem("user")) || {};
   const userId = user._id;
 
@@ -84,19 +83,17 @@ export default function ReviewPage() {
   const handleShare = () => {
     navigator.clipboard.writeText(`${window.location.origin}/review/${review._id}`);
     toast.success("🔗 Link copied!");
-    setShowOptions(false);
   };
 
   const handleChangeBackdrop = () => toast("Change backdrop clicked!");
   const handleEdit = () => toast("Edit review clicked!");
   const handleDelete = () => toast("Delete review clicked!");
 
-  const isOwner = review?.user?._id === userId;
-
   if (!review) return null;
 
   return (
     <div style={{ backgroundColor: "#0e0e0e", color: "#fff", minHeight: "100vh" }}>
+      {/* ✅ Only one ReviewHeader now! */}
       <ReviewHeader
         review={review}
         userId={userId}
@@ -106,14 +103,6 @@ export default function ReviewPage() {
         onChangeBackdrop={handleChangeBackdrop}
         onEdit={handleEdit}
         onDelete={handleDelete}
-      />
-
-      <ReviewHeader
-        review={review}
-        userId={userId}
-        onLike={handleLike}
-        onReply={handleReply}
-        onProfile={handleProfile}
       />
 
       <ReplyList
