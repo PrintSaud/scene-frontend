@@ -107,7 +107,8 @@ export default function ReviewPage() {
         justifyContent: "space-between",
         alignItems: "center",
         zIndex: 10,
-        padding: "0 16px"
+        padding: "0 16px",
+        background: "transparent"
       }}>
         <button
           onClick={() => navigate(-1)}
