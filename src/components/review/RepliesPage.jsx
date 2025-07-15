@@ -27,7 +27,7 @@ export default function RepliesPage() {
   const fetchReplies = async () => {
     try {
       const data = await getRepliesForLog(id);
-      console.log("Replies API response:", data); // 🔥 Debug log
+      console.log("Replies API response:", data);
       const sorted = (data || []).sort(
         (a, b) => (b.likes?.length || 0) - (a.likes?.length || 0)
       );
@@ -69,7 +69,16 @@ export default function RepliesPage() {
   }, [id]);
 
   return (
-    <div style={{ backgroundColor: "#0e0e0e", minHeight: "100vh", color: "#fff" }}>
+    <div
+      style={{
+        backgroundColor: "#0e0e0e",
+        minHeight: "100vh",
+        color: "#fff",
+        position: "relative",
+        overflowY: "auto",
+        paddingBottom: "80px",
+      }}
+    >
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", padding: "16px" }}>
         <button onClick={() => navigate(-1)}>←</button>
@@ -77,7 +86,7 @@ export default function RepliesPage() {
       </div>
 
       {/* Replies list */}
-      <div style={{ padding: "0 16px", paddingBottom: "80px" }}>
+      <div style={{ padding: "0 16px" }}>
         {replies.map((r) => {
           const isLikedByMe = r.likes?.includes(userId);
           return (
@@ -155,6 +164,7 @@ export default function RepliesPage() {
           display: "flex",
           alignItems: "center",
           gap: 10,
+          zIndex: 100,
         }}
       >
         <FaImage size={20} style={{ cursor: "pointer", color: "#888" }} />
