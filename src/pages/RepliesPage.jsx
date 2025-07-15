@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import { FaImage } from "react-icons/fa6";
 import { BiSolidFileGif } from "react-icons/bi";
-import { addLogReply, likeReply } from "../api/api";
+import { addLogReply, likeReply, getLogById } from "../api/api";
 import axios from "../api/api";
 import { backend } from "../config";
 
