@@ -179,7 +179,7 @@ export default function ProfileTabReviews({ logs, filter, setFilter, navigate })
     ) : (
       <AiOutlineHeart style={{ fontSize: "14px", color: "#999" }} />
     )}
-    <span style={{ fontSize: "13px", color: "#999" }}>{log.likes || 0}</span>
+    <span style={{ fontSize: "13px", color: "#999" }}>{log.likes || 0} {log.likes?.length || 0} </span>
   </div>
 
   {/* 💬 Replies */}
