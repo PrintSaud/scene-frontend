@@ -26,8 +26,8 @@ export default function RepliesPage() {
 
   const fetchReplies = async () => {
     try {
-      const { data } = await getRepliesForLog(id);
-      const sorted = (data.replies || []).sort(
+      const data = await getRepliesForLog(id);  // 🔥 FIX: no destructuring here
+      const sorted = (data || []).sort(
         (a, b) => (b.likes?.length || 0) - (a.likes?.length || 0)
       );
       setReplies(sorted);
@@ -35,6 +35,8 @@ export default function RepliesPage() {
       console.error("Failed to load replies", err);
     }
   };
+  
+  
 
   const handleReplyLike = async (replyId) => {
     try {
