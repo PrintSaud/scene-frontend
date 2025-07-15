@@ -125,7 +125,7 @@ export default function ReviewPage() {
         color: "#888",
         fontSize: "14px",
         cursor: "pointer",
-        marginRight: "-4px" // push "More →" a bit right
+        marginRight: "-8px" // push "More →" a bit right
       }}
     >
       More →
@@ -135,7 +135,7 @@ export default function ReviewPage() {
   {/* If no replies */}
   {replies.length === 0 ? (
     <div style={{ paddingLeft: "24px" }}>
-      <p style={{ color: "#888", fontSize: "14px" }}>No comments yet.</p>
+      <p style={{ color: "#888", fontSize: "14px", marginLeft: "-6px" }}>No comments yet.</p>
     </div>
   ) : (
     <>
