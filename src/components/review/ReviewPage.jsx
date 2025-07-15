@@ -101,10 +101,22 @@ export default function ReviewPage() {
       />
 
 {/* 💬 Comments section */}
-<div style={{ marginTop: "24px", padding: "0 24px" }}>
+<div style={{ marginTop: "24px" }}>
   {/* Heading with "More" button */}
-  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
-    <h3 style={{ fontSize: "18px", margin: 0, paddingLeft: "6px" }}>Comments</h3>
+  <div style={{ 
+    display: "flex", 
+    alignItems: "center", 
+    justifyContent: "space-between", 
+    marginBottom: "12px", 
+    padding: "0 24px" 
+  }}>
+    <h3 style={{ 
+      fontSize: "18px", 
+      margin: 0, 
+      marginLeft: "-24px" // ✅ negate parent padding to push far left
+    }}>
+      Comments
+    </h3>
     <button
       onClick={() => navigate(`/review/${id}/replies`)}
       style={{
@@ -113,12 +125,12 @@ export default function ReviewPage() {
         color: "#888",
         fontSize: "14px",
         cursor: "pointer",
-        marginRight: "-8px"
       }}
     >
       More →
     </button>
   </div>
+
 
   {/* If no replies */}
   {replies.length === 0 ? (
