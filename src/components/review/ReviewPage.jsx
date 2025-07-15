@@ -113,7 +113,7 @@ export default function ReviewPage() {
     <h3 style={{ 
       fontSize: "18px", 
       margin: 0, 
-      marginLeft: "-22px" // ✅ negate parent padding to push far left
+      marginLeft: "4px" // ✅ negate parent padding to push far left
     }}>
       Comments
     </h3>
