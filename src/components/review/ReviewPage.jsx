@@ -4,8 +4,8 @@ import toast from "react-hot-toast";
 import axios from "../../api/api";
 import { likeLog, likeReply } from "../../api/api";
 import { backend } from "../../config";
+import { AiOutlineHeart } from "react-icons/ai";
 import ReviewHeader from "./ReviewHeader";
-import ReplyList from "./ReplyList";
 import MoreReviewsList from "./MoreReviewsList";
 
 export default function ReviewPage() {
@@ -23,16 +23,11 @@ export default function ReviewPage() {
       setReview(data);
       setReplies(data.replies || []);
       if (data.user?._id) {
-        try {
-          const res = await axios.get(`${backend}/api/logs/user/${data.user._id}`);
-          const filtered = res.data.filter((r) => r._id !== id);
-          setMoreReviews(filtered.slice(0, 3));
-        } catch (err) {
-          console.warn("Failed to load more reviews.");
-        }
+        const res = await axios.get(`${backend}/api/logs/user/${data.user._id}`);
+        const filtered = res.data.filter((r) => r._id !== id);
+        setMoreReviews(filtered.slice(0, 3));
       }
     } catch (err) {
-      console.error(err);
       toast.error("Failed to load review.");
     }
   };
@@ -51,7 +46,7 @@ export default function ReviewPage() {
           ? (prev.likes || []).filter((uid) => uid !== userId)
           : [...(prev.likes || []), userId],
       }));
-    } catch (err) {
+    } catch {
       toast.error("Failed to like.");
     }
   };
@@ -72,7 +67,7 @@ export default function ReviewPage() {
             : r
         )
       );
-    } catch (err) {
+    } catch {
       toast.error("Failed to like reply.");
     }
   };
@@ -80,6 +75,7 @@ export default function ReviewPage() {
   const handleReply = () => navigate(`/reply/${id}`);
   const handleProfile = (profileId) => navigate(`/profile/${profileId}`);
   const handleMoreReviewsClick = (reviewId) => navigate(`/review/${reviewId}`);
+
   const handleShare = () => {
     navigator.clipboard.writeText(`${window.location.origin}/review/${review._id}`);
     toast.success("🔗 Link copied!");
@@ -93,7 +89,6 @@ export default function ReviewPage() {
 
   return (
     <div style={{ backgroundColor: "#0e0e0e", color: "#fff", minHeight: "100vh" }}>
-      {/* ✅ Only one ReviewHeader now! */}
       <ReviewHeader
         review={review}
         userId={userId}
@@ -105,14 +100,73 @@ export default function ReviewPage() {
         onDelete={handleDelete}
       />
 
-      <ReplyList
-        replies={replies}
-        userId={userId}
-        reviewId={id}
-        onReplyLike={handleReplyLike}
-        onProfile={handleProfile}
-      />
+      {/* 💬 Comments section */}
+      {replies.length > 0 && (
+        <div style={{ padding: "12px 16px" }}>
+          {replies.map((r) => (
+            <div
+              key={r._id}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                marginBottom: 14,
+              }}
+            >
+              {/* Profile pic */}
+              <img
+                src={r.user?.avatar || "/default-avatar.jpg"}
+                alt="avatar"
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: "50%",
+                  cursor: "pointer",
+                }}
+                onClick={() => handleProfile(r.user?._id)}
+              />
 
+              {/* Username + rating + comment inline */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                  gap: 6,
+                }}
+              >
+                <strong
+                  style={{ cursor: "pointer", fontSize: 14 }}
+                  onClick={() => handleProfile(r.user?._id)}
+                >
+                  @{r.user?.username}
+                </strong>
+
+                {r.ratingForThisMovie && (
+                  <span style={{ fontSize: 12, color: "#ccc" }}>
+                    ⭐️ {r.ratingForThisMovie.toFixed(1)}
+                  </span>
+                )}
+
+                <span style={{ fontSize: 14, color: "#ddd" }}>{r.text}</span>
+              </div>
+
+              {/* Like button */}
+              <div
+                style={{ marginLeft: "auto", cursor: "pointer" }}
+                onClick={() => handleReplyLike(r._id)}
+              >
+                <AiOutlineHeart
+                  size={18}
+                  color={(r.likes || []).includes(userId) ? "#f00" : "#888"}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* More reviews section */}
       <MoreReviewsList
         reviews={moreReviews}
         onClick={handleMoreReviewsClick}
