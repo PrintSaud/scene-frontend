@@ -4,8 +4,6 @@ import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import { FaImage } from "react-icons/fa6";
 import { BiSolidFileGif } from "react-icons/bi";
 import { addLogReply, likeReply, getLogById } from "../api/api";
-import axios from "../api/api";
-import { backend } from "../config";
 
 const getRelativeTime = (date) => {
   const diff = Date.now() - new Date(date).getTime();
@@ -29,7 +27,6 @@ export default function RepliesPage() {
   const fetchReplies = async () => {
     try {
       const { data } = await getLogById(id);
-      console.log("RepliesPage log data:", data);
       const sorted = (data.replies || []).sort(
         (a, b) => (b.likes?.length || 0) - (a.likes?.length || 0)
       );
@@ -38,7 +35,6 @@ export default function RepliesPage() {
       console.error("Failed to load replies", err);
     }
   };
-  
 
   const handleReplyLike = async (replyId) => {
     try {
@@ -61,7 +57,7 @@ export default function RepliesPage() {
   };
 
   const handleSend = async () => {
-    if (!input) return;
+    if (!input.trim()) return;
     await addLogReply(id, { text: input });
     setInput("");
     fetchReplies();
@@ -95,7 +91,7 @@ export default function RepliesPage() {
             >
               {/* Avatar */}
               <img
-                src={r.avatar}
+                src={r.avatar || "/default-avatar.jpg"}
                 alt="avatar"
                 style={{
                   width: 30,
@@ -119,8 +115,8 @@ export default function RepliesPage() {
                       ⭐️ {r.ratingForThisMovie.toFixed(1)}
                     </span>
                   )}
-                  <span style={{ fontSize: 14, color: "#ddd" }}>{r.text}</span>
                 </div>
+                <span style={{ fontSize: 14, color: "#ddd" }}>{r.text}</span>
               </div>
               {/* Timestamp + Like */}
               <div style={{ textAlign: "right" }}>
@@ -128,7 +124,7 @@ export default function RepliesPage() {
                   {getRelativeTime(r.createdAt)}
                 </div>
                 <div
-                  style={{ cursor: "pointer" }}
+                  style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
                   onClick={() => handleReplyLike(r._id)}
                 >
                   {isLikedByMe ? (
@@ -160,11 +156,8 @@ export default function RepliesPage() {
           gap: 10,
         }}
       >
-        {/* Photo upload icon */}
         <FaImage size={20} style={{ cursor: "pointer", color: "#888" }} />
-        {/* GIF picker icon */}
         <BiSolidFileGif size={20} style={{ cursor: "pointer", color: "#888" }} />
-        {/* Input */}
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -178,7 +171,6 @@ export default function RepliesPage() {
             fontSize: "14px",
           }}
         />
-        {/* Send button */}
         <button
           onClick={handleSend}
           style={{
