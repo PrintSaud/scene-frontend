@@ -72,7 +72,7 @@ export default function ReviewPage() {
     }
   };
 
-  const handleReply = () => navigate(`/reply/${id}`);
+  const handleReply = () => navigate(`/review/${id}/replies`);
   const handleProfile = (profileId) => navigate(`/profile/${profileId}`);
   const handleMoreReviewsClick = (reviewId) => navigate(`/review/${reviewId}`);
 
