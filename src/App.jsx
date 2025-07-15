@@ -38,6 +38,7 @@ import ActorPage from "./pages/ActorPage";
 import PersonPage from "./pages/PersonPage";
 import UploadAvatarPage from './pages/UploadAvatarPage';
 import ShareListPage from './pages/ShareListPage';
+import RepliesPage from "./pages/RepliesPage";
 
 function App() {
   const location = useLocation();
@@ -162,6 +163,7 @@ setHasUnread(unread.length > 0);
           <Route path="/director/:id" element={<PersonPage isDirector={true} />} />
           <Route path="/upload-avatar" element={<UploadAvatarPage />} />
           <Route path="/share/:id" element={<ShareListPage />} />
+          <Route path="/review/:id/replies" element={<RepliesPage />} />
         </Routes>
       </div>
       {shouldShowNav && <BottomNav hasUnread={hasUnread} />}

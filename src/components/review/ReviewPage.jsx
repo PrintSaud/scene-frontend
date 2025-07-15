@@ -125,7 +125,7 @@ export default function ReviewPage() {
         color: "#888",
         fontSize: "14px",
         cursor: "pointer",
-        marginRight: "-8px" // push "More →" a bit right
+        marginRight: "-12px" // push "More →" a bit right
       }}
     >
       More →
