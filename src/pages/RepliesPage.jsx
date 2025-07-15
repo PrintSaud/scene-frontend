@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import { FaImage } from "react-icons/fa6";
 import { BiSolidFileGif } from "react-icons/bi";
-import { addLogReply, likeReply, getLogById } from "../api/api";
+import { addLogReply, likeReply, getRepliesForLog } from "../api/api";  // ✅ perfect import now!
 
 const getRelativeTime = (date) => {
   const diff = Date.now() - new Date(date).getTime();
@@ -26,7 +26,7 @@ export default function RepliesPage() {
 
   const fetchReplies = async () => {
     try {
-      const { data } = await getLogById(id);
+      const { data } = await getRepliesForLog(id);
       const sorted = (data.replies || []).sort(
         (a, b) => (b.likes?.length || 0) - (a.likes?.length || 0)
       );

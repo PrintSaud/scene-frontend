@@ -34,7 +34,7 @@ export const createLog = (data) => {
   console.log("📦 createLog token:", user?.token);
   return api.post("/api/logs/full", data);
 };
-
+export const getRepliesForLog = (logId) => api.get(`/api/logs/${logId}/replies`);
 export const getLogsFeed = () => api.get("/api/logs/feed");
 export const getLogById = (logId) => api.get(`/api/logs/${logId}`);
 export const addLogReply = (logId, data) => api.post(`/api/logs/${logId}/reply`, data);
