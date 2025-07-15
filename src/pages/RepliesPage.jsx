@@ -28,7 +28,8 @@ export default function RepliesPage() {
 
   const fetchReplies = async () => {
     try {
-      const { data } = await axios.get(`${backend}/api/logs/${id}`);
+      const { data } = await getLogById(id);
+      console.log("RepliesPage log data:", data);
       const sorted = (data.replies || []).sort(
         (a, b) => (b.likes?.length || 0) - (a.likes?.length || 0)
       );
@@ -37,6 +38,7 @@ export default function RepliesPage() {
       console.error("Failed to load replies", err);
     }
   };
+  
 
   const handleReplyLike = async (replyId) => {
     try {
