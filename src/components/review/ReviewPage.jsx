@@ -107,13 +107,13 @@ export default function ReviewPage() {
     display: "flex", 
     alignItems: "center", 
     justifyContent: "space-between", 
-    marginBottom: "12px", 
-    padding: "0 24px" 
+    marginBottom: replies.length === 0 ? "4px" : "12px", // tighter when no comments
+    padding: "0 24px"
   }}>
     <h3 style={{ 
       fontSize: "18px", 
       margin: 0, 
-      marginLeft: "2px" // ✅ negate parent padding to push far left
+      marginLeft: "-6px"  // push further left (cleaner than "2px")
     }}>
       Comments
     </h3>
@@ -125,16 +125,18 @@ export default function ReviewPage() {
         color: "#888",
         fontSize: "14px",
         cursor: "pointer",
+        marginRight: "-4px" // push "More →" a bit right
       }}
     >
       More →
     </button>
   </div>
 
-
   {/* If no replies */}
   {replies.length === 0 ? (
-    <p style={{ color: "#888", fontSize: "14px" }}>No comments yet.</p>
+    <div style={{ paddingLeft: "24px" }}>
+      <p style={{ color: "#888", fontSize: "14px" }}>No comments yet.</p>
+    </div>
   ) : (
     <>
       {replies.slice(0, 3).map((r) => (
@@ -145,6 +147,7 @@ export default function ReviewPage() {
             alignItems: "center",
             gap: 10,
             marginBottom: 14,
+            padding: "0 24px"
           }}
         >
                 {/* Profile pic */}

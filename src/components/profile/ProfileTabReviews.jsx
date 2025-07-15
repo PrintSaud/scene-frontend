@@ -16,11 +16,13 @@ const getRelativeTime = (date) => {
   return `${day}d`;
 };
 
-export default function ProfileTabReviews({ logs, filter, setFilter, navigate }) {
+export default function ProfileTabReviews({ logs, filter, setFilter, navigate, handleLike }) {
+  const userId = JSON.parse(localStorage.getItem("user"))?._id;
+
   const filtered = logs
     .filter((log) => log.review)
     .sort((a, b) => {
-      if (filter === "likes") return (b.likes || 0) - (a.likes || 0);
+      if (filter === "likes") return (b.likes?.length || 0) - (a.likes?.length || 0);
       return new Date(b.watchedAt) - new Date(a.watchedAt);
     });
 
@@ -48,7 +50,6 @@ export default function ProfileTabReviews({ logs, filter, setFilter, navigate })
       {/* 📝 Reviews */}
       {filtered.map((log) => {
         let poster = "/default-poster.png";
-
         if (log.posterOverride) {
           poster = log.posterOverride;
         } else if (log.poster) {
@@ -56,7 +57,8 @@ export default function ProfileTabReviews({ logs, filter, setFilter, navigate })
             ? log.poster
             : `${TMDB_IMG}${log.poster}`;
         }
-        
+
+        const isLikedByMe = log.likes?.includes(userId);
 
         return (
           <div
@@ -160,36 +162,38 @@ export default function ProfileTabReviews({ logs, filter, setFilter, navigate })
               />
             )}
 
-{/* 🔥 Likes + 💬 Replies */}
-<div
-  style={{
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: "10px",
-  }}
->
-  {/* ❤️ Likes */}
-  <div
-    style={{ display: "flex", alignItems: "center", gap: "4px", cursor: "pointer" }}
-    onClick={() => handleLike(log._id)}
-  >
-    {log.isLiked ? (
-      <AiFillHeart style={{ fontSize: "14px", color: "#B327F6" }} />
-    ) : (
-      <AiOutlineHeart style={{ fontSize: "14px", color: "#999" }} />
-    )}
-    <span style={{ fontSize: "13px", color: "#999" }}>{log.likes || 0} {log.likes?.length || 0} </span>
-  </div>
+            {/* 🔥 Likes + 💬 Replies */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginTop: "10px",
+              }}
+            >
+              {/* ❤️ Likes */}
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "4px", cursor: "pointer" }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleLike(log._id);
+                }}
+              >
+                {isLikedByMe ? (
+                  <AiFillHeart style={{ fontSize: "14px", color: "#B327F6" }} />
+                ) : (
+                  <AiOutlineHeart style={{ fontSize: "14px", color: "#999" }} />
+                )}
+                <span style={{ fontSize: "13px", color: "#999" }}>{log.likes?.length || 0}</span>
+              </div>
 
-  {/* 💬 Replies */}
-  {log.replies?.length > 0 && (
-    <span style={{ fontSize: "12px", color: "#999" }}>
-      💬 {log.replies.length} {log.replies.length === 1 ? "reply" : "replies"}
-    </span>
-  )}
-</div>
-
+              {/* 💬 Replies */}
+              {log.replies?.length > 0 && (
+                <span style={{ fontSize: "12px", color: "#999" }}>
+                  💬 {log.replies.length} {log.replies.length === 1 ? "reply" : "replies"}
+                </span>
+              )}
+            </div>
           </div>
         );
       })}
