@@ -100,40 +100,41 @@ export default function ReviewPage() {
         onDelete={handleDelete}
       />
 
-      {/* 💬 Comments section */}
-      <div style={{ marginTop: "24px", padding: "0 24px" }}>
-        {/* Heading with "More" button */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
-          <h3 style={{ fontSize: "18px", margin: 0 }}>Comments</h3>
-          <button
-            onClick={() => navigate(`/review/${id}/replies`)}
-            style={{
-              background: "none",
-              border: "none",
-              color: "#888",
-              fontSize: "14px",
-              cursor: "pointer"
-            }}
-          >
-            More →
-          </button>
-        </div>
+{/* 💬 Comments section */}
+<div style={{ marginTop: "24px", padding: "0 24px" }}>
+  {/* Heading with "More" button */}
+  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
+    <h3 style={{ fontSize: "18px", margin: 0, paddingLeft: "2px" }}>Comments</h3>
+    <button
+      onClick={() => navigate(`/review/${id}/replies`)}
+      style={{
+        background: "none",
+        border: "none",
+        color: "#888",
+        fontSize: "14px",
+        cursor: "pointer",
+        marginRight: "-4px"
+      }}
+    >
+      More →
+    </button>
+  </div>
 
-        {/* If no replies */}
-        {replies.length === 0 ? (
-          <p style={{ color: "#888", fontSize: "14px" }}>No comments yet.</p>
-        ) : (
-          <>
-            {replies.slice(0, 3).map((r) => (
-              <div
-                key={r._id}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  marginBottom: 14,
-                }}
-              >
+  {/* If no replies */}
+  {replies.length === 0 ? (
+    <p style={{ color: "#888", fontSize: "14px" }}>No comments yet.</p>
+  ) : (
+    <>
+      {replies.slice(0, 3).map((r) => (
+        <div
+          key={r._id}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            marginBottom: 14,
+          }}
+        >
                 {/* Profile pic */}
                 <img
                   src={r.user?.avatar || "/default-avatar.jpg"}
