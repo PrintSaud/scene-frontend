@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import { FaImage } from "react-icons/fa6";
 import { BiSolidFileGif } from "react-icons/bi";
-import { addLogReply, likeReply, getRepliesForLog } from "../api/api";  // ✅ perfect import now!
+import { addLogReply, likeReply, getRepliesForLog } from "../../api/api";
 
 const getRelativeTime = (date) => {
   const diff = Date.now() - new Date(date).getTime();
@@ -26,7 +26,8 @@ export default function RepliesPage() {
 
   const fetchReplies = async () => {
     try {
-      const data = await getRepliesForLog(id);  // 🔥 FIX: no destructuring here
+      const data = await getRepliesForLog(id);
+      console.log("Replies API response:", data); // 🔥 Debug log
       const sorted = (data || []).sort(
         (a, b) => (b.likes?.length || 0) - (a.likes?.length || 0)
       );
@@ -35,8 +36,6 @@ export default function RepliesPage() {
       console.error("Failed to load replies", err);
     }
   };
-  
-  
 
   const handleReplyLike = async (replyId) => {
     try {

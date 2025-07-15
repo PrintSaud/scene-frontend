@@ -38,7 +38,7 @@ import ActorPage from "./pages/ActorPage";
 import PersonPage from "./pages/PersonPage";
 import UploadAvatarPage from './pages/UploadAvatarPage';
 import ShareListPage from './pages/ShareListPage';
-import RepliesPage from "./pages/RepliesPage";
+import RepliesPage from "./components/review/RepliesPage";
 
 function App() {
   const location = useLocation();
