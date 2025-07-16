@@ -8,6 +8,7 @@ import StarRating from "../StarRating";
 import { addLogReply, likeReply, getRepliesForLog, deleteReply } from "../../api/api";
 import GifSearchModal from "../GifSearchModal";
 import { HiDotsVertical } from "react-icons/hi"; 
+import api from "../../api/api";
 
 const getRelativeTime = (date) => {
   const diff = Date.now() - new Date(date).getTime();
@@ -79,12 +80,12 @@ export default function RepliesPage() {
     }, 100);
   };
 
-  
+
   const handleDelete = async (replyId) => {
     const confirmDelete = window.confirm("Delete this reply?");
     if (!confirmDelete) return;
     try {
-      await axios.delete(`${backend}/api/logs/${id}/replies/${replyId}`);
+      await api.delete(`/api/logs/${id}/replies/${replyId}`);
       fetchReplies(); // Refresh after deletion
     } catch (err) {
       console.error("Failed to delete reply", err);
