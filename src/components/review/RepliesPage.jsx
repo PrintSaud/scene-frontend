@@ -5,10 +5,9 @@ import { FaImage } from "react-icons/fa6";
 import { BiSolidFileGif } from "react-icons/bi";
 import { FiSend } from "react-icons/fi";
 import StarRating from "../StarRating";
-import { addLogReply, likeReply, getRepliesForLog, deleteReply } from "../../api/api";
+import { addLogReply, likeReply, getRepliesForLog, deleteReply } from "../../api/api"; // ✅ keep this line only!
 import GifSearchModal from "../GifSearchModal";
-import { HiDotsVertical } from "react-icons/hi"; 
-import { deleteReply } from "../../api/api";
+import { HiDotsVertical } from "react-icons/hi";
 
 const getRelativeTime = (date) => {
   const diff = Date.now() - new Date(date).getTime();
