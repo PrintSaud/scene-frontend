@@ -8,7 +8,6 @@ import StarRating from "../StarRating";
 import { addLogReply, likeReply, getRepliesForLog, deleteReply } from "../../api/api";
 import GifSearchModal from "../GifSearchModal";
 import { HiDotsVertical } from "react-icons/hi"; 
-import api from "../../api/api";
 import { deleteReply } from "../../api/api";
 
 const getRelativeTime = (date) => {
