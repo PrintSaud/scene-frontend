@@ -21,7 +21,7 @@ import TrendingPage from "./pages/TrendingPage";
 import SearchPage from './pages/SearchPage';
 import ProfilePage from "./pages/ProfilePage";
 import ReviewPage from "./components/review/ReviewPage";
-import BackdropSearchPage from "./pages/ChangeBackdropPage";
+import BackdropSearchPage from "./pages/BackdropSearchPage";
 import AvatarUploadTestPage from "./pages/AvatarUploadTestPage";
 import EditProfilePage from "./pages/EditProfilePage";
 import NotificationsPage from "./pages/NotificationsPage";
