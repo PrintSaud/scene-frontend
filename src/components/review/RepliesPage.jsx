@@ -5,6 +5,7 @@ import { FaImage, FaStar, FaRegStar } from "react-icons/fa6";
 import { BiSolidFileGif } from "react-icons/bi";
 import { FiSend } from "react-icons/fi";
 import { addLogReply, likeReply, getRepliesForLog, deleteReply } from "../../api/api";
+import StarRating from "../StarRating";
 
 const getRelativeTime = (date) => {
   const diff = Date.now() - new Date(date).getTime();
@@ -114,38 +115,54 @@ export default function RepliesPage() {
       }}
     >
       {/* Header */}
-      <div
-        style={{
-          position: "absolute",
-          top: 12,
-          left: 12,
-          right: 12,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          zIndex: 5,
-        }}
-      >
-        <button
-          onClick={() => navigate(-1)}
-          style={{
-            background: "rgba(0,0,0,0.5)",
-            border: "none",
-            borderRadius: "50%",
-            width: "32px",
-            height: "32px",
-            color: "#fff",
-            fontSize: "18px",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          ←
-        </button>
-        <h3 style={{ fontSize: "18px" }}>Comments</h3>
-      </div>
+<div
+  style={{
+    position: "absolute",
+    top: 12,
+    left: 0,
+    right: 0,
+    display: "flex",
+    justifyContent: "center", // ✅ center-align title properly
+    alignItems: "center",
+    zIndex: 5,
+  }}
+>
+  {/* Absolute back button on left */}
+  <button
+    onClick={() => navigate(-1)}
+    style={{
+      position: "absolute",
+      left: 12, // ✅ keep it pinned left
+      background: "rgba(0,0,0,0.5)",
+      border: "none",
+      borderRadius: "50%",
+      width: "32px",
+      height: "32px",
+      color: "#fff",
+      fontSize: "18px",
+      cursor: "pointer",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    }}
+  >
+    ←
+  </button>
+
+  {/* Centered title without Inter font */}
+  <h3
+    style={{
+      fontSize: "18px",
+      fontFamily: "sans-serif", // ✅ no Inter here
+      fontWeight: 500,
+      color: "#fff",
+      margin: 0,
+    }}
+  >
+    Comments
+  </h3>
+</div>
+
 
       {/* Replies list */}
       <div ref={listRef} style={{ padding: "56px 16px 0 16px" }}>
@@ -193,14 +210,19 @@ export default function RepliesPage() {
                   onClick={() => navigate(`/profile/${r.userId}`)}
                 >
                   <strong
-                    style={{
-                      fontSize: 14,
-                      fontFamily: "Inter, sans-serif",
-                    }}
-                  >
-                    @{r.username}
-                  </strong>
-                  {r.ratingForThisMovie && renderStars(r.ratingForThisMovie)}
+  style={{
+    fontSize: 14,
+    fontFamily: "Inter, sans-serif",
+    cursor: "pointer",
+    fontWeight: 400, // 🎯 lighter than default <strong>
+    color: "#ddd",   // 🎯 softer color
+  }}
+>
+  @{r.username}
+</strong>
+{r.ratingForThisMovie && (
+  <StarRating rating={r.ratingForThisMovie} size={12} />
+)}
                 </div>
                 <div
                   style={{
@@ -255,23 +277,23 @@ export default function RepliesPage() {
         <FaImage size={20} style={{ cursor: "pointer", color: "#888", marginRight: 8 }} />
         <BiSolidFileGif size={20} style={{ cursor: "pointer", color: "#888", marginRight: 8 }} />
         <input
-          ref={inputRef}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSend()}
-          placeholder="Write a comment..."
-          style={{
-            flex: "0 0 75%",
-            padding: "12px 16px",
-            borderRadius: "999px",
-            border: "1px solid #444",
-            background: "#2a2a2a",
-            color: "#fff",
-            fontSize: "15px",
-            fontFamily: "Inter, sans-serif",
-            outline: "none",
-          }}
-        />
+  ref={inputRef}
+  value={input}
+  onChange={(e) => setInput(e.target.value)}
+  onKeyDown={(e) => e.key === "Enter" && handleSend()}
+  placeholder="Write a comment..."
+  style={{
+    flex: "0 0 65%", // 🎯 reduced from 75% to 65%
+    padding: "12px 16px",
+    borderRadius: "999px",
+    border: "1px solid #444",
+    background: "#2a2a2a",
+    color: "#fff",
+    fontSize: "15px",
+    fontFamily: "Inter, sans-serif",
+    outline: "none",
+  }}
+/>
         <button
           onClick={handleSend}
           style={{
