@@ -9,6 +9,7 @@ import { addLogReply, likeReply, getRepliesForLog, deleteReply } from "../../api
 import GifSearchModal from "../GifSearchModal";
 import { HiDotsVertical } from "react-icons/hi"; 
 import api from "../../api/api";
+import { deleteReply } from "../../api/api";
 
 const getRelativeTime = (date) => {
   const diff = Date.now() - new Date(date).getTime();
