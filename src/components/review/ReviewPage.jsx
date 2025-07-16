@@ -8,7 +8,6 @@ import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import ReviewHeader from "./ReviewHeader";
 import MoreReviewsList from "./MoreReviewsList";
 import StarRating from "../StarRating";
-import { getRelativeTime } from "../../utils/dateUtils"; // Ensure this util exists or replace with Date fallback
 
 export default function ReviewPage() {
   const { id } = useParams();
@@ -18,6 +17,22 @@ export default function ReviewPage() {
   const [moreReviews, setMoreReviews] = useState([]);
   const user = JSON.parse(localStorage.getItem("user")) || {};
   const userId = user._id;
+
+  // Add this helper at the top of ReviewPage.jsx, before the component:
+
+function getRelativeTime(date) {
+  const now = new Date();
+  const then = new Date(date);
+  const diff = (now - then) / 1000; // in seconds
+
+  if (diff < 60) return "just now";
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+  if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
+
+  return then.toLocaleDateString(); // fallback: date format
+}
+
 
   const fetchData = async () => {
     try {
