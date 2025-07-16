@@ -5,16 +5,23 @@ import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 const TMDB_IMG = "https://image.tmdb.org/t/p/w300";
 
 const getRelativeTime = (date) => {
-  const diff = Date.now() - new Date(date).getTime();
-  const min = Math.floor(diff / 60000);
-  const hr = Math.floor(diff / 3600000);
-  const day = Math.floor(diff / 86400000);
-
-  if (min < 1) return "Just now";
-  if (min < 60) return `${min}min`;
-  if (hr < 24) return `${hr}h`;
-  return `${day}d`;
-};
+    const now = Date.now();
+    const then = new Date(date).getTime();
+    const diff = now - then;
+  
+    const min = Math.floor(diff / 60000);
+    const hr = Math.floor(diff / 3600000);
+    const day = Math.floor(diff / 86400000);
+  
+    if (min < 1) return "Just now";
+    if (min < 60) return `${min}min ago`;
+    if (hr < 24) return `${hr}h ago`;
+    if (day <= 7) return `${day}d ago`;
+  
+    const d = new Date(date);
+    return `${d.getDate()} ${d.toLocaleString('default', { month: 'short' })}`;
+  };
+  
 
 export default function ProfileTabReviews({ logs, filter, setFilter, navigate, handleLike }) {
   const userId = JSON.parse(localStorage.getItem("user"))?._id;
@@ -80,7 +87,6 @@ export default function ProfileTabReviews({ logs, filter, setFilter, navigate, h
                 right: "12px",
                 fontSize: "11px",
                 color: "#888",
-                fontFamily: "Inter, sans-serif",
               }}
             >
               {getRelativeTime(log.watchedAt)}

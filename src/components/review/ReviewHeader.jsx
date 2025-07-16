@@ -16,6 +16,8 @@ export default function ReviewHeader({
   const navigate = useNavigate();
   const [showOptions, setShowOptions] = useState(false);
 
+
+  
   const backdropUrl = review.movie?.backdrop_path
     ? `https://image.tmdb.org/t/p/original${review.movie.backdrop_path}`
     : "/default-backdrop.jpg";
@@ -24,9 +26,26 @@ export default function ReviewHeader({
     ? review.user.avatar
     : "/default-avatar.jpg";
 
-  const timestamp = review.createdAt
-    ? new Date(review.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })
-    : "";
+    const getRelativeTime = (date) => {
+        const now = Date.now();
+        const then = new Date(date).getTime();
+        const diff = now - then;
+      
+        const min = Math.floor(diff / 60000);
+        const hr = Math.floor(diff / 3600000);
+        const day = Math.floor(diff / 86400000);
+      
+        if (min < 1) return "Just now";
+        if (min < 60) return `${min}min ago`;
+        if (hr < 24) return `${hr}h ago`;
+        if (day <= 7) return `${day}d ago`;
+      
+        const d = new Date(date);
+        return `${d.getDate()} ${d.toLocaleString('default', { month: 'short' })}`;
+      };
+
+    const timestamp = review.createdAt ? getRelativeTime(review.createdAt) : "";
+
 
   const isOwner = review.user?._id === userId;
 
