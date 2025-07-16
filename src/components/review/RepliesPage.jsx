@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import { FaImage } from "react-icons/fa6";
 import { BiSolidFileGif } from "react-icons/bi";
-import { addLogReply, likeReply, getRepliesForLog } from "../../api/api";
+import { FiSend } from "react-icons/fi";
+import { addLogReply, likeReply, getRepliesForLog, deleteReply } from "../../api/api";
 
 const getRelativeTime = (date) => {
   const diff = Date.now() - new Date(date).getTime();
@@ -23,11 +24,12 @@ export default function RepliesPage() {
   const [input, setInput] = useState("");
   const user = JSON.parse(localStorage.getItem("user")) || {};
   const userId = user._id;
+  const listRef = useRef(null);
+  const inputRef = useRef(null);
 
   const fetchReplies = async () => {
     try {
       const data = await getRepliesForLog(id);
-      console.log("Replies API response:", data);
       const sorted = (data || []).sort(
         (a, b) => (b.likes?.length || 0) - (a.likes?.length || 0)
       );
@@ -62,11 +64,28 @@ export default function RepliesPage() {
     await addLogReply(id, { text: input });
     setInput("");
     fetchReplies();
+    inputRef.current?.focus();
+    setTimeout(() => {
+      listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
+    }, 100);
+  };
+
+  const handleDelete = async (replyId) => {
+    const confirmDelete = window.confirm("Delete this reply?");
+    if (!confirmDelete) return;
+    try {
+      await deleteReply(id, replyId);
+      fetchReplies();
+    } catch (err) {
+      console.error("Failed to delete reply", err);
+    }
   };
 
   useEffect(() => {
     fetchReplies();
   }, [id]);
+
+  
 
   return (
     <div
@@ -76,22 +95,60 @@ export default function RepliesPage() {
         color: "#fff",
         position: "relative",
         overflowY: "auto",
-        paddingBottom: "80px",
+        paddingBottom: "100px",
+        fontFamily: "Inter, sans-serif",
       }}
     >
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", padding: "16px" }}>
-        <button onClick={() => navigate(-1)}>←</button>
+      <div style={{
+          position: "absolute",
+          top: 12,
+          left: 12,
+          right: 12,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          zIndex: 5
+        }}>
+          <button
+            onClick={() => navigate(-1)}
+            style={{
+              background: "rgba(0,0,0,0.5)",
+              border: "none",
+              borderRadius: "50%",
+              width: "32px",
+              height: "32px",
+              color: "#fff",
+              fontSize: "18px",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+          >
+            ←
+          </button>
+        
         <h3 style={{ marginLeft: "8px", fontSize: "18px" }}>Comments</h3>
       </div>
 
       {/* Replies list */}
-      <div style={{ padding: "0 16px" }}>
+      <div ref={listRef} style={{ padding: "0 16px" }}>
+        {replies.length === 0 && (
+          <div style={{ textAlign: "center", marginTop: 40, color: "#888", fontSize: 14 }}>
+            No comments yet. Be the first to reply!
+          </div>
+        )}
+
         {replies.map((r) => {
           const isLikedByMe = r.likes?.includes(userId);
           return (
             <div
               key={r._id}
+              onContextMenu={(e) => {
+                e.preventDefault();
+                if (r.userId === userId) handleDelete(r._id);
+              }}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -99,7 +156,7 @@ export default function RepliesPage() {
                 gap: 10,
               }}
             >
-              {/* Avatar */}
+              {/* Avatar navigates to profile */}
               <img
                 src={r.avatar || "/default-avatar.jpg"}
                 alt="avatar"
@@ -111,23 +168,35 @@ export default function RepliesPage() {
                 }}
                 onClick={() => navigate(`/profile/${r.userId}`)}
               />
-              {/* Username, rating, comment */}
+
               <div style={{ flex: 1 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  {/* Username navigates to profile */}
                   <strong
-                    style={{ fontSize: 14, cursor: "pointer" }}
+                    style={{
+                      fontSize: 14,
+                      cursor: "pointer",
+                      fontFamily: "Inter, sans-serif",
+                    }}
                     onClick={() => navigate(`/profile/${r.userId}`)}
                   >
                     @{r.username}
                   </strong>
+
+                  {/* Rating formatted like other pages */}
                   {r.ratingForThisMovie && (
-                    <span style={{ fontSize: 12, color: "#ccc" }}>
-                      ⭐️ {r.ratingForThisMovie.toFixed(1)}
+                    <span style={{ fontSize: 12, color: "#ccc", fontFamily: "Inter, sans-serif" }}>
+                      {r.ratingForThisMovie.toFixed(1)}
                     </span>
                   )}
                 </div>
-                <span style={{ fontSize: 14, color: "#ddd" }}>{r.text}</span>
+
+                {/* Comment text in Inter font */}
+                <span style={{ fontSize: 14, color: "#ddd", fontFamily: "Inter, sans-serif" }}>
+                  {r.text}
+                </span>
               </div>
+
               {/* Timestamp + Like */}
               <div style={{ textAlign: "right" }}>
                 <div style={{ fontSize: 10, color: "#888" }}>
@@ -152,47 +221,53 @@ export default function RepliesPage() {
         })}
       </div>
 
-      {/* Sticky input */}
+      {/* SceneBot-style input */}
       <div
         style={{
           position: "fixed",
           bottom: 0,
           left: 0,
-          right: 0,
-          backgroundColor: "#1c1c1c",
-          padding: "12px",
+          width: "100%",
+          padding: "14px 16px",
+          background: "#0e0e0e",
+          borderTop: "1px solid #222",
           display: "flex",
           alignItems: "center",
-          gap: 10,
-          zIndex: 100,
+          zIndex: 99,
         }}
       >
-        <FaImage size={20} style={{ cursor: "pointer", color: "#888" }} />
-        <BiSolidFileGif size={20} style={{ cursor: "pointer", color: "#888" }} />
+        <FaImage size={20} style={{ cursor: "pointer", color: "#888", marginRight: 8 }} />
+        <BiSolidFileGif size={20} style={{ cursor: "pointer", color: "#888", marginRight: 8 }} />
         <input
+          ref={inputRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSend()}
           placeholder="Write a comment..."
           style={{
             flex: 1,
-            backgroundColor: "transparent",
-            border: "none",
-            outline: "none",
+            padding: "12px 16px",
+            borderRadius: "999px",
+            border: "1px solid #444",
+            background: "#2a2a2a",
             color: "#fff",
-            fontSize: "14px",
+            fontSize: "15px",
+            fontFamily: "Inter, sans-serif",
+            outline: "none",
           }}
         />
         <button
           onClick={handleSend}
           style={{
-            background: "none",
+            marginLeft: "8px",
+            background: "transparent",
             border: "none",
-            color: "#B327F6",
-            fontSize: "14px",
+            color: "#fff",
+            fontSize: "22px",
             cursor: "pointer",
           }}
         >
-          Send
+          <FiSend />
         </button>
       </div>
     </div>
