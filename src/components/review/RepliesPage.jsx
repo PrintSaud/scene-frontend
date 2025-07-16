@@ -366,42 +366,53 @@ export default function RepliesPage() {
     zIndex: 99,
   }}
 >
-  {/* Media preview inside input container */}
-  {(selectedGif || selectedImage) && (
-    <div style={{ position: "relative", marginBottom: 8 }}>
-      <img
-        src={selectedGif || selectedImage}
-        alt="preview"
-        style={{
-          width: "100%",
-          maxHeight: 200,
-          borderRadius: 8,
-          objectFit: "cover",
-        }}
-      />
-      <button
-        onClick={() => {
-          setSelectedGif("");
-          setSelectedImage("");
-        }}
-        style={{
-          position: "absolute",
-          top: 4,
-          right: 4,
-          background: "#333",
-          border: "none",
-          borderRadius: "50%",
-          width: 24,
-          height: 24,
-          color: "#fff",
-          fontSize: 14,
-          cursor: "pointer",
-        }}
-      >
-        ×
-      </button>
-    </div>
-  )}
+{(selectedGif || selectedImage) && (
+  <div
+    style={{
+      position: "fixed",
+      bottom: 60, // ensure it sits just above input
+      left: 12,
+      right: 12,
+      backgroundColor: "#1a1a1a",
+      borderRadius: 8,
+      padding: 4,
+      zIndex: 100,
+    }}
+  >
+    <img
+      src={selectedGif || selectedImage}
+      alt="preview"
+      style={{
+        width: "100%",
+        maxHeight: 200,
+        objectFit: "cover",
+        borderRadius: 8,
+      }}
+    />
+    <button
+      onClick={() => {
+        setSelectedGif("");
+        setSelectedImage("");
+      }}
+      style={{
+        position: "absolute",
+        top: 6,
+        right: 6,
+        background: "rgba(0,0,0,0.5)",
+        border: "none",
+        borderRadius: "50%",
+        width: 24,
+        height: 24,
+        color: "#fff",
+        fontSize: 14,
+        cursor: "pointer",
+      }}
+    >
+      ×
+    </button>
+  </div>
+)}
+
 
   {/* Row: image/gif picker + input + send */}
   <div style={{ display: "flex", alignItems: "center" }}>
@@ -422,7 +433,7 @@ export default function RepliesPage() {
       onKeyDown={(e) => e.key === "Enter" && handleSend()}
       placeholder="Write a comment..."
       style={{
-        flex: 1,
+        flex: "0 0 60%",
         minHeight: selectedGif || selectedImage ? 48 : 36,
         padding: "12px 16px",
         borderRadius: "999px",
@@ -432,6 +443,7 @@ export default function RepliesPage() {
         fontSize: "15px",
         fontFamily: "Inter, sans-serif",
         outline: "none",
+        height: 40, 
       }}
     />
     <button
