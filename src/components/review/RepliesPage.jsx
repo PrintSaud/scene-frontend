@@ -138,7 +138,6 @@ export default function RepliesPage() {
         position: "relative",
         overflowY: "auto",
         paddingBottom: "100px",
-        fontFamily: "Inter, sans-serif",
       }}
     >
       {/* Header */}
@@ -200,9 +199,9 @@ export default function RepliesPage() {
       ></div>
 
 {/* Replies list */}
-<div ref={listRef} style={{ padding: "72px 16px 0 16px" }}>
+<div ref={listRef} style={{ padding: "72px 16px 0 16px", fontFamily: "Inter, sans-serif", }}>
   {replies.length === 0 && (
-    <div style={{ textAlign: "center", marginTop: 40, color: "#888", fontSize: 14 }}>
+    <div style={{ textAlign: "center", marginTop: 40, color: "#888", fontSize: 14,fontFamily: "Inter, sans-serif", }}>
       No comments yet. Be the first to reply!
     </div>
   )}
