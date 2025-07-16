@@ -84,7 +84,7 @@ export default function RepliesPage() {
     const confirmDelete = window.confirm("Delete this reply?");
     if (!confirmDelete) return;
     try {
-      await api.delete(`/api/logs/${id}/replies/${replyId}`);
+      await deleteReply(id, replyId);
       fetchReplies(); // Refresh after deletion
     } catch (err) {
       console.error("Failed to delete reply", err);
