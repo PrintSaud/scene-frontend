@@ -4,9 +4,11 @@ import toast from "react-hot-toast";
 import axios from "../../api/api";
 import { likeLog, likeReply } from "../../api/api";
 import { backend } from "../../config";
-import { AiOutlineHeart } from "react-icons/ai";
+import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import ReviewHeader from "./ReviewHeader";
 import MoreReviewsList from "./MoreReviewsList";
+import StarRating from "../StarRating";
+import { getRelativeTime } from "../../utils/dateUtils"; // Ensure this util exists or replace with Date fallback
 
 export default function ReviewPage() {
   const { id } = useParams();
@@ -76,15 +78,6 @@ export default function ReviewPage() {
   const handleProfile = (profileId) => navigate(`/profile/${profileId}`);
   const handleMoreReviewsClick = (reviewId) => navigate(`/review/${reviewId}`);
 
-  const handleShare = () => {
-    navigator.clipboard.writeText(`${window.location.origin}/review/${review._id}`);
-    toast.success("🔗 Link copied!");
-  };
-
-  const handleChangeBackdrop = () => toast("Change backdrop clicked!");
-  const handleEdit = () => toast("Edit review clicked!");
-  const handleDelete = () => toast("Delete review clicked!");
-
   if (!review) return null;
 
   return (
@@ -95,116 +88,116 @@ export default function ReviewPage() {
         onLike={handleLike}
         onReply={handleReply}
         onProfile={handleProfile}
-        onChangeBackdrop={handleChangeBackdrop}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
       />
 
-{/* 💬 Comments section */}
-<div style={{ marginTop: "24px" }}>
-  {/* Heading with "More" button */}
-  <div style={{ 
-    display: "flex", 
-    alignItems: "center", 
-    justifyContent: "space-between", 
-    marginBottom: replies.length === 0 ? "4px" : "12px", // tighter when no comments
-    padding: "0 24px"
-  }}>
-    <h3 style={{ 
-      fontSize: "18px", 
-      margin: 0, 
-      marginLeft: "-6px"  // push further left (cleaner than "2px")
-    }}>
-      Comments
-    </h3>
-    <button
-      onClick={() => navigate(`/review/${id}/replies`)}
-      style={{
-        background: "none",
-        border: "none",
-        color: "#888",
-        fontSize: "14px",
-        cursor: "pointer",
-        marginRight: "-12px" // push "More →" a bit right
-      }}
-    >
-      More →
-    </button>
-  </div>
+      {/* 💬 Comments section */}
+      <div style={{ marginTop: 24 }}>
+        <div style={{ 
+          display: "flex", 
+          alignItems: "center", 
+          justifyContent: "space-between", 
+          padding: "0 24px",
+          marginBottom: replies.length === 0 ? 4 : 12
+        }}>
+          <h3 style={{ fontSize: 18, margin: 0, marginLeft: -6 }}>Comments</h3>
+          <button
+            onClick={() => navigate(`/review/${id}/replies`)}
+            style={{
+              background: "none",
+              border: "none",
+              color: "#888",
+              fontSize: 14,
+              cursor: "pointer",
+              marginRight: -12
+            }}
+          >
+            More →
+          </button>
+        </div>
 
-  {/* If no replies */}
-  {replies.length === 0 ? (
-    <div style={{ paddingLeft: "24px" }}>
-      <p style={{ color: "#888", fontSize: "14px", marginLeft: "-6px" }}>No comments yet.</p>
-    </div>
-  ) : (
-    <>
-      {replies.slice(0, 3).map((r) => (
-        <div
-          key={r._id}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            marginBottom: 14,
-            padding: "0 24px"
-          }}
-        >
-                {/* Profile pic */}
-                <img
-                  src={r.user?.avatar || "/default-avatar.jpg"}
-                  alt="avatar"
-                  style={{
-                    width: 30,
-                    height: 30,
-                    borderRadius: "50%",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => handleProfile(r.userId)}
-                />
+        {replies.length === 0 ? (
+          <div style={{ paddingLeft: 24 }}>
+            <p style={{ color: "#888", fontSize: 14, marginLeft: -6 }}>No comments yet.</p>
+          </div>
+        ) : (
+          [...replies]
+            .sort((a, b) => (b.likes?.length || 0) - (a.likes?.length || 0))
+            .slice(0, 3)
+            .map((r) => {
+              const isLikedByMe = r.likes?.includes(userId);
+              return (
+                <div key={r._id} style={{ position: "relative", marginBottom: 14, padding: "0 24px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    {/* Avatar */}
+                    <img
+                      src={r.avatar || "/default-avatar.jpg"}
+                      alt="avatar"
+                      style={{ width: 30, height: 30, borderRadius: "50%", cursor: "pointer" }}
+                      onClick={() => handleProfile(r.userId)}
+                    />
+                    <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                      {/* Username, stars, time */}
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <strong
+                          style={{ fontSize: 14, fontFamily: "Inter, sans-serif", fontWeight: 400, color: "#ddd", cursor: "pointer" }}
+                          onClick={() => handleProfile(r.userId)}
+                        >
+                          @{r.username}
+                        </strong>
+                        {r.ratingForThisMovie && (
+                          <StarRating rating={r.ratingForThisMovie} size={12} />
+                        )}
+                        <span style={{ fontSize: 10, color: "#888" }}>
+                          {getRelativeTime(r.createdAt)}
+                        </span>
+                      </div>
 
-                {/* Inline username, rating, comment */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    flexWrap: "wrap",
-                    gap: 6,
-                  }}
-                >
-                  <strong
-                    style={{ cursor: "pointer", fontSize: 14 }}
-                    onClick={() => handleProfile(r.userId)}
-                  >
-                    @{r.username}
-                  </strong>
+                      {/* Text comment */}
+                      {r.text && (
+                        <span style={{ fontSize: 14, color: "#ddd", fontFamily: "Inter, sans-serif", display: "block", marginTop: 2 }}>
+                          {r.text}
+                        </span>
+                      )}
 
-                  {r.ratingForThisMovie && (
-                    <span style={{ fontSize: 12, color: "#ccc" }}>
-                      ⭐️ {r.ratingForThisMovie.toFixed(1)}
-                    </span>
-                  )}
+                      {/* Optional gif/image */}
+                      {r.gif && (
+                        <img
+                          src={r.gif}
+                          alt="gif"
+                          style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }}
+                        />
+                      )}
+                      {r.image && (
+                        <img
+                          src={r.image}
+                          alt="img"
+                          style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }}
+                        />
+                      )}
+                    </div>
 
-                  <span style={{ fontSize: 14, color: "#ddd" }}>{r.text}</span>
+                    {/* Like button */}
+                    <div
+                      style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+                      onClick={() => handleReplyLike(r._id)}
+                    >
+                      {isLikedByMe ? (
+                        <AiFillHeart size={16} color="#B327F6" />
+                      ) : (
+                        <AiOutlineHeart size={16} color="#888" />
+                      )}
+                      <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>
+                        {r.likes?.length || 0}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-
-                {/* Like button */}
-                <div
-                  style={{ marginLeft: "auto", cursor: "pointer" }}
-                  onClick={() => handleReplyLike(r._id)}
-                >
-                  <AiOutlineHeart
-                    size={18}
-                    color={(r.likes || []).includes(userId) ? "#f00" : "#888"}
-                  />
-                </div>
-              </div>
-            ))}
-          </>
+              );
+            })
         )}
       </div>
 
-      {/* More reviews section */}
+      {/* ⭐ More reviews section */}
       <MoreReviewsList
         reviews={moreReviews}
         onClick={handleMoreReviewsClick}
