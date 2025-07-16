@@ -326,7 +326,6 @@ export default function RepliesPage() {
   })}
 </div>
 
-{/* Input field */}
 <div
   style={{
     position: "fixed",
@@ -337,23 +336,85 @@ export default function RepliesPage() {
     background: "#0e0e0e",
     borderTop: "1px solid #222",
     display: "flex",
-    alignItems: "center",
+    alignItems: "flex-end", // Align at bottom
+    gap: 8,
     zIndex: 99,
   }}
 >
+  {/* Icons */}
   <FaImage
     size={20}
-    style={{ cursor: "pointer", color: "#888", marginRight: 8 }}
+    style={{ cursor: "pointer", color: "#888" }}
     onClick={handlePickImage}
   />
   <BiSolidFileGif
     size={20}
-    style={{ cursor: "pointer", color: "#888", marginRight: 8 }}
+    style={{ cursor: "pointer", color: "#888" }}
     onClick={handlePickGif}
   />
 
-  {/* Input box with preview inside */}
-  <div style={{ position: "relative", flex: "0 0 60%" }}>
+{/* Input field with preview */}
+<div
+  style={{
+    position: "fixed",
+    bottom: 0,
+    left: 0,
+    width: "100%",
+    background: "#0e0e0e",
+    borderTop: "1px solid #222",
+    padding: selectedGif || selectedImage ? "12px" : "12px 12px",
+    zIndex: 99,
+  }}
+>
+  {/* Media preview inside input container */}
+  {(selectedGif || selectedImage) && (
+    <div style={{ position: "relative", marginBottom: 8 }}>
+      <img
+        src={selectedGif || selectedImage}
+        alt="preview"
+        style={{
+          width: "100%",
+          maxHeight: 200,
+          borderRadius: 8,
+          objectFit: "cover",
+        }}
+      />
+      <button
+        onClick={() => {
+          setSelectedGif("");
+          setSelectedImage("");
+        }}
+        style={{
+          position: "absolute",
+          top: 4,
+          right: 4,
+          background: "#333",
+          border: "none",
+          borderRadius: "50%",
+          width: 24,
+          height: 24,
+          color: "#fff",
+          fontSize: 14,
+          cursor: "pointer",
+        }}
+      >
+        ×
+      </button>
+    </div>
+  )}
+
+  {/* Row: image/gif picker + input + send */}
+  <div style={{ display: "flex", alignItems: "center" }}>
+    <FaImage
+      size={20}
+      style={{ cursor: "pointer", color: "#888", marginRight: 8 }}
+      onClick={handlePickImage}
+    />
+    <BiSolidFileGif
+      size={20}
+      style={{ cursor: "pointer", color: "#888", marginRight: 8 }}
+      onClick={handlePickGif}
+    />
     <input
       ref={inputRef}
       value={input}
@@ -361,7 +422,8 @@ export default function RepliesPage() {
       onKeyDown={(e) => e.key === "Enter" && handleSend()}
       placeholder="Write a comment..."
       style={{
-        width: "100%",
+        flex: 1,
+        minHeight: selectedGif || selectedImage ? 48 : 36,
         padding: "12px 16px",
         borderRadius: "999px",
         border: "1px solid #444",
@@ -372,73 +434,24 @@ export default function RepliesPage() {
         outline: "none",
       }}
     />
-
-    {/* Embedded preview image inside input box */}
-    {(selectedGif || selectedImage) && (
-      <div
-        style={{
-          position: "absolute",
-          top: -130,
-          left: 0,
-          right: 0,
-          background: "#2a2a2a",
-          padding: 6,
-          borderRadius: 8,
-        }}
-      >
-        <img
-          src={selectedGif || selectedImage}
-          alt="preview"
-          style={{
-            width: "100%",
-            maxHeight: 120,
-            borderRadius: 4,
-            objectFit: "cover",
-          }}
-        />
-        {/* Clear button */}
-        <button
-          onClick={() => {
-            setSelectedGif("");
-            setSelectedImage("");
-          }}
-          style={{
-            position: "absolute",
-            top: 4,
-            right: 4,
-            background: "#444",
-            border: "none",
-            borderRadius: "50%",
-            width: 20,
-            height: 20,
-            color: "#fff",
-            fontSize: 12,
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          ×
-        </button>
-      </div>
-    )}
+    <button
+      onClick={handleSend}
+      style={{
+        marginLeft: 8,
+        background: "transparent",
+        border: "none",
+        color: "#fff",
+        fontSize: 22,
+        cursor: "pointer",
+      }}
+    >
+      <FiSend />
+    </button>
   </div>
-
-  <button
-    onClick={handleSend}
-    style={{
-      marginLeft: "8px",
-      background: "transparent",
-      border: "none",
-      color: "#fff",
-      fontSize: "22px",
-      cursor: "pointer",
-    }}
-  >
-    <FiSend />
-  </button>
 </div>
+
+</div>
+
 
        {/* 4️⃣ GifSearchModal integrated */}
        {showGifModal && (
