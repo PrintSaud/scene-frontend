@@ -127,6 +127,7 @@ export default function RepliesPage() {
     zIndex: 5,
   }}
 >
+  
   {/* Absolute back button on left */}
   <button
     onClick={() => navigate(-1)}
@@ -163,9 +164,22 @@ export default function RepliesPage() {
   </h3>
 </div>
 
+{/* Separator line */}
+<div
+  style={{
+    position: "absolute",
+    top: 48,  // slight offset after header height
+    left: 0,
+    right: 0,
+    height: 1,
+    backgroundColor: "#333",
+    opacity: 0.6,
+  }}
+></div>
+
 
       {/* Replies list */}
-      <div ref={listRef} style={{ padding: "56px 16px 0 16px" }}>
+      <div ref={listRef} style={{ padding: "72px 16px 0 16px" }}>
         {replies.length === 0 && (
           <div style={{ textAlign: "center", marginTop: 40, color: "#888", fontSize: 14 }}>
             No comments yet. Be the first to reply!
@@ -229,8 +243,8 @@ export default function RepliesPage() {
                     fontSize: 14,
                     color: "#ddd",
                     fontFamily: "Inter, sans-serif",
-                    display: "flex",
-                    alignItems: "center",
+                    display: "block",
+                    marginTop: 2,
                   }}
                 >
                   {r.text}
@@ -283,7 +297,7 @@ export default function RepliesPage() {
   onKeyDown={(e) => e.key === "Enter" && handleSend()}
   placeholder="Write a comment..."
   style={{
-    flex: "0 0 65%", // 🎯 reduced from 75% to 65%
+    flex: "0 0 60%", // 🎯 reduced from 75% to 65%
     padding: "12px 16px",
     borderRadius: "999px",
     border: "1px solid #444",
