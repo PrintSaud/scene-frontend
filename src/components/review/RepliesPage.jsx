@@ -274,14 +274,28 @@ export default function RepliesPage() {
     />
   )}
 </div>
+<div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+  {/* Like button */}
+  <div
+    style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+    onClick={() => handleReplyLike(r._id)}
+  >
+    {isLikedByMe ? (
+      <AiFillHeart size={16} color="#B327F6" />
+    ) : (
+      <AiOutlineHeart size={16} color="#888" />
+    )}
+    <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>
+      {r.likes?.length || 0}
+    </span>
+  </div>
 
-{/* 💡 3-dots + like stacked to right */}
-<div style={{ textAlign: "right" }}>
+  {/* 3-dots menu */}
   {r.userId === userId && (
     <div style={{ position: "relative" }}>
       <HiDotsVertical
         size={14}
-        style={{ cursor: "pointer", color: "#888", marginBottom: 4 }}
+        style={{ cursor: "pointer", color: "#888" }}
         onClick={() => setMenuOpenId(menuOpenId === r._id ? null : r._id)}
       />
       {menuOpenId === r._id && (
@@ -304,19 +318,6 @@ export default function RepliesPage() {
       )}
     </div>
   )}
-  <div
-    style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
-    onClick={() => handleReplyLike(r._id)}
-  >
-    {isLikedByMe ? (
-      <AiFillHeart size={16} color="#B327F6" />
-    ) : (
-      <AiOutlineHeart size={16} color="#888" />
-    )}
-    <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>
-      {r.likes?.length || 0}
-    </span>
-  </div>
 </div>
 
         </div>
@@ -324,6 +325,21 @@ export default function RepliesPage() {
     );
   })}
 </div>
+
+{(selectedGif || selectedImage) && (
+  <div style={{ padding: "8px 12px" }}>
+    <img
+      src={selectedGif || selectedImage}
+      alt="preview"
+      style={{
+        maxWidth: "100%",
+        maxHeight: 120,
+        borderRadius: 8,
+        objectFit: "cover",
+      }}
+    />
+  </div>
+)}
 
 
       {/* Input field */}
