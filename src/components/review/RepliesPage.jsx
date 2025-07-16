@@ -7,6 +7,7 @@ import { FiSend } from "react-icons/fi";
 import StarRating from "../StarRating";
 import { addLogReply, likeReply, getRepliesForLog, deleteReply } from "../../api/api";
 import GifSearchModal from "../GifSearchModal";
+import { HiDotsVertical } from "react-icons/hi"; 
 
 const getRelativeTime = (date) => {
   const diff = Date.now() - new Date(date).getTime();
@@ -31,6 +32,7 @@ export default function RepliesPage() {
   const userId = user._id;
   const listRef = useRef(null);
   const inputRef = useRef(null);
+  const [menuOpenId, setMenuOpenId] = useState(null);
 
   const fetchReplies = async () => {
     try {
@@ -107,7 +109,12 @@ export default function RepliesPage() {
     setShowGifModal(true); // ✅ 3️⃣ Open your real modal
   };
 
-
+  const handleGifSelect = (gifUrl) => {
+    setSelectedGif(gifUrl);
+    setShowGifModal(false);
+  };
+  
+  
   useEffect(() => {
     fetchReplies();
   }, [id]);
@@ -182,111 +189,137 @@ export default function RepliesPage() {
         }}
       ></div>
 
-      {/* Replies list */}
-      <div ref={listRef} style={{ padding: "72px 16px 0 16px" }}>
-        {replies.length === 0 && (
-          <div style={{ textAlign: "center", marginTop: 40, color: "#888", fontSize: 14 }}>
-            No comments yet. Be the first to reply!
-          </div>
-        )}
+{/* Replies list */}
+<div ref={listRef} style={{ padding: "72px 16px 0 16px" }}>
+  {replies.length === 0 && (
+    <div style={{ textAlign: "center", marginTop: 40, color: "#888", fontSize: 14 }}>
+      No comments yet. Be the first to reply!
+    </div>
+  )}
 
-        {replies.map((r) => {
-          const isLikedByMe = r.likes?.includes(userId);
-          return (
-            <div key={r._id} style={{ position: "relative", marginBottom: 14 }}>
-              <div
+  {replies.map((r) => {
+    const isLikedByMe = r.likes?.includes(userId);
+    return (
+      <div key={r._id} style={{ position: "relative", marginBottom: 14 }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+          }}
+        >
+          <img
+            src={r.avatar || "/default-avatar.jpg"}
+            alt="avatar"
+            style={{
+              width: 30,
+              height: 30,
+              borderRadius: "50%",
+              cursor: "pointer",
+            }}
+            onClick={() => navigate(`/profile/${r.userId}`)}
+          />
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                cursor: "pointer",
+              }}
+              onClick={() => navigate(`/profile/${r.userId}`)}
+            >
+              <strong
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
+                  fontSize: 14,
+                  fontFamily: "Inter, sans-serif",
+                  fontWeight: 400,
+                  color: "#ddd",
                 }}
               >
-                <img
-                  src={r.avatar || "/default-avatar.jpg"}
-                  alt="avatar"
-                  style={{
-                    width: 30,
-                    height: 30,
-                    borderRadius: "50%",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => navigate(`/profile/${r.userId}`)}
-                />
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 6,
-                      cursor: "pointer",
-                    }}
-                    onClick={() => navigate(`/profile/${r.userId}`)}
-                  >
-                    <strong
-                      style={{
-                        fontSize: 14,
-                        fontFamily: "Inter, sans-serif",
-                        fontWeight: 400,
-                        color: "#ddd",
-                      }}
-                    >
-                      @{r.username}
-                    </strong>
-                    {r.ratingForThisMovie && <StarRating rating={r.ratingForThisMovie} size={12} />}
-                  </div>
-                  <span
-                    style={{
-                      fontSize: 14,
-                      color: "#ddd",
-                      fontFamily: "Inter, sans-serif",
-                      display: "block",
-                      marginTop: 2,
-                    }}
-                  >
-                    {r.text}
-                  </span>
-                  {r.gif && <img src={r.gif} alt="gif" style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }} />}
-                  {r.image && <img src={r.image} alt="img" style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }} />}
-                </div>
-                <div style={{ textAlign: "right" }}>
-                  <div style={{ fontSize: 10, color: "#888" }}>{getRelativeTime(r.createdAt)}</div>
-                  <div
-                    style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
-                    onClick={() => handleReplyLike(r._id)}
-                  >
-                    {isLikedByMe ? (
-                      <AiFillHeart size={16} color="#B327F6" />
-                    ) : (
-                      <AiOutlineHeart size={16} color="#888" />
-                    )}
-                    <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>
-                      {r.likes?.length || 0}
-                    </span>
-                  </div>
-                </div>
-              </div>
+                @{r.username}
+              </strong>
+              {r.ratingForThisMovie && <StarRating rating={r.ratingForThisMovie} size={12} />}
+            </div>
+            <span
+              style={{
+                fontSize: 14,
+                color: "#ddd",
+                fontFamily: "Inter, sans-serif",
+                display: "block",
+                marginTop: 2,
+              }}
+            >
+              {r.text}
+            </span>
+            {r.gif && (
+              <img
+                src={r.gif}
+                alt="gif"
+                style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }}
+              />
+            )}
+            {r.image && (
+              <img
+                src={r.image}
+                alt="img"
+                style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }}
+              />
+            )}
+          </div>
+
+          {/* Timestamp + Like + 3-dots menu */}
+          <div style={{ textAlign: "right" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <div style={{ fontSize: 10, color: "#888" }}>{getRelativeTime(r.createdAt)}</div>
               {r.userId === userId && (
-                <button
-                  onClick={() => handleDelete(r._id)}
-                  style={{
-                    position: "absolute",
-                    right: 0,
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    background: "transparent",
-                    border: "none",
-                    color: "#f55",
-                    fontSize: 12,
-                    cursor: "pointer",
-                  }}
-                >
-                  Delete
-                </button>
+                <div style={{ position: "relative" }}>
+                  <HiDotsVertical
+                    size={14}
+                    style={{ cursor: "pointer", color: "#888" }}
+                    onClick={() => setMenuOpenId(menuOpenId === r._id ? null : r._id)}
+                  />
+                  {menuOpenId === r._id && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: 18,
+                        right: 0,
+                        background: "#222",
+                        borderRadius: 4,
+                        padding: "4px 8px",
+                        fontSize: 12,
+                        color: "#f55",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => handleDelete(r._id)}
+                    >
+                      Delete
+                    </div>
+                  )}
+                </div>
               )}
             </div>
-          );
-        })}
+            <div
+              style={{ cursor: "pointer", display: "flex", alignItems: "center", marginTop: 4 }}
+              onClick={() => handleReplyLike(r._id)}
+            >
+              {isLikedByMe ? (
+                <AiFillHeart size={16} color="#B327F6" />
+              ) : (
+                <AiOutlineHeart size={16} color="#888" />
+              )}
+              <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>
+                {r.likes?.length || 0}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
+    );
+  })}
+</div>
+
 
       {/* Input field */}
       <div
