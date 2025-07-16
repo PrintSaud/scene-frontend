@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
-import { FaImage } from "react-icons/fa6";
+import { FaImage, FaStar, FaRegStar, FaStarHalfAlt } from "react-icons/fa6";
 import { BiSolidFileGif } from "react-icons/bi";
 import { FiSend } from "react-icons/fi";
 import { addLogReply, likeReply, getRepliesForLog, deleteReply } from "../../api/api";
@@ -15,6 +15,21 @@ const getRelativeTime = (date) => {
   if (min < 60) return `${min}min`;
   if (hr < 24) return `${hr}h`;
   return `${day}d`;
+};
+
+const renderStars = (rating) => {
+  const stars = [];
+  const roundedRating = Math.round(rating * 2) / 2; // round to nearest 0.5
+  for (let i = 1; i <= 5; i++) {
+    if (roundedRating >= i) {
+      stars.push(<FaStar key={i} size={12} color="#f5c518" />);
+    } else if (roundedRating + 0.5 === i) {
+      stars.push(<FaStarHalfAlt key={i} size={12} color="#f5c518" />);
+    } else {
+      stars.push(<FaRegStar key={i} size={12} color="#555" />);
+    }
+  }
+  return stars;
 };
 
 export default function RepliesPage() {
@@ -85,8 +100,6 @@ export default function RepliesPage() {
     fetchReplies();
   }, [id]);
 
-  
-
   return (
     <div
       style={{
@@ -100,7 +113,8 @@ export default function RepliesPage() {
       }}
     >
       {/* Header */}
-      <div style={{
+      <div
+        style={{
           position: "absolute",
           top: 12,
           left: 12,
@@ -108,32 +122,32 @@ export default function RepliesPage() {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          zIndex: 5
-        }}>
-          <button
-            onClick={() => navigate(-1)}
-            style={{
-              background: "rgba(0,0,0,0.5)",
-              border: "none",
-              borderRadius: "50%",
-              width: "32px",
-              height: "32px",
-              color: "#fff",
-              fontSize: "18px",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-          >
-            ←
-          </button>
-        
-        <h3 style={{ marginLeft: "8px", fontSize: "18px" }}>Comments</h3>
+          zIndex: 5,
+        }}
+      >
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            background: "rgba(0,0,0,0.5)",
+            border: "none",
+            borderRadius: "50%",
+            width: "32px",
+            height: "32px",
+            color: "#fff",
+            fontSize: "18px",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          ←
+        </button>
+        <h3 style={{ fontSize: "18px" }}>Comments</h3>
       </div>
 
       {/* Replies list */}
-      <div ref={listRef} style={{ padding: "0 16px" }}>
+      <div ref={listRef} style={{ padding: "56px 16px 0 16px" }}>
         {replies.length === 0 && (
           <div style={{ textAlign: "center", marginTop: 40, color: "#888", fontSize: 14 }}>
             No comments yet. Be the first to reply!
@@ -156,7 +170,6 @@ export default function RepliesPage() {
                 gap: 10,
               }}
             >
-              {/* Avatar navigates to profile */}
               <img
                 src={r.avatar || "/default-avatar.jpg"}
                 alt="avatar"
@@ -168,36 +181,38 @@ export default function RepliesPage() {
                 }}
                 onClick={() => navigate(`/profile/${r.userId}`)}
               />
-
-              <div style={{ flex: 1 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  {/* Username navigates to profile */}
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                    cursor: "pointer",
+                  }}
+                  onClick={() => navigate(`/profile/${r.userId}`)}
+                >
                   <strong
                     style={{
                       fontSize: 14,
-                      cursor: "pointer",
                       fontFamily: "Inter, sans-serif",
                     }}
-                    onClick={() => navigate(`/profile/${r.userId}`)}
                   >
                     @{r.username}
                   </strong>
-
-                  {/* Rating formatted like other pages */}
-                  {r.ratingForThisMovie && (
-                    <span style={{ fontSize: 12, color: "#ccc", fontFamily: "Inter, sans-serif" }}>
-                      {r.ratingForThisMovie.toFixed(1)}
-                    </span>
-                  )}
+                  {r.ratingForThisMovie && renderStars(r.ratingForThisMovie)}
                 </div>
-
-                {/* Comment text in Inter font */}
-                <span style={{ fontSize: 14, color: "#ddd", fontFamily: "Inter, sans-serif" }}>
+                <div
+                  style={{
+                    fontSize: 14,
+                    color: "#ddd",
+                    fontFamily: "Inter, sans-serif",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
                   {r.text}
-                </span>
+                </div>
               </div>
-
-              {/* Timestamp + Like */}
               <div style={{ textAlign: "right" }}>
                 <div style={{ fontSize: 10, color: "#888" }}>
                   {getRelativeTime(r.createdAt)}
@@ -228,7 +243,7 @@ export default function RepliesPage() {
           bottom: 0,
           left: 0,
           width: "100%",
-          padding: "14px 16px",
+          padding: "12px 12px",
           background: "#0e0e0e",
           borderTop: "1px solid #222",
           display: "flex",
@@ -245,7 +260,7 @@ export default function RepliesPage() {
           onKeyDown={(e) => e.key === "Enter" && handleSend()}
           placeholder="Write a comment..."
           style={{
-            flex: 1,
+            flex: "0 0 75%",
             padding: "12px 16px",
             borderRadius: "999px",
             border: "1px solid #444",
