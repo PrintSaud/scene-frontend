@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
-import { FaImage, FaStar, FaRegStar, FaStarHalfAlt } from "react-icons/fa6";
+import { FaImage, FaStar, FaRegStar } from "react-icons/fa6";
 import { BiSolidFileGif } from "react-icons/bi";
 import { FiSend } from "react-icons/fi";
 import { addLogReply, likeReply, getRepliesForLog, deleteReply } from "../../api/api";
@@ -19,18 +19,19 @@ const getRelativeTime = (date) => {
 
 const renderStars = (rating) => {
   const stars = [];
-  const roundedRating = Math.round(rating * 2) / 2; // round to nearest 0.5
+  const roundedRating = Math.round(rating); // Round to nearest integer
   for (let i = 1; i <= 5; i++) {
-    if (roundedRating >= i) {
-      stars.push(<FaStar key={i} size={12} color="#f5c518" />);
-    } else if (roundedRating + 0.5 === i) {
-      stars.push(<FaStarHalfAlt key={i} size={12} color="#f5c518" />);
-    } else {
-      stars.push(<FaRegStar key={i} size={12} color="#555" />);
-    }
+    stars.push(
+      i <= roundedRating ? (
+        <FaStar key={i} size={12} color="#f5c518" />
+      ) : (
+        <FaRegStar key={i} size={12} color="#555" />
+      )
+    );
   }
   return stars;
 };
+
 
 export default function RepliesPage() {
   const { id } = useParams();
