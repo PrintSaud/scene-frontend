@@ -16,11 +16,12 @@ export default function ReviewHeader({
   const navigate = useNavigate();
   const [showOptions, setShowOptions] = useState(false);
 
-
-  
-  const backdropUrl = review.movie?.backdrop_path
+    const backdropUrl = review.customBackdrop
+  ? review.customBackdrop
+  : review.movie?.backdrop_path
     ? `https://image.tmdb.org/t/p/original${review.movie.backdrop_path}`
     : "/default-backdrop.jpg";
+
 
   const avatarUrl = review.user?.avatar
     ? review.user.avatar

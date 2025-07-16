@@ -17,6 +17,7 @@ export default function ReviewPage() {
   const [moreReviews, setMoreReviews] = useState([]);
   const user = JSON.parse(localStorage.getItem("user")) || {};
   const userId = user._id;
+  const handleChangeBackdrop = () => navigate(`/review/${id}/change-backdrop`);
 
   // Add this helper at the top of ReviewPage.jsx, before the component:
 
@@ -97,13 +98,15 @@ function getRelativeTime(date) {
 
   return (
     <div style={{ backgroundColor: "#0e0e0e", color: "#fff", minHeight: "100vh" }}>
-      <ReviewHeader
-        review={review}
-        userId={userId}
-        onLike={handleLike}
-        onReply={handleReply}
-        onProfile={handleProfile}
-      />
+<ReviewHeader
+  review={review}
+  userId={userId}
+  onLike={handleLike}
+  onReply={handleReply}
+  onProfile={handleProfile}
+  onChangeBackdrop={() => navigate(`/review/${review._id}/change-backdrop`)}
+/>
+
 
       {/* 💬 Comments section */}
       <div style={{ marginTop: 24 }}>

@@ -21,7 +21,7 @@ import TrendingPage from "./pages/TrendingPage";
 import SearchPage from './pages/SearchPage';
 import ProfilePage from "./pages/ProfilePage";
 import ReviewPage from "./components/review/ReviewPage";
-import BackdropSearchPage from "./pages/BackdropSearchPage";
+import BackdropSearchPage from "./pages/ChangeBackdropPage";
 import AvatarUploadTestPage from "./pages/AvatarUploadTestPage";
 import EditProfilePage from "./pages/EditProfilePage";
 import NotificationsPage from "./pages/NotificationsPage";
@@ -39,6 +39,7 @@ import PersonPage from "./pages/PersonPage";
 import UploadAvatarPage from './pages/UploadAvatarPage';
 import ShareListPage from './pages/ShareListPage';
 import RepliesPage from "./components/review/RepliesPage";
+import ChangeReviewBackdropPage from "./pages/ChangeReviewBackdropPage";
 
 function App() {
   const location = useLocation();
@@ -144,6 +145,7 @@ setHasUnread(unread.length > 0);
           <Route path="/profile/:id" element={<ProfilePage />} />
           <Route path="/profile/" element={<ProfilePage />} />
           <Route path="/review/:id" element={<ReviewPage />} />
+          <Route path="/review/:id/change-backdrop" element={<ChangeReviewBackdropPage />} />
           <Route path="/edit-profile" element={<EditProfilePage />} />
           <Route path="/choose-backdrop" element={<BackdropSearchPage />} />
           <Route path="/avatar-upload-test" element={<AvatarUploadTestPage />} />
