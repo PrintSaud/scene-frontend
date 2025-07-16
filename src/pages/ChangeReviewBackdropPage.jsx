@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "../api/api";
 import { useNavigate, useParams } from "react-router-dom";
 import { backend } from "../config";
+import toast from "react-hot-toast"; // make sure you have this imported
 
 export default function ChangeReviewBackdropPage() {
   const { id } = useParams(); // This is the reviewId (logId)
@@ -44,14 +45,22 @@ export default function ChangeReviewBackdropPage() {
     }, 100);
   };
 
-  const handleSave = () => {
+
+  const handleSave = async () => {
     if (!selectedBackdrop) return;
-    localStorage.setItem(
-      `chosenBackdrop:${id}`,
-      selectedBackdrop
-    );
-    navigate(-1);
+    try {
+      await axios.patch(`${backend}/api/logs/${id}/backdrop`, {
+        backdrop: selectedBackdrop
+      });
+      toast.success("Backdrop updated successfully!");
+      navigate(`/review/${id}`);
+    } catch (err) {
+      console.error("Failed to update backdrop:", err);
+      toast.error("Failed to update backdrop. Please try again.");
+    }
   };
+  
+  
 
   return (
     <div style={{ background: "#0e0e0e", color: "#fff", minHeight: "100vh", padding: "24px", paddingBottom: "140px" }}>
