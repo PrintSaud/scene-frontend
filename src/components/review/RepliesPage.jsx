@@ -220,100 +220,105 @@ export default function RepliesPage() {
             onClick={() => navigate(`/profile/${r.userId}`)}
           />
           <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                cursor: "pointer",
-              }}
-              onClick={() => navigate(`/profile/${r.userId}`)}
-            >
-              <strong
-                style={{
-                  fontSize: 14,
-                  fontFamily: "Inter, sans-serif",
-                  fontWeight: 400,
-                  color: "#ddd",
-                }}
-              >
-                @{r.username}
-              </strong>
-              {r.ratingForThisMovie && <StarRating rating={r.ratingForThisMovie} size={12} />}
-            </div>
-            <span
-              style={{
-                fontSize: 14,
-                color: "#ddd",
-                fontFamily: "Inter, sans-serif",
-                display: "block",
-                marginTop: 2,
-              }}
-            >
-              {r.text}
-            </span>
-            {r.gif && (
-              <img
-                src={r.gif}
-                alt="gif"
-                style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }}
-              />
-            )}
-            {r.image && (
-              <img
-                src={r.image}
-                alt="img"
-                style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }}
-              />
-            )}
-          </div>
+  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+    <strong
+      style={{
+        fontSize: 14,
+        fontFamily: "Inter, sans-serif",
+        fontWeight: 400,
+        color: "#ddd",
+        cursor: "pointer",
+      }}
+      onClick={() => navigate(`/profile/${r.userId}`)}
+    >
+      @{r.username}
+    </strong>
 
-          {/* Timestamp + Like + 3-dots menu */}
-          <div style={{ textAlign: "right" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <div style={{ fontSize: 10, color: "#888" }}>{getRelativeTime(r.createdAt)}</div>
-              {r.userId === userId && (
-                <div style={{ position: "relative" }}>
-                  <HiDotsVertical
-                    size={14}
-                    style={{ cursor: "pointer", color: "#888" }}
-                    onClick={() => setMenuOpenId(menuOpenId === r._id ? null : r._id)}
-                  />
-                  {menuOpenId === r._id && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: 18,
-                        right: 0,
-                        background: "#222",
-                        borderRadius: 4,
-                        padding: "4px 8px",
-                        fontSize: 12,
-                        color: "#f55",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => handleDelete(r._id)}
-                    >
-                      Delete
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-            <div
-              style={{ cursor: "pointer", display: "flex", alignItems: "center", marginTop: 4 }}
-              onClick={() => handleReplyLike(r._id)}
-            >
-              {isLikedByMe ? (
-                <AiFillHeart size={16} color="#B327F6" />
-              ) : (
-                <AiOutlineHeart size={16} color="#888" />
-              )}
-              <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>
-                {r.likes?.length || 0}
-              </span>
-            </div>
-          </div>
+    {/* ⭐️ Star rating */}
+    {r.ratingForThisMovie && (
+      <StarRating rating={r.ratingForThisMovie} size={12} />
+    )}
+
+    {/* 🕒 Timestamp next to stars */}
+    <span style={{ fontSize: 10, color: "#888" }}>
+      {getRelativeTime(r.createdAt)}
+    </span>
+  </div>
+
+  {/* 💬 Comment text */}
+  <span
+    style={{
+      fontSize: 14,
+      color: "#ddd",
+      fontFamily: "Inter, sans-serif",
+      display: "block",
+      marginTop: 2,
+    }}
+  >
+    {r.text}
+  </span>
+
+  {/* Optional gif/photo previews */}
+  {r.gif && (
+    <img
+      src={r.gif}
+      alt="gif"
+      style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }}
+    />
+  )}
+  {r.image && (
+    <img
+      src={r.image}
+      alt="img"
+      style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }}
+    />
+  )}
+</div>
+
+{/* 💡 3-dots + like stacked to right */}
+<div style={{ textAlign: "right" }}>
+  {r.userId === userId && (
+    <div style={{ position: "relative" }}>
+      <HiDotsVertical
+        size={14}
+        style={{ cursor: "pointer", color: "#888", marginBottom: 4 }}
+        onClick={() => setMenuOpenId(menuOpenId === r._id ? null : r._id)}
+      />
+      {menuOpenId === r._id && (
+        <div
+          style={{
+            position: "absolute",
+            top: 18,
+            right: 0,
+            background: "#222",
+            borderRadius: 4,
+            padding: "4px 8px",
+            fontSize: 12,
+            color: "#f55",
+            cursor: "pointer",
+          }}
+          onClick={() => handleDelete(r._id)}
+        >
+          Delete
+        </div>
+      )}
+    </div>
+  )}
+  <div
+    style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+    onClick={() => handleReplyLike(r._id)}
+  >
+    {isLikedByMe ? (
+      <AiFillHeart size={16} color="#B327F6" />
+    ) : (
+      <AiOutlineHeart size={16} color="#888" />
+    )}
+    <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>
+      {r.likes?.length || 0}
+    </span>
+  </div>
+</div>
+
         </div>
       </div>
     );
