@@ -18,8 +18,8 @@ export default function ChangePosterModal({ movieId, onClose }) {
     const fetchPosters = async () => {
       try {
         const { data } = await axios.get(
-          `https://api.themoviedb.org/3/movie/${movieId}/images?api_key=${TMDB_KEY}&include_image_language=en,null`
-        );
+            `${backend}/api/logs/proxy/tmdb/images/${movieId}`
+          );          
         const sorted = (data.posters || []).sort(
           (a, b) => (b.vote_count || 0) - (a.vote_count || 0)
         );
