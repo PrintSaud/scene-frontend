@@ -79,16 +79,18 @@ export default function RepliesPage() {
     }, 100);
   };
 
+  
   const handleDelete = async (replyId) => {
     const confirmDelete = window.confirm("Delete this reply?");
     if (!confirmDelete) return;
     try {
-      await deleteReply(id, replyId);
-      fetchReplies();
+      await axios.delete(`${backend}/api/logs/${id}/replies/${replyId}`);
+      fetchReplies(); // Refresh after deletion
     } catch (err) {
       console.error("Failed to delete reply", err);
     }
   };
+  
 
   const handlePickImage = () => {
     const input = document.createElement("input");
@@ -353,7 +355,7 @@ export default function RepliesPage() {
     onClick={handlePickGif}
   />
 
-{/* Input field with preview */}
+{/* Input footer */}
 <div
   style={{
     position: "fixed",
@@ -362,60 +364,54 @@ export default function RepliesPage() {
     width: "100%",
     background: "#0e0e0e",
     borderTop: "1px solid #222",
-    padding: selectedGif || selectedImage ? "12px" : "12px 12px",
     zIndex: 99,
   }}
 >
-{(selectedGif || selectedImage) && (
+  {/* Preview container inside fixed footer */}
+  {(selectedGif || selectedImage) && (
+    <div style={{ padding: "8px 12px", position: "relative" }}>
+      <img
+        src={selectedGif || selectedImage}
+        alt="preview"
+        style={{
+          width: "100%",
+          borderRadius: 8,
+          objectFit: "cover",
+          maxHeight: 180,
+        }}
+      />
+      <button
+        onClick={() => {
+          setSelectedGif("");
+          setSelectedImage("");
+        }}
+        style={{
+          position: "absolute",
+          top: 4,
+          right: 4,
+          background: "rgba(0,0,0,0.6)",
+          border: "none",
+          borderRadius: "50%",
+          width: 24,
+          height: 24,
+          color: "#fff",
+          fontSize: 14,
+          cursor: "pointer",
+        }}
+      >
+        ×
+      </button>
+    </div>
+  )}
+
+  {/* Input row */}
   <div
     style={{
-      position: "fixed",
-      bottom: 60, // ensure it sits just above input
-      left: 12,
-      right: 12,
-      backgroundColor: "#1a1a1a",
-      borderRadius: 8,
-      padding: 4,
-      zIndex: 100,
+      display: "flex",
+      alignItems: "center",
+      padding: "12px 12px",
     }}
   >
-    <img
-      src={selectedGif || selectedImage}
-      alt="preview"
-      style={{
-        width: "100%",
-        maxHeight: 200,
-        objectFit: "cover",
-        borderRadius: 8,
-      }}
-    />
-    <button
-      onClick={() => {
-        setSelectedGif("");
-        setSelectedImage("");
-      }}
-      style={{
-        position: "absolute",
-        top: 6,
-        right: 6,
-        background: "rgba(0,0,0,0.5)",
-        border: "none",
-        borderRadius: "50%",
-        width: 24,
-        height: 24,
-        color: "#fff",
-        fontSize: 14,
-        cursor: "pointer",
-      }}
-    >
-      ×
-    </button>
-  </div>
-)}
-
-
-  {/* Row: image/gif picker + input + send */}
-  <div style={{ display: "flex", alignItems: "center" }}>
     <FaImage
       size={20}
       style={{ cursor: "pointer", color: "#888", marginRight: 8 }}
@@ -434,7 +430,6 @@ export default function RepliesPage() {
       placeholder="Write a comment..."
       style={{
         flex: "0 0 60%",
-        minHeight: selectedGif || selectedImage ? 48 : 36,
         padding: "12px 16px",
         borderRadius: "999px",
         border: "1px solid #444",
@@ -443,17 +438,16 @@ export default function RepliesPage() {
         fontSize: "15px",
         fontFamily: "Inter, sans-serif",
         outline: "none",
-        height: 40, 
       }}
     />
     <button
       onClick={handleSend}
       style={{
-        marginLeft: 8,
+        marginLeft: "8px",
         background: "transparent",
         border: "none",
         color: "#fff",
-        fontSize: 22,
+        fontSize: "22px",
         cursor: "pointer",
       }}
     >
@@ -461,6 +455,7 @@ export default function RepliesPage() {
     </button>
   </div>
 </div>
+
 
 </div>
 
