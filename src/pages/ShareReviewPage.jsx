@@ -17,7 +17,10 @@ export default function ShareReviewPage() {
   }, [id]);
 
   const handleSaveImage = () => {
-    html2canvas(document.querySelector("#share-card")).then(canvas => {
+    html2canvas(document.querySelector("#share-card"), {
+      useCORS: true,
+      backgroundColor: "#000"
+    }).then(canvas => {
       const link = document.createElement("a");
       link.download = `scene-review-${review.title}.png`;
       link.href = canvas.toDataURL();
@@ -25,8 +28,6 @@ export default function ShareReviewPage() {
       alert("✅ Saved! Check your device's Downloads folder.");
     });
   };
-  
-  
 
   const handleExitPreview = () => {
     if (previewMode) setPreviewMode(false);
@@ -37,11 +38,11 @@ export default function ShareReviewPage() {
   return (
     <div
       style={{
-        background: "#0e0e0e",
+        background: "#000",
         minHeight: "100vh",
         position: "relative",
         overflowY: "auto",
-        paddingBottom: 80 // Extra scroll space
+        paddingBottom: 80
       }}
       onClick={handleExitPreview}
     >
@@ -83,64 +84,67 @@ export default function ShareReviewPage() {
         </div>
       )}
 
-{/* Card */}
-<div id="share-card" style={{
-  maxWidth: 360,
-  margin: "100px auto 40px",
-  background: "#0e0e0e",
-  borderRadius: 12,
-  padding: 16,
-  textAlign: "center",
-  color: "#fff"
-}}>
-  {/* Poster smaller (~80%) */}
-  <img
-    src={review.poster ? `${backend}/api/logs/proxy/tmdb?url=${encodeURIComponent(review.poster)}` : "/default-poster.jpg"}
-    alt="Poster"
-    style={{ width: "80%", borderRadius: 8 }}
-  />
+      {/* Card */}
+      <div id="share-card" style={{
+        maxWidth: 360,
+        margin: "100px auto 40px",
+        background: "#000",
+        borderRadius: 12,
+        padding: 16,
+        textAlign: "center",
+        color: "#fff"
+      }}>
+        {/* Poster smaller (~80%) */}
+        <img
+          src={review.poster ? `${backend}/api/logs/proxy/tmdb?url=${encodeURIComponent(review.poster)}` : "/default-poster.jpg"}
+          alt="Poster"
+          style={{ width: "80%", borderRadius: 8 }}
+          crossOrigin="anonymous"
+        />
 
-  <div style={{ marginTop: 16 }}>
-    {/* User info */}
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-      <img src={review.user?.avatar || "/default-avatar.jpg"} alt="avatar"
-        style={{ width: 40, height: 40, borderRadius: "50%" }}
-      />
-      <strong>@{review.user?.username}</strong>
-    </div>
+        <div style={{ marginTop: 16 }}>
+          {/* User info */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+            <img
+              src={review.user?.avatar || "/default-avatar.jpg"}
+              alt="avatar"
+              style={{ width: 40, height: 40, borderRadius: "50%" }}
+              crossOrigin="anonymous"
+            />
+            <strong>@{review.user?.username}</strong>
+          </div>
 
-    {/* Dynamic "I’ve rated [movie]" text */}
-    <div style={{
-      marginTop: 8,
-      fontWeight: 500,
-      fontSize: 14,
-      fontFamily: "Inter, sans-serif",
-      color: "#aaa"
-    }}>
-      I’ve rated <strong>{review.movie?.title}</strong>
-    </div>
+          {/* Dynamic "I’ve rated [movie]" text */}
+          <div style={{
+            marginTop: 8,
+            fontWeight: 500,
+            fontSize: 14,
+            fontFamily: "Inter, sans-serif",
+            color: "#aaa"
+          }}>
+            I’ve rated <strong>{review.movie?.title}</strong>
+          </div>
 
-    {/* Star rating centered */}
-    <div style={{ marginTop: 12, display: "flex", justifyContent: "center" }}>
-      <StarRating rating={review.rating} size={22} />
-    </div>
+          {/* Star rating centered */}
+          <div style={{ marginTop: 12, display: "flex", justifyContent: "center" }}>
+            <StarRating rating={review.rating} size={22} />
+          </div>
 
-{/* "on" + Scene logo with gray lines */}
-<div style={{ marginTop: 10, fontSize: 14, fontFamily: "Inter, sans-serif", color: "#aaa" }}>on</div>
-<div style={{
-  marginTop: -8,  // even tighter spacing below "on"
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: 12
-}}>
-  <div style={{ flex: 1, height: 1, background: "#555" }} />
-  <img src="/default-avatarc.png" alt="Scene logo" style={{ width: 90, objectFit: "contain" }} />
-  <div style={{ flex: 1, height: 1, background: "#555" }} />
-</div>
-  </div>
-</div>
-
+          {/* "on" + Scene logo with gray lines */}
+          <div style={{ marginTop: 10, fontSize: 14, fontFamily: "Inter, sans-serif", color: "#aaa" }}>on</div>
+          <div style={{
+            marginTop: -4,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 12
+          }}>
+            <div style={{ flex: 1, height: 1, background: "#555" }} />
+            <img src="/default-avatarc.png" alt="Scene logo" style={{ width: 90, objectFit: "contain" }} />
+            <div style={{ flex: 1, height: 1, background: "#555" }} />
+          </div>
+        </div>
+      </div>
 
       {/* Navbar hidden when previewMode is true */}
       {!previewMode && (
@@ -150,11 +154,11 @@ export default function ShareReviewPage() {
           left: 0,
           right: 0,
           height: 56,
-          background: "transparent",  // transparent background
-  borderTop: "none",          // remove border line
+          background: "transparent",
+          borderTop: "none",
           zIndex: 15
         }}>
-          {/* Optional: Add your actual nav bar icons here */}
+          {/* Optional nav icons */}
         </div>
       )}
     </div>
