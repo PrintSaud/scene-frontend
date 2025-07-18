@@ -96,11 +96,12 @@ export default function ShareReviewPage() {
       }}>
         {/* Poster smaller (~80%) */}
         <img
-          src={review.poster ? `${backend}/api/logs/proxy/tmdb?url=${encodeURIComponent(review.poster)}` : "/default-poster.jpg"}
-          alt="Poster"
-          style={{ width: "80%", borderRadius: 8 }}
-          crossOrigin="anonymous"
-        />
+  src={review.poster ? `${backend}/api/logs/proxy/tmdb?url=${encodeURIComponent(review.poster)}` : "/default-poster.jpg"}
+  alt="Poster"
+  style={{ width: "70%", borderRadius: 8 }}
+  crossOrigin="anonymous"
+/>
+
 
         <div style={{ marginTop: 16 }}>
           {/* User info */}
