@@ -6,7 +6,6 @@ import { backend } from "../config";
 import { FiEye, FiDownload } from "react-icons/fi";
 import StarRating from "../components/StarRating";
 
-
 export default function ShareReviewPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -38,8 +37,8 @@ export default function ShareReviewPage() {
         background: "#0e0e0e",
         minHeight: "100vh",
         position: "relative",
-        overflowY: "auto", // ✅ allows scrolling comfortably
-        paddingBottom: 60 // ✅ extra space at bottom
+        overflowY: "auto",
+        paddingBottom: 90 // Extra scroll space
       }}
       onClick={handleExitPreview}
     >
@@ -47,7 +46,7 @@ export default function ShareReviewPage() {
       {!previewMode && (
         <div style={{
           position: "fixed", top: 16, left: 16, right: 16,
-          display: "flex", justifyContent: "space-between", alignItems: "center", zIndex: 10
+          display: "flex", justifyContent: "space-between", alignItems: "center", zIndex: 20
         }}>
           <button
             onClick={() => navigate(-1)}
@@ -60,7 +59,7 @@ export default function ShareReviewPage() {
           </button>
           <div style={{ display: "flex", gap: 8 }}>
             <button
-              onClick={(e) => { e.stopPropagation(); setPreviewMode(!previewMode); }}
+              onClick={(e) => { e.stopPropagation(); setPreviewMode(true); }}
               style={{
                 background: "rgba(0,0,0,0.5)", border: "none", borderRadius: "50%",
                 width: 36, height: 36, color: "#fff", fontSize: 16, cursor: "pointer"
@@ -94,6 +93,7 @@ export default function ShareReviewPage() {
         <img src={review.poster} alt="Poster" style={{ width: "100%", borderRadius: 8 }} />
 
         <div style={{ marginTop: 16 }}>
+          {/* User info */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
             <img src={review.user?.avatar || "/default-avatar.jpg"} alt="avatar"
               style={{ width: 40, height: 40, borderRadius: "50%" }}
@@ -101,29 +101,50 @@ export default function ShareReviewPage() {
             <strong>@{review.user?.username}</strong>
           </div>
 
-          {/* Movie name in text */}
-          <div style={{ marginTop: 8, fontWeight: 500, fontSize: 14 }}>
-            i’ve rated <strong>{review.title}</strong>
+          {/* Dynamic "I’ve rated [movie]" text */}
+          <div style={{
+            marginTop: 8,
+            fontWeight: 500,
+            fontSize: 14,
+            fontFamily: "Inter, sans-serif",
+            color: "#aaa"
+          }}>
+            I’ve rated <strong>{review.title}</strong>
           </div>
 
-          {/* Proper Scene StarRating */}
-          <div style={{ marginTop: 10 }}>
+          {/* Star rating centered */}
+          <div style={{ marginTop: 12, display: "flex", justifyContent: "center" }}>
             <StarRating rating={review.rating} size={22} />
           </div>
 
-          {/* "on" text */}
-          <div style={{ marginTop: 14, color: "#aaa", fontSize: 14 }}>
-            on
+          {/* "on" + Scene logo with gray lines */}
+          <div style={{ marginTop: 14, fontSize: 14, fontFamily: "Inter, sans-serif", color: "#aaa" }}>on</div>
+          <div style={{
+            marginTop: 8, display: "flex",
+            alignItems: "center", justifyContent: "center", gap: 12
+          }}>
+            <div style={{ flex: 1, height: 1, background: "#555" }} />
+            <img src="/default-avatarc.png" alt="Scene logo" style={{ width: 90, objectFit: "contain" }} />
+            <div style={{ flex: 1, height: 1, background: "#555" }} />
           </div>
-
-          {/* Scene logo with gray lines */}
-          <div style={{ marginTop: 8, display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
-  <div style={{ flex: 1, height: 1, background: "#555" }} />
-  <img src="/default-avatarc.png" alt="Scene logo" style={{ width: 72, objectFit: "contain" }} />
-  <div style={{ flex: 1, height: 1, background: "#555" }} />
-</div>
         </div>
       </div>
+
+      {/* Navbar hidden when previewMode is true */}
+      {!previewMode && (
+        <div style={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: 56,
+          background: "#000",
+          borderTop: "1px solid #222",
+          zIndex: 15
+        }}>
+          {/* Optional: Add your actual nav bar icons here */}
+        </div>
+      )}
     </div>
   );
 }
