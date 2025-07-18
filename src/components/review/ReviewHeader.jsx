@@ -136,7 +136,7 @@ export default function ReviewHeader({
                       { label: "🎨 Change Backdrop", onClick: onChangeBackdrop },
                       { label: "✏️ Edit Review/Log", onClick: onEdit },
                       { label: "🗑️ Delete Review/Log", onClick: onDelete },
-                      { label: "🔗 Copy Link", onClick: handleShare }
+                      { label: "📤 Share", onClick: () => navigate(`/share-review/${review._id}`) }
                     ]
                   : [
                       { label: "🔗 Copy Link", onClick: handleShare }

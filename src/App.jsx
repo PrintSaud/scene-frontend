@@ -166,6 +166,7 @@ setHasUnread(unread.length > 0);
           <Route path="/director/:id" element={<PersonPage isDirector={true} />} />
           <Route path="/upload-avatar" element={<UploadAvatarPage />} />
           <Route path="/share/:id" element={<ShareListPage />} />
+          <Route path="/share-review/:id" element={<ShareReviewPage />} />
           <Route path="/review/:id/replies" element={<RepliesPage />} />
           <Route path="/replies/:id" element={<RepliesPage />} />
 
