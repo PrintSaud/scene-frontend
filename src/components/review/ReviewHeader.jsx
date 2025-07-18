@@ -120,9 +120,9 @@ export default function ReviewHeader({
 
             {showOptions && (
                 <div style={{
-                    position: "absolute",
-                    top: "38px",
-                    right: "0",
+                    position: "fixed",
+top: "56px",   // Adjust depending on button position (56px might match where ⋯ icon is on screen)
+right: "12px", // Ensure alignment
                     background: "#1a1a1a",
                     border: "1px solid #333",
                     borderRadius: "12px",
