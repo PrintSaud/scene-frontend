@@ -131,19 +131,19 @@ export default function ShareReviewPage() {
             <StarRating rating={review.rating} size={22} />
           </div>
 
-          {/* "on" + Scene logo with gray lines */}
-          <div style={{ marginTop: 10, fontSize: 14, fontFamily: "Inter, sans-serif", color: "#aaa" }}>on</div>
-          <div style={{
-            marginTop: -4,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 12
-          }}>
-            <div style={{ flex: 1, height: 1, background: "#555" }} />
-            <img src="/default-avatarc.png" alt="Scene logo" style={{ width: 90, objectFit: "contain" }} />
-            <div style={{ flex: 1, height: 1, background: "#555" }} />
-          </div>
+{/* "on" + Scene logo with gray lines */}
+<div style={{ marginTop: 4, fontSize: 14, fontFamily: "Inter, sans-serif", color: "#aaa" }}>on</div>
+<div style={{
+  marginTop: -4,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 12
+}}>
+  <div style={{ flex: 1, height: 1, background: "#555" }} />
+  <img src="/default-avatarc.png" alt="Scene logo" style={{ width: 90, objectFit: "contain" }} />
+  <div style={{ flex: 1, height: 1, background: "#555" }} />
+</div>
         </div>
       </div>
 
