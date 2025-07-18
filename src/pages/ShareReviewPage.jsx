@@ -1,3 +1,9 @@
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
+import html2canvas from "html2canvas";
+import { backend } from "../config"; // Adjust if you have a backend config export
+
 export default function ShareReviewPage() {
     const { id } = useParams();
     const [review, setReview] = useState(null);
