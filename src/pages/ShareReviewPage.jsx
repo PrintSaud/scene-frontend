@@ -132,7 +132,7 @@ export default function ShareReviewPage() {
           </div>
 
 {/* "on" + Scene logo with gray lines */}
-<div style={{ marginTop: 4, fontSize: 14, fontFamily: "Inter, sans-serif", color: "#aaa" }}>on</div>
+<div style={{ marginTop: 1, fontSize: 14, fontFamily: "Inter, sans-serif", color: "#aaa" }}>on</div>
 <div style={{
   marginTop: -4,
   display: "flex",
