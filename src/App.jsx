@@ -40,6 +40,7 @@ import UploadAvatarPage from './pages/UploadAvatarPage';
 import ShareListPage from './pages/ShareListPage';
 import RepliesPage from "./components/review/RepliesPage";
 import ChangeReviewBackdropPage from "./pages/ChangeReviewBackdropPage";
+import ShareReviewPage from "./pages/ShareReviewPage";
 
 function App() {
   const location = useLocation();
