@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import toast from "react-hot-toast";
 import StarRating from "../StarRating";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
@@ -15,6 +16,7 @@ export default function ReviewHeader({
 }) {
   const navigate = useNavigate();
   const [showOptions, setShowOptions] = useState(false);
+  const onEdit = () => navigate(`/log/${review._id}`);
 
     const backdropUrl = review.customBackdrop
   ? review.customBackdrop
@@ -58,8 +60,10 @@ export default function ReviewHeader({
   const handleCopyLink = () => {
     const link = `${window.location.origin}/review/${review._id}`;
     navigator.clipboard.writeText(link);
-    alert("🔗 Link copied to clipboard!");
+    toast.success("🔗 Link copied!");
+    setShowOptions(false);
   };
+  
   
 
   return (
