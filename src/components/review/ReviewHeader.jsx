@@ -5,189 +5,111 @@ import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 
 export default function ReviewHeader({
-  review,
-  userId,
-  onLike,
-  onReply,
-  onProfile,
-  onChangeBackdrop,
-  onEdit,
-  onDelete
-}) {
-  const navigate = useNavigate();
-  const [showOptions, setShowOptions] = useState(false);
-
-  const handleEdit = () => navigate(`/log/${review._id}`);
-
-
+    review,
+    userId,
+    onLike,
+    onReply,
+    onProfile,
+    onChangeBackdrop,
+    onEdit,
+    onDelete
+  }) {
+    const navigate = useNavigate();
+    const [showOptions, setShowOptions] = useState(false);
+  
+    const handleCopyLink = () => {
+      const link = `${window.location.origin}/review/${review._id}`;
+      navigator.clipboard.writeText(link);
+      toast.success("🔗 Link copied!");
+      setShowOptions(false);
+    };
+  
     const backdropUrl = review.customBackdrop
-  ? review.customBackdrop
-  : review.movie?.backdrop_path
-    ? `https://image.tmdb.org/t/p/original${review.movie.backdrop_path}`
-    : "/default-backdrop.jpg";
-
-
-  const avatarUrl = review.user?.avatar
-    ? review.user.avatar
-    : "/default-avatar.jpg";
-
+      ? review.customBackdrop
+      : review.movie?.backdrop_path
+        ? `https://image.tmdb.org/t/p/original${review.movie.backdrop_path}`
+        : "/default-backdrop.jpg";
+  
+    const avatarUrl = review.user?.avatar
+      ? review.user.avatar
+      : "/default-avatar.jpg";
+  
     const getRelativeTime = (date) => {
-        const now = Date.now();
-        const then = new Date(date).getTime();
-        const diff = now - then;
-      
-        const min = Math.floor(diff / 60000);
-        const hr = Math.floor(diff / 3600000);
-        const day = Math.floor(diff / 86400000);
-      
-        if (min < 1) return "Just now";
-        if (min < 60) return `${min}min ago`;
-        if (hr < 24) return `${hr}h ago`;
-        if (day <= 7) return `${day}d ago`;
-      
-        const d = new Date(date);
-        return `${d.getDate()} ${d.toLocaleString('default', { month: 'short' })}`;
-      };
-
+      const now = Date.now();
+      const then = new Date(date).getTime();
+      const diff = now - then;
+      const min = Math.floor(diff / 60000);
+      const hr = Math.floor(diff / 3600000);
+      const day = Math.floor(diff / 86400000);
+      if (min < 1) return "Just now";
+      if (min < 60) return `${min}min ago`;
+      if (hr < 24) return `${hr}h ago`;
+      if (day <= 7) return `${day}d ago`;
+      const d = new Date(date);
+      return `${d.getDate()} ${d.toLocaleString('default', { month: 'short' })}`;
+    };
+  
     const timestamp = review.createdAt ? getRelativeTime(review.createdAt) : "";
-
-
-  const isOwner = review.user?._id === userId;
-
-  const handleShare = () => {
-    navigator.clipboard.writeText(`${window.location.origin}/review/${review._id}`);
-    setShowOptions(false);
-  };
-
-  const handleCopyLink = () => {
-    const link = `${window.location.origin}/review/${review._id}`;
-    navigator.clipboard.writeText(link);
-    toast.success("🔗 Link copied!");
-    setShowOptions(false);
-  };
+    const isOwner = review.user?._id === userId;
   
+    return (
+      <>
+        {/* Backdrop section */}
+        <div style={{ position: "relative", width: "100%", height: 220, overflow: "hidden", marginBottom: -30 }}>
+          <img src={backdropUrl} alt="Backdrop" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <div style={{ position: "absolute", bottom: 0, width: "100%", height: "70%", background: "linear-gradient(to top, #0e0e0e, transparent)" }} />
   
-
-  return (
-    <>
-      {/* Backdrop section */}
-      <div style={{ position: "relative", width: "100%", height: 220, overflow: "hidden", marginBottom: -30 }}>
-        <img src={backdropUrl} alt="Backdrop" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-        <div style={{
-          position: "absolute",
-          bottom: 0,
-          width: "100%",
-          height: "70%",
-          background: "linear-gradient(to top, #0e0e0e, transparent)"
-        }} />
-
-        {/* Top buttons */}
-        <div style={{
-          position: "absolute",
-          top: 12,
-          left: 12,
-          right: 12,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          zIndex: 5
-        }}>
-          <button
-            onClick={() => navigate(-1)}
-            style={{
-              background: "rgba(0,0,0,0.5)",
-              border: "none",
-              borderRadius: "50%",
-              width: "32px",
-              height: "32px",
-              color: "#fff",
-              fontSize: "18px",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-          >
-            ←
-          </button>
-
-          <div style={{ position: "relative" }}>
-            <button
-              onClick={() => setShowOptions((prev) => !prev)}
-              style={{
-                background: "rgba(0,0,0,0.5)",
-                border: "none",
-                borderRadius: "50%",
-                width: "32px",
-                height: "32px",
-                color: "#fff",
-                fontSize: "22px",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center"
-              }}
-            >
-              ⋯
-            </button>
-
-            {showOptions && (
+          {/* Top buttons */}
+          <div style={{ position: "absolute", top: 12, left: 12, right: 12, display: "flex", justifyContent: "space-between", alignItems: "center", zIndex: 5 }}>
+            <button onClick={() => navigate(-1)} style={{
+              background: "rgba(0,0,0,0.5)", border: "none", borderRadius: "50%", width: "32px", height: "32px", color: "#fff", fontSize: "18px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center"
+            }}>←</button>
+  
+            <div style={{ position: "relative" }}>
+              <button onClick={() => setShowOptions((prev) => !prev)} style={{
+                background: "rgba(0,0,0,0.5)", border: "none", borderRadius: "50%", width: "32px", height: "32px", color: "#fff", fontSize: "22px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center"
+              }}>⋯</button>
+  
+              {showOptions && (
                 <div style={{
-                    position: "fixed",
-top: "56px",   // Adjust depending on button position (56px might match where ⋯ icon is on screen)
-right: "12px", // Ensure alignment
-                    background: "#1a1a1a",
-                    border: "1px solid #333",
-                    borderRadius: "12px",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
-                    padding: "12px 0",
-                    width: "200px",
-                    zIndex: 20,
-                    maxHeight: "260px",  // 🔥 max height for dropdown
-                    overflowY: "auto"     // 🔥 allows scroll if needed
-                  }}>
-                  
-    {(isOwner
-      ? [
-          { label: "🎨 Change Backdrop", onClick: onChangeBackdrop },
-          { label: "✏️ Edit Review/Log", onClick: handleEdit },
-          { label: "🗑️ Delete Review/Log", onClick: onDelete },
-          { label: "📤 Share to Friends", onClick: () => navigate(`/share/${review._id}`) },
-          { label: "💾 Save Photo", onClick: () => navigate(`/share-review/${review._id}`) },
-          { label: "🔗 Copy Link", onClick: handleShare }
-        ]
-      : [
-          { label: "📤 Share to Friends", onClick: () => navigate(`/share/${review._id}`) },
-          { label: "🔗 Copy Link", onClick: handleShare }
-        ]
-    ).map((item, index) => (
-      <div
-        key={index}
-        onClick={() => {
-          item.onClick();
-          setShowOptions(false);
-        }}
-        style={{
-          padding: "10px 16px",
-          cursor: "pointer",
-          fontSize: "14.5px",
-          fontWeight: "500",
-          color: "#fff",
-          fontFamily: "Inter",
-          transition: "0.2s",
-          whiteSpace: "nowrap"
-        }}
-        onMouseEnter={(e) => (e.currentTarget.style.background = "#2a2a2a")}
-        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-      >
-        {item.label}
-      </div>
-    ))}
-  </div>
-)}
-
+                  position: "fixed",
+                  top: "56px",
+                  right: "12px",
+                  background: "#1a1a1a",
+                  border: "1px solid #333",
+                  borderRadius: "12px",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
+                  padding: "12px 0",
+                  width: "200px",
+                  zIndex: 20,
+                  maxHeight: "260px",
+                  overflowY: "auto"
+                }}>
+                  {(isOwner
+                    ? [
+                      { label: "🎨 Change Backdrop", onClick: onChangeBackdrop },
+                      { label: "✏️ Edit Review/Log", onClick: onEdit },  // 🟢 FIX: use onEdit not handleEdit
+                      { label: "🗑️ Delete Review/Log", onClick: onDelete },
+                      { label: "📤 Share to Friends", onClick: () => navigate(`/share/${review._id}`) },
+                      { label: "💾 Save Photo", onClick: () => navigate(`/share-review/${review._id}`) },
+                      { label: "🔗 Copy Link", onClick: handleCopyLink }
+                    ]
+                    : [
+                      { label: "📤 Share to Friends", onClick: () => navigate(`/share/${review._id}`) },
+                      { label: "🔗 Copy Link", onClick: handleCopyLink }
+                    ]
+                  ).map((item, index) => (
+                    <div key={index} onClick={() => { item.onClick(); setShowOptions(false); }} style={{
+                      padding: "10px 16px", cursor: "pointer", fontSize: "14.5px", fontWeight: "500", color: "#fff", fontFamily: "Inter", transition: "0.2s", whiteSpace: "nowrap"
+                    }}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = "#2a2a2a")}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                    >{item.label}</div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
 
         {/* Go to Movie button */}
         <div style={{ position: "absolute", bottom: 40, right: 14, textAlign: "right" }}>

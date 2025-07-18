@@ -29,6 +29,25 @@ export default function ReviewPage() {
     return then.toLocaleDateString();
   }
 
+  const handleEdit = () => {
+    navigate(`/log/${review._id}`);
+  };
+
+  const handleDelete = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`${backend}/api/logs/${review._id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success("🗑️ Review deleted!");
+      navigate("/profile");  // or wherever you want after deletion
+    } catch (err) {
+      console.error("Delete failed", err);
+      toast.error("Failed to delete review.");
+    }
+  };
+  
+
   const fetchData = async () => {
     try {
       const { data } = await axios.get(`${backend}/api/logs/${id}`);
@@ -91,13 +110,16 @@ export default function ReviewPage() {
 
   return (
     <div style={{ backgroundColor: "#0e0e0e", color: "#fff", minHeight: "100vh" }}>
-      <ReviewHeader
-        review={review}
-        userId={userId}
-        onLike={handleLike}
-        onProfile={handleProfile}
-        onChangeBackdrop={() => navigate(`/review/${review._id}/change-backdrop`)}
-      />
+<ReviewHeader
+  review={review}
+  userId={userId}
+  onLike={handleLike}
+  onProfile={handleProfile}
+  onChangeBackdrop={() => navigate(`/review/${review._id}/change-backdrop`)}
+  onEdit={handleEdit}         // 🟢 Add this
+  onDelete={handleDelete}     // 🟢 Add this
+/>
+
 
       {/* 💬 Comments section */}
       <div style={{ marginTop: 24 }}>
