@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { IoArrowBack } from "react-icons/io5";
 import { FaStar, FaRegStar, FaStarHalfAlt } from "react-icons/fa";
 import { HiOutlineRefresh } from "react-icons/hi";
@@ -7,19 +8,33 @@ import { BiSolidFileGif } from "react-icons/bi";
 import GifSearchModal from "../GifSearchModal";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { createLog } from "../../api/api";  // ✅ Import it at top!
+import { createLog } from "../../api/api";
 import { backend } from "../../config";
 
-
 export default function LogModal({ movie, onClose, refreshLogs }) {
-
+  const { logId } = useParams();
+  const [isEditMode, setIsEditMode] = useState(false);
   const [rating, setRating] = useState(0);
   const [rewatchCount, setRewatchCount] = useState(0);
   const [review, setReview] = useState("");
   const [gifUrl, setGifUrl] = useState(null);
-  const [showGifModal, setShowGifModal] = useState(false);
   const [uploadedImageFile, setUploadedImageFile] = useState(null);
+  const [showGifModal, setShowGifModal] = useState(false);
+
   const movieId = movie?.id || movie?._id;
+
+  useEffect(() => {
+    if (logId) {
+      setIsEditMode(true);
+      axios.get(`${backend}/api/logs/${logId}`).then(({ data }) => {
+        setRating(data.rating || 0);
+        setReview(data.review || "");
+        setRewatchCount(data.rewatch || 0);
+        setGifUrl(data.gif || null);
+        setUploadedImageFile(null);  // Don't preload uploaded file preview.
+      });
+    }
+  }, [logId]);
 
   const handleLogSubmit = async () => {
     try {
@@ -30,63 +45,56 @@ export default function LogModal({ movie, onClose, refreshLogs }) {
       formData.append("rewatch", rewatchCount.toString());
       formData.append("watchedAt", new Date().toISOString());
       formData.append("gif", gifUrl || "");
-      formData.append("title", movie.title || "Untitled");
+      formData.append("title", movie?.title || "Untitled");
       formData.append(
         "poster",
-        movie.poster || `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+        movie?.poster || `https://image.tmdb.org/t/p/w500${movie?.poster_path}`
       );
-  
       if (uploadedImageFile) {
         formData.append("image", uploadedImageFile);
       }
-  
-      await createLog(formData);  // Submit log first
-  
-      // ✅ After logging, remove from watchlist if present
-      const user = JSON.parse(localStorage.getItem("user"));
-      await axios.delete(`${backend}/api/watchlist/${user._id}/watchlist/${movieId}`);
-  
-      toast.success("🎬 Log submitted!");
+
+      if (isEditMode) {
+        await axios.patch(`${backend}/api/logs/${logId}`, formData);
+        toast.success("✅ Log updated!");
+      } else {
+        await createLog(formData);
+        const user = JSON.parse(localStorage.getItem("user"));
+        await axios.delete(`${backend}/api/watchlist/${user._id}/watchlist/${movieId}`);
+        toast.success("🎬 Log submitted!");
+      }
+
       onClose();
-      refreshLogs?.();      
-  
+      refreshLogs?.();
     } catch (err) {
       console.error("❌ Log submit failed:", err);
-      toast.error("Failed to log this movie.");
+      toast.error("Failed to submit log.");
     }
   };
-  
+
   const handleStarClick = (index, isHalf) => {
     const newRating = isHalf ? index + 0.5 : index + 1;
     setRating(newRating);
   };
 
-  
-
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      setUploadedImageFile(file);
-    }
+    if (file) setUploadedImageFile(file);
   };
-  
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        zIndex: 9999,
-        width: "100vw",
-        height: "100vh",
-        backgroundColor: "#0e0e0e",
-        color: "#fff",
-        overflowY: "auto",
-        padding: "20px 20px 40px",
-      }}
-    >
-      {/* 🔙 Back */}
+    <div style={{
+      position: "fixed",
+      top: 0,
+      left: 0,
+      zIndex: 9999,
+      width: "100vw",
+      height: "100vh",
+      backgroundColor: "#0e0e0e",
+      color: "#fff",
+      overflowY: "auto",
+      padding: "20px 20px 40px",
+    }}>
       <button
         onClick={onClose}
         style={{
@@ -101,7 +109,7 @@ export default function LogModal({ movie, onClose, refreshLogs }) {
         <IoArrowBack />
       </button>
 
-      {/* 🎞️ Poster + Title + Stars */}
+      {/* Poster + Title + Stars */}
       <div style={{ display: "flex", gap: "16px", marginBottom: "20px" }}>
         <img
           src={
@@ -122,28 +130,15 @@ export default function LogModal({ movie, onClose, refreshLogs }) {
             {movie?.title}
           </h2>
 
-          {/* ⭐ Rating */}
           <div style={{ display: "flex", gap: "3px", marginTop: "6px", fontSize: "28px", position: "relative" }}>
             {[...Array(5)].map((_, i) => {
               const isFull = i + 1 <= rating;
               const isHalf = rating >= i + 0.5 && rating < i + 1;
               return (
                 <div key={i} style={{ position: "relative", cursor: "pointer" }}>
-                  <div
-                    onClick={() => handleStarClick(i, true)}
-                    style={{ position: "absolute", left: 0, width: "50%", height: "100%", zIndex: 2 }}
-                  />
-                  <div
-                    onClick={() => handleStarClick(i, false)}
-                    style={{ position: "absolute", right: 0, width: "50%", height: "100%", zIndex: 2 }}
-                  />
-                  {isFull ? (
-                    <FaStar style={{ color: "#B327F6" }} />
-                  ) : isHalf ? (
-                    <FaStarHalfAlt style={{ color: "#B327F6" }} />
-                  ) : (
-                    <FaRegStar style={{ color: "#777" }} />
-                  )}
+                  <div onClick={() => handleStarClick(i, true)} style={{ position: "absolute", left: 0, width: "50%", height: "100%", zIndex: 2 }} />
+                  <div onClick={() => handleStarClick(i, false)} style={{ position: "absolute", right: 0, width: "50%", height: "100%", zIndex: 2 }} />
+                  {isFull ? <FaStar style={{ color: "#B327F6" }} /> : isHalf ? <FaStarHalfAlt style={{ color: "#B327F6" }} /> : <FaRegStar style={{ color: "#777" }} />}
                 </div>
               );
             })}
@@ -153,11 +148,8 @@ export default function LogModal({ movie, onClose, refreshLogs }) {
             {rating > 0 ? `${rating.toFixed(1)} / 5` : `No rating yet`}
           </p>
 
-          {/* 🔄 Rewatch */}
-          <div
-            style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", cursor: "pointer", color: "#aaa" }}
-            onClick={() => setRewatchCount((prev) => prev + 1)}
-          >
+          <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", cursor: "pointer", color: "#aaa" }}
+            onClick={() => setRewatchCount((prev) => prev + 1)}>
             <HiOutlineRefresh size={18} />
             <span style={{ fontSize: "13px" }}>
               {rewatchCount > 0 ? `Rewatched ${rewatchCount}x` : "Mark as Rewatch"}
@@ -166,19 +158,15 @@ export default function LogModal({ movie, onClose, refreshLogs }) {
         </div>
       </div>
 
-      {/* 📝 Review + Media */}
-      <div
-        style={{
-          width: "86%",
-          background: "#1a1a1a",
-          borderRadius: "12px",
-          padding: "12px",
-          color: "#fff",
-          fontFamily: "Inter",
-          position: "relative",
-          minHeight: "120px",
-        }}
-      >
+      {/* Review + Media */}
+      <div style={{
+        width: "86%",
+        background: "#1a1a1a",
+        borderRadius: "12px",
+        padding: "12px",
+        fontFamily: "Inter",
+        minHeight: "120px",
+      }}>
         <textarea
           placeholder="Write your thoughts..."
           value={review}
@@ -195,110 +183,49 @@ export default function LogModal({ movie, onClose, refreshLogs }) {
           }}
         />
 
-{(uploadedImageFile || gifUrl) && (
-  <div style={{ marginTop: "8px", position: "relative" }}>
-    <img
-      src={uploadedImageFile ? URL.createObjectURL(uploadedImageFile) : gifUrl}
-      alt="preview"
-      style={{
-        maxWidth: "100%",
-        maxHeight: "160px",
-        borderRadius: "8px",
-        objectFit: "contain",
-      }}
-    />
-    <button
-      onClick={() => {
-        setUploadedImageFile(null);
-        setGifUrl(null);
-      }}
-      style={{
-        position: "absolute",
-        top: "-6px",
-        right: "-6px",
-        background: "#000",
-        color: "#fff",
-        border: "none",
-        borderRadius: "50%",
-        width: "22px",
-        height: "22px",
-        fontSize: "14px",
-        cursor: "pointer",
-      }}
-    >
-      ✕
-    </button>
-  </div>
-)}
-
+        {(uploadedImageFile || gifUrl) && (
+          <div style={{ marginTop: "8px", position: "relative" }}>
+            <img
+              src={uploadedImageFile ? URL.createObjectURL(uploadedImageFile) : gifUrl}
+              alt="preview"
+              style={{ maxWidth: "100%", maxHeight: "160px", borderRadius: "8px", objectFit: "contain" }}
+            />
+            <button onClick={() => { setUploadedImageFile(null); setGifUrl(null); }}
+              style={{
+                position: "absolute", top: "-6px", right: "-6px",
+                background: "#000", color: "#fff", border: "none",
+                borderRadius: "50%", width: "22px", height: "22px", fontSize: "14px", cursor: "pointer",
+              }}>
+              ✕
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* 📎 Upload Buttons */}
+      {/* Upload Buttons */}
       <div style={{ display: "flex", gap: "10px", marginTop: "12px" }}>
-        {/* Image Upload */}
-        <label
-          style={{
-            background: "#1a1a1a",
-            padding: "12px",
-            borderRadius: "8px",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
+        <label style={{ background: "#1a1a1a", padding: "12px", borderRadius: "8px", cursor: "pointer" }}>
           <input type="file" accept="image/*" onChange={handleImageUpload} style={{ display: "none" }} />
           <FaImage size={20} color="#fff" />
         </label>
-
-        {/* GIF Search */}
-        <button
-          onClick={() => setShowGifModal(true)}
-          style={{
-            background: "#1a1a1a",
-            padding: "12px",
-            borderRadius: "8px",
-            border: "none",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
+        <button onClick={() => setShowGifModal(true)} style={{ background: "#1a1a1a", padding: "12px", borderRadius: "8px", border: "none", cursor: "pointer" }}>
           <BiSolidFileGif size={20} color="#fff" />
         </button>
       </div>
 
-{/* ✅ Submit Button */}
-<div style={{ position: "absolute", top: 20, right: 60 }}>
-  <button
-    onClick={handleLogSubmit}
-    style={{
-      background: "#fff",
-      color: "#000",
-      padding: "6px 14px",
-      fontSize: "15px",
-      borderRadius: "10px",
-      fontWeight: "600",
-      border: "none",
-      cursor: "pointer",
-    }}
-  >
-    Log
-  </button>
-</div>
+      <div style={{ position: "absolute", top: 20, right: 60 }}>
+        <button onClick={handleLogSubmit} style={{
+          background: "#fff", color: "#000", padding: "6px 14px",
+          fontSize: "15px", borderRadius: "10px", fontWeight: "600",
+          border: "none", cursor: "pointer",
+        }}>
+          {isEditMode ? "Update" : "Log"}
+        </button>
+      </div>
 
-
-      {/* 🟣 Gif Modal */}
       {showGifModal && (
-        <GifSearchModal
-          onSelect={(url) => {
-            setGifUrl(url);
-            setUploadedImageFile(null);
-            setShowGifModal(false);
-          }}
-          onClose={() => setShowGifModal(false)}
-        />
+        <GifSearchModal onSelect={(url) => { setGifUrl(url); setUploadedImageFile(null); setShowGifModal(false); }}
+          onClose={() => setShowGifModal(false)} />
       )}
     </div>
   );

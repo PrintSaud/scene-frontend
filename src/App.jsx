@@ -175,7 +175,7 @@ setHasUnread(unread.length > 0);
           <Route path="/share-review/:id" element={<ShareReviewPage />} />
           <Route path="/review/:id/replies" element={<RepliesPage />} />
           <Route path="/replies/:id" element={<RepliesPage />} />
-
+          <Route path="/log/:logId" element={<LogModal />} />
         </Routes>
       </div>
       {shouldShowNav && <BottomNav hasUnread={hasUnread} />}

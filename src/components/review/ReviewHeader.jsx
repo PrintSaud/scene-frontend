@@ -55,6 +55,13 @@ export default function ReviewHeader({
     setShowOptions(false);
   };
 
+  const handleCopyLink = () => {
+    const link = `${window.location.origin}/review/${review._id}`;
+    navigator.clipboard.writeText(link);
+    alert("🔗 Link copied to clipboard!");
+  };
+  
+
   return (
     <>
       {/* Backdrop section */}
