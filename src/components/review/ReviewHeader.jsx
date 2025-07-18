@@ -119,18 +119,21 @@ export default function ReviewHeader({
             </button>
 
             {showOptions && (
-  <div style={{
-    position: "absolute",
-    top: "38px",
-    right: "0",
-    background: "#1a1a1a",
-    border: "1px solid #333",
-    borderRadius: "12px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
-    padding: "12px 0",
-    width: "200px",
-    zIndex: 20
-  }}>
+                <div style={{
+                    position: "absolute",
+                    top: "38px",
+                    right: "0",
+                    background: "#1a1a1a",
+                    border: "1px solid #333",
+                    borderRadius: "12px",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
+                    padding: "12px 0",
+                    width: "200px",
+                    zIndex: 20,
+                    maxHeight: "260px",  // 🔥 max height for dropdown
+                    overflowY: "auto"     // 🔥 allows scroll if needed
+                  }}>
+                  
     {(isOwner
       ? [
           { label: "🎨 Change Backdrop", onClick: onChangeBackdrop },
