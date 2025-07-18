@@ -21,20 +21,26 @@ export default function LogModal({ movie, onClose, refreshLogs }) {
   const [uploadedImageFile, setUploadedImageFile] = useState(null);
   const [showGifModal, setShowGifModal] = useState(false);
 
-  const movieId = movie?.id || movie?._id;
 
+  const [movieId, setMovieId] = useState(movie?.id || movie?._id);
+  const [movieData, setMovieData] = useState(movie || null);
+  
   useEffect(() => {
     if (logId) {
-      setIsEditMode(true);
-      axios.get(`${backend}/api/logs/${logId}`).then(({ data }) => {
-        setRating(data.rating || 0);
-        setReview(data.review || "");
-        setRewatchCount(data.rewatch || 0);
-        setGifUrl(data.gif || null);
-        setUploadedImageFile(null);  // Don't preload uploaded file preview.
-      });
-    }
+        setIsEditMode(true);
+        axios.get(`${backend}/api/logs/${logId}`).then(({ data }) => {
+          setRating(data.rating || 0);
+          setReview(data.review || "");
+          setRewatchCount(data.rewatch || 0);
+          setGifUrl(data.gif || null);
+          setUploadedImageFile(null);
+          setMovieId(data.movie?._id || data.movie?.id);
+          setMovieData(data.movie);
+        });
+      }      
   }, [logId]);
+
+  
 
   const handleLogSubmit = async () => {
     try {
@@ -45,17 +51,21 @@ export default function LogModal({ movie, onClose, refreshLogs }) {
       formData.append("rewatch", rewatchCount.toString());
       formData.append("watchedAt", new Date().toISOString());
       formData.append("gif", gifUrl || "");
-      formData.append("title", movie?.title || "Untitled");
+      formData.append("title", movieData?.title || "Untitled");
       formData.append(
         "poster",
-        movie?.poster || `https://image.tmdb.org/t/p/w500${movie?.poster_path}`
+        movieData?.poster || `https://image.tmdb.org/t/p/w500${movieData?.poster_path}`
       );
+      
       if (uploadedImageFile) {
         formData.append("image", uploadedImageFile);
       }
 
       if (isEditMode) {
-        await axios.patch(`${backend}/api/logs/${logId}`, formData);
+        const token = localStorage.getItem("token");
+await axios.patch(`${backend}/api/logs/${logId}`, formData, {
+  headers: { Authorization: `Bearer ${token}` }
+});
         toast.success("✅ Log updated!");
       } else {
         await createLog(formData);
@@ -82,6 +92,12 @@ export default function LogModal({ movie, onClose, refreshLogs }) {
     if (file) setUploadedImageFile(file);
   };
 
+  const handleBack = () => {
+    if (onClose) onClose();
+    else window.history.back();
+  };
+
+
   return (
     <div style={{
       position: "fixed",
@@ -95,8 +111,11 @@ export default function LogModal({ movie, onClose, refreshLogs }) {
       overflowY: "auto",
       padding: "20px 20px 40px",
     }}>
-      <button
-        onClick={onClose}
+        <button
+  onClick={() => {
+    if (onClose) onClose();
+    else window.history.back();
+  }}
         style={{
           background: "none",
           border: "none",
@@ -111,13 +130,13 @@ export default function LogModal({ movie, onClose, refreshLogs }) {
 
       {/* Poster + Title + Stars */}
       <div style={{ display: "flex", gap: "16px", marginBottom: "20px" }}>
-        <img
-          src={
-            movie?.poster_path
-              ? `https://image.tmdb.org/t/p/w300${movie.poster_path}`
-              : movie?.poster || "/default-poster.png"
-          }
-          alt={movie?.title}
+      <img
+  src={
+    movieData?.poster_path
+      ? `https://image.tmdb.org/t/p/w300${movieData.poster_path}`
+      : movieData?.poster || "/default-poster.png"
+  }
+  alt={movieData?.title}
           style={{
             width: "150px",
             height: "240px",
@@ -127,7 +146,7 @@ export default function LogModal({ movie, onClose, refreshLogs }) {
         />
         <div>
           <h2 style={{ fontSize: "18px", fontWeight: "bold", fontFamily: "Inter" }}>
-            {movie?.title}
+          {movieData?.title}
           </h2>
 
           <div style={{ display: "flex", gap: "3px", marginTop: "6px", fontSize: "28px", position: "relative" }}>
