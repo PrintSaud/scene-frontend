@@ -4,7 +4,8 @@ import axios from "axios";
 import html2canvas from "html2canvas";
 import { backend } from "../config";
 import { FiEye, FiDownload } from "react-icons/fi";
-import StarRating from "../StarRating";  // ✅ your actual star component!
+import StarRating from "../components/StarRating";
+
 
 export default function ShareReviewPage() {
   const { id } = useParams();
