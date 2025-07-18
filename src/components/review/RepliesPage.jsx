@@ -355,22 +355,6 @@ const { parentCommentId, parentUsername } = location.state || {};
     );
   })}
 
-        
-<div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-  {/* Like button */}
-  <div
-    style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
-    onClick={() => handleReplyLike(r._id)}
-  >
-    {isLikedByMe ? (
-      <AiFillHeart size={16} color="#B327F6" />
-    ) : (
-      <AiOutlineHeart size={16} color="#888" />
-    )}
-    <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>
-      {r.likes?.length || 0}
-    </span>
-  </div>
 
   {/* 3-dots menu */}
   {r.userId === userId && (
@@ -403,7 +387,6 @@ const { parentCommentId, parentUsername } = location.state || {};
 </div>
 
         </div>
-      </div>
     );
   }
 
