@@ -17,13 +17,15 @@ export default function ShareReviewPage() {
   }, [id]);
 
   const handleSaveImage = () => {
-    html2canvas(document.querySelector("#share-card")).then(canvas => {
-      const link = document.createElement("a");
-      link.download = `scene-review-${review.title}.png`;
-      link.href = canvas.toDataURL();
-      link.click();
-    });
+    html2canvas(document.querySelector("#share-card"), { useCORS: true, backgroundColor: null })
+      .then(canvas => {
+        const link = document.createElement("a");
+        link.download = `scene-review-${review.title || 'movie'}.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+      });
   };
+  
 
   const handleExitPreview = () => {
     if (previewMode) setPreviewMode(false);
@@ -109,7 +111,7 @@ export default function ShareReviewPage() {
             fontFamily: "Inter, sans-serif",
             color: "#aaa"
           }}>
-            I’ve rated <strong>{review.title}</strong>
+            I’ve rated <strong>{review.movie?.title}</strong>
           </div>
 
           {/* Star rating centered */}
