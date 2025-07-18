@@ -4,6 +4,7 @@ import axios from "axios";
 import html2canvas from "html2canvas";
 import { backend } from "../config";
 import { FiEye, FiDownload } from "react-icons/fi";
+import StarRating from "../StarRating";  // ✅ your actual star component!
 
 export default function ShareReviewPage() {
   const { id } = useParams();
@@ -32,12 +33,21 @@ export default function ShareReviewPage() {
 
   return (
     <div
-      style={{ background: "#0e0e0e", minHeight: "100vh", position: "relative", padding: 16 }}
+      style={{
+        background: "#0e0e0e",
+        minHeight: "100vh",
+        position: "relative",
+        overflowY: "auto", // ✅ allows scrolling comfortably
+        paddingBottom: 60 // ✅ extra space at bottom
+      }}
       onClick={handleExitPreview}
     >
-      {/* Top controls */}
+      {/* Top buttons */}
       {!previewMode && (
-        <div style={{ position: "absolute", top: 16, left: 16, right: 16, display: "flex", justifyContent: "space-between", alignItems: "center", zIndex: 10 }}>
+        <div style={{
+          position: "fixed", top: 16, left: 16, right: 16,
+          display: "flex", justifyContent: "space-between", alignItems: "center", zIndex: 10
+        }}>
           <button
             onClick={() => navigate(-1)}
             style={{
@@ -72,10 +82,16 @@ export default function ShareReviewPage() {
 
       {/* Card */}
       <div id="share-card" style={{
-        maxWidth: 360, margin: "100px auto 0", background: "#0e0e0e", borderRadius: 12, padding: 16,
-        textAlign: "center", color: "#fff"
+        maxWidth: 360,
+        margin: "100px auto 40px",
+        background: "#0e0e0e",
+        borderRadius: 12,
+        padding: 16,
+        textAlign: "center",
+        color: "#fff"
       }}>
         <img src={review.poster} alt="Poster" style={{ width: "100%", borderRadius: 8 }} />
+
         <div style={{ marginTop: 16 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
             <img src={review.user?.avatar || "/default-avatar.jpg"} alt="avatar"
@@ -83,27 +99,28 @@ export default function ShareReviewPage() {
             />
             <strong>@{review.user?.username}</strong>
           </div>
-          <div style={{ marginTop: 8, fontWeight: "500" }}>i’ve rated</div>
-          <div style={{ fontWeight: "bold", fontSize: 18 }}>{review.title}</div>
 
-          {/* Scene rating stars design */}
-          <div style={{ marginTop: 8, display: "flex", justifyContent: "center", gap: 4 }}>
-            {Array.from({ length: 5 }).map((_, idx) => (
-              <div key={idx} style={{
-                width: 20, height: 20, borderRadius: 4, background: idx < review.rating ? "#B327F6" : "#333"
-              }} />
-            ))}
+          {/* Movie name in text */}
+          <div style={{ marginTop: 8, fontWeight: 500, fontSize: 14 }}>
+            i’ve rated <strong>{review.title}</strong>
           </div>
 
-          {/* "on" + Scene logo + gray lines */}
-          <div style={{ marginTop: 16 }}>
-            <div style={{ color: "#aaa", fontSize: 14, marginBottom: 6 }}>on</div>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
-              <div style={{ flex: 1, height: 1, background: "#555" }} />
-              <img src="/default-avatarc.png" alt="Scene logo" style={{ width: 48, height: 24, objectFit: "contain" }} />
-              <div style={{ flex: 1, height: 1, background: "#555" }} />
-            </div>
+          {/* Proper Scene StarRating */}
+          <div style={{ marginTop: 10 }}>
+            <StarRating rating={review.rating} size={22} />
           </div>
+
+          {/* "on" text */}
+          <div style={{ marginTop: 14, color: "#aaa", fontSize: 14 }}>
+            on
+          </div>
+
+          {/* Scene logo with gray lines */}
+          <div style={{ marginTop: 8, display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
+  <div style={{ flex: 1, height: 1, background: "#555" }} />
+  <img src="/default-avatarc.png" alt="Scene logo" style={{ width: 72, objectFit: "contain" }} />
+  <div style={{ flex: 1, height: 1, background: "#555" }} />
+</div>
         </div>
       </div>
     </div>
