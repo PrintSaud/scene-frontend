@@ -11,20 +11,22 @@ export default function ShareReviewPage() {
   const navigate = useNavigate();
   const [review, setReview] = useState(null);
   const [previewMode, setPreviewMode] = useState(false);
+  const proxiedPosterUrl = `${backend}/api/logs/proxy/tmdb?url=${encodeURIComponent(review.poster)}`;
 
   useEffect(() => {
     axios.get(`${backend}/api/logs/${id}`).then(({ data }) => setReview(data));
   }, [id]);
 
   const handleSaveImage = () => {
-    html2canvas(document.querySelector("#share-card"), { useCORS: true, backgroundColor: null })
-      .then(canvas => {
-        const link = document.createElement("a");
-        link.download = `scene-review-${review.title || 'movie'}.png`;
-        link.href = canvas.toDataURL();
-        link.click();
-      });
+    html2canvas(document.querySelector("#share-card")).then(canvas => {
+      const link = document.createElement("a");
+      link.download = `scene-review-${review.title}.png`;
+      link.href = canvas.toDataURL();
+      link.click();
+      alert("✅ Saved! Check your device's Downloads folder.");
+    });
   };
+  
   
 
   const handleExitPreview = () => {
@@ -40,7 +42,7 @@ export default function ShareReviewPage() {
         minHeight: "100vh",
         position: "relative",
         overflowY: "auto",
-        paddingBottom: 90 // Extra scroll space
+        paddingBottom: 80 // Extra scroll space
       }}
       onClick={handleExitPreview}
     >
@@ -92,7 +94,7 @@ export default function ShareReviewPage() {
         textAlign: "center",
         color: "#fff"
       }}>
-        <img src={review.poster} alt="Poster" style={{ width: "100%", borderRadius: 8 }} />
+<img src={proxiedPosterUrl} alt="Poster" style={{ width: "100%", borderRadius: 8 }} />
 
         <div style={{ marginTop: 16 }}>
           {/* User info */}
