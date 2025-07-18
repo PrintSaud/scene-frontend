@@ -128,7 +128,7 @@ export default function ShareReviewPage() {
 {/* "on" + Scene logo with gray lines */}
 <div style={{ marginTop: 10, fontSize: 14, fontFamily: "Inter, sans-serif", color: "#aaa" }}>on</div>
 <div style={{
-  marginTop: -6,  // even tighter spacing below "on"
+  marginTop: -8,  // even tighter spacing below "on"
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
