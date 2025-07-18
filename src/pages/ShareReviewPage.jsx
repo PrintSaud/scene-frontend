@@ -11,7 +11,6 @@ export default function ShareReviewPage() {
   const navigate = useNavigate();
   const [review, setReview] = useState(null);
   const [previewMode, setPreviewMode] = useState(false);
-  const proxiedPosterUrl = `${backend}/api/logs/proxy/tmdb?url=${encodeURIComponent(review.poster)}`;
 
   useEffect(() => {
     axios.get(`${backend}/api/logs/${id}`).then(({ data }) => setReview(data));
@@ -94,7 +93,12 @@ export default function ShareReviewPage() {
         textAlign: "center",
         color: "#fff"
       }}>
-<img src={proxiedPosterUrl} alt="Poster" style={{ width: "100%", borderRadius: 8 }} />
+        <img
+  src={review.poster ? `${backend}/api/logs/proxy/tmdb/image?url=${encodeURIComponent(review.poster)}` : "/default-poster.jpg"}
+  alt="Poster"
+  style={{ width: "100%", borderRadius: 8 }}
+/>
+
 
         <div style={{ marginTop: 16 }}>
           {/* User info */}
