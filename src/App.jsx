@@ -15,7 +15,7 @@ import SignupPage from './pages/SignupPage';
 import ForgotPassword from "./pages/ForgotPassword";
 import VerifyResetCode from "./pages/VerifyResetCode";
 import ResetPassword from "./pages/ResetPassword";
-import LogModal from ".components/modals/LogModal";
+import LogModal from "./components/modals/LogModal";
 import UploadAvatar from "./pages/UploadAvatar";
 import FriendsActivityPage from "./pages/FriendsActivityPage";
 import TrendingPage from "./pages/TrendingPage";
