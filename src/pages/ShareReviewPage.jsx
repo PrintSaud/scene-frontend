@@ -37,7 +37,7 @@ export default function ShareReviewPage() {
   return (
     <div
       style={{
-        background: "#000",  // force solid black background for html2canvas
+        background: "#0e0e0e",
         minHeight: "100vh",
         position: "relative",
         overflowY: "auto",
