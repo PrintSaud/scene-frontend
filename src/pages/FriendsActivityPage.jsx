@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import LogModal from "../components/LogModal";
+import LogModal from "../components/modals/LogModal";
 import axios from "../api/api";
 import { backend } from "../config";
 
