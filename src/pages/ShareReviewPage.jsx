@@ -94,7 +94,7 @@ export default function ShareReviewPage() {
         color: "#fff"
       }}>
         <img
-  src={review.poster ? `${backend}/api/logs/proxy/tmdb/image?url=${encodeURIComponent(review.poster)}` : "/default-poster.jpg"}
+        src={review.poster ? `${backend}/api/logs/proxy/tmdb?url=${encodeURIComponent(review.poster)}` : "/default-poster.jpg"}
   alt="Poster"
   style={{ width: "100%", borderRadius: 8 }}
 />

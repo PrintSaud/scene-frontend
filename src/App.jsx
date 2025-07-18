@@ -94,7 +94,12 @@ setHasUnread(unread.length > 0);
     '/reset-password',
     '/choose-avatar',
   ];
-  const shouldShowNav = !hideNavRoutes.includes(location.pathname) && user;
+
+  const shouldShowNav = !(
+    hideNavRoutes.includes(location.pathname) ||
+    location.pathname.startsWith('/share')
+  ) && user;
+  
 
   return (
     <div style={{ overflowX: "hidden", width: "100%", maxWidth: "100vw" }}>
