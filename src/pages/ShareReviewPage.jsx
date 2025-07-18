@@ -83,60 +83,62 @@ export default function ShareReviewPage() {
         </div>
       )}
 
-      {/* Card */}
-      <div id="share-card" style={{
-        maxWidth: 360,
-        margin: "100px auto 40px",
-        background: "#0e0e0e",
-        borderRadius: 12,
-        padding: 16,
-        textAlign: "center",
-        color: "#fff"
-      }}>
-        <img
-        src={review.poster ? `${backend}/api/logs/proxy/tmdb?url=${encodeURIComponent(review.poster)}` : "/default-poster.jpg"}
-  alt="Poster"
-  style={{ width: "100%", borderRadius: 8 }}
-/>
+     {/* Card */}
+<div id="share-card" style={{
+  maxWidth: 360,
+  margin: "100px auto 40px",
+  background: "#0e0e0e",
+  borderRadius: 12,
+  padding: 16,
+  textAlign: "center",
+  color: "#fff"
+}}>
+  {/* Poster smaller (reduce from 100% to ~85%) */}
+  <img
+    src={review.poster ? `${backend}/api/logs/proxy/tmdb?url=${encodeURIComponent(review.poster)}` : "/default-poster.jpg"}
+    alt="Poster"
+    style={{ width: "85%", borderRadius: 8 }}
+  />
 
+  <div style={{ marginTop: 16 }}>
+    {/* User info */}
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+      <img src={review.user?.avatar || "/default-avatar.jpg"} alt="avatar"
+        style={{ width: 40, height: 40, borderRadius: "50%" }}
+      />
+      <strong>@{review.user?.username}</strong>
+    </div>
 
-        <div style={{ marginTop: 16 }}>
-          {/* User info */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-            <img src={review.user?.avatar || "/default-avatar.jpg"} alt="avatar"
-              style={{ width: 40, height: 40, borderRadius: "50%" }}
-            />
-            <strong>@{review.user?.username}</strong>
-          </div>
+    {/* Dynamic "I’ve rated [movie]" text */}
+    <div style={{
+      marginTop: 8,
+      fontWeight: 500,
+      fontSize: 14,
+      fontFamily: "Inter, sans-serif",
+      color: "#aaa"
+    }}>
+      I’ve rated <strong>{review.movie?.title}</strong>
+    </div>
 
-          {/* Dynamic "I’ve rated [movie]" text */}
-          <div style={{
-            marginTop: 8,
-            fontWeight: 500,
-            fontSize: 14,
-            fontFamily: "Inter, sans-serif",
-            color: "#aaa"
-          }}>
-            I’ve rated <strong>{review.movie?.title}</strong>
-          </div>
+    {/* Star rating centered */}
+    <div style={{ marginTop: 12, display: "flex", justifyContent: "center" }}>
+      <StarRating rating={review.rating} size={22} />
+    </div>
 
-          {/* Star rating centered */}
-          <div style={{ marginTop: 12, display: "flex", justifyContent: "center" }}>
-            <StarRating rating={review.rating} size={22} />
-          </div>
+    {/* "on" + Scene logo with gray lines */}
+    {/* Move "on" text down slightly (from 14px to 20px marginTop) */}
+    <div style={{ marginTop: 20, fontSize: 14, fontFamily: "Inter, sans-serif", color: "#aaa" }}>on</div>
+    <div style={{
+      marginTop: 8, display: "flex",
+      alignItems: "center", justifyContent: "center", gap: 12
+    }}>
+      <div style={{ flex: 1, height: 1, background: "#555" }} />
+      <img src="/default-avatarc.png" alt="Scene logo" style={{ width: 90, objectFit: "contain" }} />
+      <div style={{ flex: 1, height: 1, background: "#555" }} />
+    </div>
+  </div>
+</div>
 
-          {/* "on" + Scene logo with gray lines */}
-          <div style={{ marginTop: 14, fontSize: 14, fontFamily: "Inter, sans-serif", color: "#aaa" }}>on</div>
-          <div style={{
-            marginTop: 8, display: "flex",
-            alignItems: "center", justifyContent: "center", gap: 12
-          }}>
-            <div style={{ flex: 1, height: 1, background: "#555" }} />
-            <img src="/default-avatarc.png" alt="Scene logo" style={{ width: 90, objectFit: "contain" }} />
-            <div style={{ flex: 1, height: 1, background: "#555" }} />
-          </div>
-        </div>
-      </div>
 
       {/* Navbar hidden when previewMode is true */}
       {!previewMode && (
