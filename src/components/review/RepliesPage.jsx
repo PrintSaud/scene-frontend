@@ -231,19 +231,21 @@ const { parentCommentId, parentUsername } = location.state || {};
 
 {replies.map((r) => {
   const isLikedByMe = r.likes?.includes(userId);
-  const isParentComment = r._id === parentCommentId; // 👈 highlight condition
-  const isChildReply = r.parentComment === parentCommentId || !!r.parentComment; // 👈 indent if nested
+  const isParentComment = r._id === parentCommentId;
+  const isChildReply = !!r.parentComment;
 
   return (
     <div
       key={r._id}
       style={{
         position: "relative",
-        marginBottom: 14,
         backgroundColor: isParentComment ? "#1e1e1e" : "transparent",
         borderRadius: isParentComment ? 8 : 0,
-        padding: isParentComment ? 8 : 0,
-        paddingLeft: isChildReply ? 10 : 0, // 👈 indent nested replies
+        padding: isParentComment ? "8px 12px" : "0px",
+        marginBottom: 10,
+        marginLeft: isChildReply ? 20 : 0,  // ✅ indent child replies properly
+        fontSize: isChildReply ? 13 : 14,   // ✅ smaller font for child replies
+        opacity: isChildReply ? 0.9 : 1,    // ✅ subtle dim for child replies
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -262,7 +264,7 @@ const { parentCommentId, parentUsername } = location.state || {};
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
             <strong
               style={{
-                fontSize: 14,
+                fontSize: isChildReply ? 13 : 14,
                 fontFamily: "Inter, sans-serif",
                 fontWeight: 400,
                 color: "#ddd",
@@ -281,7 +283,7 @@ const { parentCommentId, parentUsername } = location.state || {};
           </div>
           <span
             style={{
-              fontSize: 14,
+              fontSize: isChildReply ? 13 : 14,
               color: "#ddd",
               fontFamily: "Inter, sans-serif",
               display: "block",
@@ -304,25 +306,27 @@ const { parentCommentId, parentUsername } = location.state || {};
               style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }}
             />
           )}
-          <button
-  onClick={() => navigate(`/replies/${id}`, {
-    state: { parentCommentId: r._id, parentUsername: r.username }
-  })}
-  style={{
-    background: "none",
-    border: "none",
-    color: "#888",
-    fontSize: 13,
-    cursor: "pointer",
-    padding: 0,
-    marginTop: 4,
-    textAlign: "left",
-  }}
->
-  Reply
-</button>
 
+          {/* ✅ Reply button */}
+          <button
+            onClick={() => navigate(`/replies/${id}`, {
+              state: { parentCommentId: r._id, parentUsername: r.username }
+            })}
+            style={{
+              background: "none",
+              border: "none",
+              color: "#888",
+              fontSize: 13,
+              cursor: "pointer",
+              padding: 0,
+              marginTop: 4,
+              textAlign: "left",
+            }}
+          >
+            Reply
+          </button>
         </div>
+        
 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
   {/* Like button */}
   <div
