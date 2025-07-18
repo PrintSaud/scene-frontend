@@ -37,7 +37,7 @@ export default function ShareReviewPage() {
   return (
     <div
       style={{
-        background: "#0e0e0e",
+        background: "#000",  // force solid black background for html2canvas
         minHeight: "100vh",
         position: "relative",
         overflowY: "auto",
@@ -83,7 +83,7 @@ export default function ShareReviewPage() {
         </div>
       )}
 
-     {/* Card */}
+{/* Card */}
 <div id="share-card" style={{
   maxWidth: 360,
   margin: "100px auto 40px",
@@ -93,11 +93,11 @@ export default function ShareReviewPage() {
   textAlign: "center",
   color: "#fff"
 }}>
-  {/* Poster smaller (reduce from 100% to ~85%) */}
+  {/* Poster smaller (~80%) */}
   <img
     src={review.poster ? `${backend}/api/logs/proxy/tmdb?url=${encodeURIComponent(review.poster)}` : "/default-poster.jpg"}
     alt="Poster"
-    style={{ width: "85%", borderRadius: 8 }}
+    style={{ width: "80%", borderRadius: 8 }}
   />
 
   <div style={{ marginTop: 16 }}>
@@ -126,11 +126,14 @@ export default function ShareReviewPage() {
     </div>
 
     {/* "on" + Scene logo with gray lines */}
-    {/* Move "on" text down slightly (from 14px to 20px marginTop) */}
-    <div style={{ marginTop: 20, fontSize: 14, fontFamily: "Inter, sans-serif", color: "#aaa" }}>on</div>
+    {/* Move "on" text down a bit, tighten logo spacing */}
+    <div style={{ marginTop: 18, fontSize: 14, fontFamily: "Inter, sans-serif", color: "#aaa" }}>on</div>
     <div style={{
-      marginTop: 8, display: "flex",
-      alignItems: "center", justifyContent: "center", gap: 12
+      marginTop: 4,  // 🔥 reduce spacing from 8px → 4px
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 12
     }}>
       <div style={{ flex: 1, height: 1, background: "#555" }} />
       <img src="/default-avatarc.png" alt="Scene logo" style={{ width: 90, objectFit: "contain" }} />
