@@ -141,7 +141,7 @@ export default function ChangePosterModal({ movieId, onClose }) {
         ref={scrollRef}
         style={{
           marginTop: "48px",
-          paddingBottom: "80px", // ✅ Extra scrollable room
+          paddingBottom: "100px", // ✅ Extra scrollable room
           textAlign: "center",
         }}
       >

@@ -17,23 +17,17 @@ export default function ReviewPage() {
   const [moreReviews, setMoreReviews] = useState([]);
   const user = JSON.parse(localStorage.getItem("user")) || {};
   const userId = user._id;
-  const handleChangeBackdrop = () => navigate(`/review/${id}/change-backdrop`);
 
-  // Add this helper at the top of ReviewPage.jsx, before the component:
-
-function getRelativeTime(date) {
-  const now = new Date();
-  const then = new Date(date);
-  const diff = (now - then) / 1000; // in seconds
-
-  if (diff < 60) return "just now";
-  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-  if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
-
-  return then.toLocaleDateString(); // fallback: date format
-}
-
+  function getRelativeTime(date) {
+    const now = new Date();
+    const then = new Date(date);
+    const diff = (now - then) / 1000;
+    if (diff < 60) return "just now";
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
+    return then.toLocaleDateString();
+  }
 
   const fetchData = async () => {
     try {
@@ -90,7 +84,6 @@ function getRelativeTime(date) {
     }
   };
 
-  const handleReply = () => navigate(`/review/${id}/replies`);
   const handleProfile = (profileId) => navigate(`/profile/${profileId}`);
   const handleMoreReviewsClick = (reviewId) => navigate(`/review/${reviewId}`);
 
@@ -98,36 +91,21 @@ function getRelativeTime(date) {
 
   return (
     <div style={{ backgroundColor: "#0e0e0e", color: "#fff", minHeight: "100vh" }}>
-<ReviewHeader
-  review={review}
-  userId={userId}
-  onLike={handleLike}
-  onReply={handleReply}
-  onProfile={handleProfile}
-  onChangeBackdrop={() => navigate(`/review/${review._id}/change-backdrop`)}
-/>
-
+      <ReviewHeader
+        review={review}
+        userId={userId}
+        onLike={handleLike}
+        onProfile={handleProfile}
+        onChangeBackdrop={() => navigate(`/review/${review._id}/change-backdrop`)}
+      />
 
       {/* 💬 Comments section */}
       <div style={{ marginTop: 24 }}>
-        <div style={{ 
-          display: "flex", 
-          alignItems: "center", 
-          justifyContent: "space-between", 
-          padding: "0 24px",
-          marginBottom: replies.length === 0 ? 4 : 12
-        }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px", marginBottom: replies.length === 0 ? 4 : 12 }}>
           <h3 style={{ fontSize: 18, margin: 0, marginLeft: -6 }}>Comments</h3>
           <button
             onClick={() => navigate(`/review/${id}/replies`)}
-            style={{
-              background: "none",
-              border: "none",
-              color: "#888",
-              fontSize: 14,
-              cursor: "pointer",
-              marginRight: -12
-            }}
+            style={{ background: "none", border: "none", color: "#888", fontSize: 14, cursor: "pointer", marginRight: -12 }}
           >
             More →
           </button>
@@ -156,10 +134,7 @@ function getRelativeTime(date) {
                     <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
                       {/* Username, stars, time */}
                       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                        <strong
-                          style={{ fontSize: 14, fontFamily: "Inter, sans-serif", fontWeight: 400, color: "#ddd", cursor: "pointer" }}
-                          onClick={() => handleProfile(r.userId)}
-                        >
+                        <strong style={{ fontSize: 14, fontFamily: "Inter, sans-serif", fontWeight: 400, color: "#ddd", cursor: "pointer" }} onClick={() => handleProfile(r.userId)}>
                           @{r.username}
                         </strong>
                         {r.ratingForThisMovie && (
@@ -179,34 +154,36 @@ function getRelativeTime(date) {
 
                       {/* Optional gif/image */}
                       {r.gif && (
-                        <img
-                          src={r.gif}
-                          alt="gif"
-                          style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }}
-                        />
+                        <img src={r.gif} alt="gif" style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }} />
                       )}
                       {r.image && (
-                        <img
-                          src={r.image}
-                          alt="img"
-                          style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }}
-                        />
+                        <img src={r.image} alt="img" style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }} />
                       )}
+
+                      {/* Reply button */}
+                      <button
+                        onClick={() => navigate(`/replies/${id}`, {
+                          state: { parentCommentId: r._id, parentUsername: r.username }
+                        })}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          color: "#888",
+                          fontSize: 13,
+                          cursor: "pointer",
+                          padding: 0,
+                          marginTop: 4,
+                          textAlign: "left",
+                        }}
+                      >
+                        Reply
+                      </button>
                     </div>
 
                     {/* Like button */}
-                    <div
-                      style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
-                      onClick={() => handleReplyLike(r._id)}
-                    >
-                      {isLikedByMe ? (
-                        <AiFillHeart size={16} color="#B327F6" />
-                      ) : (
-                        <AiOutlineHeart size={16} color="#888" />
-                      )}
-                      <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>
-                        {r.likes?.length || 0}
-                      </span>
+                    <div style={{ cursor: "pointer", display: "flex", alignItems: "center" }} onClick={() => handleReplyLike(r._id)}>
+                      {isLikedByMe ? <AiFillHeart size={16} color="#B327F6" /> : <AiOutlineHeart size={16} color="#888" />}
+                      <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>{r.likes?.length || 0}</span>
                     </div>
                   </div>
                 </div>
@@ -216,10 +193,7 @@ function getRelativeTime(date) {
       </div>
 
       {/* ⭐ More reviews section */}
-      <MoreReviewsList
-        reviews={moreReviews}
-        onClick={handleMoreReviewsClick}
-      />
+      <MoreReviewsList reviews={moreReviews} onClick={handleMoreReviewsClick} />
     </div>
   );
 }
