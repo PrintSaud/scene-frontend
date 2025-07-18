@@ -16,7 +16,9 @@ export default function ReviewHeader({
 }) {
   const navigate = useNavigate();
   const [showOptions, setShowOptions] = useState(false);
-  const onEdit = () => navigate(`/log/${review._id}`);
+
+  const handleEdit = () => navigate(`/log/${review._id}`);
+
 
     const backdropUrl = review.customBackdrop
   ? review.customBackdrop
@@ -148,7 +150,7 @@ right: "12px", // Ensure alignment
     {(isOwner
       ? [
           { label: "🎨 Change Backdrop", onClick: onChangeBackdrop },
-          { label: "✏️ Edit Review/Log", onClick: onEdit },
+          { label: "✏️ Edit Review/Log", onClick: handleEdit },
           { label: "🗑️ Delete Review/Log", onClick: onDelete },
           { label: "📤 Share to Friends", onClick: () => navigate(`/share/${review._id}`) },
           { label: "💾 Save Photo", onClick: () => navigate(`/share-review/${review._id}`) },
