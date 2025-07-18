@@ -304,6 +304,24 @@ const { parentCommentId, parentUsername } = location.state || {};
               style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }}
             />
           )}
+          <button
+  onClick={() => navigate(`/replies/${id}`, {
+    state: { parentCommentId: r._id, parentUsername: r.username }
+  })}
+  style={{
+    background: "none",
+    border: "none",
+    color: "#888",
+    fontSize: 13,
+    cursor: "pointer",
+    padding: 0,
+    marginTop: 4,
+    textAlign: "left",
+  }}
+>
+  Reply
+</button>
+
         </div>
 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
   {/* Like button */}

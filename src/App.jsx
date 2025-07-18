@@ -145,6 +145,7 @@ setHasUnread(unread.length > 0);
           <Route path="/profile/:id" element={<ProfilePage />} />
           <Route path="/profile/" element={<ProfilePage />} />
           <Route path="/review/:id" element={<ReviewPage />} />
+          <Route path="/replies/:id" element={<RepliesPage />} />
           <Route path="/review/:id/change-backdrop" element={<ChangeReviewBackdropPage />} />
           <Route path="/edit-profile" element={<EditProfilePage />} />
           <Route path="/choose-backdrop" element={<BackdropSearchPage />} />
@@ -166,6 +167,8 @@ setHasUnread(unread.length > 0);
           <Route path="/upload-avatar" element={<UploadAvatarPage />} />
           <Route path="/share/:id" element={<ShareListPage />} />
           <Route path="/review/:id/replies" element={<RepliesPage />} />
+          <Route path="/replies/:id" element={<RepliesPage />} />
+
         </Routes>
       </div>
       {shouldShowNav && <BottomNav hasUnread={hasUnread} />}
