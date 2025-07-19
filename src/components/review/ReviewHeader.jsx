@@ -207,20 +207,21 @@ export default function ReviewHeader({
             <span style={{ fontSize: "13px" }}>{review.likes?.length || 0}</span>
           </div>
           <button
-            style={{
-              background: "transparent",
-              border: "1px solid #555",
-              borderRadius: 4,
-              padding: "4px 8px",
-              fontSize: 12,
-              fontFamily: "Inter, sans-serif",
-              color: "#fff",
-              cursor: "pointer"
-            }}
-            onClick={onReply}
-          >
-            Reply
-          </button>
+  style={{
+    background: "transparent",
+    border: "1px solid #555",
+    borderRadius: 4,
+    padding: "4px 8px",
+    fontSize: 12,
+    fontFamily: "Inter, sans-serif",
+    color: "#fff",
+    cursor: "pointer"
+  }}
+  onClick={() => navigate(`/review/${review._id}/replies`)}
+>
+  Reply
+</button>
+
         </div>
       </div>
     </>

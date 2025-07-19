@@ -75,10 +75,10 @@ export default function ListViewPage() {
     }
   };
   
-
   const handleShare = () => {
-    navigate(`/share-list/${id}`);
+    navigate(`/share/list/${id}`);
   };
+  
   
 
   if (!list) {
@@ -183,6 +183,7 @@ export default function ListViewPage() {
                     ]
                   : [
                       { label: "📤 Share to Friend", onClick: handleShare },
+                      
                       { label: isSaved ? "✅ Saved" : "💾 Save List", onClick: handleSave },
                     ]
                 ).map((item, index) => (
@@ -256,7 +257,7 @@ export default function ListViewPage() {
   <span style={{ fontSize: "14px" }}>{list.likes?.length || 0}</span>
 </div>
         </div>
-      </div>
+      </div> 
 
       {/* Movies grid */}
       <div style={{ padding: "12px 16px" }}>
