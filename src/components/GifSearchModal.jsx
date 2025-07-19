@@ -200,7 +200,7 @@ export default function GifSearchModal({ onSelect, onClose }) {
        {/* ✅ Attribution mark */}
     <div style={{ textAlign: "center", marginTop: 12 }}>
     <img
-  src="/powered-by-giphy copy.png"
+  src="/powered-by-giphy.png"
   alt="Powered by GIPHY"
   style={{ width: 100, opacity: 0.8 }}
 />
