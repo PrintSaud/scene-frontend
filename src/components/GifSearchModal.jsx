@@ -129,7 +129,7 @@ export default function GifSearchModal({ onSelect, onClose }) {
         value={search}
         onChange={handleSearch}
         style={{
-          width: "100%",
+          width: "90%",
           padding: "10px 14px",
           borderRadius: "8px",
           border: "none",
@@ -178,6 +178,7 @@ export default function GifSearchModal({ onSelect, onClose }) {
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
           gap: "8px",
+          paddingBottom: "40px",
         }}
       >
         {gifs.map((gif) => (
