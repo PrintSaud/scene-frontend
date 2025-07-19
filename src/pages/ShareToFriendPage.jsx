@@ -156,13 +156,14 @@ export default function ShareToFriendPage() {
                 alignItems: "center",
                 paddingTop: 10,
                 paddingBottom: 10,
-                paddingRight: 16,  // keep spacing on right side
+                paddingRight: 16,
+                marginLeft: -16,  // ensure it shifts left to the screen edge
+                width: "100vw",   // force it to fill viewport width regardless of parent
                 borderBottom: "1px solid #222",
                 cursor: "pointer",
                 background: selected.includes(u._id) ? "#2a2a2a" : "transparent",
-                width: "100%",
                 boxSizing: "border-box",
-              }}  
+              }}              
             >
               <img src={u.avatar || "/default-avatar.png"} alt="avatar" style={{ width: 36, height: 36, borderRadius: "50%", marginRight: 12 }} />
               <span>@{u.username}</span>
