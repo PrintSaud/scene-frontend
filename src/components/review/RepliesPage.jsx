@@ -111,7 +111,6 @@ const { parentCommentId, parentUsername } = location.state || {};
       console.error("❌ Failed to send reply", err);
     }
   };
-}
 
   const handleDelete = async (replyId) => {
     const confirmDelete = window.confirm("Delete this reply?");
@@ -529,4 +528,4 @@ const { parentCommentId, parentUsername } = location.state || {};
       )}
        </div>
   );
-
+}
