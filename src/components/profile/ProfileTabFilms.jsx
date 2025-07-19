@@ -1,65 +1,69 @@
 import React from "react";
-import { backend } from "../../config";
+import { useNavigate } from "react-router-dom";
+import { AiFillHeart } from "react-icons/ai";
+import { FaRegComment } from "react-icons/fa";
 
+const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
+const FALLBACK_POSTER = "/default-poster.jpg";
 
-export default function ProfileTabFilms({ logs = [], navigate }) {
-  const handleClick = (log) => {
-    if (log.review) {
-      navigate(`/review/${log._id}`);
-    } else {
-      navigate(`/movie/${log.movie?._id || log.movieId}`);
-    }
-  };
-
-  const sortedLogs = logs
-    .filter((log) => log.movie?.poster)
-    .sort((a, b) => new Date(b.watchedAt) - new Date(a.watchedAt));
+export default function ProfileTabFilms({ logs, favorites = [] }) {
+  const navigate = useNavigate();
 
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
-        gap: "12px",
-        marginTop: "16px",
-      }}
-    >
-      {sortedLogs.map((log) => (
-        <div
-          key={log._id}
-          onClick={() => handleClick(log)}
-          style={{ cursor: "pointer" }}
-        >
-          <img
-            src={log.movie?.customPoster || log.movie?.poster}
-            alt={log.movie?.title}
-            style={{
-              width: "100%",
-              aspectRatio: "2/3",
-              objectFit: "cover",
-              borderRadius: "6px",
-            }}
-          />
+    <div style={{
+      display: "grid",
+      gridTemplateColumns: "repeat(3, 1fr)",
+      gap: "12px",
+      padding: "12px 0"
+    }}>
+      {logs.map((log) => {
+        const posterUrl = log.poster || FALLBACK_POSTER;
+        const rating = log.rating ? log.rating.toFixed(1) : "0.0";
+        const isFavorite = favorites.includes(Number(log.movie.id || log.movie));
+        const hasReview = log.review && log.review.trim().length > 0;
 
-          {/* ⭐ Rating + 📝 Review */}
-          {log.rating && (
-            <div
+        const handleClick = () => {
+          if (hasReview) {
+            navigate(`/review/${log._id}`);
+          } else {
+            navigate(`/movie/${log.movie.id || log.movie}`);
+          }
+        };
+
+        return (
+          <div
+            key={log._id}
+            onClick={handleClick}
+            style={{ cursor: "pointer", textAlign: "center" }}
+          >
+            <img
+              src={posterUrl}
+              alt={log.title}
               style={{
-                marginTop: "4px",
-                fontSize: "13px",
-                color: "#ddd",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "6px",
+                width: "100%",
+                height: "160px",
+                objectFit: "cover",
+                borderRadius: "8px",
+                marginBottom: "4px"
               }}
-            >
-              ⭐ {log.rating}
-              {log.review && <span>📝</span>}
+              onError={(e) => (e.currentTarget.src = FALLBACK_POSTER)}
+            />
+            <div style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "0 4px",
+              fontSize: "11.5px",
+              color: "#aaa",
+              fontFamily: "Inter"
+            }}>
+              <span>⭐ {rating}</span>
+              {hasReview && <FaRegComment size={12} />}
+              {isFavorite && <AiFillHeart size={12} color="#B327F6" />}
             </div>
-          )}
-        </div>
-      ))}
+          </div>
+        );
+      })}
     </div>
   );
 }

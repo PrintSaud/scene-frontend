@@ -1,10 +1,8 @@
-// src/components/movie/MovieTopBar.jsx
-import React from "react";
+import React, { useState } from "react";
 import { toast } from "react-hot-toast";
 import { toggleWatchlist } from "../../api/api";
+import axios from "axios";
 import { backend } from "../../config";
-
-
 
 export default function MovieTopBar({
   navigate,
@@ -14,17 +12,18 @@ export default function MovieTopBar({
   setShowPosterModal,
   setShowAddToListModal,
 }) {
-  const TMDB_IMG = "https://image.tmdb.org/t/p/original";
+  const [showOptions, setShowOptions] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   const handleToggleWatchlist = async () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
       const token = user?.token;
       if (!token) return toast.error("Not logged in");
-  
+
       const movieId = Number(movie.id || movie._id);
       await toggleWatchlist(movieId);
-  
+
       setIsInWatchlist(!isInWatchlist);
       toast.success(
         isInWatchlist ? "Removed from Watchlist" : "Added to Watchlist"
@@ -34,9 +33,29 @@ export default function MovieTopBar({
       toast.error("Failed to update watchlist");
     }
   };
-  
 
-  const [showOptions, setShowOptions] = React.useState(false);
+  const handleToggleFavorite = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const token = user?.token;
+      if (!token) return toast.error("Not logged in");
+
+      const movieId = Number(movie.id || movie._id);
+
+      if (isFavorite) {
+        await axios.delete(`${backend}/api/users/${user._id}/favorites/${movieId}`);
+        toast.success("❌ Removed from Favorites");
+      } else {
+        await axios.post(`${backend}/api/users/${user._id}/favorites/${movieId}`);
+        toast.success("❤️ Added to Favorites");
+      }
+
+      setIsFavorite(!isFavorite);
+    } catch (err) {
+      console.error("❌ Favorite error:", err.response?.data || err.message);
+      toast.error("Failed to update favorites");
+    }
+  };
 
   return (
     <div
@@ -51,7 +70,6 @@ export default function MovieTopBar({
         alignItems: "center",
       }}
     >
-      {/* 🔙 Back */}
       <button
         onClick={() => navigate(-1)}
         style={{
@@ -71,7 +89,6 @@ export default function MovieTopBar({
         ←
       </button>
 
-      {/* ⋯ Options */}
       <div style={{ position: "relative" }}>
         <button
           onClick={() => setShowOptions((prev) => !prev)}
@@ -103,7 +120,7 @@ export default function MovieTopBar({
               borderRadius: "12px",
               boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
               padding: "12px 0",
-              width: "180px",
+              width: "200px",
             }}
           >
             {[
@@ -116,14 +133,17 @@ export default function MovieTopBar({
                 onClick: handleToggleWatchlist,
               },
               {
+                label: "❤️ " + (isFavorite ? "Remove From Favorites" : "Add to Favorites"),
+                onClick: handleToggleFavorite,
+              },
+              {
                 label: "🎞 Add to List",
-                onClick: () =>
-                  setShowAddToListModal(true), // handled by parent modal logic
+                onClick: () => setShowAddToListModal(true),
               },
               {
                 label: "📤 Share to a Friend",
-                onClick: () => navigate(`/share/movie/${movie.id}`),  // ✅ correct path
-              },              
+                onClick: () => navigate(`/share/movie/${movie.id}`),
+              },
             ].map((item, index) => (
               <div
                 key={index}
