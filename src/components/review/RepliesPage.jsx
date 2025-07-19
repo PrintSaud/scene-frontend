@@ -113,26 +113,6 @@ const { parentCommentId, parentUsername } = location.state || {};
   };
 }
 
-  
-    await addLogReply(id, {
-      text: input,
-      gif: selectedGif,
-      image: selectedImage,
-      parentComment: parentCommentId || null, // ✅ correct key here from useLocation state
-    });
-  
-    setInput("");
-    setSelectedGif("");
-    setSelectedImage("");
-    fetchReplies();
-    inputRef.current?.focus();
-    setTimeout(() => {
-      listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
-    }, 100);
-
-  
-
-
   const handleDelete = async (replyId) => {
     const confirmDelete = window.confirm("Delete this reply?");
     if (!confirmDelete) return;
