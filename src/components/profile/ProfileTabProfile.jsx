@@ -1,10 +1,12 @@
 import React from "react";
-import { TMDB_IMG } from "../../config";
+import { backend } from "../../config";
+
+const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 
 export default function ProfileTabProfile({ favoriteMovies = [], logs = [], navigate, customPosters = {} }) {
   const recentlyWatched = Array.isArray(logs)
     ? logs
-        .filter((log) => log.movie?.poster || log.movie?.poster_path)
+        .filter((log) => log.movie?.poster)
         .sort((a, b) => new Date(b.watchedAt) - new Date(a.watchedAt))
         .slice(0, 6)
     : [];
@@ -14,11 +16,11 @@ export default function ProfileTabProfile({ favoriteMovies = [], logs = [], navi
     if (log.review) {
       navigate(`/review/${log._id}`);
     } else {
-      navigate(`/movie/${log.movie?.id || log.movie}`);
+      navigate(`/movie/${log.movie?._id || log.movieId}`);
     }
   };
 
-  const hasFavorites = favoriteMovies.length > 0;
+  const hasFavorites = favoriteMovies && favoriteMovies.length > 0;
 
   return (
     <>
@@ -39,20 +41,19 @@ export default function ProfileTabProfile({ favoriteMovies = [], logs = [], navi
             }}
           >
             {favoriteMovies.map((movie) => {
-              const movieId = movie.id || movie.tmdbId || movie._id;
               const poster =
-                customPosters[String(movieId)] ||
-                (movie.poster?.startsWith("http")
+                customPosters[movie.id || movie._id] ||
+                (movie.poster_path
+                  ? `${TMDB_IMG}${movie.poster_path}`
+                  : movie.poster?.startsWith("http")
                   ? movie.poster
                   : movie.poster
                   ? `${TMDB_IMG}${movie.poster}`
-                  : movie.poster_path
-                  ? `${TMDB_IMG}${movie.poster_path}`
                   : "/default-poster.jpg");
 
               return (
                 <img
-                  key={movieId}
+                  key={movie._id}
                   src={poster}
                   alt={movie.title}
                   style={{
@@ -105,9 +106,8 @@ export default function ProfileTabProfile({ favoriteMovies = [], logs = [], navi
             }}
           >
             {recentlyWatched.map((log) => {
-              const movieId = log.movie?.id || log.movie;
               const poster =
-                customPosters[String(movieId)] ||
+                log.posterOverride ||
                 (log.poster?.startsWith("http")
                   ? log.poster
                   : log.poster
