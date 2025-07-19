@@ -7,7 +7,7 @@ import { FaRegComment } from "react-icons/fa";
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const FALLBACK_POSTER = "/default-poster.jpg";
 
-export default function ProfileTabFilms({ logs, favorites = [], customPosters = {} }) {
+export default function ProfileTabFilms({ logs, favorites = [] }) {
   const navigate = useNavigate();
 
   return (
@@ -21,15 +21,12 @@ export default function ProfileTabFilms({ logs, favorites = [], customPosters = 
     >
       {logs.map((log) => {
         const movieId = log.movie?.id || log.movie;
-        const posterUrl =
-          customPosters[String(movieId)] ||
-          (log.poster?.startsWith("http")
-            ? log.poster
-            : log.poster
-            ? `${TMDB_IMG}${log.poster}`
-            : log.movie?.poster_path
-            ? `${TMDB_IMG}${log.movie.poster_path}`
-            : FALLBACK_POSTER);
+
+        const posterUrl = log.posterOverride
+          || (log.poster?.startsWith("http") ? log.poster
+          : log.poster ? `${TMDB_IMG}${log.poster}`
+          : log.movie?.poster_path ? `${TMDB_IMG}${log.movie.poster_path}`
+          : FALLBACK_POSTER);
 
         const isFavorite = favorites.includes(Number(movieId));
         const hasReview = log.review && log.review.trim().length > 0;
@@ -69,7 +66,7 @@ export default function ProfileTabFilms({ logs, favorites = [], customPosters = 
               }}
             >
               <StarRating rating={log.rating} size={12} />
-              {isFavorite && <AiFillHeart size={11} color="#B327F6" />}
+              {isFavorite && <AiFillHeart size={11} color="#B327F6" style={{ position: "relative", top: "-1px" }}/>}
               {hasReview && <FaRegComment size={9} style={{ position: "relative", top: "-1.5px" }} />}
             </div>
           </div>
