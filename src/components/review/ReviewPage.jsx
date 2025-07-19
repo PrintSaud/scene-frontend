@@ -8,6 +8,7 @@ import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import ReviewHeader from "./ReviewHeader";
 import MoreReviewsList from "./MoreReviewsList";
 import StarRating from "../StarRating";
+import api from "../../api/api";
 
 export default function ReviewPage() {
   const { id } = useParams();
