@@ -34,9 +34,7 @@ export default function ReviewPage() {
     const confirmDelete = window.confirm("Delete this review?");
     if (!confirmDelete) return;
     try {
-      await axios.delete(`${backend}/api/logs/${review._id}`, {
-        headers: { Authorization: `Bearer ${user?.token}` }
-      });
+      await api.delete(`/api/logs/${review._id}`);
       toast.success("🗑️ Review deleted!");
       navigate("/profile");
     } catch (err) {
@@ -44,6 +42,7 @@ export default function ReviewPage() {
       toast.error("Failed to delete review.");
     }
   };
+  
   
   const handleEdit = () => {
     navigate(`/movie/${review.movie?.id || review.movie}?edit=1&logId=${review._id}`);
