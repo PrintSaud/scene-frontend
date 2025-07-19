@@ -78,7 +78,13 @@ export default function MovieTopBar({
     if (!myLog) return;
     if (window.confirm("Are you sure you want to delete your log for this film?")) {
       try {
-        await axios.delete(`${backend}/api/logs/${myLog._id}`);
+        const user = JSON.parse(localStorage.getItem("user"));
+        const token = user?.token;
+  
+        await axios.delete(`${backend}/api/logs/${myLog._id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+  
         toast.success("✅ Log deleted successfully!");
         setMyLog(null);
       } catch (err) {
@@ -87,6 +93,7 @@ export default function MovieTopBar({
       }
     }
   };
+  
 
   return (
     <div
