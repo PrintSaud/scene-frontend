@@ -146,7 +146,7 @@ export default function ShareToFriendPage() {
       {mutualFollowers.length === 0 ? (
         <p style={{ color: "#aaa", textAlign: "center", marginTop: 50 }}>You have no mutual followers yet.</p>
       ) : (
-        <div style={{ padding: "0 16px" }}>
+        <div style={{ padding: 0 }}>
           {mutualFollowers.map((u) => (
             <div
               key={u._id}
