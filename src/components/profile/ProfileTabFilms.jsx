@@ -41,44 +41,48 @@ export default function ProfileTabFilms({ logs, favorites = [] }) {
 
   return (
     <>
-      {/* 🔽 Filter UI */}
-      <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: "8px", marginBottom: "12px" }}>
-        <select
-          value={sortType}
-          onChange={(e) => setSortType(e.target.value)}
-          style={{
-            background: "#111",
-            color: "#fff",
-            border: "1px solid #333",
-            borderRadius: "6px",
-            padding: "6px 10px",
-            fontSize: "13px",
-            minWidth: "130px",
-          }}
-        >
-          <option value="added">Recently Added</option>
-          <option value="rating">Rating</option>
-          <option value="release">Release Date</option>
-          <option value="runtime">Runtime</option>
-        </select>
+{/* 🔹 Small space after tabs */}
+<div style={{ height: "6px" }} />
 
-        <select
-          value={order}
-          onChange={(e) => setOrder(e.target.value)}
-          style={{
-            background: "#111",
-            color: "#fff",
-            border: "1px solid #333",
-            borderRadius: "6px",
-            padding: "6px 10px",
-            fontSize: "13px",
-            minWidth: "130px",
-          }}
-        >
-          <option value="desc">⬇ Descending</option>
-          <option value="asc">⬆ Ascending</option>
-        </select>
-      </div>
+{/* 🔽 Filter UI */}
+<div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: "8px", marginBottom: "8px" }}>
+  <select
+    value={sortType}
+    onChange={(e) => setSortType(e.target.value)}
+    style={{
+      background: "#111",
+      color: "#fff",
+      border: "1px solid #333",
+      borderRadius: "6px",
+      padding: "6px 10px",
+      fontSize: "13px",
+      minWidth: "130px",
+    }}
+  >
+    <option value="added">Recently Added</option>
+    <option value="rating">Rating</option>
+    <option value="release">Release Date</option>
+    <option value="runtime">Runtime</option>
+  </select>
+
+  <select
+    value={order}
+    onChange={(e) => setOrder(e.target.value)}
+    style={{
+      background: "#111",
+      color: "#fff",
+      border: "1px solid #333",
+      borderRadius: "6px",
+      padding: "6px 10px",
+      fontSize: "13px",
+      minWidth: "130px",
+    }}
+  >
+    <option value="desc">⬇ Descending</option>
+    <option value="asc">⬆ Ascending</option>
+  </select>
+</div>
+
 
       {/* 🎬 Grid */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "4px", padding: "0" }}>
@@ -128,8 +132,8 @@ export default function ProfileTabFilms({ logs, favorites = [] }) {
                 }}
               >
                 <StarRating rating={log.rating} size={12} />
-                {isFavorite && <AiFillHeart size={11} color="#B327F6" style={{ position: "relative", top: "-1px" }} />}
                 {hasReview && <FaRegComment size={9} style={{ position: "relative", top: "-1.5px" }} />}
+                {isFavorite && <AiFillHeart size={11} color="#B327F6" style={{ position: "relative", top: "-1px" }} />}
               </div>
             </div>
           );
