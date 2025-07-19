@@ -237,7 +237,9 @@ export default function ProfilePage() {
             triggerRefresh={() => setListRefreshKey((prev) => prev + 1)}
           />
         )}
-        {activeTab === "Films" && <ProfileTabFilms logs={logs} />}
+        {activeTab === "Films" && (
+  <ProfileTabFilms logs={logs} favorites={user.favoriteMovies || []} customPosters={user.customPosters || {}} />
+)}
       </div>
     </div>
   );
