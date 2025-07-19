@@ -120,7 +120,7 @@ export default function GifSearchModal({ onSelect, onClose }) {
     padding: "12px 16px 20px",
     overflowY: "auto",
   }}
-    >
+>
       {/* 🔍 Search */}
       <input
         type="text"
@@ -172,7 +172,7 @@ export default function GifSearchModal({ onSelect, onClose }) {
         ))}
       </div>
 
-  {/* Make GIF grid + attribution scroll together */}
+  {/* 👇 Scrollable content (GIFs + attribution together) */}
   <div>
     <div
       style={{
@@ -199,7 +199,7 @@ export default function GifSearchModal({ onSelect, onClose }) {
       ))}
     </div>
 
-    {/* Attribution is part of scrollable area now */}
+    {/* ✅ Attribution placed immediately after GIF grid */}
     <div style={{ textAlign: "center", marginTop: 12 }}>
       <img
         src="/powered-by-giphy.png"
