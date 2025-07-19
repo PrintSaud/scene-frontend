@@ -107,19 +107,19 @@ export default function GifSearchModal({ onSelect, onClose }) {
 
   return (
     <div
-      style={{
-        position: "absolute",
-        bottom: 0,
-        left: 0,
-        width: "100vw",
-        height: "75vh",
-        backgroundColor: "#111",
-        borderTopLeftRadius: "14px",
-        borderTopRightRadius: "14px",
-        zIndex: 9999,
-        padding: "12px 16px 20px",
-        overflowY: "auto",
-      }}
+  style={{
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    width: "100vw",
+    height: "75vh",
+    backgroundColor: "#111",
+    borderTopLeftRadius: "14px",
+    borderTopRightRadius: "14px",
+    zIndex: 9999,
+    padding: "12px 16px 20px",
+    overflowY: "auto",
+  }}
     >
       {/* 🔍 Search */}
       <input
@@ -172,41 +172,42 @@ export default function GifSearchModal({ onSelect, onClose }) {
         ))}
       </div>
 
-      {/* 🎞️ GIF Grid */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "8px",
-          paddingBottom: "40px",
-        }}
-      >
-        {gifs.map((gif) => (
-          <img
-            key={gif.id}
-            src={gif.images.fixed_width.webp}
-            alt={gif.title}
-            style={{
-              width: "100%",
-              borderRadius: "8px",
-              cursor: "pointer",
-              transition: "transform 0.2s ease",
-            }}
-            onClick={() => handleSelectGif(gif)}
-            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
-            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-          />
-        ))}
-      </div>
-       {/* ✅ Attribution mark */}
-    <div style={{ textAlign: "center", marginTop: 12 }}>
-    <img
-  src="/powered-by-giphy.png"
-  alt="Powered by GIPHY"
-  style={{ width: 100, opacity: 0.8 }}
-/>
+  {/* Make GIF grid + attribution scroll together */}
+  <div>
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap: "8px",
+      }}
+    >
+      {gifs.map((gif) => (
+        <img
+          key={gif.id}
+          src={gif.images.fixed_width.webp}
+          alt={gif.title}
+          style={{
+            width: "100%",
+            borderRadius: "8px",
+            cursor: "pointer",
+            transition: "transform 0.2s ease",
+          }}
+          onClick={() => handleSelectGif(gif)}
+          onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
+          onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+        />
+      ))}
+    </div>
 
-          </div>
+    {/* Attribution is part of scrollable area now */}
+    <div style={{ textAlign: "center", marginTop: 12 }}>
+      <img
+        src="/powered-by-giphy.png"
+        alt="Powered by GIPHY"
+        style={{ width: 100, opacity: 0.8 }}
+      />
+    </div>
   </div>
+</div>
 );
 }
