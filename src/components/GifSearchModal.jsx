@@ -199,11 +199,11 @@ export default function GifSearchModal({ onSelect, onClose }) {
       </div>
        {/* ✅ Attribution mark */}
     <div style={{ textAlign: "center", marginTop: 12 }}>
-      <img
-        src="https://raw.githubusercontent.com/Giphy/GiphyAPI/master/attribution/powered-by-giphy.png"
-        alt="Powered by GIPHY"
-        style={{ width: 100, opacity: 0.8 }}
-      />
+    <img
+  src="https://raw.githubusercontent.com/Giphy/GiphyAPI/master/attribution/powered-by-giphy.png"
+  alt="Powered by GIPHY"
+  style={{ width: 100, opacity: 0.8 }}
+/>
           </div>
   </div>
 );
