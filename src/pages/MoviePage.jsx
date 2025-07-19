@@ -7,6 +7,7 @@ import LogModal from "../components/modals/LogModal"; // update path if differen
 import { backend } from "../config";
 import { getWatchlistStatus } from "../api/api";
 import ListPickerModal from "../components/lists/ListPickerModal";
+import { useSearchParams } from "react-router-dom";
 
 
 // Components
@@ -21,6 +22,10 @@ export default function MoviePage() {
 
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const editMode = searchParams.get("edit") === "1";
+  const editLogId = searchParams.get("logId");
+
 
   const [movie, setMovie] = useState(null);
   const [credits, setCredits] = useState(null);
@@ -38,10 +43,16 @@ export default function MoviePage() {
   const [scrollReady, setScrollReady] = useState(false);
   const [showLogModal, setShowLogModal] = useState(false);
 
+useEffect(() => {
+  if (editMode && editLogId) {
+    setShowLogModal(true);
+  }
+}, [editMode, editLogId]);
+
+
   const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY;
   const TMDB_IMG = "https://image.tmdb.org/t/p/original";
   const TMDB_AVATAR = "https://image.tmdb.org/t/p/w185";
-
   
 
   const fetchLogs = async () => {
@@ -104,6 +115,12 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
   useEffect(() => {
     fetchLogs();
   }, [id]);
+  
+  useEffect(() => {
+    if (editMode && editLogId) {
+      setShowLogModal(true);
+    }
+  }, [editMode, editLogId]);
   
 
   useEffect(() => {
@@ -337,10 +354,15 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
 {showLogModal && (
   <LogModal
     movie={movie}
-    onClose={() => setShowLogModal(false)}
-    refreshLogs={fetchLogs} // ✅ THIS must be passed
+    editLogId={editLogId}
+    onClose={() => {
+      setShowLogModal(false);
+      navigate(`/movie/${id}`);  // Remove query params when closing
+    }}
+    refreshLogs={fetchLogs}
   />
 )}
+
     </div>
   );
 }

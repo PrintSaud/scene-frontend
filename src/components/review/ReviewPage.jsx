@@ -45,17 +45,8 @@ export default function ReviewPage() {
     }
   };
   
-  const handleEdit = async () => {
-    const newText = prompt("Edit your review:", review.review);
-    if (newText === null) return;
-    try {
-      await axios.patch(`${backend}/api/logs/${review._id}`, { review: newText });
-      toast.success("Review updated!");
-      fetchData();  // Refetch review after update
-    } catch (err) {
-      console.error("Edit failed", err);
-      toast.error("Failed to update review.");
-    }
+  const handleEdit = () => {
+    navigate(`/movie/${review.movie?.id || review.movie}?edit=1&logId=${review._id}`);
   };
   
 

@@ -11,8 +11,9 @@ import toast from "react-hot-toast";
 import { createLog } from "../../api/api";
 import { backend } from "../../config";
 
-export default function LogModal({ movie, onClose, refreshLogs }) {
-  const { logId } = useParams();
+export default function LogModal({ movie, onClose, refreshLogs, editLogId }) {
+  const { logId: logIdParam } = useParams();
+const logId = editLogId || logIdParam;
   const [isEditMode, setIsEditMode] = useState(false);
   const [rating, setRating] = useState(0);
   const [rewatchCount, setRewatchCount] = useState(0);
