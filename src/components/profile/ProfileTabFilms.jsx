@@ -69,8 +69,8 @@ export default function ProfileTabFilms({ logs, favorites = [], customPosters = 
               }}
             >
               <StarRating rating={log.rating} size={12} />
-              {hasReview && <FaRegComment size={9} style={{ position: "relative", top: "-2px" }} />}
-              {isFavorite && <AiFillHeart size={9} color="#B327F6" />}
+              {isFavorite && <AiFillHeart size={11} color="#B327F6" />}
+              {hasReview && <FaRegComment size={9} style={{ position: "relative", top: "-1.5px" }} />}
             </div>
           </div>
         );
