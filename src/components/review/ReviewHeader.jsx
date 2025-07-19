@@ -90,12 +90,12 @@ export default function ReviewHeader({
                       { label: "🎨 Change Backdrop", onClick: onChangeBackdrop },
                       { label: "✏️ Edit Review/Log", onClick: onEdit },  // 🟢 FIX: use onEdit not handleEdit
                       { label: "🗑️ Delete Review/Log", onClick: onDelete },
-                      { label: "📤 Share to Friends", onClick: () => navigate(`/share/${review._id}`) },
+                      { label: "📤 Share to Friends", onClick: () => navigate(`/share/log/${review._id}`) },
                       { label: "💾 Save Photo", onClick: () => navigate(`/share-review/${review._id}`) },
                       { label: "🔗 Copy Link", onClick: handleCopyLink }
                     ]
                     : [
-                      { label: "📤 Share to Friends", onClick: () => navigate(`/share/${review._id}`) },
+                      { label: "📤 Share to Friends", onClick: () => navigate(`/share/log/${review._id}`) },
                       { label: "🔗 Copy Link", onClick: handleCopyLink }
                     ]
                   ).map((item, index) => (

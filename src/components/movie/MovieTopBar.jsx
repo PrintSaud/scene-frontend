@@ -112,7 +112,7 @@ export default function MovieTopBar({
                 onClick: () => setShowPosterModal(true),
               },
               {
-                label: isInWatchlist ? "✅ In Watchlist" : "➕ Add to Watchlist",
+                label: isInWatchlist ? "❌ Remove From Watchlist" : "➕ Add to Watchlist",
                 onClick: handleToggleWatchlist,
               },
               {
@@ -122,8 +122,8 @@ export default function MovieTopBar({
               },
               {
                 label: "📤 Share to a Friend",
-                onClick: () => navigate(`/share/${movie.id}`),
-              },
+                onClick: () => navigate(`/share/movie/${movie.id}`),  // ✅ correct path
+              },              
             ].map((item, index) => (
               <div
                 key={index}
