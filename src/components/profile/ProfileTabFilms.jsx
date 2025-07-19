@@ -17,7 +17,6 @@ export default function ProfileTabFilms({ logs, favorites = [] }) {
     const sorted = [...logs];
     sorted.sort((a, b) => {
       let valA, valB;
-
       switch (sortType) {
         case "rating":
           valA = a.rating || 0;
@@ -35,7 +34,6 @@ export default function ProfileTabFilms({ logs, favorites = [] }) {
           valA = new Date(a.watchedAt || 0);
           valB = new Date(b.watchedAt || 0);
       }
-
       return (valA - valB) * (order === "asc" ? 1 : -1);
     });
     return sorted;
