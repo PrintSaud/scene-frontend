@@ -174,6 +174,7 @@ setHasUnread(unread.length > 0);
           <Route path="/upload-avatar" element={<UploadAvatarPage />} />
           <Route path="/share/:id" element={<ShareListPage />} />
           <Route path="/share-review/:id" element={<ShareReviewPage />} />
+          <Route path="/share-list/:id" element={<ShareToFriendPage />} />
           <Route path="/review/:id/replies" element={<RepliesPage />} />
           <Route path="/replies/:id" element={<RepliesPage />} />
           <Route path="/log/:logId" element={<LogModal />} />
