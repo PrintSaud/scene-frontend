@@ -86,12 +86,20 @@ export default function ShareToFriendPage() {
     }
   };
 
-  const mutualFollowers = allUsers.filter(
-    (u) =>
-      u._id !== currentUser?._id &&
-      currentUser?.following?.includes(u._id) &&
-      u.following?.includes(currentUser._id)
-  );
+  const mutualFollowers = allUsers.filter((u) => {
+    const currentUserId = currentUser?._id?.toString();
+    const userId = u._id?.toString();
+  
+    const currentUserFollowing = (currentUser?.following || []).map((id) => id.toString());
+    const userFollowing = (u.following || []).map((id) => id.toString());
+  
+    return (
+      userId !== currentUserId &&
+      currentUserFollowing.includes(userId) &&
+      userFollowing.includes(currentUserId)
+    );
+  });
+  
 
   if (loading) return <div style={{ padding: 20, color: "#fff", background: "#0e0e0e", minHeight: "100vh" }}>Loading...</div>;
 
