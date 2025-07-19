@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { toggleWatchlist } from "../../api/api";
 import axios from "axios";
@@ -14,6 +14,23 @@ export default function MovieTopBar({
 }) {
   const [showOptions, setShowOptions] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [myLog, setMyLog] = useState(null);
+
+  useEffect(() => {
+    const fetchMyLog = async () => {
+      try {
+        const user = JSON.parse(localStorage.getItem("user"));
+        if (!user) return;
+
+        const res = await axios.get(`${backend}/api/logs/user/${user._id}`);
+        const log = res.data.find((l) => String(l.movie.id) === String(movie.id));
+        setMyLog(log || null);
+      } catch (err) {
+        console.error("Failed to fetch user logs:", err);
+      }
+    };
+    fetchMyLog();
+  }, [movie.id]);
 
   const handleToggleWatchlist = async () => {
     try {
@@ -54,6 +71,20 @@ export default function MovieTopBar({
     } catch (err) {
       console.error("❌ Favorite error:", err.response?.data || err.message);
       toast.error("Failed to update favorites");
+    }
+  };
+
+  const handleDeleteLog = async () => {
+    if (!myLog) return;
+    if (window.confirm("Are you sure you want to delete your log for this film?")) {
+      try {
+        await axios.delete(`${backend}/api/logs/${myLog._id}`);
+        toast.success("✅ Log deleted successfully!");
+        setMyLog(null);
+      } catch (err) {
+        console.error("❌ Delete log error:", err);
+        toast.error("Failed to delete log");
+      }
     }
   };
 
@@ -144,7 +175,11 @@ export default function MovieTopBar({
                 label: "📤 Share to a Friend",
                 onClick: () => navigate(`/share/movie/${movie.id}`),
               },
-            ].map((item, index) => (
+              myLog && {
+                label: "🗑️ Delete Log",
+                onClick: handleDeleteLog,
+              }
+            ].filter(Boolean).map((item, index) => (
               <div
                 key={index}
                 onClick={() => {
