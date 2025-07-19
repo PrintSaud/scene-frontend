@@ -86,10 +86,32 @@ const { parentCommentId, parentUsername } = location.state || {};
       inputRef.current?.focus();
     }
   }, [parentUsername]);
-  
+
 
   const handleSend = async () => {
     if (!input.trim() && !selectedGif && !selectedImage) return;
+  
+    const formData = new FormData();
+    formData.append('text', input || '');
+    if (selectedGif) formData.append('gif', selectedGif);
+    if (selectedImage) formData.append('externalImage', selectedImage);
+    if (parentCommentId) formData.append('parentComment', parentCommentId);
+  
+    try {
+      await addLogReply(id, formData);
+      setInput("");
+      setSelectedGif("");
+      setSelectedImage("");
+      fetchReplies();
+      inputRef.current?.focus();
+      setTimeout(() => {
+        listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
+      }, 100);
+    } catch (err) {
+      console.error("❌ Failed to send reply", err);
+    }
+  };
+}
 
   
     await addLogReply(id, {
@@ -107,7 +129,7 @@ const { parentCommentId, parentUsername } = location.state || {};
     setTimeout(() => {
       listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
     }, 100);
-  };
+
   
 
 
@@ -527,4 +549,4 @@ const { parentCommentId, parentUsername } = location.state || {};
       )}
        </div>
   );
-}
+
