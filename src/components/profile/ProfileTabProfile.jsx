@@ -1,10 +1,10 @@
 import React from "react";
-import { backend } from "../../config";
+import { TMDB_IMG } from "../../config";
 
-export default function ProfileTabProfile({ favoriteMovies, logs = [], navigate }) {
+export default function ProfileTabProfile({ favoriteMovies = [], logs = [], navigate, customPosters = {} }) {
   const recentlyWatched = Array.isArray(logs)
     ? logs
-        .filter((log) => log.movie?.poster)
+        .filter((log) => log.movie?.poster || log.movie?.poster_path)
         .sort((a, b) => new Date(b.watchedAt) - new Date(a.watchedAt))
         .slice(0, 6)
     : [];
@@ -14,11 +14,11 @@ export default function ProfileTabProfile({ favoriteMovies, logs = [], navigate 
     if (log.review) {
       navigate(`/review/${log._id}`);
     } else {
-      navigate(`/movie/${log.movie?._id || log.movieId}`);
+      navigate(`/movie/${log.movie?.id || log.movie}`);
     }
   };
 
-  const hasFavorites = favoriteMovies && favoriteMovies.length > 0;
+  const hasFavorites = favoriteMovies.length > 0;
 
   return (
     <>
@@ -38,20 +38,33 @@ export default function ProfileTabProfile({ favoriteMovies, logs = [], navigate 
               marginTop: "10px",
             }}
           >
-            {favoriteMovies.map((movie) => (
-              <img
-                key={movie._id}
-                src={movie.customPoster || movie.poster}
-                alt={movie.title}
-                style={{
-                  width: "90px",
-                  height: "135px",
-                  objectFit: "cover",
-                  borderRadius: "6px",
-                  flexShrink: 0,
-                }}
-              />
-            ))}
+            {favoriteMovies.map((movie) => {
+              const movieId = movie.id || movie.tmdbId || movie._id;
+              const poster =
+                customPosters[String(movieId)] ||
+                (movie.poster?.startsWith("http")
+                  ? movie.poster
+                  : movie.poster
+                  ? `${TMDB_IMG}${movie.poster}`
+                  : movie.poster_path
+                  ? `${TMDB_IMG}${movie.poster_path}`
+                  : "/default-poster.jpg");
+
+              return (
+                <img
+                  key={movieId}
+                  src={poster}
+                  alt={movie.title}
+                  style={{
+                    width: "90px",
+                    height: "135px",
+                    objectFit: "cover",
+                    borderRadius: "6px",
+                    flexShrink: 0,
+                  }}
+                />
+              );
+            })}
           </div>
         </div>
       ) : (
@@ -91,36 +104,49 @@ export default function ProfileTabProfile({ favoriteMovies, logs = [], navigate 
               paddingBottom: "4px",
             }}
           >
-            {recentlyWatched.map((log) => (
-              <div
-                key={log._id}
-                onClick={() => handleLogClick(log)}
-                style={{ cursor: "pointer", flexShrink: 0 }}
-              >
-                <img
-                  src={log.movie?.poster}
-                  alt={log.movie?.title}
-                  style={{
-                    width: "95px",
-                    height: "145px",
-                    objectFit: "cover",
-                    borderRadius: "6px",
-                  }}
-                />
-                {log.rating && (
-                  <div
+            {recentlyWatched.map((log) => {
+              const movieId = log.movie?.id || log.movie;
+              const poster =
+                customPosters[String(movieId)] ||
+                (log.poster?.startsWith("http")
+                  ? log.poster
+                  : log.poster
+                  ? `${TMDB_IMG}${log.poster}`
+                  : log.movie?.poster_path
+                  ? `${TMDB_IMG}${log.movie.poster_path}`
+                  : "/default-poster.jpg");
+
+              return (
+                <div
+                  key={log._id}
+                  onClick={() => handleLogClick(log)}
+                  style={{ cursor: "pointer", flexShrink: 0 }}
+                >
+                  <img
+                    src={poster}
+                    alt={log.movie?.title}
                     style={{
-                      color: "#ccc",
-                      fontSize: "12px",
-                      textAlign: "center",
-                      marginTop: "4px",
+                      width: "95px",
+                      height: "145px",
+                      objectFit: "cover",
+                      borderRadius: "6px",
                     }}
-                  >
-                    ⭐ {log.rating}
-                  </div>
-                )}
-              </div>
-            ))}
+                  />
+                  {log.rating && (
+                    <div
+                      style={{
+                        color: "#ccc",
+                        fontSize: "12px",
+                        textAlign: "center",
+                        marginTop: "4px",
+                      }}
+                    >
+                      ⭐ {log.rating}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       ) : (

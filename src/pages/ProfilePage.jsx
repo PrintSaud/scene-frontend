@@ -208,7 +208,13 @@ export default function ProfilePage() {
       <ProfileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <div style={{ padding: "0 16px" }}>
-        {activeTab === "Profile" && <ProfileTabProfile logs={logs} />}
+        {activeTab === "Profile" && <ProfileTabProfile
+  logs={logs}
+  favoriteMovies={user.favoriteMovies || []}
+  customPosters={user.customPosters || {}}
+  navigate={navigate}
+/>
+}
         {activeTab === "Reviews" && (
           <ProfileTabReviews
             logs={logs}

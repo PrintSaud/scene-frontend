@@ -3,6 +3,9 @@ import api from "../../api/api";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
+const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
+const FALLBACK_POSTER = "/default-poster.jpg";
+
 export default function ProfileTabWatchlist({
   user,
   sortType,
@@ -15,7 +18,6 @@ export default function ProfileTabWatchlist({
 }) {
   const navigate = useNavigate();
   const isOwner = user?._id === profileUserId;
-  const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 
   useEffect(() => {
     const fetchWatchlist = async () => {
@@ -33,7 +35,7 @@ export default function ProfileTabWatchlist({
   }, [profileUserId, sortType, order]);
 
   return (
-    <div style={{ padding: "0" }}> {/* ✅ Remove all side padding */}
+    <div style={{ padding: "0" }}>
       {isOwner && (
         <div
           style={{
@@ -42,7 +44,7 @@ export default function ProfileTabWatchlist({
             flexWrap: "wrap",
             gap: "8px",
             marginBottom: "12px",
-            padding: "6px 12px", // ✅ Only padding for filters, not for posters
+            padding: "6px 12px",
           }}
         >
           <select
@@ -89,13 +91,16 @@ export default function ProfileTabWatchlist({
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "4px", // ✅ Tight gap
-            padding: "0",  // ✅ No side padding on grid itself
+            gap: "4px",
+            padding: "0",
           }}
         >
           {watchList.map((movie) => {
-            let image = "/default-poster.jpg";
-            if (movie.poster_path) {
+            let image = FALLBACK_POSTER;
+
+            if (movie.posterOverride) {
+              image = movie.posterOverride;
+            } else if (movie.poster_path) {
               image = `${TMDB_IMG}${movie.poster_path}`;
             } else if (movie.poster?.startsWith("http")) {
               image = movie.poster;
@@ -112,7 +117,7 @@ export default function ProfileTabWatchlist({
                   width: "100%",
                   aspectRatio: "2/3",
                   objectFit: "cover",
-                  borderRadius: "6px", // Optional: sharp edges for a full grid look
+                  borderRadius: "6px",
                   cursor: "pointer",
                 }}
                 onClick={() => {
@@ -128,7 +133,7 @@ export default function ProfileTabWatchlist({
                 }}
                 onError={(e) => {
                   e.target.onerror = null;
-                  e.target.src = "/default-poster.jpg";
+                  e.target.src = FALLBACK_POSTER;
                 }}
               />
             );
