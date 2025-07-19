@@ -15,16 +15,21 @@ export default function ProfileTabFilms({ logs, favorites = [], customPosters = 
       style={{
         display: "grid",
         gridTemplateColumns: "repeat(3, 1fr)",
-        gap: "8px",
-        padding: "12px 0"
+        gap: "4px",
+        padding: "0",
       }}
     >
       {logs.map((log) => {
         const movieId = log.movie?.id || log.movie;
         const posterUrl =
           customPosters[movieId] ||
-          log.poster ||
-          (log.movie?.poster_path ? `${TMDB_IMG}${log.movie.poster_path}` : FALLBACK_POSTER);
+          (log.poster?.startsWith("http")
+            ? log.poster
+            : log.poster
+            ? `${TMDB_IMG}${log.poster}`
+            : log.movie?.poster_path
+            ? `${TMDB_IMG}${log.movie.poster_path}`
+            : FALLBACK_POSTER);
 
         const isFavorite = favorites.includes(Number(movieId));
         const hasReview = log.review && log.review.trim().length > 0;
@@ -38,24 +43,15 @@ export default function ProfileTabFilms({ logs, favorites = [], customPosters = 
         };
 
         return (
-          <div
-            key={log._id}
-            onClick={handleClick}
-            style={{
-              cursor: "pointer",
-              textAlign: "center",
-              position: "relative"
-            }}
-          >
+          <div key={log._id} style={{ position: "relative", cursor: "pointer" }} onClick={handleClick}>
             <img
               src={posterUrl}
               alt={log.title}
               style={{
                 width: "100%",
-                height: "200px", // 🔥 Slightly larger poster
+                aspectRatio: "2/3",
                 objectFit: "cover",
-                borderRadius: "10px",
-                marginBottom: "4px"
+                borderRadius: "6px",
               }}
               onError={(e) => (e.currentTarget.src = FALLBACK_POSTER)}
             />
@@ -63,17 +59,18 @@ export default function ProfileTabFilms({ logs, favorites = [], customPosters = 
             <div
               style={{
                 display: "flex",
-                justifyContent: "center",
                 alignItems: "center",
-                gap: "6px",
-                fontSize: "11px",
+                justifyContent: "flex-start",
+                gap: "4px",
+                padding: "2px 4px 0 4px",
+                fontSize: "10px",
                 color: "#aaa",
-                fontFamily: "Inter"
+                fontFamily: "Inter",
               }}
             >
-              <StarRating rating={log.rating} size={12} />
-              {hasReview && <FaRegComment size={10} />}
-              {isFavorite && <AiFillHeart size={10} color="#B327F6" />}
+              <StarRating rating={log.rating} size={10} />
+              {hasReview && <FaRegComment size={9} style={{ position: "relative", top: "-1px" }} />}
+              {isFavorite && <AiFillHeart size={9} color="#B327F6" />}
             </div>
           </div>
         );
