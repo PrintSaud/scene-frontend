@@ -174,12 +174,12 @@ export default function GifSearchModal({ onSelect, onClose }) {
 
   {/* 👇 Scrollable content (GIFs + attribution together) */}
   <div>
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        gap: "8px",
-      }}
+  <div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "8px",
+  }}
     >
       {gifs.map((gif) => (
         <img
@@ -200,14 +200,14 @@ export default function GifSearchModal({ onSelect, onClose }) {
     </div>
 
     {/* ✅ Attribution placed immediately after GIF grid */}
-    <div style={{ textAlign: "center", marginTop: 12 }}>
-      <img
-        src="/powered-by-giphy.png"
-        alt="Powered by GIPHY"
-        style={{ width: 100, opacity: 0.8 }}
-      />
-    </div>
+    <div style={{ gridColumn: "1 / -1", textAlign: "center", marginTop: 12 }}>
+    <img
+      src="/powered-by-giphy.png"
+      alt="Powered by GIPHY"
+      style={{ width: 100, opacity: 0.8 }}
+    />
   </div>
+</div>
 </div>
 );
 }
