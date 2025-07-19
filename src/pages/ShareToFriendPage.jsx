@@ -154,14 +154,15 @@ export default function ShareToFriendPage() {
               style={{
                 display: "flex",
                 alignItems: "center",
-                padding: "10px 16px",  // ensure horizontal padding so background fills edge to edge
+                paddingTop: 10,
+                paddingBottom: 10,
+                paddingRight: 16,  // keep spacing on right side
                 borderBottom: "1px solid #222",
                 cursor: "pointer",
-                background: selected.includes(u._id) ? "#2a2a2a" : "transparent",  // optional: slightly lighter gray for clarity
-                width: "100%",  // ensure full width coverage
-                boxSizing: "border-box",  // fix for Safari and odd layouts
-              }}
-              
+                background: selected.includes(u._id) ? "#2a2a2a" : "transparent",
+                width: "100%",
+                boxSizing: "border-box",
+              }}  
             >
               <img src={u.avatar || "/default-avatar.png"} alt="avatar" style={{ width: 36, height: 36, borderRadius: "50%", marginRight: 12 }} />
               <span>@{u.username}</span>
