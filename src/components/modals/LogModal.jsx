@@ -63,17 +63,17 @@ const logId = editLogId || logIdParam;
       }
 
       if (isEditMode) {
-        const token = localStorage.getItem("token");
-await axios.patch(`${backend}/api/logs/${logId}`, formData, {
-  headers: { Authorization: `Bearer ${token}` }
-});
+        await api.patch(`${backend}/api/logs/${logId}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" }
+        });
         toast.success("✅ Log updated!");
       } else {
         await createLog(formData);
         const user = JSON.parse(localStorage.getItem("user"));
-        await axios.delete(`${backend}/api/watchlist/${user._id}/watchlist/${movieId}`);
+        await api.delete(`${backend}/api/watchlist/${user._id}/watchlist/${movieId}`);
         toast.success("🎬 Log submitted!");
       }
+      
 
       onClose();
       refreshLogs?.();
