@@ -15,12 +15,16 @@ export default function ProfileTabFilms({ logs, favorites = [] }) {
 
   const sortedLogs = useMemo(() => {
     let filtered = [...logs];
-
+  
+    // ⭐ FIX favorites filter to ensure numeric comparison
     if (sortType === "favorites") {
-      filtered = filtered.filter((log) => favorites.includes(log.movie?.id));
+      filtered = filtered.filter((log) => {
+        const movieId = log.movie?.id || log.movie;
+        return favorites.includes(Number(movieId));
+      });
       return filtered;
     }
-
+  
     filtered.sort((a, b) => {
       let valA, valB;
       switch (sortType) {
@@ -29,12 +33,20 @@ export default function ProfileTabFilms({ logs, favorites = [] }) {
           valB = b.rating || 0;
           break;
         case "release":
-          valA = a.movie?.release_date ? new Date(a.movie.release_date).getTime() : 0;
-          valB = b.movie?.release_date ? new Date(b.movie.release_date).getTime() : 0;
+          valA = a.movie && a.movie.release_date
+            ? new Date(a.movie.release_date).getTime()
+            : 0;
+          valB = b.movie && b.movie.release_date
+            ? new Date(b.movie.release_date).getTime()
+            : 0;
           break;
         case "runtime":
-          valA = a.movie?.runtime || 0;
-          valB = b.movie?.runtime || 0;
+          valA = a.movie && a.movie.runtime
+            ? a.movie.runtime
+            : 0;
+          valB = b.movie && b.movie.runtime
+            ? b.movie.runtime
+            : 0;
           break;
         default:
           valA = new Date(a.watchedAt || 0).getTime();
@@ -42,9 +54,10 @@ export default function ProfileTabFilms({ logs, favorites = [] }) {
       }
       return (valA - valB) * (order === "asc" ? 1 : -1);
     });
-
+  
     return filtered;
   }, [logs, sortType, order, favorites]);
+  
 
   return (
     <>
@@ -95,7 +108,7 @@ export default function ProfileTabFilms({ logs, favorites = [] }) {
       {sortedLogs.length === 0 ? (
         <div style={{ textAlign: "center", color: "#888", marginTop: "30px", fontSize: "14px" }}>
           {sortType === "favorites"
-            ? "✨ You haven’t marked any favorite films yet."
+            ? "You haven’t marked any favorite films yet."
             : "No films found for this filter."}
         </div>
       ) : (
@@ -146,8 +159,8 @@ export default function ProfileTabFilms({ logs, favorites = [] }) {
                   }}
                 >
                   <StarRating rating={log.rating} size={12} />
-                  {hasReview && <FaRegComment size={9} style={{ position: "relative", top: "-1.5px" }} />}
                   {isFavorite && <AiFillHeart size={11} color="#B327F6" style={{ position: "relative", top: "-1.5px" }} />}
+                  {hasReview && <FaRegComment size={9} style={{ position: "relative", top: "-1.5px" }} />}
                 </div>
               </div>
             );
