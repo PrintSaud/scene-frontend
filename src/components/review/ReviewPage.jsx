@@ -29,23 +29,37 @@ export default function ReviewPage() {
     return then.toLocaleDateString();
   }
 
-  const handleEdit = () => {
-    navigate(`/log/${review._id}`);
-  };
 
   const handleDelete = async () => {
+    const confirmDelete = window.confirm("Delete this review?");
+    if (!confirmDelete) return;
     try {
-      const token = localStorage.getItem("token");
       await axios.delete(`${backend}/api/logs/${review._id}`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${user?.token}` }
       });
       toast.success("🗑️ Review deleted!");
-      navigate("/profile");  // or wherever you want after deletion
+      navigate("/profile");
     } catch (err) {
       console.error("Delete failed", err);
       toast.error("Failed to delete review.");
     }
   };
+  
+  const handleEdit = async () => {
+    const newText = prompt("Edit your review:", review.review);
+    if (newText === null) return;
+    try {
+      await axios.patch(`${backend}/api/logs/${review._id}`, { review: newText });
+      toast.success("Review updated!");
+      fetchData();  // Refetch review after update
+    } catch (err) {
+      console.error("Edit failed", err);
+      toast.error("Failed to update review.");
+    }
+  };
+  
+
+
   
 
   const fetchData = async () => {

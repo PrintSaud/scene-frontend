@@ -46,6 +46,11 @@ export const deleteReply = (logId, replyId) => api.delete(`/api/logs/${logId}/re
 // Likes for reviews/logs
 export const likeLog = (logId) => api.post(`/api/logs/${logId}/like`);
 
+export const deleteLog = (logId) => api.delete(`/api/logs/${logId}`);
+export const editLog = (logId, data) => api.patch(`/api/logs/${logId}`, data);
+
+
+
 // Likes for replies
 export const likeReply = (logId, replyId) => api.post(`/api/logs/${logId}/replies/${replyId}/like`);
 
