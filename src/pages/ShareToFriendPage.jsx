@@ -28,15 +28,18 @@ export default function ShareToFriendPage() {
       try {
         const stored = localStorage.getItem("user");
         if (!stored) return toast.error("Not logged in");
-
-        const user = JSON.parse(stored);
-        setCurrentUser(user);
-
+    
+        const loggedIn = JSON.parse(stored);
+    
+        // 🔥 FIX: Fetch fresh current user data with following/followers included
+        const { data: freshUser } = await axios.get(`${backend}/api/users/${loggedIn._id}`);
+        setCurrentUser(freshUser);
+    
         const usersRes = await axios.get(`${backend}/api/users`);
         setAllUsers(usersRes.data);
-
+    
         let title = "";
-
+    
         if (type === "movie") {
           try {
             const res = await axios.get(`${backend}/api/movies/${id}`);
@@ -52,7 +55,7 @@ export default function ShareToFriendPage() {
           const res = await axios.get(`${backend}/api/lists/${id}`);
           title = res.data.title || "Untitled List";
         }
-
+    
         setResourceTitle(title);
         setLoading(false);
       } catch (err) {
@@ -61,6 +64,7 @@ export default function ShareToFriendPage() {
         setLoading(false);
       }
     };
+    
 
     if (type && id) fetchData();
   }, [type, id]);
