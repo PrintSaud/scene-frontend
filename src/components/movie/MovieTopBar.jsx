@@ -134,7 +134,7 @@ export default function MovieTopBar({
                 style={{
                   padding: "10px 16px",
                   cursor: "pointer",
-                  fontSize: "14.5px",
+                  fontSize: "12.5px",
                   fontWeight: "500",
                   color: "#fff",
                   fontFamily: "Inter",
