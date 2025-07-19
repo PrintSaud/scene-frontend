@@ -10,7 +10,8 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { createLog } from "../../api/api";
 import { backend } from "../../config";
-import api from "../api/api";
+import api from "../../api/api";
+
 
 export default function LogModal({ movie, onClose, refreshLogs, editLogId }) {
   const { logId: logIdParam } = useParams();
