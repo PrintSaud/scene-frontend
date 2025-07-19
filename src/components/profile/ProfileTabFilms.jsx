@@ -22,7 +22,7 @@ export default function ProfileTabFilms({ logs, favorites = [], customPosters = 
       {logs.map((log) => {
         const movieId = log.movie?.id || log.movie;
         const posterUrl =
-          customPosters[movieId] ||
+          customPosters[String(movieId)] ||
           (log.poster?.startsWith("http")
             ? log.poster
             : log.poster
@@ -68,8 +68,8 @@ export default function ProfileTabFilms({ logs, favorites = [], customPosters = 
                 fontFamily: "Inter",
               }}
             >
-              <StarRating rating={log.rating} size={10} />
-              {hasReview && <FaRegComment size={9} style={{ position: "relative", top: "-1px" }} />}
+              <StarRating rating={log.rating} size={12} />
+              {hasReview && <FaRegComment size={9} style={{ position: "relative", top: "-2px" }} />}
               {isFavorite && <AiFillHeart size={9} color="#B327F6" />}
             </div>
           </div>

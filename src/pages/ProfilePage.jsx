@@ -238,7 +238,11 @@ export default function ProfilePage() {
           />
         )}
         {activeTab === "Films" && (
-  <ProfileTabFilms logs={logs} favorites={user.favoriteMovies || []} customPosters={user.customPosters || {}} />
+          <ProfileTabFilms
+          logs={logs}
+          favorites={user.favorites || []}  // ✅ Use correct schema field
+          customPosters={user.customPosters || {}}
+        />        
 )}
       </div>
     </div>
