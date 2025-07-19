@@ -158,7 +158,7 @@ export default function ShareToFriendPage() {
                 paddingBottom: 10,
                 paddingRight: 16,
                 paddingLeft: 12,        // ➡️ slight indent for avatar
-                marginLeft: -18,        // ✅ extend background full left
+                marginLeft: -20,        // ✅ extend background full left
                 width: "100vw",         // ✅ ensure full width
                 borderBottom: "1px solid #222",
                 cursor: "pointer",
