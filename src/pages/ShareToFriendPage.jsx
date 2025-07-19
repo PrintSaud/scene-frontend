@@ -130,7 +130,7 @@ export default function ShareToFriendPage() {
           onClick={handleSend}
           disabled={selected.length === 0}
           style={{
-            background: selected.length === 0 ? "#444" : "#1db954",
+            background: selected.length === 0 ? "#444" : "#B327F6",
             color: "#fff",
             padding: "6px 14px",
             borderRadius: 6,
@@ -154,11 +154,14 @@ export default function ShareToFriendPage() {
               style={{
                 display: "flex",
                 alignItems: "center",
-                padding: "10px 0",
+                padding: "10px 16px",  // ensure horizontal padding so background fills edge to edge
                 borderBottom: "1px solid #222",
                 cursor: "pointer",
-                background: selected.includes(u._id) ? "#222" : "transparent",
+                background: selected.includes(u._id) ? "#2a2a2a" : "transparent",  // optional: slightly lighter gray for clarity
+                width: "100%",  // ensure full width coverage
+                boxSizing: "border-box",  // fix for Safari and odd layouts
               }}
+              
             >
               <img src={u.avatar || "/default-avatar.png"} alt="avatar" style={{ width: 36, height: 36, borderRadius: "50%", marginRight: 12 }} />
               <span>@{u.username}</span>
