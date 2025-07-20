@@ -42,29 +42,31 @@ export default function SearchPage() {
 
         if (filtered.length > 0) {
           setResults(filtered);
-          // After setting results, fetch poster overrides:
-if (filtered.length > 0) {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const userId = user?._id;
-
-  const overrides = {};
-  await Promise.all(filtered.map(async (movie) => {
-    try {
-      const res = await fetch(`${backend}/api/custom-poster/${movie.id}?userId=${userId}`);
-      const data = await res.json();
-      if (data.posterOverride) {
-        overrides[movie.id] = data.posterOverride;
-      }
-    } catch (err) {
-      console.warn(`Custom poster fetch failed for movie ${movie.id}`, err);
-    }
-  }));
-
-  setPosterOverrides(overrides);
-}
-
+        
+          const user = JSON.parse(localStorage.getItem("user"));
+          const userId = user?._id;
+        
+          if (userId) {
+            const overrides = {};
+            await Promise.all(filtered.map(async (movie) => {
+              try {
+                const res = await fetch(`${backend}/api/posters/${movie.id}?userId=${userId}`);
+                const data = await res.json();
+                if (data.posterOverride) {
+                  overrides[movie.id] = data.posterOverride;
+                }
+              } catch (err) {
+                console.warn(`Custom poster fetch failed for movie ${movie.id}`, err);
+              }
+            }));
+        
+            setPosterOverrides(overrides);
+          }
+        
           return;
         }
+        
+    
 
         // 🔁 Fallback by ID
         if (!isNaN(q)) {
