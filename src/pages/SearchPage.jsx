@@ -15,6 +15,7 @@ export default function SearchPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const [posterOverrides, setPosterOverrides] = useState({});
 
   const tabs = ["films",]; //"users", "lists "];
 
@@ -41,6 +42,27 @@ export default function SearchPage() {
 
         if (filtered.length > 0) {
           setResults(filtered);
+          // After setting results, fetch poster overrides:
+if (filtered.length > 0) {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const userId = user?._id;
+
+  const overrides = {};
+  await Promise.all(filtered.map(async (movie) => {
+    try {
+      const res = await fetch(`${backend}/api/custom-poster/${movie.id}?userId=${userId}`);
+      const data = await res.json();
+      if (data.posterOverride) {
+        overrides[movie.id] = data.posterOverride;
+      }
+    } catch (err) {
+      console.warn(`Custom poster fetch failed for movie ${movie.id}`, err);
+    }
+  }));
+
+  setPosterOverrides(overrides);
+}
+
           return;
         }
 
@@ -168,16 +190,19 @@ export default function SearchPage() {
               >
                 {movie.poster_path ? (
                   <img
-                    src={movie.customPoster || `https://image.tmdb.org/t/p/w200${movie.poster_path}`}
-                    alt={movie.title}
-                    style={{
-                      width: "100%",
-                      height: "280px",
-                      objectFit: "cover",
-                      borderRadius: "8px",
-                      marginBottom: "10px",
-                    }}
-                  />
+                  src={posterOverrides[movie.id] 
+                    || (movie.poster_path && `https://image.tmdb.org/t/p/w200${movie.poster_path}`) 
+                    || "/default-poster.jpg"
+                  }
+                  alt={movie.title}
+                  style={{
+                    width: "100%",
+                    height: "280px",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                    marginBottom: "10px",
+                  }}
+                />                
                 ) : (
                   <div style={{ width: "100%", height: "250px", background: "#333", borderRadius: "8px", marginBottom: "10px" }} />
                 )}
