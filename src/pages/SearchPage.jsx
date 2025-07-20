@@ -200,11 +200,13 @@ export default function SearchPage() {
                   style={{
                     width: "100%",
                     height: "280px",
-                    objectFit: "cover",
+                    objectFit: "contain",
                     borderRadius: "8px",
                     marginBottom: "10px",
+                    backgroundColor: "#111",  // Optional clean background
                   }}
-                />                
+                />
+                            
                 ) : (
                   <div style={{ width: "100%", height: "250px", background: "#333", borderRadius: "8px", marginBottom: "10px" }} />
                 )}
