@@ -179,17 +179,16 @@ export default function SearchPage() {
            gap: "14px", justifyContent: "center", }}>
             {results.map((movie) => (
               <div
-                key={movie.id}
-                onClick={() => navigate(`/movie/${movie.id}`)}
-                style={{
-                  background: "#111",
-                  borderRadius: "12px",
-                  overflow: "hidden",
-                  padding: "10px",
-                  cursor: "pointer",
-                  width: "170px",
-                }}
-              >
+              key={movie.id}
+              onClick={() => navigate(`/movie/${movie.id}`)}
+              style={{
+                background: "#111",
+                borderRadius: "12px",
+                overflow: "hidden",
+                cursor: "pointer",
+                width: "170px",
+              }}
+            >            
                 {movie.poster_path ? (
                   <img
                   src={posterOverrides[movie.id] 
