@@ -144,19 +144,27 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
   
     const fetchPoster = async () => {
       try {
-        const { data } = await axios.get(`${backend}/api/posters/${movie.id}`);
-        if (data?.posterUrl) {
-          setPosterOverride(data.posterUrl);
+        const user = JSON.parse(localStorage.getItem("user"));
+        const userId = user?._id;
+        if (!userId) return;
+  
+        const { data } = await axios.get(`${backend}/api/posters/${movie.id}?userId=${userId}`);
+        if (data?.posterOverride) {
+          setPosterOverride(data.posterOverride);
         } else {
-          setPosterOverride(null); // No custom poster exists
+          setPosterOverride(null);
         }
       } catch (err) {
-        setPosterOverride(null); // API returned 404 or failed → fallback to TMDB poster later
+        setPosterOverride(null);
+        console.warn("Custom poster fetch failed on MoviePage:", err);
       }
     };
   
     fetchPoster();
   }, [movie]);
+  
+  
+
   
 
   useEffect(() => {
