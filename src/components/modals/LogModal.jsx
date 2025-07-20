@@ -82,10 +82,13 @@ export default function LogModal({ movie, onClose, refreshLogs, editLogId }) {
         });
         toast.success("✅ Log updated!");
       } else {
-        await createLog(formData);
+        await api.post(`${backend}/api/logs/full`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
         await api.delete(`${backend}/api/watchlist/${user._id}/watchlist/${movieId}`);
         toast.success("🎬 Log submitted!");
       }
+      
 
       if (isFavorite && user) {
         await axios.post(`${backend}/api/users/${user._id}/favorites/${movieId}`);
