@@ -63,7 +63,8 @@ export default function LogModal({ movie, onClose, refreshLogs, editLogId }) {
       formData.append("movieId", movieId);
       formData.append("review", review);
       formData.append("rating", rating.toString());
-      formData.append("rewatch", rewatchCount.toString());
+      formData.append("rewatch", rewatchCount > 0 ? "true" : "false");  // Proper boolean flag for backend
+formData.append("rewatchCount", rewatchCount.toString());         // Actual numeric count value!
       formData.append("watchedAt", new Date().toISOString());
       formData.append("gif", gifUrl || "");
       formData.append("title", movieData?.title || "Untitled");
@@ -260,8 +261,8 @@ export default function LogModal({ movie, onClose, refreshLogs, editLogId }) {
           >
             <HiOutlineRefresh size={18} />
             <span style={{ fontSize: "13px" }}>
-              {rewatchCount > 0
-                ? `Rewatched ${rewatchCount}x`
+              {rewatchCount > 1
+                ? `${rewatchCount}x`
                 : "Mark as Rewatch"}
             </span>
           </div>
