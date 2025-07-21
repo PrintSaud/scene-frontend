@@ -261,7 +261,13 @@ export default function ListViewPage() {
       </div> 
 
 {/* Movies grid */}
-<div style={{ padding: "12px 16px" }}>
+<div
+  style={{
+    padding: "12px 16px",
+    marginTop: list.coverImage ? "0px" : "12px",  // 🔥 Only add margin if no image
+    marginBottom: "24px",
+  }}
+>
   <h3 style={{ marginBottom: "12px" }}>
     🎬 {list.isRanked ? "Ranked Movies" : "Movies"}:
   </h3>

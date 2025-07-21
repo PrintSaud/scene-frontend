@@ -140,12 +140,12 @@ export default function EditListPage() {
         {/* Toggles */}
         <label style={toggleStyle}>
           <input type="checkbox" checked={isPrivate} onChange={() => setIsPrivate(!isPrivate)} />
-          <span style={{ marginLeft: "8px" }}>🔒 Private</span>
+          <span style={{ marginLeft: "8px" }}>Private</span>
         </label>
 
         <label style={toggleStyle}>
           <input type="checkbox" checked={isRanked} onChange={() => setIsRanked(!isRanked)} />
-          <span style={{ marginLeft: "8px" }}>🏆 Ranked</span>
+          <span style={{ marginLeft: "8px" }}>Ranked</span>
         </label>
 
 {/* Movies */}
