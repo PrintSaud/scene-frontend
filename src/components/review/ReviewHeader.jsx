@@ -35,6 +35,12 @@ export default function ReviewHeader({
     const avatarUrl = review.user?.avatar
       ? review.user.avatar
       : "/default-avatar.jpg";
+
+      const posterUrl = review.posterOverride
+  || review.poster
+  || review.movie?.poster
+  || "/default-poster.jpg";
+
   
     const getRelativeTime = (date) => {
       const now = Date.now();
@@ -171,9 +177,9 @@ export default function ReviewHeader({
 }}>
   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
     <StarRating rating={review.rating} />
-    {rewatchCount > 1 && (
+    {rewatchCount > 0 && (
       <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-        <HiOutlineRefresh size={12} color="#aaa" />
+        <HiOutlineRefresh size={14} color="#aaa" />
         <span style={{ fontSize: 10, color: "#aaa" }}>
           {rewatchCount}x
         </span>
