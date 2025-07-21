@@ -77,11 +77,11 @@ export default function ProfileTabWatchlist({
               borderRadius: "5px",
               padding: "4px 8px",
               fontSize: "12px",
-              minWidth: "100px",
+              minWidth: "40px",
             }}
           >
-            <option value="desc">⬇ Desc</option>
-            <option value="asc">⬆ Asc</option>
+            <option value="desc">⬇</option>
+            <option value="asc">⬆</option>
           </select>
   
           <select
