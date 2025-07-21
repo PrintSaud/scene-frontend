@@ -88,25 +88,27 @@ export default function ListViewPage() {
   return (
     <div style={{ background: "#0e0e0e", minHeight: "100vh", color: "white", paddingBottom: "80px" }}>
       {/* Cover */}
-      <div style={{ position: "relative", height: "220px", overflow: "hidden", background: list.coverImage ? "none" : "#1a1a1a" }}>
-        <img
-          src={list.coverImage || FALLBACK_COVER}
-          alt="cover"
-          style={{ width: "100%", height: "100%", objectFit: "cover" }}
-          onError={(e) => (e.currentTarget.src = FALLBACK_COVER)}
-        />
-
+      {list.coverImage && (
+        <div style={{ position: "relative", height: "220px", overflow: "hidden" }}>
+          <img
+            src={list.coverImage}
+            alt="cover"
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
+  
           {/* 🔥 Fade-down overlay */}
-  <div style={{
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: "100px",
-    background: "linear-gradient(to bottom, rgba(0,0,0,0) 0%, #0e0e0e 100%)",
-    zIndex: 1
-  }} />
-
+          <div style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: "100px",
+            background: "linear-gradient(to bottom, rgba(0,0,0,0) 0%, #0e0e0e 100%)",
+            zIndex: 1
+          }} />
+        </div>
+      )}
+  
         <div
           style={{
             position: "absolute",
@@ -213,14 +215,13 @@ export default function ListViewPage() {
             )}
           </div>
         </div>
-      </div>
+
 
       {/* Content */}
       <div style={{ padding: "12px 16px 0 16px" }}>
         <h2 style={{
           marginBottom: "4px",
-          fontSize: "22px",
-          fontFamily: "Inter, sans-serif",
+          fontSize: "18px",
           fontWeight: "600"
         }}>
           {list.title}
@@ -259,50 +260,64 @@ export default function ListViewPage() {
         </div>
       </div> 
 
-      {/* Movies grid */}
-      <div style={{ padding: "12px 16px" }}>
-        <h3 style={{ marginBottom: "12px" }}>🎬 {list.isRanked ? "Ranked Movies" : "Movies"}:</h3>
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
-          gap: "12px"
-        }}>
-          {list.movies.map((movie, index) => {
-            const posterUrl =
-              movie.posterOverride ||
-              (movie.poster?.startsWith("/") ? `${TMDB_IMG}${movie.poster}` : movie.poster) ||
-              "/default-poster.jpg";
+{/* Movies grid */}
+<div style={{ padding: "12px 16px" }}>
+  <h3 style={{ marginBottom: "12px" }}>
+    🎬 {list.isRanked ? "Ranked Movies" : "Movies"}:
+  </h3>
 
-            return (
-              <div
-                key={movie.id}
-                onClick={() => navigate(`/movie/${movie.id}`)}
-                style={{ cursor: "pointer", textAlign: "center" }}
-              >
-                <img
-                  src={posterUrl}
-                  alt={movie.title}
-                  style={{
-                    width: "100%",
-                    height: "180px",
-                    objectFit: "cover",
-                    borderRadius: "8px",
-                    marginBottom: "4px"
-                  }}
-                />
-                <div style={{
-                  fontSize: "12px",
-                  color: "#fff",
-                  fontFamily: "Inter, sans-serif",
-                  lineHeight: "1.2"
-                }}>
-                  {list.isRanked ? `${index + 1}. ` : ""}{movie.title}
-                </div>
-              </div>
-            );
-          })}
+  <div
+    style={{
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
+      gap: "12px",
+    }}
+  >
+    {list.movies.map((movie, index) => {
+      const posterUrl =
+        movie.posterOverride ||
+        (movie.poster?.startsWith("/")
+          ? `${TMDB_IMG}${movie.poster}`
+          : movie.poster);
+
+      return (
+        <div
+          key={movie.id}
+          onClick={() => navigate(`/movie/${movie.id}`)}
+          style={{ cursor: "pointer", textAlign: "center" }}
+        >
+          {posterUrl && (
+            <img
+              src={posterUrl}
+              alt={movie.title}
+              style={{
+                width: "100%",
+                aspectRatio: "2/3",  // 🔥 match Watchlist / Films tab perfectly
+                objectFit: "cover",
+                borderRadius: "8px",
+                marginBottom: "4px",
+              }}
+            />
+          )}
+          <div
+            style={{
+              fontSize: "12px",
+              color: "#fff",
+              fontFamily: "Inter, sans-serif",
+              lineHeight: "1.2",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {list.isRanked ? `${index + 1}. ` : ""}
+            {movie.title}
+          </div>
         </div>
-      </div>
+      );
+    })}
+  </div>
+</div>
     </div>
   );
 }
