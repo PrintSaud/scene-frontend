@@ -144,20 +144,25 @@ formData.append("rewatchCount", rewatchCount.toString());         // Actual nume
 
       {/* Poster + Title + Stars */}
       <div style={{ display: "flex", gap: "16px", marginBottom: "20px" }}>
-        <img
-          src={
-            movieData?.poster_path
-              ? `https://image.tmdb.org/t/p/w300${movieData.poster_path}`
-              : movieData?.poster || "/default-poster.png"
-          }
-          alt={movieData?.title}
-          style={{
-            width: "150px",
-            height: "240px",
-            objectFit: "cover",
-            borderRadius: "10px",
-          }}
-        />
+      <img
+  src={
+    movieData?.posterOverride
+      ? movieData.posterOverride
+      : movieData?.poster && movieData.poster.startsWith("http")
+      ? movieData.poster
+      : movieData?.poster_path
+      ? `https://image.tmdb.org/t/p/w300${movieData.poster_path}`
+      : "/default-poster.png"
+  }
+  alt={movieData?.title}
+  style={{
+    width: "150px",
+    height: "240px",
+    objectFit: "cover",
+    borderRadius: "10px",
+  }}
+/>
+
         <div>
           <h2
             style={{

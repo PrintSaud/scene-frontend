@@ -119,7 +119,8 @@ export default function ReviewPage() {
       backgroundColor: "#0e0e0e",
       color: "#fff",
       minHeight: "100vh",
-      overflowY: "auto"   // ⭐️ Add this
+      overflowY: "auto",
+      paddingBottom: "80px"  // ⭐️ Add this line (adjust if needed)
     }}>
     
       <ReviewHeader
