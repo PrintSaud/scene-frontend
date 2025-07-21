@@ -10,6 +10,7 @@ import ProfileTabLists from "../components/profile/ProfileTabLists";
 import ProfileTabFilms from "../components/profile/ProfileTabFilms";
 import api, { getUserProfile } from "../api/api";
 import toast from "react-hot-toast";
+import { followUser } from "../api/api";
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -73,14 +74,17 @@ export default function ProfilePage() {
     }
   }, [user, stored]);
 
+
+
   const handleFollow = async () => {
     try {
-      await api.post(`/api/users/${stored._id}/follow/${user._id}`);
+      await followUser(user._id);
       setIsFollowing(!isFollowing);
     } catch (err) {
       console.error("❌ Failed to follow/unfollow:", err);
     }
   };
+  
 
   const handleCopyLink = () => {
     const link = `${window.location.origin}/profile/${user._id}`;
