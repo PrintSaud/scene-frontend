@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import StarRating from "../StarRating";
 import { AiFillHeart } from "react-icons/ai";
 import { FaRegComment } from "react-icons/fa";
+import axios from "../../api/api"; // or wherever you import your axios instance
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const FALLBACK_POSTER = "/default-poster.jpg";
@@ -124,13 +125,22 @@ export default function ProfileTabFilms({ logs, favorites = [] }) {
             const isFavorite = favorites.includes(Number(movieId));
             const hasReview = log.review && log.review.trim().length > 0;
 
-            const handleClick = () => {
-              if (hasReview) {
-                navigate(`/review/${log._id}`);
-              } else {
-                navigate(`/movie/${movieId}`);
+
+
+            // Inside map:
+            const handleClick = async () => {
+              try {
+                const { data: logsForThisMovie } = await axios.get(`/api/logs/user/${log.user._id}/movie/${movieId}`);
+                if (logsForThisMovie.length === 1) {
+                  navigate(`/review/${logsForThisMovie[0]._id}`);
+                } else {
+                  navigate(`/film-reviews/${movieId}/${log.user._id}`);
+                }
+              } catch (err) {
+                console.error("Failed to fetch logs for this movie", err);
               }
             };
+            
 
             return (
               <div key={log._id} onClick={handleClick} style={{ position: "relative", cursor: "pointer" }}>

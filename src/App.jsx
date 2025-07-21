@@ -152,6 +152,7 @@ setHasUnread(unread.length > 0);
           <Route path="/profile/:id" element={<ProfilePage />} />
           <Route path="/profile/" element={<ProfilePage />} />
           <Route path="/review/:id" element={<ReviewPage />} />
+          <Route path="/film-reviews/:movieId/:userId" element={<FilmReviewsPage />} />
           <Route path="/replies/:id" element={<RepliesPage />} />
           <Route path="/review/:id/change-backdrop" element={<ChangeReviewBackdropPage />} />
           <Route path="/edit-profile" element={<EditProfilePage />} />

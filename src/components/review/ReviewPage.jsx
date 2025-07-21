@@ -9,6 +9,7 @@ import ReviewHeader from "./ReviewHeader";
 import MoreReviewsList from "./MoreReviewsList";
 import StarRating from "../StarRating";
 import api from "../../api/api";
+import { HiOutlineRefresh } from "react-icons/hi"
 
 export default function ReviewPage() {
   const { id } = useParams();
@@ -159,19 +160,39 @@ export default function ReviewPage() {
                       onClick={() => handleProfile(r.userId)}
                     />
                     <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-                      {/* Username, stars, time */}
-                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                        <strong style={{ fontSize: 14, fontFamily: "Inter, sans-serif", fontWeight: 400, color: "#ddd", cursor: "pointer" }} onClick={() => handleProfile(r.userId)}>
-                          @{r.username}
-                        </strong>
-                        {r.ratingForThisMovie && (
-                          <StarRating rating={r.ratingForThisMovie} size={12} />
-                        )}
-                        <span style={{ fontSize: 10, color: "#888" }}>
-                          {getRelativeTime(r.createdAt)}
-                        </span>
-                      </div>
+  {/* Username, stars, time */}
+  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+    <strong
+      style={{
+        fontSize: 14,
+        fontFamily: "Inter, sans-serif",
+        fontWeight: 400,
+        color: "#ddd",
+        cursor: "pointer",
+      }}
+      onClick={() => handleProfile(r.userId)}
+    >
+      @{r.username}
+    </strong>
 
+    {r.ratingForThisMovie && (
+      <StarRating rating={r.ratingForThisMovie} size={12} />
+    )}
+
+    {/* ✅ Rewatch icon + count if r.rewatch > 0 */}
+    {r.rewatch > 0 && (
+      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+        <HiOutlineRefresh size={12} color="#aaa" />
+        <span style={{ fontSize: 10, color: "#aaa" }}>
+          {r.rewatch}x
+        </span>
+      </div>
+    )}
+
+    <span style={{ fontSize: 10, color: "#888" }}>
+      {getRelativeTime(r.createdAt)}
+    </span>
+  </div>
                       {/* Text comment */}
                       {r.text && (
                         <span style={{ fontSize: 14, color: "#ddd", fontFamily: "Inter, sans-serif", display: "block", marginTop: 2 }}>
