@@ -58,7 +58,7 @@ export default function ProfileTabWatchlist({
               borderRadius: "5px",
               padding: "4px 8px",
               fontSize: "12px",
-              minWidth: "100px",
+              minWidth: "130px",
             }}
           >
             <option value="added">Recently Added</option>
@@ -77,7 +77,7 @@ export default function ProfileTabWatchlist({
               borderRadius: "5px",
               padding: "4px 8px",
               fontSize: "12px",
-              minWidth: "40px",
+              minWidth: "20px",
             }}
           >
             <option value="desc">⬇</option>
@@ -94,7 +94,7 @@ export default function ProfileTabWatchlist({
               borderRadius: "5px",
               padding: "4px 8px",
               fontSize: "12px",
-              minWidth: "100px",
+              minWidth: "130px",
             }}
           >
             <option value="">All Genres</option>
