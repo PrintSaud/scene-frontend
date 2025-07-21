@@ -116,15 +116,17 @@ export default function ReviewPage() {
 
   return (
     <div style={{ backgroundColor: "#0e0e0e", color: "#fff", minHeight: "100vh" }}>
-<ReviewHeader
+      <ReviewHeader
   review={review}
   userId={userId}
+  rewatchCount={review.rewatchCount}  // ✅ Add this line
   onLike={handleLike}
   onProfile={handleProfile}
   onChangeBackdrop={() => navigate(`/review/${review._id}/change-backdrop`)}
-  onEdit={handleEdit}         // 🟢 Add this
-  onDelete={handleDelete}     // 🟢 Add this
+  onEdit={handleEdit}
+  onDelete={handleDelete}
 />
+
 
 
       {/* 💬 Comments section */}

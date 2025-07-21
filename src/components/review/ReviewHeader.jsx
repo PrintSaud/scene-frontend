@@ -162,18 +162,30 @@ export default function ReviewHeader({
             </div>
 
             <div style={{
-              marginTop: 4,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between"
-            }}>
-              <StarRating rating={review.rating} />
-              {timestamp && (
-                <div style={{ fontSize: 11, color: "#aaa" }}>
-                  {timestamp}
-                </div>
-              )}
-            </div>
+  marginTop: 4,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between"
+}}>
+  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+    <StarRating rating={review.rating} />
+    {rewatchCount > 1 && (
+      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+        <HiOutlineRefresh size={12} color="#aaa" />
+        <span style={{ fontSize: 10, color: "#aaa" }}>
+          {rewatchCount}x
+        </span>
+      </div>
+    )}
+  </div>
+  {timestamp && (
+    <div style={{ fontSize: 11, color: "#aaa" }}>
+      {timestamp}
+    </div>
+  )}
+</div>
+
+
           </>
         )}
 
