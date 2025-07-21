@@ -36,19 +36,16 @@ export default function CreateListPage() {
     }
   };
 
-  const canSave = title.trim().length > 0 && coverImage && movies.length > 0;
+
+  const canSave = title.trim().length > 0 && movies.length > 0;
+
 
   const handleSave = async () => {
-    if (!coverImage) {
-      toast.error("Please upload a cover image before saving.");
-      return;
-    }
-
     try {
       const payload = {
         title,
         description,
-        coverImage,
+        coverImage,  // Will be empty string if no image selected
         isPrivate,
         isRanked,
         movies: movies.map((m) => ({
@@ -62,11 +59,11 @@ export default function CreateListPage() {
               : "",
         })),
       };
-
+  
       await axios.post(`${backend}/api/lists`, payload, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-
+  
       window.dispatchEvent(new Event("refreshMyLists"));
       toast.success("✅ List created!");
       navigate(-1);
@@ -75,6 +72,7 @@ export default function CreateListPage() {
       toast.error("Failed to create list.");
     }
   };
+  
 
   return (
     <div style={{ background: "#0e0e0e", color: "white", minHeight: "100vh", paddingBottom: "80px" }}>
@@ -107,8 +105,8 @@ export default function CreateListPage() {
         {!coverImage ? (
           <div style={{ marginTop: "12px" }}>
             <label htmlFor="cover-upload" style={uploadLabel}>
-              ⬆️ Upload a cover image (required)
-            </label>
+  ⬆️ Upload a cover image (optional)
+</label>
             <input type="file" id="cover-upload" accept="image/*" style={{ display: "none" }} onChange={handleCoverUpload} />
           </div>
         ) : (
