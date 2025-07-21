@@ -180,14 +180,16 @@ export default function ReviewPage() {
     )}
 
     {/* ✅ Rewatch icon + count if r.rewatch > 0 */}
-    {r.rewatch > 0 && (
-      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-        <HiOutlineRefresh size={12} color="#aaa" />
-        <span style={{ fontSize: 10, color: "#aaa" }}>
-          {r.rewatch}x
-        </span>
-      </div>
-    )}
+    {review.rewatchCount > 1 && (
+  <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+    <HiOutlineRefresh size={12} color="#aaa" />
+    <span style={{ fontSize: 10, color: "#aaa" }}>
+      {review.rewatchCount}x
+    </span>
+  </div>
+)}
+
+
 
     <span style={{ fontSize: 10, color: "#888" }}>
       {getRelativeTime(r.createdAt)}
