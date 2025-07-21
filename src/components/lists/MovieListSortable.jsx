@@ -1,9 +1,7 @@
 import React, { useCallback } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import { backend } from "../../config";
 
-
-const MovieListSortable = React.memo(({ movies, setMovies }) => {
+const MovieListSortable = React.memo(({ movies, setMovies, hideNumbers = false }) => {
   const handleDragEnd = useCallback(
     (result) => {
       if (!result.destination) return;
@@ -33,7 +31,7 @@ const MovieListSortable = React.memo(({ movies, setMovies }) => {
               marginTop: "8px",
               maxHeight: "300px",
               overflowY: "auto",
-              overflowX: "hidden", // ✅ prevent horizontal scroll
+              overflowX: "hidden",
               padding: 0,
               paddingRight: "4px",
               listStyle: "none",
@@ -80,12 +78,12 @@ const MovieListSortable = React.memo(({ movies, setMovies }) => {
                         flexGrow: 1,
                         fontFamily: "Inter, sans-serif",
                         fontSize: "15px",
-                        wordBreak: "break-word", // ✅ allow wrapping
+                        wordBreak: "break-word",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                       }}
                     >
-                      <strong>{index + 1}.</strong> {movie.title}
+                      {!hideNumbers && <strong>{index + 1}.</strong>} {movie.title}
                     </span>
 
                     <button

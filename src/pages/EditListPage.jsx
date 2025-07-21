@@ -148,29 +148,20 @@ export default function EditListPage() {
           <span style={{ marginLeft: "8px" }}>🏆 Ranked</span>
         </label>
 
-        {/* Movies */}
-        <div>
-          <h4 style={{ marginTop: "20px" }}>🎬 Movies in this list:</h4>
-          {movies.length === 0 ? (
-            <p style={{ color: "#888" }}>No movies yet.</p>
-          ) : isRanked ? (
-            <MovieListSortable movies={movies} setMovies={setMovies} />
-          ) : (
-            <ul style={{ marginTop: "8px", paddingLeft: "0" }}>
-              {movies.map((movie) => (
-                <li key={movie.id} style={{ marginBottom: "8px", fontFamily: "Inter, sans-serif", listStyle: "none" }}>
-                  {movie.title}
-                  <button
-                    onClick={() => setMovies(movies.filter((m) => m.id !== movie.id))}
-                    style={{ marginLeft: "8px", color: "#f55", background: "none", border: "none" }}
-                  >
-                    ❌
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+{/* Movies */}
+<div>
+  <h4 style={{ marginTop: "20px" }}>🎬 Movies in this list:</h4>
+  {movies.length === 0 ? (
+    <p style={{ color: "#888" }}>No movies yet.</p>
+  ) : (
+    <MovieListSortable
+      movies={movies}
+      setMovies={setMovies}
+      hideNumbers={!isRanked}  // 🔥 Always sortable; hide numbers if unranked
+    />
+  )}
+</div>
+
 
         <button onClick={() => setShowModal(true)} style={btnStyle}>➕ Add Movie</button>
       </div>
