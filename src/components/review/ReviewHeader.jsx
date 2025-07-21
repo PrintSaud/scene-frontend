@@ -11,6 +11,7 @@ export default function ReviewHeader({
     onReply,
     onProfile,
     onChangeBackdrop,
+    rewatchCount,
     onEdit,
     onDelete
   }) {
