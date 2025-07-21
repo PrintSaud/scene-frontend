@@ -217,8 +217,12 @@ export default function ListViewPage() {
         </div>
 
 
-      {/* Content */}
-      <div style={{ padding: "12px 16px 0 16px" }}>
+{/* Content */}
+<div style={{
+  padding: "12px 16px 0 16px",
+  marginTop: list.coverImage ? "0px" : "16px"  // 🔥 Add clean spacing only when no cover image
+}}>
+
         <h2 style={{
           marginBottom: "4px",
           fontSize: "18px",
