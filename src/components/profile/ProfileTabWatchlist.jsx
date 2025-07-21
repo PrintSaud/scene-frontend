@@ -43,9 +43,9 @@ export default function ProfileTabWatchlist({
             display: "flex",
             justifyContent: "center",
             flexWrap: "wrap",
-            gap: "8px",
+            gap: "6px",
             marginBottom: "12px",
-            padding: "6px 12px",
+            padding: "4px 8px",
           }}
         >
           <select
@@ -55,10 +55,10 @@ export default function ProfileTabWatchlist({
               background: "#111",
               color: "#fff",
               border: "1px solid #333",
-              borderRadius: "6px",
-              padding: "6px 10px",
-              fontSize: "13px",
-              minWidth: "130px",
+              borderRadius: "5px",
+              padding: "4px 8px",
+              fontSize: "12px",
+              minWidth: "100px",
             }}
           >
             <option value="added">Recently Added</option>
@@ -66,7 +66,7 @@ export default function ProfileTabWatchlist({
             <option value="rating">Rating</option>
             <option value="runtime">Runtime</option>
           </select>
-
+  
           <select
             value={order}
             onChange={(e) => setOrder(e.target.value)}
@@ -74,16 +74,16 @@ export default function ProfileTabWatchlist({
               background: "#111",
               color: "#fff",
               border: "1px solid #333",
-              borderRadius: "6px",
-              padding: "6px 10px",
-              fontSize: "13px",
-              minWidth: "130px",
+              borderRadius: "5px",
+              padding: "4px 8px",
+              fontSize: "12px",
+              minWidth: "100px",
             }}
           >
-            <option value="desc">⬇ Descending</option>
-            <option value="asc">⬆ Ascending</option>
+            <option value="desc">⬇ Desc</option>
+            <option value="asc">⬆ Asc</option>
           </select>
-
+  
           <select
             value={selectedGenre}
             onChange={(e) => setSelectedGenre(e.target.value)}
@@ -91,10 +91,10 @@ export default function ProfileTabWatchlist({
               background: "#111",
               color: "#fff",
               border: "1px solid #333",
-              borderRadius: "6px",
-              padding: "6px 10px",
-              fontSize: "13px",
-              minWidth: "130px",
+              borderRadius: "5px",
+              padding: "4px 8px",
+              fontSize: "12px",
+              minWidth: "100px",
             }}
           >
             <option value="">All Genres</option>
@@ -106,10 +106,10 @@ export default function ProfileTabWatchlist({
             <option value="16">Animation</option>
             <option value="80">Crime</option>
             <option value="53">Thriller</option>
-            {/* Add more genres as needed */}
           </select>
         </div>
       )}
+  
 
       {watchList?.length > 0 ? (
         <div
