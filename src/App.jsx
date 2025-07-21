@@ -38,6 +38,7 @@ import DirectorPage from "./pages/DirectorPage";
 import ActorPage from "./pages/ActorPage"; 
 import PersonPage from "./pages/PersonPage";
 import UploadAvatarPage from './pages/UploadAvatarPage';
+import FilmReviewsPage from "./pages/FilmReviewsPage"; // ✅ check the correct relative path!
 import ShareListPage from './pages/ShareListPage';
 import RepliesPage from "./components/review/RepliesPage";
 import ChangeReviewBackdropPage from "./pages/ChangeReviewBackdropPage";
