@@ -35,31 +35,22 @@ export default function ProfileTabWatchlist({
   }, [profileUserId, sortType, order]);
 
   return (
-    <div style={{ padding: "0" }}>
+    <div style={{ height: "6px" }} >
       {isOwner && (
-        <div
+              <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: "8px", marginBottom: "8px" }}>
+        <select
+          value={sortType}
+          onChange={(e) => setSortType(e.target.value)}
           style={{
-            display: "flex",
-            justifyContent: "center",
-            flexWrap: "wrap",
-            gap: "8px",
-            marginBottom: "12px",
-            padding: "6px 12px",
+            background: "#111",
+            color: "#fff",
+            border: "1px solid #333",
+            borderRadius: "6px",
+            padding: "6px 10px",
+            fontSize: "13px",
+            minWidth: "130px",
           }}
         >
-          <select
-            value={sortType}
-            onChange={(e) => setSortType(e.target.value)}
-            style={{
-              background: "#111",
-              color: "#fff",
-              border: "1px solid #333",
-              borderRadius: "6px",
-              padding: "6px 10px",
-              fontSize: "13px",
-              minWidth: "130px",
-            }}
-          >
             <option value="added">Recently Added</option>
             <option value="title">Title</option>
             <option value="release">Release Date</option>

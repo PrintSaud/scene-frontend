@@ -179,7 +179,7 @@ export default function ReviewHeader({
     <StarRating rating={review.rating} />
     {rewatchCount > 1 && (
       <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-        <HiOutlineRefresh size={14} color="#aaa" />
+        <HiOutlineRefresh size={16} color="#aaa" />
         <span style={{ fontSize: 10, color: "#aaa" }}>
           {rewatchCount}x
         </span>
