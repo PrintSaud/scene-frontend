@@ -43,6 +43,10 @@ export const addLogReply = (logId, data) => api.post(`/api/logs/${logId}/reply`,
 export const reactToLog = (logId, emoji) => api.post(`/api/logs/${logId}/react`, { emoji });
 export const deleteReply = (logId, replyId) => api.delete(`/api/logs/${logId}/replies/${replyId}`);
 
+export const suggestMovieToFriends = (userId, movieId, { friends, movieTitle }) =>
+  api.post(`/api/users/${userId}/suggest/${movieId}`, { friends, movieTitle });
+
+
 // Likes for reviews/logs
 export const likeLog = (logId) => api.post(`/api/logs/${logId}/like`);
 

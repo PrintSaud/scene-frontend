@@ -71,17 +71,11 @@ export default function ShareToFriendPage() {
 
   const handleSend = async () => {
     try {
-      await Promise.all(
-        selected.map((friendId) =>
-          axios.post(`${backend}/api/users/${friendId}/notify/share`, {
-            fromUserId: currentUser._id,
-            resourceType: type,
-            resourceId: id,
-            resourceTitle,
-          })
-        )
-      );
-
+      await axios.post(`${backend}/api/users/${currentUser._id}/suggest/${id}`, {
+        friends: selected,
+        movieTitle: resourceTitle,
+      });
+  
       toast.success(`✅ Suggested to ${selected.length} friend(s)!`);
       navigate(-1);
     } catch (err) {
@@ -89,6 +83,7 @@ export default function ShareToFriendPage() {
       toast.error("Failed to send suggestions.");
     }
   };
+  
 
   const mutualFollowers = allUsers.filter((u) => {
     const currentUserId = currentUser?._id?.toString();
