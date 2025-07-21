@@ -2,14 +2,13 @@ import React, { useEffect, useState } from "react";
 import axios from "../../api/api";
 import { backend } from "../../config";
 import toast from "react-hot-toast";
-
+import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 
 export default function ListPickerModal({ movie, onClose }) {
   const [lists, setLists] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const user = JSON.parse(localStorage.getItem("user"));
-
 
   useEffect(() => {
     const fetchLists = async () => {
@@ -41,16 +40,15 @@ export default function ListPickerModal({ movie, onClose }) {
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
-  
+
       window.dispatchEvent(new Event("refreshMyLists"));
-      toast.success("✅ Added to list!");  // ✅ Nice toast
+      toast.success("✅ Added to list!");
       onClose();
     } catch (err) {
       console.error("❌ Failed to add movie to list", err);
-      toast.error("❌ Failed to add movie.");  // ✅ Error toast too
+      toast.error("❌ Failed to add movie.");
     }
   };
-  
 
   return (
     <div
@@ -66,11 +64,13 @@ export default function ListPickerModal({ movie, onClose }) {
         overflowY: "scroll",
       }}
     >
+      {/* Header */}
       <div style={{ display: "flex", alignItems: "center", marginBottom: "16px" }}>
         <button onClick={onClose} style={backBtn}>← Back</button>
         <h3 style={{ marginLeft: "16px", fontSize: "16px" }}>Select a list to add this film</h3>
       </div>
 
+      {/* Content */}
       {loading ? (
         <p style={{ color: "#aaa" }}>Loading your lists...</p>
       ) : lists.length === 0 ? (
@@ -99,15 +99,19 @@ export default function ListPickerModal({ movie, onClose }) {
               onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
               onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
             >
-              <img
-                src={list.coverImage || "/default-cover.jpg"}
-                alt={list.title}
-                style={{
-                  width: "100%",
-                  height: "140px",
-                  objectFit: "cover",
-                }}
-              />
+              {/* 🔥 Only show coverImage if it exists */}
+              {list.coverImage && (
+                <img
+                  src={list.coverImage}
+                  alt={list.title}
+                  style={{
+                    width: "100%",
+                    height: "140px",
+                    objectFit: "cover",
+                  }}
+                />
+              )}
+
               <div style={{ padding: "10px" }}>
                 <div
                   style={{
@@ -121,12 +125,26 @@ export default function ListPickerModal({ movie, onClose }) {
                 >
                   {list.title}
                 </div>
+
                 <div style={{ color: "#aaa", fontSize: "12px", marginTop: "4px" }}>
                   @{list.user?.username || "unknown"}
                 </div>
-                <div style={{ fontSize: "12px", color: "#bbb", marginTop: "4px" }}>
-                  ❤️ {list.likes?.length || 0} {list.likes?.length === 1 ? "like" : "likes"}
-                </div>
+
+                <div style={{
+  display: "flex",
+  alignItems: "center",
+  gap: "4px",
+  fontSize: "12px",
+  marginTop: "4px"
+}}>
+  {list.likes?.includes(user?._id) ? (
+    <AiFillHeart style={{ fontSize: "14px", color: "#B327F6" }} />
+  ) : (
+    <AiOutlineHeart style={{ fontSize: "14px", color: "#999" }} />
+  )}
+  <span style={{ fontSize: "12px", color: "#bbb" }}>{list.likes?.length || 0}</span>
+</div>
+
               </div>
             </div>
           ))}
