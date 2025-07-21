@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import api from "../../api/api";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -17,13 +17,14 @@ export default function ProfileTabWatchlist({
   profileUserId,
 }) {
   const navigate = useNavigate();
+  const [selectedGenre, setSelectedGenre] = useState("");
   const isOwner = user?._id === profileUserId;
 
   useEffect(() => {
     const fetchWatchlist = async () => {
       try {
         const res = await api.get(
-          `/api/users/${profileUserId}/watchlist?sort=${sortType}&order=${order}`
+          `/api/users/${profileUserId}/watchlist?sort=${sortType}&order=${order}&genre=${selectedGenre}`
         );
         setWatchList(isOwner ? res.data : res.data.filter((movie) => !movie.isPrivate));
       } catch (err) {
@@ -32,7 +33,7 @@ export default function ProfileTabWatchlist({
     };
 
     if (profileUserId) fetchWatchlist();
-  }, [profileUserId, sortType, order]);
+  }, [profileUserId, sortType, order, selectedGenre]);
 
   return (
     <div style={{ padding: "0" }}>
@@ -65,6 +66,7 @@ export default function ProfileTabWatchlist({
             <option value="rating">Rating</option>
             <option value="runtime">Runtime</option>
           </select>
+
           <select
             value={order}
             onChange={(e) => setOrder(e.target.value)}
@@ -80,6 +82,31 @@ export default function ProfileTabWatchlist({
           >
             <option value="desc">⬇ Descending</option>
             <option value="asc">⬆ Ascending</option>
+          </select>
+
+          <select
+            value={selectedGenre}
+            onChange={(e) => setSelectedGenre(e.target.value)}
+            style={{
+              background: "#111",
+              color: "#fff",
+              border: "1px solid #333",
+              borderRadius: "6px",
+              padding: "6px 10px",
+              fontSize: "13px",
+              minWidth: "130px",
+            }}
+          >
+            <option value="">All Genres</option>
+            <option value="28">Action</option>
+            <option value="35">Comedy</option>
+            <option value="18">Drama</option>
+            <option value="27">Horror</option>
+            <option value="10749">Romance</option>
+            <option value="16">Animation</option>
+            <option value="80">Crime</option>
+            <option value="53">Thriller</option>
+            {/* Add more genres as needed */}
           </select>
         </div>
       )}
