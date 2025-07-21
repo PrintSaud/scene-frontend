@@ -109,18 +109,21 @@ export default function ListViewPage() {
         </div>
       )}
   
-        <div
-          style={{
-            position: "absolute",
-            top: "16px",
-            left: "16px",
-            right: "16px",
-            zIndex: 10,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
+  <div
+  style={{
+    position: "absolute",
+    top: "0",
+    left: "0",
+    right: "0",
+    padding: "16px",
+    background: list.coverImage ? "transparent" : "#0e0e0e",  // 🔥 This fixes the gray mismatch perfectly!
+    zIndex: 10,
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  }}
+>
+
           {/* 🔙 Back */}
           <button
             onClick={() => navigate(-1)}
