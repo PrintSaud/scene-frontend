@@ -20,7 +20,7 @@ export default function MoreReviewsList({ reviews, onClick }) {
   };
 
   return (
-    <div style={{ padding: "16px", maxHeight: 240, overflowY: "auto" }}>  {/* ✅ Allow scrolling */}
+    <div style={{ padding: "16px" }}> {/* ✅ No maxHeight or overflow */}
       <h4 style={{ fontFamily: "Inter, sans-serif" }}>More reviews</h4>
       {filteredReviews.map((r) => (
         <div

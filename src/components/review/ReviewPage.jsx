@@ -115,7 +115,13 @@ export default function ReviewPage() {
   if (!review) return null;
 
   return (
-    <div style={{ backgroundColor: "#0e0e0e", color: "#fff", minHeight: "100vh" }}>
+    <div style={{
+      backgroundColor: "#0e0e0e",
+      color: "#fff",
+      minHeight: "100vh",
+      overflowY: "auto"   // ⭐️ Add this
+    }}>
+    
       <ReviewHeader
   review={review}
   userId={userId}
