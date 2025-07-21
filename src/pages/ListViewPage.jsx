@@ -220,7 +220,7 @@ export default function ListViewPage() {
 {/* Content */}
 <div style={{
   padding: "12px 16px 0 16px",
-  marginTop: list.coverImage ? "0px" : "26px"  // 🔥 Add clean spacing only when no cover image
+  marginTop: list.coverImage ? "0px" : "40px"  // 🔥 Add clean spacing only when no cover image
 }}>
 
         <h2 style={{
@@ -272,9 +272,10 @@ export default function ListViewPage() {
     marginBottom: "24px",
   }}
 >
-  <h3 style={{ marginBottom: "4px" }}>
-    🎬 {list.isRanked ? "Ranked Movies" : "Movies"}:
-  </h3>
+<h3 style={{ marginTop: "8px", marginBottom: "12px" }}>
+  🎬 {list.isRanked ? "Ranked Movies" : "Movies"}:
+</h3>
+
 
   <div
     style={{

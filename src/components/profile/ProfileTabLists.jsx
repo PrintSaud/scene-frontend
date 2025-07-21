@@ -151,7 +151,7 @@ export default function ProfileTabLists({ user, profileUserId, refreshTrigger })
         <img
           src={list.coverImage}
           alt={list.title}
-          style={{ width: "100%", height: "140px", objectFit: "cover" }}
+          style={{ width: "100%", height: "150px", objectFit: "cover" }}
         />
       )}
 
