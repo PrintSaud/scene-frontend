@@ -66,7 +66,9 @@ export default function SceneBotComponent() {
 
     const lang = forcedLang || localStorage.getItem("sceneLang") || "english";
     const result = await callSceneBot(question, lang);
-    const replyText = typeof result === 'object' && result.reply ? result.reply : result;
+console.log("🔔 Raw API result =", result);
+    const replyText = result?.reply?.text || result?.reply || result;
+
 
 
     setLoading(false);
@@ -214,7 +216,7 @@ export default function SceneBotComponent() {
         position: "fixed",
         bottom: "60px",
         left: 0,
-        width: "100%",
+        width: "90%",
         padding: "14px 16px",
         background: "#0e0e0e",
         borderTop: "1px solid #222",

@@ -202,7 +202,7 @@ export default function GifSearchModal({ onSelect, onClose }) {
     {/* ✅ Attribution placed immediately after GIF grid */}
     <div style={{ textAlign: "center", marginTop: 12 }}>
   <img
-    src="/powered-by-giphy.png"
+    src="/rrpowered-by-giphy.png" 
     alt="Powered by GIPHY"
     style={{ width: 100, opacity: 0.8 }}
   />
