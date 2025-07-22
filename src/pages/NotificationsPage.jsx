@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "../api/api"; // ✅ Token-aware instance
+import axios from "../api/api";
 import { format } from "timeago.js";
 import { useNavigate } from "react-router-dom";
 import { socket } from "../socket";
@@ -8,19 +8,19 @@ import { toast } from "react-hot-toast";
 export default function NotificationsPage({ setHasUnread }) {
   const [notifications, setNotifications] = useState([]);
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
 
-  const getActionText = (type, message) => {
-    if (type === "follow") return "just followed you";
-    if (type === "review_like") return "liked your review";
-    if (type === "reply") return "replied to your review";
-    if (type === "suggest_movie") return "suggested a movie for you";
-    if (type === "share-list") return "shared a list with you";
-    if (type === "share-movie") return "shared a movie with you";
-    return message;  // fallback
+  const getActionText = (type) => {
+    switch (type) {
+      case "follow": return "just followed you";
+      case "review_like": return "liked your review";
+      case "reply": return "replied to your review";
+      case "reaction": return "liked your reply";
+      case "suggest_movie": return "suggested a movie for you";
+      case "share-list": return "shared a list with you";
+      case "share-movie": return "shared a movie with you";
+      default: return "sent you a notification";
+    }
   };
-  
-
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -124,7 +124,6 @@ export default function NotificationsPage({ setHasUnread }) {
               transition: "0.2s"
             }}
           >
-            {/* Avatar: profile navigation only */}
             <img
               src={n.from?.avatar || "/default-avatar.png"}
               alt="Avatar"
@@ -139,31 +138,25 @@ export default function NotificationsPage({ setHasUnread }) {
               }}
             />
 
-            {/* Message: smart clickable */}
             <div style={{ flex: 1 }}>
-            <div
-  onClick={() => {
-    if (n.type === "follow") {
-      navigate(`/profile/${n.from?._id}`);
-    } else if (["review_like", "reaction", "reply"].includes(n.type)) {
-      markAsReadAndNavigate(n, `/review/${n.relatedId}`);
-    } else if (n.type === "suggest_movie") {
-      /* Don't auto navigate for suggest_movie */
-    } else if (n.type === "share-list") {
-      markAsReadAndNavigate(n, `/list/${n.listId}`);
-    } else if (n.type === "share-movie") {
-      markAsReadAndNavigate(n, `/movie/${n.movieId}`);
-    }
-  }}
-  style={{ fontSize: "14px", color: "#ddd", cursor: "pointer" }}
->
-  <span style={{ color: "#fff", fontWeight: "500" }}>@{n.from?.username}</span>{" "}
-  {getActionText(n.type, n.message)}
-</div>
+              <div
+                onClick={() => {
+                  if (n.type === "follow") {
+                    navigate(`/profile/${n.from?._id}`);
+                  } else if (["review_like", "reaction", "reply"].includes(n.type)) {
+                    markAsReadAndNavigate(n, `/review/${n.relatedId}`);
+                  } else if (n.type === "share-list") {
+                    markAsReadAndNavigate(n, `/list/${n.listId}`);
+                  } else if (n.type === "share-movie") {
+                    markAsReadAndNavigate(n, `/movie/${n.movieId}`);
+                  }
+                }}
+                style={{ fontSize: "14px", color: "#ddd", cursor: "pointer" }}
+              >
+                <span style={{ fontFamily: "Inter", fontWeight: "500", color: "#fff" }}>@{n.from?.username}</span>{" "}
+                {getActionText(n.type)}
+              </div>
 
-
-
-              {/* Suggestion: show rectangle button */}
               {n.type === "suggest_movie" && (
                 <button
                   onClick={() => markAsReadAndNavigate(n, `/movie/${n.relatedId}`)}
