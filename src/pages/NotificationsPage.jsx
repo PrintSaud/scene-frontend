@@ -10,6 +10,18 @@ export default function NotificationsPage({ setHasUnread }) {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
 
+  const getActionText = (type, message) => {
+    if (type === "follow") return "just followed you";
+    if (type === "review_like") return "liked your review";
+    if (type === "reply") return "replied to your review";
+    if (type === "suggest_movie") return "suggested a movie for you";
+    if (type === "share-list") return "shared a list with you";
+    if (type === "share-movie") return "shared a movie with you";
+    return message;  // fallback
+  };
+  
+
+
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
@@ -143,11 +155,12 @@ export default function NotificationsPage({ setHasUnread }) {
       markAsReadAndNavigate(n, `/movie/${n.movieId}`);
     }
   }}
-  style={{ fontSize: "14px", color: "#ddd", cursor: "pointer" }}  // 💪 Slightly stronger gray than timestamp
+  style={{ fontSize: "14px", color: "#ddd", cursor: "pointer" }}
 >
   <span style={{ color: "#fff", fontWeight: "500" }}>@{n.from?.username}</span>{" "}
-  {n.message.replace(n.from?.username, "").trim()}  {/* Remove redundant username from message if present */}
+  {getActionText(n.type, n.message)}
 </div>
+
 
 
               {/* Suggestion: show rectangle button */}
