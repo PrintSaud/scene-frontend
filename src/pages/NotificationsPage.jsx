@@ -81,7 +81,7 @@ export default function NotificationsPage({ setHasUnread }) {
           <button
             onClick={markAllAsRead}
             style={{ padding: "6px 10px", background: "#222", color: "#fff", borderRadius: "4px", border: "1px solid #444", fontSize: "12px", cursor: "pointer" }}>
-            ✅ Mark All Read
+            ✅ Mark All as Read
           </button>
         )}
       </div>
@@ -129,25 +129,26 @@ export default function NotificationsPage({ setHasUnread }) {
 
             {/* Message: smart clickable */}
             <div style={{ flex: 1 }}>
-              <div
-                onClick={() => {
-                  if (n.type === "follow") {
-                    navigate(`/profile/${n.from?._id}`);
-                  } else if (["review_like", "reaction", "reply"].includes(n.type)) {
-                    markAsReadAndNavigate(n, `/review/${n.relatedId}`);
-                  } else if (n.type === "suggest_movie") {
-                    /* Don't navigate immediately for suggest_movie (show button) */
-                  } else if (n.type === "share-list") {
-                    markAsReadAndNavigate(n, `/list/${n.listId}`);
-                  } else if (n.type === "share-movie") {
-                    markAsReadAndNavigate(n, `/movie/${n.movieId}`);
-                  }
-                }}
-                style={{ fontSize: "14px", color: "#aaa", cursor: "pointer" }}
-              >
-                <strong style={{ color: "#fff" }}>{n.from?.username}</strong>{" "}
-                {n.message}
-              </div>
+            <div
+  onClick={() => {
+    if (n.type === "follow") {
+      navigate(`/profile/${n.from?._id}`);
+    } else if (["review_like", "reaction", "reply"].includes(n.type)) {
+      markAsReadAndNavigate(n, `/review/${n.relatedId}`);
+    } else if (n.type === "suggest_movie") {
+      /* Don't auto navigate for suggest_movie */
+    } else if (n.type === "share-list") {
+      markAsReadAndNavigate(n, `/list/${n.listId}`);
+    } else if (n.type === "share-movie") {
+      markAsReadAndNavigate(n, `/movie/${n.movieId}`);
+    }
+  }}
+  style={{ fontSize: "14px", color: "#ddd", cursor: "pointer" }}  // 💪 Slightly stronger gray than timestamp
+>
+  <span style={{ color: "#fff", fontWeight: "500" }}>@{n.from?.username}</span>{" "}
+  {n.message.replace(n.from?.username, "").trim()}  {/* Remove redundant username from message if present */}
+</div>
+
 
               {/* Suggestion: show rectangle button */}
               {n.type === "suggest_movie" && (
