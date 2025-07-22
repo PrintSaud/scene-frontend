@@ -113,7 +113,7 @@ export const updateBackdrop = (userId, backdropUrl) => api.patch(`/api/users/${u
 // 🧑‍🤝‍🧑 USER
 //
 export const getUserProfile = (userId) => api.get(`/api/users/${userId}`);
-export const followUser = (targetId) => api.post(`/api/users/follow/${targetId}`);
+export const followUser = (userId, targetId) => api.post(`/api/users/${userId}/follow/${targetId}`);
 export const updateProfile = (userId, data) => api.patch(`/api/users/${userId}`, data);
 
 //

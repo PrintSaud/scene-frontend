@@ -78,7 +78,7 @@ export default function ProfilePage() {
 
   const handleFollow = async () => {
     try {
-      await followUser(user._id);
+      await followUser(stored._id, user._id);
       setIsFollowing(!isFollowing);
     } catch (err) {
       console.error("❌ Failed to follow/unfollow:", err);
