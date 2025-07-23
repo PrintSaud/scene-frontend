@@ -91,7 +91,7 @@ export default function ProfileTabProfile({
             src={customPoster || fallbackPoster}
             alt={movie.title}
             style={{
-              width: "23vw", // ✅ bigger
+              width: "21vw", // ✅ bigger
               maxWidth: "110px",
               aspectRatio: "2/3",
               objectFit: "cover",
