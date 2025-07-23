@@ -130,12 +130,11 @@ export default function ProfilePage() {
   }, []);
   
   useEffect(() => {
-    const handleNavigateToFilms = () => {
-      setActiveTab("films");
-    };
+    const handleNavigateToFilms = () => setActiveTab("Films"); // Capital "F" 
     window.addEventListener("navigateToFilms", handleNavigateToFilms);
     return () => window.removeEventListener("navigateToFilms", handleNavigateToFilms);
   }, []);
+  
   
   if (!user) return <div style={{ color: "white", padding: "20px" }}>Loading...</div>;
 
@@ -195,12 +194,14 @@ export default function ProfilePage() {
           />
         )}
         {activeTab === "Films" && (
+          
           <ProfileTabFilms
           logs={logs}
           favorites={user.favorites || []}  // ✅ Use correct schema field
           customPosters={user.customPosters || {}}
         />        
 )}
+
       </div>
     </div>
   );
