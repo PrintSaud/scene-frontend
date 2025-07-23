@@ -76,35 +76,36 @@ export default function ProfileTabProfile({
       }}
     >
       {favoriteMovies.map((movie) => {
-        const id = movie.id || movie._id || movie.tmdbId;
-        const customPoster = customPosters?.[id];
-        const fallbackPoster =
-          movie.poster?.startsWith("http")
-            ? movie.poster
-            : movie.poster
-            ? `${TMDB_IMG}${movie.poster}`
-            : FALLBACK_POSTER;
+  const id = movie.id || movie._id || movie.tmdbId;
+  const customPoster = customPosters?.[id];
+  const fallbackPoster =
+    movie.poster?.startsWith("http")
+      ? movie.poster
+      : movie.poster
+      ? `${TMDB_IMG}${movie.poster}`
+      : FALLBACK_POSTER;
 
-        const posterToShow = customPoster || fallbackPoster;
+  const posterToShow = customPoster || tmdbPosters[id] || fallbackPoster;
 
-        return (
-          <img
-            key={id}
-            src={posterToShow}
-            alt={movie.title}
-            style={{
-              width: "21vw",
-              maxWidth: "110px",
-              aspectRatio: "2/3",
-              objectFit: "cover",
-              borderRadius: "6px",
-              flexShrink: 0,
-              cursor: "pointer",
-            }}
-            onClick={() => navigate(`/movie/${id}`)}
-          />
-        );
-      })}
+  return (
+    <img
+      key={id}
+      src={posterToShow}
+      alt={movie.title}
+      style={{
+        width: "21vw",
+        maxWidth: "110px",
+        aspectRatio: "2/3",
+        objectFit: "cover",
+        borderRadius: "6px",
+        flexShrink: 0,
+        cursor: "pointer",
+      }}
+      onClick={() => navigate(`/movie/${id}`)}
+    />
+  );
+})}
+
     </div>
   </div>
 ) : (
@@ -144,7 +145,11 @@ export default function ProfileTabProfile({
       }}
     >
       {recentlyWatched.map((log) => {
-        const movieId = log.movie?._id || log.movie || log.movieId;
+        const movieId =
+        typeof log.movie === "string"
+          ? log.movie
+          : log.movie?._id || log.movie?.id || log.movieId;
+      
         const poster =
           log.posterOverride ||
           (log.poster?.startsWith("http")
@@ -168,8 +173,9 @@ export default function ProfileTabProfile({
                 ? navigate(`/review/${log._id}`)
                 : movieId
                 ? navigate(`/movie/${movieId}`)
-                : null
+                : console.warn("❌ No movie ID found for this log:", log)
             }
+            
             style={{
               position: "relative",
               cursor: "pointer",

@@ -128,7 +128,15 @@ export default function ProfilePage() {
     window.addEventListener("refreshMyLists", refresh);
     return () => window.removeEventListener("refreshMyLists", refresh);
   }, []);
-
+  
+  useEffect(() => {
+    const handleNavigateToFilms = () => {
+      setActiveTab("films");
+    };
+    window.addEventListener("navigateToFilms", handleNavigateToFilms);
+    return () => window.removeEventListener("navigateToFilms", handleNavigateToFilms);
+  }, []);
+  
   if (!user) return <div style={{ color: "white", padding: "20px" }}>Loading...</div>;
 
   return (
