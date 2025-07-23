@@ -189,14 +189,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-
-const menuItemStyle = {
-  padding: "10px 16px",
-  cursor: "pointer",
-  fontSize: "14.5px",
-  fontWeight: "500",
-  color: "#fff",
-  fontFamily: "Inter",
-  transition: "0.2s",
-  whiteSpace: "nowrap",
-};
