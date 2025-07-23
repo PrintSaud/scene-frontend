@@ -49,12 +49,13 @@ export default function ProfilePage() {
     const fetchUser = async () => {
       try {
         const userRes = await getUserProfile(id);
+        console.log("🧪 userRes:", userRes); // optional debug
         setUser(userRes);
-        setLogs(userRes.recentLogs || []); // ✅ this will be used in ProfileTabProfile
       } catch (err) {
         console.error("❌ Failed to load profile", err);
       }
     };
+    
     
 
     const fetchLogs = async () => {
