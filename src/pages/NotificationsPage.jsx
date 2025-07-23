@@ -77,9 +77,19 @@ export default function NotificationsPage({ setHasUnread }) {
   };
 
   return (
-    <div style={{ background: "#0e0e0e", minHeight: "100vh", padding: "24px", color: "#fff" }}>
+    <div
+  style={{
+    background: "#0e0e0e",
+    height: "100vh",
+    overflowY: "auto", // ✅ enable vertical scroll
+    padding: "24px",
+    color: "#fff",
+    WebkitOverflowScrolling: "touch", // ✅ smooth scroll on mobile
+  }}
+>
+
       {/* 🔔 Heading */}
-      <h2 style={{ marginBottom: "16px", fontFamily: "Inter", fontWeight: "bold" }}>
+      <h2 style={{ marginBottom: "16px", fontWeight: "bold" }}>
         🔔 Notifications
       </h2>
 

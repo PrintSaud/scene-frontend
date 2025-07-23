@@ -48,12 +48,14 @@ export default function ProfilePage() {
 
     const fetchUser = async () => {
       try {
-        const res = await getUserProfile(id);
-        setUser(res.data);
+        const userRes = await getUserProfile(id);
+        setUser(userRes);
+        setLogs(userRes.recentLogs || []); // ✅ this will be used in ProfileTabProfile
       } catch (err) {
-        console.error("❌ Failed to fetch profile:", err);
+        console.error("❌ Failed to load profile", err);
       }
     };
+    
 
     const fetchLogs = async () => {
       try {
@@ -139,23 +141,24 @@ export default function ProfilePage() {
       />
 
       {/* 3-dots menu for not-owner */}
-{!isOwner && (
+      {!isOwner && (
   <div style={{ position: "absolute", top: "16px", right: "16px", zIndex: 10 }}>
     <div style={{ position: "relative" }}>
       <button
         onClick={() => setShowOptions(!showOptions)}
         style={{
-          background: "rgba(0,0,0,0.5)",
-          border: "none",
-          borderRadius: "50%",
-          width: "32px",
-          height: "32px",
+          background: "rgba(255,255,255,0.06)",
+          border: "1px solid rgba(255,255,255,0.1)",
+          borderRadius: "999px",
+          width: "36px",
+          height: "36px",
           color: "#fff",
-          fontSize: "22px",
+          fontSize: "20px",
           cursor: "pointer",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          backdropFilter: "blur(4px)",
         }}
       >
         ⋯
@@ -165,39 +168,36 @@ export default function ProfilePage() {
         <div
           style={{
             position: "absolute",
-            top: "38px",
+            top: "42px",
             right: "0",
-            background: "#1a1a1a",
-            border: "1px solid #333",
+            background: "#111",
+            border: "1px solid #2f2f2f",
             borderRadius: "12px",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
-            padding: "12px 0",
-            width: "200px",
-            zIndex: 20,
+            boxShadow: "0 8px 20px rgba(0,0,0,0.45)",
+            padding: "8px 0",
+            width: "190px",
+            zIndex: 99,
           }}
         >
+          {/* 📤 Share Profile */}
           <div
             onClick={() => {
               handleCopyLink();
               setShowOptions(false);
             }}
-            style={menuItemStyle}
-            onMouseEnter={(e) => (e.currentTarget.style.background = "#2a2a2a")}
-            onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+            style={dropdownItemStyle}
           >
             📤 Share Profile
           </div>
 
-          {/* ✅ Only show if profile user is following you */}
+          {/* ❌ Remove Follower — only if they follow you */}
           {user.following?.includes(stored._id) && (
             <div
               onClick={() => {
                 handleRemoveFollower();
                 setShowOptions(false);
               }}
-              style={menuItemStyle}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "#2a2a2a")}
-              onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+              style={dropdownItemStyle}
             >
               ❌ Remove Follower
             </div>

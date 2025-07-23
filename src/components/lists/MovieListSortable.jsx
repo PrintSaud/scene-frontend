@@ -1,7 +1,10 @@
 import React, { useCallback } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import toast from "react-hot-toast";
 
 const MovieListSortable = React.memo(({ movies, setMovies, hideNumbers = false }) => {
+  const MAX_MOVIES = 4;
+
   const handleDragEnd = useCallback(
     (result) => {
       if (!result.destination) return;
@@ -104,6 +107,29 @@ const MovieListSortable = React.memo(({ movies, setMovies, hideNumbers = false }
                 )}
               </Draggable>
             ))}
+
+            {/* ➕ Add Movie Placeholder (disabled if 4 reached) */}
+            {movies.length < MAX_MOVIES && (
+              <li
+                onClick={() => {
+                  toast.error("Add film from the backdrop search or modal!");
+                }}
+                style={{
+                  background: "#111",
+                  border: "1px dashed #444",
+                  color: "#888",
+                  textAlign: "center",
+                  padding: "14px",
+                  borderRadius: "6px",
+                  fontSize: "14px",
+                  cursor: "not-allowed",
+                  userSelect: "none",
+                }}
+              >
+                ➕ Add a film (use main modal)
+              </li>
+            )}
+
             {provided.placeholder}
           </ul>
         )}

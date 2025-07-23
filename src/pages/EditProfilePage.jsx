@@ -4,130 +4,111 @@ import axios from "../api/api";
 import MovieListSortable from "../components/lists/MovieListSortable";
 import { backend } from "../config";
 import toast from "react-hot-toast";
+import { getPlatformIcon } from "../../utils/getPlatformIcon";
 
-
-import {
-  DragDropContext,
-  Droppable,
-  Draggable,
-} from "@hello-pangea/dnd";
 import ReactModal from "react-modal";
 import { BLOCKED_MOVIE_IDS } from "../utils/blockedMovies";
 import BackdropSearchModalV2 from "../components/BackdropSearchModalV2";
 
-
-
-const inputStyle = {
-    width: "100%",
-    background: "#1a1a1a",
-    border: "1px solid #333",
-    borderRadius: "6px",
-    padding: "10px",
-    color: "#fff",
-    fontSize: "14px",
-  };
-  
-  const btnStyle = {
-    background: "none",
-    border: "1px solid #444",
-    color: "#aaa",
-    padding: "6px 12px",
-    borderRadius: "6px",
-    fontSize: "13px",
-    cursor: "pointer",
-  };
-  
-  const posterStyle = {
-    width: "72px",
-    height: "108px",
-    borderRadius: "6px",
-    objectFit: "cover",
-  };
-  
-  const addPosterStyle = {
-    width: "72px",
-    height: "108px",
-    background: "#222",
-    color: "#999",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: "28px",
-    borderRadius: "6px",
-    cursor: "pointer",
-  };
-
 ReactModal.setAppElement("#root");
 
-export default function EditProfilePage() {
-    const stored = localStorage.getItem("user");
-const rawUser = stored ? JSON.parse(stored) : null;
-
-const user = {
-  ...rawUser,
-  _id: rawUser?._id || rawUser?.id || "", // Ensure _id always exists
+const inputStyle = {
+  width: "100%",
+  background: "#1a1a1a",
+  border: "1px solid #333",
+  borderRadius: "6px",
+  padding: "10px",
+  color: "#fff",
+  fontSize: "14px",
 };
 
+const btnStyle = {
+  background: "none",
+  border: "1px solid #444",
+  color: "#aaa",
+  padding: "6px 12px",
+  borderRadius: "6px",
+  fontSize: "13px",
+  cursor: "pointer",
+};
 
-const token = user?.token;
-
-
+export default function EditProfilePage() {
+  const stored = localStorage.getItem("user");
+  const rawUser = stored ? JSON.parse(stored) : null;
+  const user = { ...rawUser, _id: rawUser?._id || rawUser?.id || "" };
+  const token = user?.token;
   const navigate = useNavigate();
 
-  const [displayName, setDisplayName] = useState("");
+  const [socials, setSocials] = useState({
+    X: "",
+    youtube: "",
+    instagram: "",
+    tiktok: "",
+    imdb: "",
+    tmdb: "",
+    website: "",
+  });
+
   const [bio, setBio] = useState("");
   const [favoriteFilms, setFavoriteFilms] = useState([]);
   const [avatar, setAvatar] = useState("");
   const [username, setUsername] = useState("");
   const [backdrop, setBackdrop] = useState("");
   const [showBackdropModal, setShowBackdropModal] = useState(false);
-  const [tmdbBackdrops, setTmdbBackdrops] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-const [searchResults, setSearchResults] = useState([]);
-const [backdropOptions, setBackdropOptions] = useState([]);
-const [selectedBackdrop, setSelectedBackdrop] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [backdropOptions, setBackdropOptions] = useState([]);
+  const [selectedBackdrop, setSelectedBackdrop] = useState("");
 
-
-
-
-console.log("User object:", user);
-
-
-useEffect(() => {
+  useEffect(() => {
     if (user) {
       const localBackdrop = JSON.parse(localStorage.getItem("chosenBackdrop"));
-  
-      setDisplayName(user.name || "");
+
       setBio(user.bio || "");
       setFavoriteFilms(user.favoriteMovies || []);
       setAvatar(user.avatar || "");
       setUsername(user.username);
-  
-      // 🔥 Use chosen backdrop if exists, fallback to saved one
       setBackdrop(localBackdrop?.backdrop || user.backdrop || "");
+
+      setSocials({
+        X: user.X || "",
+        youtube: user.youtube || "",
+        instagram: user.instagram || "",
+        tiktok: user.tiktok || "",
+        imdb: user.imdb || "",
+        tmdb: user.tmdb || "",
+        website: user.website || "",
+      });
     }
   }, []);
-  
-
-
 
   const handleSave = async () => {
-    if (!user._id || !token) {
-        alert("User not found. Please log in again.");
-        return;
-      }
-      
-      localStorage.removeItem("chosenBackdrop");
-
+    if (
+      bio === user.bio &&
+      avatar === user.avatar &&
+      backdrop === user.backdrop &&
+      JSON.stringify(favoriteFilms) === JSON.stringify(user.favoriteMovies) &&
+      JSON.stringify(socials) === JSON.stringify({
+        X: user.X || "",
+        youtube: user.youtube || "",
+        instagram: user.instagram || "",
+        tiktok: user.tiktok || "",
+        imdb: user.imdb || "",
+        tmdb: user.tmdb || "",
+        website: user.website || "",
+      })
+    ) {
+      toast("No changes to save.");
+      return;
+    }
 
     try {
       const updatedUser = {
-        name: displayName,
         bio,
         avatar,
         backdrop,
         favoriteMovies: favoriteFilms,
-        
+        ...socials,
       };
 
       await axios.patch(`${backend}/api/users/${user._id}`, updatedUser, {
@@ -135,107 +116,43 @@ useEffect(() => {
           Authorization: `Bearer ${token}`,
         },
       });
-      
-      // 🧠 UPDATE localStorage
+
       localStorage.setItem("user", JSON.stringify({ ...user, ...updatedUser }));
-      
+
       toast.success("✅ Profile updated!");
       navigate(`/profile/${user._id}`);
-      
-
-
     } catch (err) {
       console.error("❌ Failed to update profile", err);
       toast.error("❌ Failed to update profile.");
-
     }
   };
 
   const handleAvatarUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-  
+
     const formData = new FormData();
-    formData.append("avatar", file); // ✅ key must be 'avatar'
-  
+    formData.append("avatar", file);
+
     try {
       const res = await axios.post(
         `${backend}/api/upload/avatar/${user._id}`,
         formData,
         {
           headers: {
-            Authorization: `Bearer ${user.token}`,
+            Authorization: `Bearer ${token}`,
             "Content-Type": "multipart/form-data",
           },
         }
       );
-  
+
       setAvatar(res.data.avatar);
-      toast.success("✅ Avatar uploaded!"); // ✅ backend returns avatar: url
+      toast.success("✅ Avatar uploaded!");
     } catch (err) {
       console.error("Avatar upload failed", err);
       toast.error("❌ Avatar upload failed.");
-
     }
   };
-  
-
-  const searchTMDBMovies = async () => {
-    if (!searchQuery) return;
-  
-    try {
-      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/movies/search?q=${searchQuery}`);
-  
-      const bannedWords = ["porn", "sex", "nude", "xxx", "hentai", "fetish"];
-      const indianLangs = ["hi", "ta", "te", "ml", "kn", "bn", "pa", "ur"];
-      const foreignLangs = ["zh", "fr", "de", "ru", "ko"];
-  
-      const filtered = (res.data.results || []).filter((movie) => {
-        const title = (movie.title || "").toLowerCase();
-  
-        const isBlocked = BLOCKED_MOVIE_IDS.includes(movie.id);
-        const isLowRatedJapanese = movie.original_language === "ja" && movie.vote_count < 2500;
-        const isIndian = indianLangs.includes(movie.original_language);
-        const isForeignLowRated =
-          foreignLangs.includes(movie.original_language) && movie.vote_count < 5000;
-        const hasBannedWord = bannedWords.some((word) => title.includes(word));
-  
-        return (
-          movie.vote_count > 10 &&
-          movie.poster_path &&
-          !movie.adult &&
-          !isBlocked &&
-          !isLowRatedJapanese &&
-          !isIndian &&
-          !isForeignLowRated &&
-          !hasBannedWord
-        );
-      });
-  
-      setSearchResults(filtered);
-      setBackdropOptions([]); // clear old backdrops
-      setSelectedBackdrop(""); // reset selected
-    } catch (err) {
-      console.error("Search failed", err);
-      setSearchResults([]);
-    }
-  };
-  
-  
-  const fetchMovieBackdrops = async (tmdbId) => {
-    try {
-      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/movies/${tmdbId}`);
-      const backdrops = res.data.backdrops || [];
-      const formatted = backdrops.map(
-        (img) => `https://image.tmdb.org/t/p/original${img}`
-      );
-      setBackdropOptions(formatted);
-      // 🔥 Do NOT clear searchResults here!
-    } catch (err) {
-      console.error("Backdrop fetch failed", err);
-    }
-  };
-  
 
   const onDragEnd = (result) => {
     if (!result.destination) return;
@@ -247,109 +164,189 @@ useEffect(() => {
 
   return (
     <>
-      <div style={{ background: "#0e0e0e", color: "#fff", padding: "24px", minHeight: "100vh" }}>
-        {/* Top Bar */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-          <button
-            onClick={() => navigate(-1)}
-            style={{ background: "none", color: "#aaa", border: "none", fontSize: "16px", cursor: "pointer" }}
-          >
-            ← Back
-          </button>
-          <button
-            onClick={handleSave}
-            style={{
-              background: "#fff",
-              color: "#000",
-              borderRadius: "6px",
-              padding: "6px 14px",
-              fontWeight: "600",
-              fontSize: "14px",
-              cursor: "pointer",
-            }}
-          >
-            Save
-          </button>
-        </div>
-  
-        {/* Backdrop Preview */}
-        {backdrop && (
-          <img
-            src={backdrop}
-            alt="backdrop"
-            style={{
-              width: "100%",
-              height: "140px",
-              borderRadius: "12px",
-              objectFit: "cover",
-              marginBottom: "16px",
-            }}
-          />
-        )}
-  
-        {/* Avatar Upload */}
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-        <img
-  src={user.avatar || "/default-avatar.png"}
-  alt="Avatar"
-  style={{
-    width: "80px",
-    height: "80px",
-    borderRadius: "50%",
-    objectFit: "cover",
-    border: "2px solid white",
-  }}
-/>
-          <div>
-            <h2 style={{ marginBottom: "6px" }}>{displayName}</h2>
-            <input
-              type="file"
-              accept="image/*"
-              style={{ display: "none" }}
-              id="avatarInput"
-              onChange={handleAvatarUpload}
+      <div
+        style={{
+          background: "#0e0e0e",
+          color: "#fff",
+          padding: "24px",
+          minHeight: "100vh",
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
+        <div style={{ width: "100%", maxWidth: "620px" }}>
+          {/* Top Bar */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+            <button
+              onClick={() => navigate(-1)}
+              style={{ background: "none", color: "#aaa", border: "none", fontSize: "16px", cursor: "pointer" }}
+            >
+              ←
+            </button>
+            <button
+              onClick={handleSave}
+              style={{
+                background: "#fff",
+                color: "#000",
+                borderRadius: "6px",
+                padding: "6px 14px",
+                fontWeight: "600",
+                fontSize: "14px",
+                cursor: "pointer",
+              }}
+            >
+              Save
+            </button>
+          </div>
+
+          {/* Backdrop */}
+          {backdrop && (
+            <img
+              src={backdrop}
+              alt="backdrop"
+              style={{
+                width: "100%",
+                height: "140px",
+                borderRadius: "12px",
+                objectFit: "cover",
+                marginBottom: "16px",
+              }}
             />
-            <label htmlFor="avatarInput" style={btnStyle}>
-              Change Photo
-            </label>
+          )}
+
+          {/* Avatar Upload */}
+          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+            <img
+              src={avatar || "/default-avatar.jpg"}
+              alt="Avatar"
+              style={{
+                width: "80px",
+                height: "80px",
+                borderRadius: "50%",
+                objectFit: "cover",
+                border: "2px solid white",
+              }}
+            />
+            <div>
+              <input
+                type="file"
+                accept="image/*"
+                style={{ display: "none" }}
+                id="avatarInput"
+                onChange={handleAvatarUpload}
+              />
+              <label htmlFor="avatarInput" style={btnStyle}>
+                Change Photo
+              </label>
+            </div>
+          </div>
+
+          {/* Backdrop button */}
+          <div style={{ marginTop: "16px", width: "60%", display: "flex", alignItems: "center" }}>
+            <button style={btnStyle} onClick={() => navigate("/choose-backdrop")}>
+              Change backdrop
+            </button>
+          </div>
+
+          {/* Bio */}
+          <div style={{ marginTop: "14px", width: "90%" }}>
+            <label>Bio</label>
+            <textarea
+              value={bio}
+              onChange={(e) => setBio(e.target.value.slice(0, 180))}
+              maxLength={180}
+              style={{ ...inputStyle, height: "80px" }}
+            />
+          </div>
+
+          {/* Favorite Films */}
+          <div style={{ marginTop: "24px" }}>
+            <h4>Favorite Films</h4>
+            <MovieListSortable movies={favoriteFilms} setMovies={setFavoriteFilms} />
+            <p style={{ fontSize: "12px", color: "#888", marginTop: "6px" }}>
+              Drag to reorder, click ❌ to remove
+            </p>
+          </div>
+
+          {/* Connections */}
+          <div style={{ marginTop: "36px" }}>
+            <h4>Connections</h4>
+            <p style={{ fontSize: "13px", color: "#888", marginBottom: "6px" }}>
+              Add your social links (X, YouTube, etc.)
+            </p>
+            <details style={{ marginBottom: "20px" }}>
+              <summary style={{ cursor: "pointer", color: "#ddd" }}>Add / Edit Connections</summary>
+              <div style={{ marginTop: "12px", display: "flex", flexDirection: "column", gap: "12px" }}>
+                {["X", "youtube", "instagram", "tiktok", "imdb", "tmdb", "website"].map((platform) => (
+                  <div key={platform} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <div style={{ fontSize: "18px", width: "24px" }}>
+                      {getPlatformIcon(platform)}
+                    </div>
+                    <input
+                      placeholder={`Enter your ${platform} link or username`}
+                      value={socials[platform]}
+                      onChange={(e) =>
+                        setSocials((prev) => ({ ...prev, [platform]: e.target.value }))
+                      }
+                      style={{ ...inputStyle, flex: 1 }}
+                    />
+                  </div>
+                ))}
+              </div>
+            </details>
+          </div>
+
+          {/* Contact Us */}
+          <div style={{ marginTop: "32px" }}>
+            <h4>Contact Us</h4>
+            <details>
+              <summary style={{ cursor: "pointer", color: "#ddd" }}>Show contact info</summary>
+              <div style={{ marginTop: "12px", color: "#aaa" }}>
+                <p>Email: scenewebapp@gmail.com</p>
+                <p>X: @joinsceneapp</p>
+                <p>instagram: @joinscene</p>
+              </div>
+            </details>
+          </div>
+
+          {/* Delete My Account */}
+          <div style={{ marginTop: "40px", textAlign: "center" }}>
+            <button
+              style={{
+                background: "transparent",
+                border: "1px solid red",
+                color: "red",
+                padding: "10px 20px",
+                borderRadius: "8px",
+                fontSize: "14px",
+                cursor: "pointer",
+              }}
+              onClick={async () => {
+                if (!window.confirm("⚠️ Are you sure you want to delete your account? This cannot be undone.")) return;
+
+                try {
+                  await axios.delete(`${backend}/api/users/${user._id}`, {
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                  });
+
+                  localStorage.clear();
+                  toast.success("🗑️ Account deleted.");
+                  navigate("/login");
+                } catch (err) {
+                  toast.error("Failed to delete account.");
+                  console.error(err);
+                }
+              }}
+            >
+              Delete My Account
+            </button>
           </div>
         </div>
-  
-        <div style={{ marginTop: "24px", width: "90%" }}>
-          <label>Display Name</label>
-          <input value={displayName} onChange={(e) => setDisplayName(e.target.value)} style={inputStyle} />
-        </div>
-  
-        <div style={{ marginTop: "16px", width: "60%", display: "flex", alignItems: "center" }}>
-        <button style={btnStyle} onClick={() => navigate("/choose-backdrop")}>
-  Change backdrop
-</button>
-
-        </div>
-  
-        <div style={{ marginTop: "14px", width: "90%" }}>
-          <label>Bio</label>
-          <textarea value={bio} onChange={(e) => setBio(e.target.value)} style={{ ...inputStyle, height: "80px" }} />
-        </div>
-
-{/* 🎬 Favorite Films - Drag & Drop */}
-<div style={{ marginTop: "24px" }}>
-  <h4>Favorite Films</h4>
-  <MovieListSortable movies={favoriteFilms} setMovies={setFavoriteFilms} />
-  <p style={{ fontSize: "12px", color: "#888", marginTop: "6px" }}>
-    Drag to reorder, click ❌ to remove
-  </p>
-</div>
-
-  
-        <div style={{ marginTop: "32px", color: "#ccc" }}>
-        </div>
-  
-        <div style={{ marginTop: "40px", display: "flex", alignItems: "center", gap: "12px" }}>
-        </div>
       </div>
-  
-      {/* 🟩 This is OUTSIDE the main div AND the fragment — so it renders like a modal! */}
+
+      {/* Backdrop Picker Modal */}
       {showBackdropModal && (
         <BackdropSearchModalV2
           onSelect={(movie) => {
