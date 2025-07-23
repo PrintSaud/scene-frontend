@@ -4,7 +4,7 @@ import axios from "../api/api";
 import MovieListSortable from "../components/lists/MovieListSortable";
 import { backend } from "../config";
 import toast from "react-hot-toast";
-import { getPlatformIcon } from "../../utils/getPlatformIcon.jsx";
+import { getPlatformIcon } from "../utils/getPlatformIcon.jsx";
 
 
 import ReactModal from "react-modal";
