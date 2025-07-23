@@ -4,7 +4,8 @@ import axios from "../api/api";
 import MovieListSortable from "../components/lists/MovieListSortable";
 import { backend } from "../config";
 import toast from "react-hot-toast";
-import { getPlatformIcon } from "../../utils/getPlatformIcon";
+import { getPlatformIcon } from "../utils/getPlatformIcon";
+
 
 import ReactModal from "react-modal";
 import { BLOCKED_MOVIE_IDS } from "../utils/blockedMovies";
