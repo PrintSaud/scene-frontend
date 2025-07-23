@@ -89,7 +89,7 @@ export default function EditProfilePage() {
       bio === user.bio &&
       avatar === user.avatar &&
       backdrop === user.backdrop &&
-      JSON.stringify(favoriteFilms) === JSON.stringify(user.favoriteMovies) &&
+      JSON.stringify(favoriteFilms) === JSON.stringify(user.favoriteFilms),
       JSON.stringify(socials) === JSON.stringify({
         X: user.X || "",
         youtube: user.youtube || "",
@@ -110,7 +110,7 @@ const updatedUser = {
   bio,
   avatar,
   backdrop,
-  favorites: favoriteFilms,  // ← match the “favorites” field your API returns
+  favoriteFilms: favoriteFilms,
   ...socials,
 };
 

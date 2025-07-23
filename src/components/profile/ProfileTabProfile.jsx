@@ -22,7 +22,7 @@ export default function ProfileTabProfile({
     ? logs
         .filter((log) => log.movie?.poster || log.poster)
         .sort((a, b) => new Date(b.watchedAt) - new Date(a.watchedAt))
-        .slice(0, 4)
+        .slice(0, 6)
     : [];
 
   const handleLogClick = (log) => {
