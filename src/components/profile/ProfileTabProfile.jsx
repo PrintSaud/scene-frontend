@@ -16,7 +16,29 @@ export default function ProfileTabProfile({
   navigate,
   customPosters = {},
 }) {
-  console.log("🧪 [ProfileTabProfile] favoriteMovies prop:", favoriteMovies);
+  const [tmdbPosters, setTmdbPosters] = React.useState({});
+
+  // 🧠 Fetch poster paths for favorite movies from TMDB if not available
+  React.useEffect(() => {
+    const fetchPosters = async () => {
+      const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY;
+      const updated = {};
+      for (const movie of favoriteMovies) {
+        const id = movie.id || movie._id;
+        if (!customPosters[id]) {
+          try {
+            const res = await fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${TMDB_KEY}`);
+            const data = await res.json();
+            updated[id] = data.poster_path ? `${TMDB_IMG}${data.poster_path}` : FALLBACK_POSTER;
+          } catch (err) {
+            updated[id] = FALLBACK_POSTER;
+          }
+        }
+      }
+      setTmdbPosters(updated);
+    };
+    fetchPosters();
+  }, [favoriteMovies]);
 
   const recentlyWatched = Array.isArray(logs)
     ? logs
@@ -45,39 +67,32 @@ export default function ProfileTabProfile({
             Favorite Movies
           </h3>
           <div
-  style={{
-    display: "flex",
-    flexWrap: "wrap",
-    gap: "8px",
-    marginTop: "10px",
-    justifyContent: "flex-start", // ✅ NEW
-  }}
->
-
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "8px",
+              marginTop: "10px",
+              justifyContent: "flex-start",
+            }}
+          >
             {favoriteMovies.map((movie) => {
               const id = movie.id || movie._id;
               const poster =
-                customPosters[id] ||
-                (movie.poster?.startsWith("http")
-                  ? movie.poster
-                  : movie.poster
-                  ? `${TMDB_IMG}${movie.poster}`
-                  : FALLBACK_POSTER);
+                customPosters[id] || tmdbPosters[id] || FALLBACK_POSTER;
 
               return (
                 <img
-           
-  key={id}
-  src={poster}
-  alt={movie.title}
-  style={{
-    width: "22.5%",         // ✅ gives 4 per row with some gap
-    maxWidth: "90px",
-    aspectRatio: "2/3",
-    objectFit: "cover",
-    borderRadius: "6px",
-    flexShrink: 0,
-  }}
+                  key={id}
+                  src={poster}
+                  alt={movie.title}
+                  style={{
+                    width: "22.5%",
+                    maxWidth: "90px",
+                    aspectRatio: "2/3",
+                    objectFit: "cover",
+                    borderRadius: "6px",
+                    flexShrink: 0,
+                  }}
                   onClick={() => navigate(`/movie/${id}`)}
                 />
               );
