@@ -60,10 +60,10 @@ export default function ProfileTabProfile({
 
   return (
     <>
-    {/* 🎬 Favorite Movies */}
+{/* 🎬 Favorite Movies */}
 {hasFavorites ? (
-  <div style={{ marginTop: "24px" }}>
-    <h3 style={{  fontSize: "12px", fontWeight: "600" }}>
+  <div style={{ marginTop: "16px" }}>
+    <h3 style={{ fontSize: "12px", fontWeight: "600" }}>
       Favorite Movies
     </h3>
     <div
@@ -85,13 +85,15 @@ export default function ProfileTabProfile({
             ? `${TMDB_IMG}${movie.poster}`
             : FALLBACK_POSTER;
 
+        const posterToShow = customPoster || fallbackPoster;
+
         return (
           <img
             key={id}
-            src={customPoster || fallbackPoster}
+            src={posterToShow}
             alt={movie.title}
             style={{
-              width: "21vw", // ✅ bigger
+              width: "21vw",
               maxWidth: "110px",
               aspectRatio: "2/3",
               objectFit: "cover",
@@ -109,127 +111,134 @@ export default function ProfileTabProfile({
   <p style={{ color: "#888", marginTop: "20px" }}>No favorite movies yet.</p>
 )}
 
-      {/* 🕒 Recent Activity */}
-      {recentlyWatched.length > 0 ? (
-        <div style={{ marginTop: "32px" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h3 style={{ fontSize: "12px", fontWeight: "600" }}>
-              Recent Activity
-            </h3>
-            <button
-              onClick={() => {
-                const event = new CustomEvent("navigateToFilms");
-                window.dispatchEvent(event);
-              }}
-              style={{
-                background: "none",
-                border: "none",
-                color: "#ccc",
-                fontSize: "13px",
-                cursor: "pointer",
-              }}
-            >
-              More →
-            </button>
-          </div>
+{/* 🕒 Recent Activity */}
+{recentlyWatched.length > 0 ? (
+  <div style={{ marginTop: "24px" }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <h3 style={{ fontSize: "12px", fontWeight: "600" }}>
+        Recent Activity
+      </h3>
+      <button
+        onClick={() => {
+          const event = new CustomEvent("navigateToFilms");
+          window.dispatchEvent(event);
+        }}
+        style={{
+          background: "none",
+          border: "none",
+          color: "#ccc",
+          fontSize: "13px",
+          cursor: "pointer",
+        }}
+      >
+        More →
+      </button>
+    </div>
 
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(90px, 1fr))",
+        gap: "10px",
+        marginTop: "12px",
+      }}
+    >
+      {recentlyWatched.map((log) => {
+        const movieId = log.movie?._id || log.movie || log.movieId;
+        const poster =
+          log.posterOverride ||
+          (log.poster?.startsWith("http")
+            ? log.poster
+            : log.poster
+            ? `${TMDB_IMG}${log.poster}`
+            : log.movie?.poster_path
+            ? `${TMDB_IMG}${log.movie.poster_path}`
+            : FALLBACK_POSTER);
+
+        const timestamp = new Date(log.createdAt).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+        });
+
+        return (
           <div
+            key={log._id}
+            onClick={() =>
+              log.review
+                ? navigate(`/review/${log._id}`)
+                : movieId
+                ? navigate(`/movie/${movieId}`)
+                : null
+            }
             style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(90px, 1fr))",
-              gap: "10px",
-              marginTop: "12px",
+              position: "relative",
+              cursor: "pointer",
+              borderRadius: "8px",
+              overflow: "hidden",
             }}
           >
-            {recentlyWatched.map((log) => {
-              const poster =
-                log.posterOverride ||
-                (log.poster?.startsWith("http")
-                  ? log.poster
-                  : log.poster
-                  ? `${TMDB_IMG}${log.poster}`
-                  : log.movie?.poster_path
-                  ? `${TMDB_IMG}${log.movie.poster_path}`
-                  : FALLBACK_POSTER);
+            <img
+              src={poster}
+              alt={log.title || "Movie"}
+              style={{ width: "100%", aspectRatio: "2/3", objectFit: "cover" }}
+            />
 
-              const timestamp = new Date(log.createdAt).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-              });
+            {/* 🕒 Timestamp top-right */}
+            <div
+              style={{
+                position: "absolute",
+                top: "6px",
+                right: "6px",
+                fontSize: "11px",
+                background: "rgba(0,0,0,0.7)",
+                padding: "2px 6px",
+                borderRadius: "6px",
+                color: "#fff",
+              }}
+            >
+              {timestamp}
+            </div>
 
-              return (
-                <div
-                  key={log._id}
-                  onClick={() => handleLogClick(log)}
-                  style={{
-                    position: "relative",
-                    cursor: "pointer",
-                    borderRadius: "8px",
-                    overflow: "hidden",
-                  }}
-                >
-                  <img
-                    src={poster}
-                    alt={log.movie?.title}
-                    style={{ width: "100%", aspectRatio: "2/3", objectFit: "cover" }}
-                  />
+            {/* 🔁 Rewatch icon */}
+            {log.rewatch && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "6px",
+                  left: "6px",
+                  background: "rgba(0,0,0,0.6)",
+                  padding: "4px",
+                  borderRadius: "6px",
+                  color: "#fff",
+                }}
+              >
+                <HiOutlineRefresh size={14} />
+              </div>
+            )}
 
-                  {/* 🕒 Timestamp top-right */}
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "6px",
-                      right: "6px",
-                      fontSize: "11px",
-                      background: "rgba(0,0,0,0.7)",
-                      padding: "2px 6px",
-                      borderRadius: "6px",
-                      color: "#fff",
-                    }}
-                  >
-                    {timestamp}
-                  </div>
-
-                  {/* 🔁 Rewatch icon */}
-                  {log.rewatch && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: "6px",
-                        left: "6px",
-                        background: "rgba(0,0,0,0.6)",
-                        padding: "4px",
-                        borderRadius: "6px",
-                        color: "#fff",
-                      }}
-                    >
-                      <HiOutlineRefresh size={14} />
-                    </div>
-                  )}
-
-                  {/* ⭐ Star Rating */}
-                  {log.rating > 0 && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        bottom: "6px",
-                        left: "6px",
-                        background: "rgba(0,0,0,0.7)",
-                        borderRadius: "6px",
-                        padding: "2px 5px",
-                      }}
-                    >
-                      <StarRating rating={log.rating} />
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+            {/* ⭐ Star Rating */}
+            {log.rating > 0 && (
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: "6px",
+                  left: "6px",
+                  background: "rgba(0,0,0,0.7)",
+                  borderRadius: "6px",
+                  padding: "2px 5px",
+                }}
+              >
+                <StarRating rating={log.rating} />
+              </div>
+            )}
           </div>
-        </div>
-      ) : (
-        <p style={{ color: "#888", marginTop: "20px" }}>No recent logs yet.</p>
-      )}
+        );
+      })}
+    </div>
+  </div>
+) : (
+  <p style={{ color: "#888", marginTop: "20px" }}>No recent logs yet.</p>
+)}
 
       {/* 🔗 Connections */}
       {Object.values(user.socials || {}).some((val) => val) && (
