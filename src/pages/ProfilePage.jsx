@@ -152,7 +152,7 @@ export default function ProfilePage() {
         <ProfileTabProfile
         user={user}
         logs={logs}
-        favoriteMovies={user.favoriteFilms || []}
+        favoriteMovies={user.favoriteMovies || []}
         customPosters={user.customPosters || {}}
         navigate={navigate}
       />      
