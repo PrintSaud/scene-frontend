@@ -60,48 +60,55 @@ export default function ProfileTabProfile({
 
   return (
     <>
-      {/* 🎬 Favorite Movies */}
-      {hasFavorites ? (
-        <div style={{ marginTop: "24px" }}>
-          <h3 style={{ fontFamily: "Inter, sans-serif", fontSize: "16px", fontWeight: "600" }}>
-            Favorite Movies
-          </h3>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "8px",
-              marginTop: "10px",
-              justifyContent: "flex-start",
-            }}
-          >
-            {favoriteMovies.map((movie) => {
-              const id = movie.id || movie._id;
-              const poster =
-                customPosters[id] || tmdbPosters[id] || FALLBACK_POSTER;
+    {/* 🎬 Favorite Movies */}
+{hasFavorites ? (
+  <div style={{ marginTop: "24px" }}>
+    <h3 style={{ fontFamily: "Inter, sans-serif", fontSize: "16px", fontWeight: "600" }}>
+      Favorite Movies
+    </h3>
+    <div
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "10px",
+        marginTop: "12px",
+        justifyContent: "flex-start",
+      }}
+    >
+      {favoriteMovies.map((movie) => {
+        const id = movie.id || movie._id;
+        const poster =
+          customPosters[id] ||
+          tmdbPosters[id] ||
+          (movie.poster?.startsWith("http")
+            ? movie.poster
+            : movie.poster
+            ? `${TMDB_IMG}${movie.poster}`
+            : FALLBACK_POSTER);
 
-              return (
-                <img
-                  key={id}
-                  src={poster}
-                  alt={movie.title}
-                  style={{
-                    width: "22.5%",
-                    maxWidth: "90px",
-                    aspectRatio: "2/3",
-                    objectFit: "cover",
-                    borderRadius: "6px",
-                    flexShrink: 0,
-                  }}
-                  onClick={() => navigate(`/movie/${id}`)}
-                />
-              );
-            })}
-          </div>
-        </div>
-      ) : (
-        <p style={{ color: "#888", marginTop: "20px" }}>No favorite movies yet.</p>
-      )}
+        return (
+          <img
+            key={id}
+            src={poster}
+            alt={movie.title}
+            style={{
+              width: "24.5%",          // ⬆️ slightly bigger than 22.5%
+              maxWidth: "110px",       // ⬆️ more room for quality
+              aspectRatio: "2/3",
+              objectFit: "cover",
+              borderRadius: "8px",
+              flexShrink: 0,
+              cursor: "pointer",
+            }}
+            onClick={() => navigate(`/movie/${id}`)}
+          />
+        );
+      })}
+    </div>
+  </div>
+) : (
+  <p style={{ color: "#888", marginTop: "20px" }}>No favorite movies yet.</p>
+)}
 
       {/* 🕒 Recent Activity */}
       {recentlyWatched.length > 0 ? (
