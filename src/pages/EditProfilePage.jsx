@@ -67,7 +67,7 @@ export default function EditProfilePage() {
       const localBackdrop = JSON.parse(localStorage.getItem("chosenBackdrop"));
 
       setBio(user.bio || "");
-      setFavoriteFilms(user.favoriteMovies || []);
+      setFavoriteFilms(user.favorites || []);
       setAvatar(user.avatar || "");
       setUsername(user.username);
       setBackdrop(localBackdrop?.backdrop || user.backdrop || "");
@@ -105,13 +105,15 @@ export default function EditProfilePage() {
     }
 
     try {
-      const updatedUser = {
-        bio,
-        avatar,
-        backdrop,
-        favoriteMovies: favoriteFilms,
-        ...socials,
-      };
+      // after
+const updatedUser = {
+  bio,
+  avatar,
+  backdrop,
+  favorites: favoriteFilms,  // ← match the “favorites” field your API returns
+  ...socials,
+};
+
 
       await axios.patch(`${backend}/api/users/${user._id}`, updatedUser, {
         headers: {
