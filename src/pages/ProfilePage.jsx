@@ -49,11 +49,14 @@ export default function ProfilePage() {
     const fetchUser = async () => {
       try {
         const userRes = await getUserProfile(id);
-setUser(userRes.data); // ✅ correct
+        console.log("🧪 [fetchUser] full response:", userRes);
+        console.log("🧪 [fetchUser] actual user object:", userRes.data);
+        setUser(userRes.data);
       } catch (err) {
         console.error("❌ Failed to load profile", err);
       }
     };
+    
     
     
 
@@ -145,6 +148,7 @@ setUser(userRes.data); // ✅ correct
       <ProfileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <div style={{ padding: "0 16px" }}>
+        
       {activeTab === "Profile" && (
   <ProfileTabProfile
     user={user}

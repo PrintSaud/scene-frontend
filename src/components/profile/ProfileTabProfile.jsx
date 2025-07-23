@@ -10,6 +10,7 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 
 
   export default function ProfileTabProfile({ user, favoriteMovies = [], logs = [], navigate, customPosters = {} }) {
+    console.log("🧪 [ProfileTabProfile] favoriteMovies prop:", favoriteMovies);
 
   const recentlyWatched = Array.isArray(logs)
     ? logs
