@@ -5,7 +5,6 @@ import MovieListSortable from "../components/lists/MovieListSortable";
 import { backend } from "../config";
 import toast from "react-hot-toast";
 import { getPlatformIcon } from "../utils/getPlatformIcon.jsx";
-import MovieListSortable from "../components/MovieListSortable"; // adjust path
 import AddMovieModal from "../components/AddMovieModal";         // adjust path
 
 import ReactModal from "react-modal";
