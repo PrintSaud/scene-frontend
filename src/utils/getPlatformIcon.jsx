@@ -1,11 +1,11 @@
-import { FaXTwitter, FaYoutube, FaInstagram, FaTiktok, FaImdb } from "react-icons/fa";
+import { FaTwitter, FaYoutube, FaInstagram, FaTiktok, FaImdb } from "react-icons/fa";
 import { SiThemoviedatabase } from "react-icons/si";
 import { FiGlobe } from "react-icons/fi";
 
 export const getPlatformIcon = (platform) => {
   switch (platform.toLowerCase()) {
     case "x":
-      return <FaXTwitter />;
+  return <FaTwitter />;
     case "youtube":
       return <FaYoutube />;
     case "instagram":
