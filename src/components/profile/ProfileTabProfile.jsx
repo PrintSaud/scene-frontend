@@ -63,7 +63,7 @@ export default function ProfileTabProfile({
     {/* 🎬 Favorite Movies */}
 {hasFavorites ? (
   <div style={{ marginTop: "24px" }}>
-    <h3 style={{ fontFamily: "Inter, sans-serif", fontSize: "16px", fontWeight: "600" }}>
+    <h3 style={{  fontSize: "16px", fontWeight: "600" }}>
       Favorite Movies
     </h3>
     <div
@@ -71,32 +71,31 @@ export default function ProfileTabProfile({
         display: "flex",
         flexWrap: "wrap",
         gap: "10px",
-        marginTop: "12px",
+        marginTop: "10px",
         justifyContent: "flex-start",
       }}
     >
       {favoriteMovies.map((movie) => {
-        const id = movie.id || movie._id;
-        const poster =
-          customPosters[id] ||
-          tmdbPosters[id] ||
-          (movie.poster?.startsWith("http")
+        const id = movie.id || movie._id || movie.tmdbId;
+        const customPoster = customPosters?.[id];
+        const fallbackPoster =
+          movie.poster?.startsWith("http")
             ? movie.poster
             : movie.poster
             ? `${TMDB_IMG}${movie.poster}`
-            : FALLBACK_POSTER);
+            : FALLBACK_POSTER;
 
         return (
           <img
             key={id}
-            src={poster}
+            src={customPoster || fallbackPoster}
             alt={movie.title}
             style={{
-              width: "24.5%",          // ⬆️ slightly bigger than 22.5%
-              maxWidth: "110px",       // ⬆️ more room for quality
+              width: "26vw", // ✅ bigger
+              maxWidth: "110px",
               aspectRatio: "2/3",
               objectFit: "cover",
-              borderRadius: "8px",
+              borderRadius: "6px",
               flexShrink: 0,
               cursor: "pointer",
             }}
@@ -114,7 +113,7 @@ export default function ProfileTabProfile({
       {recentlyWatched.length > 0 ? (
         <div style={{ marginTop: "32px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h3 style={{ fontFamily: "Inter, sans-serif", fontSize: "16px", fontWeight: "600" }}>
+            <h3 style={{ fontSize: "16px", fontWeight: "600" }}>
               Recent Activity
             </h3>
             <button
