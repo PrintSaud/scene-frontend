@@ -89,7 +89,7 @@ export default function EditProfilePage() {
       bio === user.bio &&
       avatar === user.avatar &&
       backdrop === user.backdrop &&
-      JSON.stringify(favoriteFilms) === JSON.stringify(user.favoriteFilms)  &&
+      JSON.stringify(favoriteFilms) === JSON.stringify(user.favoriteFilms) &&
       JSON.stringify(socials) === JSON.stringify({
         X: user.X || "",
         youtube: user.youtube || "",
@@ -103,26 +103,24 @@ export default function EditProfilePage() {
       toast("No changes to save.");
       return;
     }
-
+  
     try {
-      // after
-const updatedUser = {
-  bio,
-  avatar,
-  backdrop,
-  favoriteFilms: favoriteFilms,
-  ...socials,
-};
-
-
-      await axios.patch(`${backend}/api/users/${user._id}`, updatedUser, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const updatedUser = {
+        bio,
+        avatar,
+        backdrop,
+        favoriteFilms,
+        ...socials,
+      };
+  
+      const res = await axios.patch(`${backend}/api/users/${user._id}`, updatedUser, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-
-      localStorage.setItem("user", JSON.stringify({ ...user, ...updatedUser }));
-
+  
+      // 🔥 Save updated user (includes favoriteMovies)
+      localStorage.setItem("user", JSON.stringify({ ...user, ...res.data.user }));
+  
+      console.log("✅ Saved user:", res.data.user);
       toast.success("✅ Profile updated!");
       navigate(`/profile/${user._id}`);
     } catch (err) {
@@ -130,7 +128,7 @@ const updatedUser = {
       toast.error("❌ Failed to update profile.");
     }
   };
-
+  
   const handleAvatarUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
