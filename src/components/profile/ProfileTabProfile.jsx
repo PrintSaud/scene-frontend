@@ -63,7 +63,7 @@ export default function ProfileTabProfile({
     {/* 🎬 Favorite Movies */}
 {hasFavorites ? (
   <div style={{ marginTop: "24px" }}>
-    <h3 style={{  fontSize: "16px", fontWeight: "600" }}>
+    <h3 style={{  fontSize: "12px", fontWeight: "600" }}>
       Favorite Movies
     </h3>
     <div
@@ -91,7 +91,7 @@ export default function ProfileTabProfile({
             src={customPoster || fallbackPoster}
             alt={movie.title}
             style={{
-              width: "26vw", // ✅ bigger
+              width: "23vw", // ✅ bigger
               maxWidth: "110px",
               aspectRatio: "2/3",
               objectFit: "cover",
@@ -113,7 +113,7 @@ export default function ProfileTabProfile({
       {recentlyWatched.length > 0 ? (
         <div style={{ marginTop: "32px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h3 style={{ fontSize: "16px", fontWeight: "600" }}>
+            <h3 style={{ fontSize: "12px", fontWeight: "600" }}>
               Recent Activity
             </h3>
             <button
