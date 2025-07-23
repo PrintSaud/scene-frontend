@@ -30,28 +30,31 @@ export default function DirectorPage() {
     return `🏆 ${name} may have awards – check IMDb for more`;
   };
 
+
+
   useEffect(() => {
     const fetchDirector = async () => {
       try {
         const [detailsRes, creditsRes] = await Promise.all([
-          axios.get(`https://api.themoviedb.org/3/person/${id}?api_key=${import.meta.env.VITE_TMDB_API_KEY}`),
-          axios.get(`https://api.themoviedb.org/3/person/${id}/movie_credits?api_key=${import.meta.env.VITE_TMDB_API_KEY}`)
+          axios.get(`${backend}/api/tmdb/person/${id}`),
+          axios.get(`${backend}/api/tmdb/person/${id}/credits`)
         ]);
-
+  
         setDirector(detailsRes.data);
-
+  
         const directed = creditsRes.data.crew
           .filter((c) => c.job === "Director" && c.poster_path)
           .sort((a, b) => b.popularity - a.popularity);
-
+  
         setMovies(directed);
       } catch (err) {
         console.error("Failed to fetch director:", err);
       }
     };
-
+  
     fetchDirector();
   }, [id]);
+  
 
   const toggleBio = () => setShowFullBio((prev) => !prev);
 
@@ -135,7 +138,8 @@ export default function DirectorPage() {
                 display: "-webkit-box",
                 WebkitLineClamp: showFullBio ? "none" : "4",
                 WebkitBoxOrient: "vertical",
-                overflow: "hidden"
+                overflow: "hidden",
+                fontFamily: "Inter, sans-serif",
               }}>
                 {director.biography}
               </p>
@@ -146,6 +150,7 @@ export default function DirectorPage() {
                     marginTop: "6px",
                     fontSize: "13px",
                     background: "none",
+                    fontFamily: "Inter, sans-serif",
                     color: "#1db954",
                     border: "none",
                     cursor: "pointer"

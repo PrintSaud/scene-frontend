@@ -120,6 +120,7 @@ export default function ActorPage() {
                     WebkitLineClamp: showFullBio ? "none" : "4",
                     WebkitBoxOrient: "vertical",
                     overflow: "hidden",
+                    fontFamily: "Inter, sans-serif",
                   }}
                 >
                   {actor.biography}
@@ -131,6 +132,7 @@ export default function ActorPage() {
                       marginTop: "6px",
                       fontSize: "13px",
                       background: "none",
+                      fontFamily: "Inter, sans-serif",
                       color: "#1db954",
                       border: "none",
                       cursor: "pointer",
