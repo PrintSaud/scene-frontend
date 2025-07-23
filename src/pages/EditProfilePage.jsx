@@ -5,7 +5,8 @@ import MovieListSortable from "../components/lists/MovieListSortable";
 import { backend } from "../config";
 import toast from "react-hot-toast";
 import { getPlatformIcon } from "../utils/getPlatformIcon.jsx";
-
+import MovieListSortable from "../components/MovieListSortable"; // adjust path
+import AddMovieModal from "../components/AddMovieModal";         // adjust path
 
 import ReactModal from "react-modal";
 import { BLOCKED_MOVIE_IDS } from "../utils/blockedMovies";
@@ -60,6 +61,7 @@ export default function EditProfilePage() {
   const [searchResults, setSearchResults] = useState([]);
   const [backdropOptions, setBackdropOptions] = useState([]);
   const [selectedBackdrop, setSelectedBackdrop] = useState("");
+  const [showAddMovieModal, setShowAddMovieModal] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -217,17 +219,22 @@ export default function EditProfilePage() {
 
           {/* Avatar Upload */}
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            <img
-              src={avatar || "/default-avatar.jpg"}
-              alt="Avatar"
-              style={{
-                width: "80px",
-                height: "80px",
-                borderRadius: "50%",
-                objectFit: "cover",
-                border: "2px solid white",
-              }}
-            />
+          <img
+  src={avatar || "/default-avatar.jpg"}
+  alt="Avatar"
+  style={{
+    width: "80px",
+    height: "80px",
+    borderRadius: "50%",
+    objectFit: "cover",
+    border: "2px solid white",
+  }}
+  onError={(e) => {
+    e.currentTarget.onerror = null; // prevent infinite loop
+    e.currentTarget.src = "/default-avatar.jpg";
+  }}
+/>
+
             <div>
               <input
                 type="file"
@@ -260,14 +267,47 @@ export default function EditProfilePage() {
             />
           </div>
 
-          {/* Favorite Films */}
-          <div style={{ marginTop: "24px" }}>
-            <h4>Favorite Films</h4>
-            <MovieListSortable movies={favoriteFilms} setMovies={setFavoriteFilms} />
-            <p style={{ fontSize: "12px", color: "#888", marginTop: "6px" }}>
-              Drag to reorder, click ❌ to remove
-            </p>
-          </div>
+{/* Favorite Films */}
+<div style={{ marginTop: "24px" }}>
+  <h4>Favorite Films</h4>
+
+  {favoriteFilms.length === 0 ? (
+    <p style={{ color: "#888" }}>No favorite movies yet.</p>
+  ) : (
+    <MovieListSortable movies={favoriteFilms} setMovies={setFavoriteFilms} />
+  )}
+
+  <button
+    onClick={() => setShowAddMovieModal(true)}
+    style={{
+      marginTop: "12px",
+      padding: "8px 16px",
+      fontSize: "14px",
+      cursor: "pointer",
+      backgroundColor: "#1a1a1a",
+      border: "1px solid #333",
+      borderRadius: "6px",
+      color: "white",
+    }}
+  >
+    ➕ Add Movie
+  </button>
+
+  {showAddMovieModal && (
+    <AddMovieModal
+      onClose={() => setShowAddMovieModal(false)}
+      onSelect={(movie) => {
+        // Avoid duplicates
+        if (!favoriteFilms.some((m) => m.id === movie.id)) {
+          setFavoriteFilms([...favoriteFilms, movie]);
+        }
+        setShowAddMovieModal(false);
+      }}
+      existing={favoriteFilms}
+    />
+  )}
+</div>
+
 
           {/* Connections */}
           <div style={{ marginTop: "36px" }}>
