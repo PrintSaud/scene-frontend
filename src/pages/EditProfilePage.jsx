@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../api/api";
-import MovieListSortable from "../components/lists/MovieListSortable";
 import { backend } from "../config";
 import toast from "react-hot-toast";
 import { getPlatformIcon } from "../utils/getPlatformIcon.jsx";
-import AddMovieModal from "../components/AddMovieModal";         // adjust path
+import MovieListSortable from "../components/lists/MovieListSortable";
+import AddMovieModal       from "../components/lists/AddMovieModal";
 
 import ReactModal from "react-modal";
 import { BLOCKED_MOVIE_IDS } from "../utils/blockedMovies";
