@@ -67,7 +67,7 @@ export default function EditProfilePage() {
       const localBackdrop = JSON.parse(localStorage.getItem("chosenBackdrop"));
 
       setBio(user.bio || "");
-      setFavoriteFilms(user.favorites || []);
+      setFavoriteFilms(user.favoriteFilms || []);
       setAvatar(user.avatar || "");
       setUsername(user.username);
       setBackdrop(localBackdrop?.backdrop || user.backdrop || "");
