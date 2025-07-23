@@ -89,7 +89,7 @@ export default function EditProfilePage() {
       bio === user.bio &&
       avatar === user.avatar &&
       backdrop === user.backdrop &&
-      JSON.stringify(favoriteFilms) === JSON.stringify(user.favoriteFilms),
+      JSON.stringify(favoriteFilms) === JSON.stringify(user.favoriteFilms)  &&
       JSON.stringify(socials) === JSON.stringify({
         X: user.X || "",
         youtube: user.youtube || "",
@@ -221,7 +221,11 @@ const updatedUser = {
           {/* Avatar Upload */}
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
           <img
-  src={avatar || "/default-avatar.jpg"}
+  src={
+    avatar && avatar !== "null" && avatar !== "undefined"
+      ? avatar
+      : "/default-avatar.jpg"
+  }
   alt="Avatar"
   style={{
     width: "80px",
@@ -235,6 +239,7 @@ const updatedUser = {
     e.currentTarget.src = "/default-avatar.jpg";
   }}
 />
+
 
             <div>
               <input
