@@ -149,13 +149,13 @@ export default function ProfilePage() {
       <div style={{ padding: "0 16px" }}>
 
       {activeTab === "Profile" && (
-  <ProfileTabProfile
-    user={user}
-    logs={logs}
-    favoriteMovies={user.favoriteMovies ?? user.favorites ?? []}
-    customPosters={user.customPosters || {}}
-    navigate={navigate}
-  />
+        <ProfileTabProfile
+        user={user}
+        logs={logs}
+        favoriteMovies={user.favoriteFilms || []}
+        customPosters={user.customPosters || {}}
+        navigate={navigate}
+      />      
 )}
 
         {activeTab === "Reviews" && (
