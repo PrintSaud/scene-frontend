@@ -49,8 +49,7 @@ export default function ProfilePage() {
     const fetchUser = async () => {
       try {
         const userRes = await getUserProfile(id);
-        console.log("🧪 userRes:", userRes); // optional debug
-        setUser(userRes);
+setUser(userRes.data); // ✅ correct
       } catch (err) {
         console.error("❌ Failed to load profile", err);
       }
@@ -144,13 +143,16 @@ export default function ProfilePage() {
       <ProfileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <div style={{ padding: "0 16px" }}>
-      <ProfileTabProfile
-  user={user} // ✅ ADD THIS LINE
-  logs={logs}
-  favoriteMovies={user.favoriteMovies || []}
-  customPosters={user.customPosters || {}}
-  navigate={navigate}
-/>
+      {activeTab === "Profile" && (
+  <ProfileTabProfile
+    user={user}
+    logs={logs}
+    favoriteMovies={user.favoriteMovies || []}
+    customPosters={user.customPosters || {}}
+    navigate={navigate}
+  />
+)}
+
         {activeTab === "Reviews" && (
           <ProfileTabReviews
             logs={logs}

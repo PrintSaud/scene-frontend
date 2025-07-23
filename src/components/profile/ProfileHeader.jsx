@@ -230,12 +230,13 @@ export default function ProfileHeader({
         }}
       >
         <div onClick={() => navigate(`/profile/${user._id}/following`)} style={{ cursor: "pointer", fontFamily: "Inter" }}>
-          <strong>{user.followingCount ?? 0}</strong>
+          <strong>{user.following?.length || 0}</strong>
+
           <div>Following</div>
         </div>
 
         <div onClick={() => navigate(`/profile/${user._id}/followers`)} style={{ cursor: "pointer", fontFamily: "Inter" }}>
-          <strong>{user.followerCount ?? 0}</strong>
+        <strong>{user.followers?.length || 0}</strong>
           <div>Followers</div>
         </div>
 
@@ -246,7 +247,7 @@ export default function ProfileHeader({
           }}
           style={{ cursor: "pointer", fontFamily: "Inter" }}
         >
-          <strong>{user.totalLogs || 0}</strong>
+          <strong>{logs.length || 0}</strong>
           <div>Films</div>
         </div>
       </div>
