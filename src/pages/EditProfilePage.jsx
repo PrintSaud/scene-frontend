@@ -278,27 +278,30 @@ const updatedUser = {
     <MovieListSortable movies={favoriteFilms} setMovies={setFavoriteFilms} />
   )}
 
-  <button
-    onClick={() => setShowAddMovieModal(true)}
-    style={{
-      marginTop: "12px",
-      padding: "8px 16px",
-      fontSize: "14px",
-      cursor: "pointer",
-      backgroundColor: "#1a1a1a",
-      border: "1px solid #333",
-      borderRadius: "6px",
-      color: "white",
-    }}
-  >
-    ➕ Add Movie
-  </button>
+  {/* only show add button if fewer than 4 movies */}
+  {favoriteFilms.length < 4 && (
+    <button
+      onClick={() => setShowAddMovieModal(true)}
+      style={{
+        marginTop: "12px",
+        padding: "8px 16px",
+        fontSize: "14px",
+        cursor: "pointer",
+        backgroundColor: "#1a1a1a",
+        border: "1px solid #333",
+        borderRadius: "6px",
+        color: "white",
+      }}
+    >
+      ➕ Add Movie
+    </button>
+  )}
 
-  {showAddMovieModal && (
+  {/* likewise, only allow modal to open if under 4 */}
+  {showAddMovieModal && favoriteFilms.length < 4 && (
     <AddMovieModal
       onClose={() => setShowAddMovieModal(false)}
       onSelect={(movie) => {
-        // Avoid duplicates
         if (!favoriteFilms.some((m) => m.id === movie.id)) {
           setFavoriteFilms([...favoriteFilms, movie]);
         }

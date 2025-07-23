@@ -21,6 +21,7 @@ export default function ProfileHeader({
   isOwner,
   isFollowing,
   handleFollow,
+  handleRemoveFollower,
 }) {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -92,25 +93,22 @@ export default function ProfileHeader({
   </button>
 )}
 
-{/* ⋯ Top Right Menu for owner (cleaner look) */}
-{isOwner && (
+  {/* ⋯ Options */}
   <div style={{ position: "absolute", top: "16px", right: "16px", zIndex: 10 }}>
-    <button
-      onClick={() => setMenuOpen((prev) => !prev)}
-      style={{
-        background: "rgba(255,255,255,0.06)",
-        border: "1px solid rgba(255,255,255,0.1)",
-        borderRadius: "999px",
-        width: "36px",
-        height: "36px",
-        color: "#fff",
-        fontSize: "20px",
+    <button     onClick={() => setMenuOpen((prev) => !prev)}
+     style={{
+        background: "rgba(0,0,0,0.5)",
+        border: "none",
+        borderRadius: "50%",
+       width: "32px",
+       height: "32px",
+       color: "#fff",
+        fontSize: "22px",
         cursor: "pointer",
-        display: "flex",
-        alignItems: "center",
+       display: "flex",
+       alignItems: "center",
         justifyContent: "center",
-        backdropFilter: "blur(4px)",
-      }}
+     }}
     >
       ⋯
     </button>
@@ -119,24 +117,51 @@ export default function ProfileHeader({
       <div
         style={{
           position: "absolute",
-          top: "42px",
-          right: 0,
-          background: "#111",
-          border: "1px solid #2f2f2f",
+          top: "38px",
+         right: 0,
+          background: "#1a1a1a",
+          border: "1px solid #333",
           borderRadius: "12px",
-          boxShadow: "0 8px 20px rgba(0,0,0,0.45)",
-          padding: "8px 0",
-          width: "160px",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
+          padding: "12px 0",          width: "180px",
         }}
       >
-        <div onClick={() => navigate("/edit-profile")} style={menuItemStyle}>✏️ Edit Profile</div>
-        <div onClick={handleShare} style={menuItemStyle}>📤 Share</div>
-        <div onClick={handleLogout} style={menuItemStyle}>🚪 Log Out</div>
+        {(isOwner
+          ? [
+              { label: "✏️ Edit Profile",   onClick: () => navigate("/edit-profile") },
+              { label: "📤 Share",            onClick: handleShare },
+              { label: "🚪 Log Out",         onClick: handleLogout },
+            ]
+          : [
+              { label: "📤 Share",            onClick: handleShare },
+              { label: "❌ Remove Follower",  onClick: handleRemoveFollower },
+           ]
+       ).map((item, i) => (
+          <div
+           key={i}
+            onClick={() => {
+              item.onClick();
+              setMenuOpen(false);
+            }}
+            style={{
+              padding: "10px 16px",
+              cursor: "pointer",
+              fontSize: "14.5px",
+              fontWeight: "500",
+              color: "#fff",
+              fontFamily: "Inter",
+              transition: "0.2s",
+              whiteSpace: "nowrap",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "#2a2a2a")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+          >
+            {item.label}
+          </div>
+        ))}
       </div>
     )}
   </div>
-)}
-
 
         {/* AVATAR */}
         <div style={{ position: "absolute", left: "16px", bottom: "0px", zIndex: 2 }}>
