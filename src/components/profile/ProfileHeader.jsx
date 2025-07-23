@@ -3,6 +3,17 @@ import { useNavigate } from "react-router-dom";
 import { HiDotsVertical } from "react-icons/hi";
 import toast from "react-hot-toast";
 
+const menuItemStyle = {
+  fontSize: "13px",
+  padding: "6px 10px",
+  background: "#1c1c1c",
+  borderRadius: "5px",
+  cursor: "pointer",
+  color: "white",
+  transition: "0.2s",
+};
+
+
 export default function ProfileHeader({
   user,
   imgRef,
@@ -243,12 +254,4 @@ export default function ProfileHeader({
   );
 }
 
-const menuItemStyle = {
-  fontSize: "13px",
-  padding: "6px 10px",
-  background: "#1c1c1c",
-  borderRadius: "5px",
-  cursor: "pointer",
-  color: "white",
-  transition: "0.2s",
-};
+
