@@ -8,7 +8,9 @@ import { getPlatformIcon } from "../../utils/getPlatformIcon.jsx";
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 
-export default function ProfileTabProfile({ favoriteMovies = [], logs = [], navigate, customPosters = {} }) {
+
+  export default function ProfileTabProfile({ user, favoriteMovies = [], logs = [], navigate, customPosters = {} }) {
+
   const recentlyWatched = Array.isArray(logs)
     ? logs
         .filter((log) => log.movie?.poster)
