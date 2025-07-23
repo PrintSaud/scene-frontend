@@ -45,14 +45,15 @@ export default function ProfileTabProfile({
             Favorite Movies
           </h3>
           <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "8px",
-              marginTop: "10px",
-              justifyContent: "space-between",
-            }}
-          >
+  style={{
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "8px",
+    marginTop: "10px",
+    justifyContent: "flex-start", // ✅ NEW
+  }}
+>
+
             {favoriteMovies.map((movie) => {
               const id = movie.id || movie._id;
               const poster =
@@ -65,17 +66,18 @@ export default function ProfileTabProfile({
 
               return (
                 <img
-                  key={id}
-                  src={poster}
-                  alt={movie.title}
-                  style={{
-                    width: "23vw",
-                    maxWidth: "90px",
-                    aspectRatio: "2/3",
-                    objectFit: "cover",
-                    borderRadius: "6px",
-                    flexShrink: 0,
-                  }}
+           
+  key={id}
+  src={poster}
+  alt={movie.title}
+  style={{
+    width: "22.5%",         // ✅ gives 4 per row with some gap
+    maxWidth: "90px",
+    aspectRatio: "2/3",
+    objectFit: "cover",
+    borderRadius: "6px",
+    flexShrink: 0,
+  }}
                   onClick={() => navigate(`/movie/${id}`)}
                 />
               );
