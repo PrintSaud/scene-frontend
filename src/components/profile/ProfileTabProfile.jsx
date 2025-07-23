@@ -114,7 +114,7 @@ export default function ProfileTabProfile({
 
 {/* 🕒 Recent Activity */}
 {recentlyWatched.length > 0 ? (
-  <div style={{ marginTop: "20px" }}>
+  <div style={{ marginTop: "12px" }}>
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
       <h3 style={{ fontSize: "12px", fontWeight: "600" }}>
         Recent Activity
