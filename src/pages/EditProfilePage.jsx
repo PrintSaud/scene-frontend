@@ -120,7 +120,7 @@ export default function EditProfilePage() {
       // 🔥 Save updated user (includes favoriteMovies)
       localStorage.setItem("user", JSON.stringify({ ...user, ...res.data.user }));
   
-      console.log("✅ Saved user:", res.data.user);
+
       toast.success("✅ Profile updated!");
       navigate(`/profile/${user._id}`);
     } catch (err) {

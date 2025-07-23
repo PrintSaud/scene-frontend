@@ -50,7 +50,6 @@ export default function ProfilePage() {
       try {
         const userRes = await getUserProfile(id);
         setUser(userRes.data);
-        console.log("🧠 Profile data:", userRes.data);
       } catch (err) {
         console.error("❌ Failed to load profile", err);
       }
