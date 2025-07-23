@@ -149,7 +149,7 @@ setUser(userRes.data); // ✅ correct
   <ProfileTabProfile
     user={user}
     logs={logs}
-    favoriteMovies={user.favoriteMovies || []}
+    favoriteMovies={user.favoriteMovies ?? user.favorites ?? []}
     customPosters={user.customPosters || {}}
     navigate={navigate}
   />
