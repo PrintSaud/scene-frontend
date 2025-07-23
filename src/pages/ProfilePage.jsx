@@ -132,13 +132,15 @@ setUser(userRes.data); // ✅ correct
   return (
     <div style={{ backgroundColor: "#0e0e0e", color: "white", minHeight: "100vh", paddingBottom: "100px", position: "relative" }}>
       <ProfileHeader
-        user={user}
-        navigate={navigate}
-        imgRef={imgRef}
-        isOwner={isOwner}
-        isFollowing={isFollowing}
-        handleFollow={handleFollow}
-      />
+  user={user}
+  logs={logs}            // <-- pass logs here
+  navigate={navigate}
+  imgRef={imgRef}
+  isOwner={isOwner}
+  isFollowing={isFollowing}
+  handleFollow={handleFollow}
+/>
+
 
       <ProfileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 

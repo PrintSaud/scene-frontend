@@ -17,6 +17,7 @@ const menuItemStyle = {
 export default function ProfileHeader({
   user,
   imgRef,
+  logs, 
   isOwner,
   isFollowing,
   handleFollow,
