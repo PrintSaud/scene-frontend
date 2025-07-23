@@ -101,7 +101,7 @@ export default function ProfileHeader({
         border: "none",
         borderRadius: "50%",
        width: "32px",
-       height: "32px",
+       height: "36px",
        color: "#fff",
         fontSize: "22px",
         cursor: "pointer",
