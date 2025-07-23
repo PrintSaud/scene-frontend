@@ -53,63 +53,78 @@ export default function ProfileHeader({
           }}
         />
 
-        {/* Back button styled like MoviePage when not owner */}
-        {!isOwner && (
-          <button
-            onClick={() => navigate(-1)}
-            style={{
-              position: "absolute",
-              top: "16px",
-              left: "16px",
-              background: "#1a1a1a",
-              border: "1px solid #333",
-              borderRadius: "50%",
-              width: "32px",
-              height: "32px",
-              color: "#fff",
-              fontSize: "16px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              zIndex: 2
-            }}
-          >
-            ←
-          </button>
-        )}
+        {/* 🔙 Back Button for non-owners (like MoviePage style) */}
+{!isOwner && (
+  <button
+    onClick={() => navigate(-1)}
+    style={{
+      position: "absolute",
+      top: "16px",
+      left: "16px",
+      background: "rgba(255,255,255,0.05)",
+      border: "1px solid rgba(255,255,255,0.15)",
+      borderRadius: "999px",
+      width: "36px",
+      height: "36px",
+      color: "#fff",
+      fontSize: "18px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      cursor: "pointer",
+      backdropFilter: "blur(6px)",
+      zIndex: 2
+    }}
+  >
+    ←
+  </button>
+)}
 
-        {/* ⋯ Top Right Menu for owner */}
-        {isOwner && (
-          <div style={{ position: "absolute", top: 20, right: 20 }}>
-            <HiDotsVertical
-              onClick={() => setMenuOpen((prev) => !prev)}
-              style={{ fontSize: "20px", color: "white", cursor: "pointer" }}
-            />
-            {menuOpen && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: "24px",
-                  right: 0,
-                  background: "#111",
-                  border: "1px solid #333",
-                  borderRadius: "8px",
-                  padding: "8px",
-                  zIndex: 20,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "6px",
-                  width: "140px",
-                }}
-              >
-                <div onClick={() => navigate("/edit-profile")} style={menuItemStyle}>✏️ Edit Profile</div>
-                <div onClick={handleShare} style={menuItemStyle}>📤 Share</div>
-                <div onClick={handleLogout} style={menuItemStyle}>🚪 Log Out</div>
-              </div>
-            )}
-          </div>
-        )}
+{/* ⋯ Top Right Menu for owner (cleaner look) */}
+{isOwner && (
+  <div style={{ position: "absolute", top: "16px", right: "16px", zIndex: 10 }}>
+    <button
+      onClick={() => setMenuOpen((prev) => !prev)}
+      style={{
+        background: "rgba(255,255,255,0.06)",
+        border: "1px solid rgba(255,255,255,0.1)",
+        borderRadius: "999px",
+        width: "36px",
+        height: "36px",
+        color: "#fff",
+        fontSize: "20px",
+        cursor: "pointer",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        backdropFilter: "blur(4px)",
+      }}
+    >
+      ⋯
+    </button>
+
+    {menuOpen && (
+      <div
+        style={{
+          position: "absolute",
+          top: "42px",
+          right: 0,
+          background: "#111",
+          border: "1px solid #2f2f2f",
+          borderRadius: "12px",
+          boxShadow: "0 8px 20px rgba(0,0,0,0.45)",
+          padding: "8px 0",
+          width: "160px",
+        }}
+      >
+        <div onClick={() => navigate("/edit-profile")} style={menuItemStyle}>✏️ Edit Profile</div>
+        <div onClick={handleShare} style={menuItemStyle}>📤 Share</div>
+        <div onClick={handleLogout} style={menuItemStyle}>🚪 Log Out</div>
+      </div>
+    )}
+  </div>
+)}
+
 
         {/* AVATAR */}
         <div style={{ position: "absolute", left: "16px", bottom: "0px", zIndex: 2 }}>
