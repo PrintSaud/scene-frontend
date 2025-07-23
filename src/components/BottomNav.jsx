@@ -17,6 +17,12 @@ export default function BottomNav({ hasUnread }) {
   const hiddenRoutes = ["/upload-avatar"];
   if (hiddenRoutes.includes(location.pathname)) return null;
 
+  // 👀 Count unread from localStorage or props (optional upgrade)
+  const unreadCount = JSON.parse(localStorage.getItem("notifications") || "[]")
+    .filter((n) => !n.read).length;
+
+  const showDot = hasUnread && location.pathname !== "/notifications";
+
   return (
     <div
       style={{
@@ -63,18 +69,24 @@ export default function BottomNav({ hasUnread }) {
               {route === "/notifications" ? (
                 <div style={{ position: "relative" }}>
                   <Bell size={26} strokeWidth={isActive ? 2.4 : 1.8} />
-                  {hasUnread && (
+                  {showDot && unreadCount > 0 && (
                     <div
                       style={{
                         position: "absolute",
-                        top: 2,
-                        right: 2,
-                        width: 8,
-                        height: 8,
-                        borderRadius: "50%",
-                        background: "red",
+                        top: -6,
+                        right: -10,
+                        minWidth: 18,
+                        padding: "2px 5px",
+                        backgroundColor: "#a855f7", // Scene purple
+                        color: "white",
+                        fontSize: "10px",
+                        fontWeight: "bold",
+                        borderRadius: "999px",
+                        textAlign: "center",
                       }}
-                    />
+                    >
+                      {unreadCount}
+                    </div>
                   )}
                 </div>
               ) : (

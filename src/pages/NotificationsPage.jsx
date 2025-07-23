@@ -18,25 +18,35 @@ export default function NotificationsPage({ setHasUnread }) {
       case "suggest_movie": return "suggested a movie for you";
       case "share-list": return "shared a list with you";
       case "share-movie": return "shared a movie with you";
+      case "share-review": return "shared a review with you";
       default: return "sent you a notification";
     }
   };
 
+  // ✅ Auto-mark all as read when opening
   useEffect(() => {
+    const markAllAsRead = async () => {
+      try {
+        await axios.patch("/api/notifications/read");
+        setHasUnread(false);
+      } catch (err) {
+        console.error("Failed to mark all as read", err);
+      }
+    };
+
     const fetchNotifications = async () => {
       try {
         const { data } = await axios.get("/api/notifications");
         setNotifications(data);
-        if (setHasUnread) {
-          const hasUnread = data.some((n) => !n.read);
-          setHasUnread(hasUnread);
-        }
+        const hasUnread = data.some((n) => !n.read);
+        if (setHasUnread) setHasUnread(hasUnread);
       } catch (err) {
         console.error("Failed to fetch notifications", err);
       }
     };
 
     fetchNotifications();
+    markAllAsRead();
 
     socket.off("notification");
     socket.on("notification", (newNotif) => {
@@ -48,24 +58,10 @@ export default function NotificationsPage({ setHasUnread }) {
     return () => socket.off("notification");
   }, []);
 
-  const markAllAsRead = async () => {
-    try {
-      await axios.patch("/api/notifications/read");
-      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-      if (setHasUnread) setHasUnread(false);
-    } catch (err) {
-      console.error("Failed to mark all as read", err);
-    }
-  };
-
   const handleDelete = async (id) => {
     try {
       await axios.delete(`/api/notifications/${id}`);
       setNotifications((prev) => prev.filter((n) => n._id !== id));
-      if (setHasUnread) {
-        const anyUnread = notifications.some((n) => n._id !== id && !n.read);
-        setHasUnread(anyUnread);
-      }
     } catch (err) {
       console.error("Failed to delete notification", err);
     }
@@ -74,11 +70,6 @@ export default function NotificationsPage({ setHasUnread }) {
   const markAsReadAndNavigate = async (n, destination) => {
     try {
       await axios.patch(`/api/notifications/read-single/${n._id}`);
-      setNotifications((prev) => prev.map((notif) => notif._id === n._id ? { ...notif, read: true } : notif));
-      if (setHasUnread) {
-        const anyUnread = notifications.some((notif) => notif._id !== n._id && !notif.read);
-        setHasUnread(anyUnread);
-      }
       navigate(destination);
     } catch (err) {
       console.error("Failed to mark notification as read", err);
@@ -87,16 +78,10 @@ export default function NotificationsPage({ setHasUnread }) {
 
   return (
     <div style={{ background: "#0e0e0e", minHeight: "100vh", padding: "24px", color: "#fff" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-        <h2 style={{ margin: 0 }}>🔔 Notifications</h2>
-        {notifications.length > 0 && (
-          <button
-            onClick={markAllAsRead}
-            style={{ padding: "6px 10px", background: "#222", color: "#fff", borderRadius: "4px", border: "1px solid #444", fontSize: "12px", cursor: "pointer" }}>
-            ✅ Mark All as Read
-          </button>
-        )}
-      </div>
+      {/* 🔔 Heading */}
+      <h2 style={{ marginBottom: "16px", fontFamily: "Inter", fontWeight: "bold" }}>
+        🔔 Notifications
+      </h2>
 
       {notifications.length === 0 ? (
         <p style={{ color: "#888" }}>You're all caught up. No notifications yet!</p>
@@ -120,8 +105,6 @@ export default function NotificationsPage({ setHasUnread }) {
               gap: "14px",
               padding: "14px 0",
               borderBottom: "1px solid #222",
-              opacity: n.read ? 0.5 : 1,
-              transition: "0.2s"
             }}
           >
             <img
@@ -139,6 +122,7 @@ export default function NotificationsPage({ setHasUnread }) {
             />
 
             <div style={{ flex: 1 }}>
+              {/* 🧠 Notification text */}
               <div
                 onClick={() => {
                   if (n.type === "follow") {
@@ -149,29 +133,43 @@ export default function NotificationsPage({ setHasUnread }) {
                     markAsReadAndNavigate(n, `/list/${n.listId}`);
                   } else if (n.type === "share-movie") {
                     markAsReadAndNavigate(n, `/movie/${n.movieId}`);
+                  } else if (n.type === "share-review") {
+                    markAsReadAndNavigate(n, `/review/${n.reviewId}`);
                   }
                 }}
                 style={{ fontSize: "14px", color: "#ddd", cursor: "pointer" }}
               >
-                <span style={{ fontFamily: "Inter", fontWeight: "500", color: "#fff" }}>@{n.from?.username}</span>{" "}
+                <span style={{ fontFamily: "Inter", fontWeight: "500", color: "#fff" }}>
+                  @{n.from?.username}
+                </span>{" "}
                 {getActionText(n.type)}
               </div>
 
+              {/* 🎬 View content buttons by type */}
               {n.type === "suggest_movie" && (
                 <button
                   onClick={() => markAsReadAndNavigate(n, `/movie/${n.relatedId}`)}
-                  style={{
-                    marginTop: "6px",
-                    padding: "4px 10px",
-                    background: "#222",
-                    border: "1px solid #555",
-                    borderRadius: "4px",
-                    fontSize: "12px",
-                    cursor: "pointer",
-                    color: "#fff",
-                  }}
+                  style={buttonStyle}
                 >
                   🎬 View Movie
+                </button>
+              )}
+
+              {n.type === "share-list" && (
+                <button
+                  onClick={() => markAsReadAndNavigate(n, `/list/${n.listId}`)}
+                  style={buttonStyle}
+                >
+                  📋 View List
+                </button>
+              )}
+
+              {n.type === "share-review" && (
+                <button
+                  onClick={() => markAsReadAndNavigate(n, `/review/${n.reviewId}`)}
+                  style={buttonStyle}
+                >
+                  ✍️ View Review
                 </button>
               )}
 
@@ -187,3 +185,14 @@ export default function NotificationsPage({ setHasUnread }) {
     </div>
   );
 }
+
+const buttonStyle = {
+  marginTop: "6px",
+  padding: "4px 10px",
+  background: "#222",
+  border: "1px solid #555",
+  borderRadius: "4px",
+  fontSize: "12px",
+  cursor: "pointer",
+  color: "#fff",
+};
