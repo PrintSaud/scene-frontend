@@ -4,7 +4,7 @@ import StarRating from "../StarRating";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 import { HiOutlineRefresh } from "react-icons/hi"
-import { getPlatformIcon } from "../../utils/getPlatformIcon";
+import { getPlatformIcon } from "../../utils/getPlatformIcon.jsx";
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 
