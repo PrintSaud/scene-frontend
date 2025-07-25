@@ -43,6 +43,7 @@ import ShareListPage from './pages/ShareListPage';
 import RepliesPage from "./components/review/RepliesPage";
 import ChangeReviewBackdropPage from "./pages/ChangeReviewBackdropPage";
 import ShareReviewPage from "./pages/ShareReviewPage";
+import ImportPage from "./pages/ImportPage";
 
 function App() {
   const location = useLocation();
@@ -175,6 +176,7 @@ setHasUnread(unread.length > 0);
           <Route path="/share-review/:id" element={<ShareReviewPage />} />
           <Route path="/review/:id/replies" element={<RepliesPage />} />
           <Route path="/replies/:id" element={<RepliesPage />} />
+          <Route path="/import" element={<ImportPage />} />
           <Route path="/log/:logId" element={<LogModal />} />
           <Route path="/share/:type/:id" element={<ShareToFriendPage />} />
         </Routes>

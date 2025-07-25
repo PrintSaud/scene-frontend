@@ -339,6 +339,25 @@ export default function EditProfilePage() {
             </details>
           </div>
 
+          <div style={{ marginTop: "24px" }}>
+  <button
+    onClick={() => navigate("/import")}
+    style={{
+      padding: "10px 16px",
+      background: "#1e1e1e",
+      color: "#fff",
+      border: "1px solid #444",
+      borderRadius: "8px",
+      fontSize: "14px",
+      fontWeight: "600",
+      cursor: "pointer",
+    }}
+  >
+    📦 Transfer Data from Letterboxd
+  </button>
+</div>
+
+
           {/* Contact Us */}
           <div style={{ marginTop: "32px" }}>
             <h4>Contact Us</h4>
