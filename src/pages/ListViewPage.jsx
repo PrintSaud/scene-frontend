@@ -274,13 +274,12 @@ export default function ListViewPage({ customPosters = {} }) {
           {list.movies.map((movie, index) => {
             const id = movie.id || movie._id;
             const posterUrl =
-              movie.posterOverride ||
-              externalCustomPosters?.[id] ||
-              customPosters?.[id] ||
-              (movie.poster?.startsWith("/")
-                ? `${TMDB_IMG}${movie.poster}`
-                : movie.poster) ||
-              FALLBACK_POSTER;
+            movie.posterOverride ||
+            (movie.poster?.startsWith("/")
+              ? `${TMDB_IMG}${movie.poster}`
+              : movie.poster) ||
+            FALLBACK_POSTER;
+          
 
             return (
               <div
