@@ -37,7 +37,8 @@ export default function UploadAvatarPage() {
         }
       );
 
-      console.log("✅ Upload success:", res.data);
+      console.log("✅ Success:", res);
+
 
       user.avatar = res.data.avatar;
       localStorage.setItem("user", JSON.stringify(response.data));
