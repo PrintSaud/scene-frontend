@@ -118,7 +118,7 @@ export default function ImportPage() {
         </div>
       ))}
 
-      {loading && <p style={{ color: "#0cf" }}>⏳ Uploading files...</p>}
+      {loading && <p style={{ color: "#fff" }}>⏳ Uploading files...</p>}
       {message && <p style={{ marginTop: "12px" }}>{message}</p>}
 
       {!uploadComplete && (
