@@ -12,7 +12,6 @@ export default function ListViewPage({ customPosters = {} }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
-  const customPosters = props.customPosters || {};
   const [list, setList] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
