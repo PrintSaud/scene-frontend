@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "../api/api";
+import { useNavigate } from "react-router-dom";
 
 const importEndpoints = {
   diary: "/api/import/letterboxd/diary",
@@ -9,53 +10,173 @@ const importEndpoints = {
 };
 
 export default function ImportPage() {
+  const navigate = useNavigate();
+  const [files, setFiles] = useState({
+    diary: null,
+    ratings: null,
+    watchlist: null,
+    reviews: null,
+  });
+
+  const [previews, setPreviews] = useState({});
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [uploadComplete, setUploadComplete] = useState(false);
 
-  const handleFileUpload = async (e) => {
-    const file = e.target.files[0];
+  const handleFileChange = async (type, file) => {
     if (!file) return;
+    setFiles((prev) => ({ ...prev, [type]: file }));
 
-    const name = file.name.toLowerCase();
-    let type = "";
+    const text = await file.text();
+    const rows = text.split("\n").slice(1, 4);
+    setPreviews((prev) => ({ ...prev, [type]: rows }));
+  };
 
-    if (name.includes("diary")) type = "diary";
-    else if (name.includes("rating")) type = "ratings";
-    else if (name.includes("watchlist")) type = "watchlist";
-    else if (name.includes("review")) type = "reviews";
-    else {
-      setMessage("❌ File name must include: diary, ratings, watchlist, or reviews");
-      return;
-    }
-
+  const handleUpload = async () => {
     setLoading(true);
-    const formData = new FormData();
-    formData.append("file", file);
+    const summary = {};
 
-    try {
-      const res = await axios.post(importEndpoints[type], formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      setMessage(res.data.message || "✅ Import successful!");
-    } catch (err) {
-      setMessage("❌ Import failed");
-    } finally {
-      setLoading(false);
+    for (const [type, file] of Object.entries(files)) {
+      if (!file) continue;
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const res = await axios.post(importEndpoints[type], formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        summary[type] = res.data.message;
+      } catch (err) {
+        summary[type] = `❌ Import failed for ${type}`;
+      }
     }
+
+    setMessage("✅ Import complete.");
+    setUploadComplete(true);
+    setLoading(false);
+
+    if (Object.values(summary).some((m) => m.includes("✅"))) {
+      alert("🎬 Welcome to Scene!");
+    }
+  };
+
+  const undoImport = () => {
+    setFiles({ diary: null, ratings: null, watchlist: null, reviews: null });
+    setPreviews({});
+    setUploadComplete(false);
+    setMessage("🗑️ Cleared last import.");
   };
 
   return (
     <div style={{ padding: "24px", color: "white" }}>
-      <h2 style={{ fontSize: "22px", marginBottom: "8px" }}>📦 Transfer Data from Letterboxd</h2>
-      <p style={{ fontSize: "14px", color: "#aaa", marginBottom: "16px" }}>
-        Export your data from Letterboxd and upload the CSV files below (diary.csv, ratings.csv, etc.).
-        The system will auto-detect each file type based on the filename.
+      <h2 style={{ fontSize: "16px", marginBottom: "8px", textAlign: "center" }}>
+        📦 Transfer Data from Letterboxd
+      </h2>
+
+      <button
+        onClick={() => navigate(-1)}
+        style={{
+          background: "rgba(0,0,0,0.5)",
+          border: "none",
+          borderRadius: "50%",
+          width: "32px",
+          height: "32px",
+          color: "#fff",
+          fontSize: "18px",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          marginBottom: "12px",
+        }}
+      >
+        ←
+      </button>
+
+      <p style={{ fontSize: "14px", color: "#aaa", marginBottom: "16px", fontFamily: "Inter, sans-serif" }}>
+        Upload your exported files one by one from the Letterboxd data folder (diary.csv, ratings.csv, etc.).
       </p>
 
-      <input type="file" onChange={handleFileUpload} accept=".csv" />
+      {["diary", "ratings", "reviews", "watchlist"].map((type) => (
+        <div key={type} style={{ marginBottom: "16px" }}>
+          <label style={{ fontWeight: "bold", fontSize: "13px", display: "block", marginBottom: "4px" }}>
+            {type.charAt(0).toUpperCase() + type.slice(1)}.csv
+          </label>
+          <input
+            type="file"
+            accept=".csv"
+            onChange={(e) => handleFileChange(type, e.target.files[0])}
+          />
+          {previews[type] && (
+            <ul style={{ fontSize: "12px", color: "#ccc", marginTop: "4px" }}>
+              {previews[type].map((line, i) => (
+                <li key={i}>{line}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ))}
 
-      {loading && <p style={{ color: "#00f" }}>⏳ Uploading...</p>}
+      {loading && <p style={{ color: "#0cf" }}>⏳ Uploading files...</p>}
       {message && <p style={{ marginTop: "12px" }}>{message}</p>}
+
+      {!uploadComplete && (
+        <button
+          onClick={handleUpload}
+          disabled={loading}
+          style={{
+            marginTop: "16px",
+            padding: "10px 16px",
+            fontSize: "14px",
+            background: "#111",
+            color: "#fff",
+            border: "1px solid #444",
+            borderRadius: "8px",
+            cursor: "pointer",
+          }}
+        >
+          🚀 Upload All Files
+        </button>
+      )}
+
+      {uploadComplete && (
+        <button
+          onClick={() => navigate("/profile")}
+          style={{
+            marginTop: "16px",
+            padding: "10px 16px",
+            fontSize: "14px",
+            background: "#0f0",
+            color: "#000",
+            border: "none",
+            borderRadius: "8px",
+            cursor: "pointer",
+            fontWeight: "bold",
+          }}
+        >
+          ✅ Continue to Profile
+        </button>
+      )}
+
+      {(previews.diary || previews.ratings || previews.watchlist || previews.reviews) && (
+        <button
+          onClick={undoImport}
+          style={{
+            marginTop: "12px",
+            padding: "8px 12px",
+            background: "#331111",
+            border: "1px solid #511",
+            borderRadius: "6px",
+            color: "#f55",
+            fontWeight: "600",
+            cursor: "pointer",
+            display: "block",
+          }}
+        >
+          🗑️ Undo Last Import
+        </button>
+      )}
     </div>
   );
 }

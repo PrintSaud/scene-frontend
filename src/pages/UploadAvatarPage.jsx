@@ -18,7 +18,7 @@ export default function UploadAvatarPage() {
       return;
     }
 
-    const token = localStorage.getItem("token");
+    const token = user?.token;
     console.log("🔐 Token:", token);
 
     const formData = new FormData();
@@ -40,7 +40,9 @@ export default function UploadAvatarPage() {
       console.log("✅ Upload success:", res.data);
 
       user.avatar = res.data.avatar;
-      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("user", JSON.stringify(response.data));
+localStorage.setItem("token", response.data.token); // ✅ ADD THIS LINE
+
       setMessage("✅ Upload successful!");
 
       setTimeout(() => {
