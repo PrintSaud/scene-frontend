@@ -40,9 +40,13 @@ export default function UploadAvatarPage() {
       console.log("✅ Success:", res);
 
 
-      user.avatar = res.data.avatar;
-      localStorage.setItem("user", JSON.stringify(res.data));
-localStorage.setItem("token", res.data.token);
+      const updatedUser = {
+        ...user,
+        avatar: res.data.avatar, // merge new avatar into old user
+      };
+      
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      
 
 
       setMessage("✅ Upload successful!");
