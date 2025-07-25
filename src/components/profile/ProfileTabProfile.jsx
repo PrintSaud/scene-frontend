@@ -223,7 +223,7 @@ export default function ProfileTabProfile({
 
      {/* 🔗 Connections */}
 {Object.values(user.socials || {}).some((val) => val) && (
-  <div style={{ marginTop: "26px" }}>
+  <div style={{ marginTop: "16px" }}>
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
       <h3 style={{ fontFamily: "Inter, sans-serif", fontSize: "16px", fontWeight: "600" }}>
         Connections
@@ -243,7 +243,7 @@ export default function ProfileTabProfile({
     </div>
 
     {showConnections && (
-      <div style={{ marginTop: "16px", display: "flex", flexDirection: "column", gap: "16px" }}>
+      <div style={{ marginTop: "6px", display: "flex", flexDirection: "column", gap: "16px" }}>
         {Object.entries(user.socials || {})
           .filter(([_, value]) => value)
           .map(([platform, value]) => {
@@ -273,7 +273,10 @@ export default function ProfileTabProfile({
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                  <div style={{ fontSize: "20px" }}>{icon}</div>
+                <div style={{ fontSize: "20px", position: "relative", top: "2px" }}>
+  {icon}
+</div>
+
                   <div style={{ fontSize: "14px", fontWeight: "500", display: "flex", alignItems: "center", gap: "6px" }}>
                   {value}
     <span style={{
