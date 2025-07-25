@@ -13,15 +13,6 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  // 🔐 Auto-redirect if already logged in
-  useEffect(() => {
-    const stored = localStorage.getItem("user");
-    const user = stored ? JSON.parse(stored) : null;
-  
-    if (user?.token) {
-      navigate("/home");
-    }
-  }, []);
   
 
   const handleLogin = async (e) => {
