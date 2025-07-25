@@ -1,17 +1,17 @@
-import React from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import React from 'react';
+import { Navigate } from 'react-router-dom';
 
 export default function PublicRoute({ children }) {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const location = useLocation();
+  try {
+    const stored = localStorage.getItem('user');
+    const user = stored ? JSON.parse(stored) : null;
 
-  // ✅ Only redirect if user AND they're not on /login or /signup
-  const publicPaths = ["/login", "/signup", "/forgot-password"];
-  const isTryingToAccessAuthPage = publicPaths.includes(location.pathname);
+    if (user && user.token) {
+      return <Navigate to="/" replace />;
+    }
 
-  if (user && !isTryingToAccessAuthPage) {
-    return <Navigate to="/home" />;
+    return children;
+  } catch (err) {
+    return children;
   }
-
-  return children;
 }
