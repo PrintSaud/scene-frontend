@@ -7,6 +7,7 @@ import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";  // replace BsHear
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const FALLBACK_COVER = "/default-list-cover.jpg";
+const FALLBACK_POSTER = "/default-poster.jpg";
 
 export default function ListViewPage({ customPosters = {} }) {
   const { id } = useParams();
@@ -16,6 +17,7 @@ export default function ListViewPage({ customPosters = {} }) {
   const [isLiked, setIsLiked] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
+  
 
   useEffect(() => {
     const fetchList = async () => {

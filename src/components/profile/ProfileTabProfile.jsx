@@ -11,6 +11,8 @@ import { subDays, isBefore, formatDistanceToNowStrict } from "date-fns";
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const FALLBACK_POSTER = "/default-poster.jpg";
+const [showConnections, setShowConnections] = useState(true);
+
 
 export default function ProfileTabProfile({
   user,
@@ -217,63 +219,84 @@ export default function ProfileTabProfile({
   <p style={{ color: "#888", marginTop: "20px" }}>No recent logs yet.</p>
 )}
 
-      {/* 🔗 Connections */}
-      {Object.values(user.socials || {}).some((val) => val) && (
-        <div style={{ marginTop: "36px" }}>
-          <h3 style={{ fontFamily: "Inter, sans-serif", fontSize: "16px", fontWeight: "600" }}>
-            Connections
-          </h3>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))",
-              gap: "12px",
-              marginTop: "12px",
-            }}
-          >
-            {Object.entries(user.socials || {})
-              .filter(([_, value]) => value)
-              .map(([platform, value]) => {
-                const icon = getPlatformIcon(platform);
-                const link =
-                  platform === "website"
-                    ? value
-                    : `https://${platform}.com/${value.replace(/^@/, "")}`;
+     {/* 🔗 Connections */}
+{Object.values(user.socials || {}).some((val) => val) && (
+  <div style={{ marginTop: "36px" }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <h3 style={{ fontFamily: "Inter, sans-serif", fontSize: "16px", fontWeight: "600" }}>
+        Connections
+      </h3>
+      <button
+        onClick={() => setShowConnections((prev) => !prev)}
+        style={{
+          fontSize: "12px",
+          color: "#888",
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+        }}
+      >
+        {showConnections ? "Hide" : "Show"}
+      </button>
+    </div>
 
-                return (
-                  <a
-                    key={platform}
-                    href={link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      background: "#1a1a1a",
-                      border: "1px solid #333",
-                      borderRadius: "8px",
-                      padding: "10px",
+    {showConnections && (
+      <div style={{ marginTop: "16px", display: "flex", flexDirection: "column", gap: "16px" }}>
+        {Object.entries(user.socials || {})
+          .filter(([_, value]) => value)
+          .map(([platform, value]) => {
+            const icon = getPlatformIcon(platform);
+            const link =
+              platform === "website"
+                ? value
+                : `https://${platform}.com/${value.replace(/^@/, "")}`;
+
+            return (
+              <a
+                key={platform}
+                href={link}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  background: "#1a1a1a",
+                  border: "1px solid #333",
+                  borderRadius: "12px",
+                  padding: "12px 16px",
+                  color: "#fff",
+                  textDecoration: "none",
+                  fontFamily: "Inter, sans-serif",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <div style={{ fontSize: "20px" }}>{icon}</div>
+                  <div style={{ fontSize: "14px", fontWeight: "500", display: "flex", alignItems: "center", gap: "6px" }}>
+                    {value}
+                    <span style={{
+                      background: "#444",
+                      padding: "2px 6px",
+                      borderRadius: "6px",
+                      fontSize: "11px",
+                      fontWeight: "600",
                       color: "#fff",
-                      textDecoration: "none",
-                    }}
-                  >
-                    <span style={{ fontSize: "18px", marginRight: "8px" }}>{icon}</span>
-                    <span
-                      style={{
-                        fontSize: "13px",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {value}
+                    }}>
+                      ✓
                     </span>
-                  </a>
-                );
-              })}
-          </div>
-        </div>
-      )}
+                  </div>
+                </div>
+
+                {/* ↗ External icon */}
+                <span style={{ fontSize: "16px", color: "#aaa" }}>↗</span>
+              </a>
+            );
+          })}
+      </div>
+    )}
+  </div>
+)}
+
     </>
   );
 }
