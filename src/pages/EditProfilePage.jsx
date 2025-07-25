@@ -90,15 +90,7 @@ export default function EditProfilePage() {
       avatar === user.avatar &&
       backdrop === user.backdrop &&
       JSON.stringify(favoriteFilms) === JSON.stringify(user.favoriteFilms) &&
-      JSON.stringify(socials) === JSON.stringify({
-        X: user.X || "",
-        youtube: user.youtube || "",
-        instagram: user.instagram || "",
-        tiktok: user.tiktok || "",
-        imdb: user.imdb || "",
-        tmdb: user.tmdb || "",
-        website: user.website || "",
-      })
+      JSON.stringify(socials) === JSON.stringify(user.socials || {})
     ) {
       toast("No changes to save.");
       return;
@@ -110,8 +102,9 @@ export default function EditProfilePage() {
         avatar,
         backdrop,
         favoriteFilms,
-        ...socials,
+        socials, // ✅ NESTED correctly
       };
+      
   
       const res = await axios.patch(`${backend}/api/users/${user._id}`, updatedUser, {
         headers: { Authorization: `Bearer ${token}` },
@@ -172,6 +165,8 @@ export default function EditProfilePage() {
           color: "#fff",
           padding: "24px",
           minHeight: "100vh",
+          paddingBottom: "100px", // ✅ adds scroll space for delete button
+          overflowY: "auto",       // ✅ enables scrolling if needed
           display: "flex",
           justifyContent: "center",
         }}
@@ -349,7 +344,7 @@ export default function EditProfilePage() {
             <h4>Contact Us</h4>
             <details>
               <summary style={{ cursor: "pointer", color: "#ddd" }}>Show contact info</summary>
-              <div style={{ marginTop: "12px", color: "#aaa" }}>
+              <div style={{ marginTop: "12px", color: "#aaa",fontFamily: "Inter, sans-serif", }}>
                 <p>Email: scenewebapp@gmail.com</p>
                 <p>X: @joinsceneapp</p>
                 <p>instagram: @joinscene</p>

@@ -287,12 +287,14 @@ export default function ListViewPage() {
       gap: "12px",
     }}
   >
-    {list.movies.map((movie, index) => {
-      const posterUrl =
-        movie.posterOverride ||
-        (movie.poster?.startsWith("/")
-          ? `${TMDB_IMG}${movie.poster}`
-          : movie.poster);
+{list.movies.map((movie, index) => {
+  const id = movie.id || movie._id;
+  const posterUrl =
+    customPosters?.[id] || // ✅ use override if exists
+    (movie.poster?.startsWith("/")
+      ? `${TMDB_IMG}${movie.poster}`
+      : movie.poster) ||
+    FALLBACK_POSTER;
 
       return (
         <div

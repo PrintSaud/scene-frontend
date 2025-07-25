@@ -16,6 +16,7 @@
     "@use-gesture/react": "^10.3.1",
     "axios": "^1.9.0",
     "colorthief": "^2.6.0",
+    "date-fns": "^4.1.0",
     "html2canvas": "^1.4.1",
     "lucide-react": "^0.513.0",
     "react": "^19.1.0",
