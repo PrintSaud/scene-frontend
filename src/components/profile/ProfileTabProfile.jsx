@@ -7,6 +7,8 @@ import { HiOutlineRefresh } from "react-icons/hi";
 import { getPlatformIcon } from "../../utils/getPlatformIcon.jsx";
 import { FaRegComment } from "react-icons/fa";
 import { subDays, isBefore, formatDistanceToNowStrict } from "date-fns";
+import { FiExternalLink } from "react-icons/fi";
+import { AiOutlineCheck } from "react-icons/ai";
 
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
@@ -221,7 +223,7 @@ export default function ProfileTabProfile({
 
      {/* 🔗 Connections */}
 {Object.values(user.socials || {}).some((val) => val) && (
-  <div style={{ marginTop: "36px" }}>
+  <div style={{ marginTop: "26px" }}>
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
       <h3 style={{ fontFamily: "Inter, sans-serif", fontSize: "16px", fontWeight: "600" }}>
         Connections
@@ -273,22 +275,26 @@ export default function ProfileTabProfile({
                 <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                   <div style={{ fontSize: "20px" }}>{icon}</div>
                   <div style={{ fontSize: "14px", fontWeight: "500", display: "flex", alignItems: "center", gap: "6px" }}>
-                    {value}
-                    <span style={{
-                      background: "#444",
-                      padding: "2px 6px",
-                      borderRadius: "6px",
-                      fontSize: "11px",
-                      fontWeight: "600",
-                      color: "#fff",
-                    }}>
-                      ✓
-                    </span>
-                  </div>
-                </div>
+                  {value}
+    <span style={{
+      background: "#444",
+      padding: "2px 6px",
+      borderRadius: "6px",
+      fontSize: "11px",
+      fontWeight: "600",
+      color: "#fff",
+      display: "flex",
+      alignItems: "center",
+    }}>
+      <AiOutlineCheck />
+    </span>
+  </div>
+</div>
 
-                {/* ↗ External icon */}
-                <span style={{ fontSize: "16px", color: "#aaa" }}>↗</span>
+{/* External link icon */}
+<span style={{ fontSize: "16px", color: "#aaa", display: "flex", alignItems: "center" }}>
+  <FiExternalLink />
+</span>
               </a>
             );
           })}
