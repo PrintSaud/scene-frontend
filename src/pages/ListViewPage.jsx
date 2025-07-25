@@ -7,7 +7,8 @@ import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";  // replace BsHear
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const FALLBACK_COVER = "/default-list-cover.jpg";
-const FALLBACK_POSTER = "/default-poster.jpg";
+const FALLBACK_POSTER = "https://via.placeholder.com/300x450?text=No+Poster";
+
 
 export default function ListViewPage({ customPosters = {} }) {
   const { id } = useParams();
@@ -317,12 +318,14 @@ useEffect(() => {
 {list.movies.map((movie, index) => {
   const id = movie.id || movie._id;
   const posterUrl =
-  externalCustomPosters?.[id] ||  // ✅ show other user’s custom posters
-  customPosters?.[id] ||          // ✅ fallback to your own custom posters (if owner)
+  movie.posterOverride ||  // ✅ use backend-prepared override first
+  externalCustomPosters?.[id] ||
+  customPosters?.[id] ||
   (movie.poster?.startsWith("/")
     ? `${TMDB_IMG}${movie.poster}`
     : movie.poster) ||
   FALLBACK_POSTER;
+
 
 
 
