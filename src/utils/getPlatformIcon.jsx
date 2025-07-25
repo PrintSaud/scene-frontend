@@ -5,8 +5,8 @@ import { SiX } from "react-icons/si"; // ✅ this is the official "X" (Twitter) 
 
 export const getPlatformIcon = (platform) => {
   switch (platform.toLowerCase()) {
-    case "X":
-  return <SiX />;
+    case "x": // ✅ lowercase to match .toLowerCase()
+      return <SiX />;
     case "youtube":
       return <FaYoutube />;
     case "instagram":
@@ -21,5 +21,5 @@ export const getPlatformIcon = (platform) => {
       return <FiGlobe />;
     default:
       return <FiGlobe />;
-  }
+  }  
 };

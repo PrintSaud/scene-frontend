@@ -73,14 +73,14 @@ export default function EditProfilePage() {
       setBackdrop(localBackdrop?.backdrop || user.backdrop || "");
 
       setSocials({
-        X: user.X || "",
-        youtube: user.youtube || "",
-        instagram: user.instagram || "",
-        tiktok: user.tiktok || "",
-        imdb: user.imdb || "",
-        tmdb: user.tmdb || "",
-        website: user.website || "",
-      });
+        X: user.socials?.X || "",
+        youtube: user.socials?.youtube || "",
+        instagram: user.socials?.instagram || "",
+        tiktok: user.socials?.tiktok || "",
+        imdb: user.socials?.imdb || "",
+        tmdb: user.socials?.tmdb || "",
+        website: user.socials?.website || "",
+      });      
     }
   }, []);
 

@@ -12,7 +12,7 @@ export default function ListViewPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
-
+  const customPosters = props.customPosters || {};
   const [list, setList] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
@@ -290,11 +290,12 @@ export default function ListViewPage() {
 {list.movies.map((movie, index) => {
   const id = movie.id || movie._id;
   const posterUrl =
-    customPosters?.[id] || // ✅ use override if exists
-    (movie.poster?.startsWith("/")
-      ? `${TMDB_IMG}${movie.poster}`
-      : movie.poster) ||
-    FALLBACK_POSTER;
+  customPosters?.[id] ||
+  (movie.poster?.startsWith("/")
+    ? `${TMDB_IMG}${movie.poster}`
+    : movie.poster) ||
+  FALLBACK_POSTER;
+
 
       return (
         <div

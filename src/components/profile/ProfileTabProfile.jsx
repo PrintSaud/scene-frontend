@@ -6,7 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { HiOutlineRefresh } from "react-icons/hi";
 import { getPlatformIcon } from "../../utils/getPlatformIcon.jsx";
 import { FaRegComment } from "react-icons/fa";
-import { formatDistanceToNowStrict, subDays, isBefore } from "date-fns";
+import { subDays, isBefore, formatDistanceToNowStrict } from "date-fns";
+
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const FALLBACK_POSTER = "/default-poster.jpg";
@@ -106,147 +107,115 @@ export default function ProfileTabProfile({
         <p style={{ color: "#888", marginTop: "20px" }}>No favorite movies yet.</p>
       )}
 
-      {/* 🕒 Recent Activity */}
-      {recentlyWatched.length > 0 ? (
-        <div style={{ marginTop: "12px" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h3 style={{ fontSize: "12px", fontWeight: "600" }}>Recent Activity</h3>
-            <button
-              onClick={() => {
-                const event = new CustomEvent("navigateToFilms");
-                window.dispatchEvent(event);
-              }}
+ {/* 🕒 Recent Activity */}
+{recentlyWatched.length > 0 ? (
+  <div style={{ marginTop: "12px" }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <h3 style={{ fontSize: "12px", fontWeight: "600" }}>Recent Activity</h3>
+      <button
+        onClick={() => {
+          const event = new CustomEvent("navigateToFilms");
+          window.dispatchEvent(event);
+        }}
+        style={{
+          background: "none",
+          border: "none",
+          color: "#ccc",
+          fontSize: "13px",
+          cursor: "pointer",
+        }}
+      >
+        More →
+      </button>
+    </div>
+
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(90px, 1fr))",
+        gap: "10px",
+        marginTop: "12px",
+      }}
+    >
+      {recentlyWatched.map((log) => {
+        const movieId =
+          typeof log.movie === "string"
+            ? log.movie
+            : log.movie?._id || log.movie?.id || log.movieId;
+
+        const posterUrl =
+          log.posterOverride ||
+          (log.poster?.startsWith("http")
+            ? log.poster
+            : log.poster
+            ? `${TMDB_IMG}${log.poster}`
+            : log.movie?.poster_path
+            ? `${TMDB_IMG}${log.movie.poster_path}`
+            : FALLBACK_POSTER);
+
+        const hasReview = log.review && log.review.length > 0;
+
+        // 🧠 Smart timestamp
+        const logDate = new Date(log.createdAt);
+        const sevenDaysAgo = subDays(new Date(), 7);
+        const timestamp = isBefore(logDate, sevenDaysAgo)
+          ? logDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+          : formatDistanceToNowStrict(logDate, { addSuffix: true });
+
+        return (
+          <div key={log._id} onClick={() => handleLogClick(log)} style={{ position: "relative", cursor: "pointer" }}>
+            <img
+              src={posterUrl}
+              alt={log.title}
               style={{
-                background: "none",
-                border: "none",
-                color: "#ccc",
-                fontSize: "13px",
-                cursor: "pointer",
+                width: "100%",
+                aspectRatio: "2/3",
+                objectFit: "cover",
+                borderRadius: "6px",
+              }}
+              onError={(e) => (e.currentTarget.src = FALLBACK_POSTER)}
+            />
+
+            {/* 🕒 Timestamp top-right */}
+            <div
+              style={{
+                position: "absolute",
+                top: "6px",
+                right: "6px",
+                fontSize: "11px",
+                background: "rgba(0,0,0,0.7)",
+                padding: "2px 6px",
+                borderRadius: "6px",
+                color: "#fff",
               }}
             >
-              More →
-            </button>
+              {timestamp}
+            </div>
+
+            {/* ⭐ & 💬 below the poster */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-start",
+                gap: "4px",
+                padding: "2px 4px 0 4px",
+                fontSize: "10px",
+                color: "#aaa",
+                fontFamily: "Inter",
+              }}
+            >
+              <StarRating rating={log.rating} size={12} />
+              {hasReview && <FaRegComment size={9} style={{ position: "relative", top: "-1.5px" }} />}
+            </div>
           </div>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(90px, 1fr))",
-              gap: "10px",
-              marginTop: "12px",
-            }}
-          >
-            {recentlyWatched.map((log) => {
-              const movieId =
-                typeof log.movie === "string"
-                  ? log.movie
-                  : log.movie?._id || log.movie?.id || log.movieId;
-
-              const poster =
-                log.posterOverride ||
-                (log.poster?.startsWith("http")
-                  ? log.poster
-                  : log.poster
-                  ? `${TMDB_IMG}${log.poster}`
-                  : log.movie?.poster_path
-                  ? `${TMDB_IMG}${log.movie.poster_path}`
-                  : FALLBACK_POSTER);
-
-              // Format time: "3 hours ago" or "23 Jul"
-              const logDate = new Date(log.createdAt);
-              const sevenDaysAgo = subDays(new Date(), 7);
-              const timestamp = isBefore(logDate, sevenDaysAgo)
-                ? logDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })
-                : formatDistanceToNowStrict(logDate, { addSuffix: true });
-
-              return (
-                <div
-                  key={log._id}
-                  onClick={() => handleLogClick(log)}
-                  style={{
-                    position: "relative",
-                    cursor: "pointer",
-                    borderRadius: "8px",
-                    overflow: "hidden",
-                  }}
-                >
-                  <img
-                    src={poster}
-                    alt={log.title || "Movie"}
-                    style={{ width: "100%", aspectRatio: "2/3", objectFit: "cover" }}
-                  />
-
-                  {/* 🕒 Timestamp */}
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "6px",
-                      right: "6px",
-                      fontSize: "11px",
-                      background: "rgba(0,0,0,0.7)",
-                      padding: "2px 6px",
-                      borderRadius: "6px",
-                      color: "#fff",
-                    }}
-                  >
-                    {timestamp}
-                  </div>
-
-                  {/* 🔽 Bottom Icon Row */}
-                  <div
-                    style={{
-                      marginTop: "4px",
-                      display: "flex",
-                      gap: "6px",
-                      alignItems: "center",
-                    }}
-                  >
-                    {log.rewatch && (
-                      <div
-                        style={{
-                          background: "rgba(0,0,0,0.6)",
-                          padding: "4px",
-                          borderRadius: "6px",
-                          color: "#fff",
-                        }}
-                      >
-                        <HiOutlineRefresh size={14} />
-                      </div>
-                    )}
-
-                    {log.review && (
-                      <div
-                        style={{
-                          background: "rgba(0,0,0,0.6)",
-                          padding: "4px",
-                          borderRadius: "6px",
-                          color: "#fff",
-                        }}
-                      >
-                        <FaRegComment size={12} />
-                      </div>
-                    )}
-
-                    {log.rating > 0 && (
-                      <div
-                        style={{
-                          background: "rgba(0,0,0,0.7)",
-                          borderRadius: "6px",
-                          padding: "2px 5px",
-                        }}
-                      >
-                        <StarRating rating={log.rating} />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      ) : (
-        <p style={{ color: "#888", marginTop: "20px" }}>No recent logs yet.</p>
-      )}
+        );
+      })}
+    </div>
+  </div>
+) : (
+  <p style={{ color: "#888", marginTop: "20px" }}>No recent logs yet.</p>
+)}
 
       {/* 🔗 Connections */}
       {Object.values(user.socials || {}).some((val) => val) && (
