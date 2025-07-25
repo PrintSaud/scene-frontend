@@ -15,11 +15,14 @@ export default function LoginPage() {
 
   // 🔐 Auto-redirect if already logged in
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
+    const stored = localStorage.getItem("user");
+    const user = stored ? JSON.parse(stored) : null;
+  
+    if (user?.token) {
       navigate("/home");
     }
   }, []);
+  
 
   const handleLogin = async (e) => {
     e.preventDefault();
