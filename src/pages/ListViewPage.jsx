@@ -8,7 +8,7 @@ import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";  // replace BsHear
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const FALLBACK_COVER = "/default-list-cover.jpg";
 
-export default function ListViewPage() {
+export default function ListViewPage({ customPosters = {} }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
