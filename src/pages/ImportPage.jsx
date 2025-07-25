@@ -3,11 +3,12 @@ import axios from "../api/api";
 import { useNavigate } from "react-router-dom";
 
 const importEndpoints = {
-  diary: "/api/import/letterboxd/diary",
-  ratings: "/api/import/letterboxd/ratings",
-  watchlist: "/api/import/letterboxd/watchlist",
-  reviews: "/api/import/letterboxd/reviews",
-};
+    diary: "/api/letterboxd/diary",       // ✅ fixed
+    ratings: "/api/letterboxd/ratings",   // ✅ still works
+    watchlist: "/api/letterboxd/watchlist", // ✅ fixed
+    reviews: "/api/letterboxd/reviews",   // ✅ still works
+  };
+  
 
 export default function ImportPage() {
   const navigate = useNavigate();
