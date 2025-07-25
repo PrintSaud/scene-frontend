@@ -35,6 +35,32 @@ export default function ListViewPage({ customPosters = {} }) {
     fetchList();
   }, [id]);
 
+  const [externalCustomPosters, setExternalCustomPosters] = useState({});
+
+useEffect(() => {
+  const fetchList = async () => {
+    try {
+      const { data } = await axios.get(`${backend}/api/lists/${id}`);
+      setList(data);
+      if (user) {
+        setIsLiked(data.likes?.includes(user._id));
+        setIsSaved(data.savedBy?.includes(user._id));
+      }
+
+      // 🧠 Fetch custom posters for list creator
+      const posterRes = await axios.get(`${backend}/api/posters/user/${data.user._id}`);
+      const posterMap = {};
+      posterRes.data.forEach(p => posterMap[p.movieId] = p.url);
+      setExternalCustomPosters(posterMap);
+    } catch (err) {
+      console.error("Failed to fetch list or custom posters:", err);
+    }
+  };
+
+  fetchList();
+}, [id]);
+
+
   const isOwner = user && list?.user._id === user._id;
 
   const handleLike = async () => {
@@ -291,11 +317,13 @@ export default function ListViewPage({ customPosters = {} }) {
 {list.movies.map((movie, index) => {
   const id = movie.id || movie._id;
   const posterUrl =
-  customPosters?.[id] ||
+  externalCustomPosters?.[id] ||  // ✅ show other user’s custom posters
+  customPosters?.[id] ||          // ✅ fallback to your own custom posters (if owner)
   (movie.poster?.startsWith("/")
     ? `${TMDB_IMG}${movie.poster}`
     : movie.poster) ||
   FALLBACK_POSTER;
+
 
 
       return (
