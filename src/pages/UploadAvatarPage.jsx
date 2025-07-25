@@ -41,8 +41,9 @@ export default function UploadAvatarPage() {
 
 
       user.avatar = res.data.avatar;
-      localStorage.setItem("user", JSON.stringify(response.data));
-localStorage.setItem("token", response.data.token); // ✅ ADD THIS LINE
+      localStorage.setItem("user", JSON.stringify(res.data));
+localStorage.setItem("token", res.data.token);
+
 
       setMessage("✅ Upload successful!");
 
