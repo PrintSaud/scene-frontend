@@ -11,7 +11,6 @@ import { subDays, isBefore, formatDistanceToNowStrict } from "date-fns";
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const FALLBACK_POSTER = "/default-poster.jpg";
-const [showConnections, setShowConnections] = useState(true);
 
 
 export default function ProfileTabProfile({
@@ -21,6 +20,7 @@ export default function ProfileTabProfile({
   navigate,
   customPosters = {},
 }) {
+  const [showConnections, setShowConnections] = useState(true);
   const [tmdbPosters, setTmdbPosters] = useState({});
   const recentlyWatched = Array.isArray(logs)
     ? logs
