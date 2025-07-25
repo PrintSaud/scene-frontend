@@ -25,17 +25,10 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
       parsedUser = null;
     }
 
-    if (!parsedUser) {
-      const dummyUser = {
-        _id: "12345",
-        username: "Saud",
-        avatar: "",
-      };
-      localStorage.setItem("user", JSON.stringify(dummyUser));
-      window.location.reload(); // only triggers once
-    } else {
+    if (parsedUser) {
       setUser(parsedUser);
     }
+    
   }, []);
 
   useEffect(() => {
