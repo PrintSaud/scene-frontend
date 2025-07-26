@@ -29,9 +29,12 @@ export default function ReviewHeader({
     const TMDB_BACKDROP = "https://image.tmdb.org/t/p/original";
     const DEFAULT_BACKDROP = "/default-backdrop.jpg";
 
-    const backdropUrl = review?.backdrop
-  ? `https://image.tmdb.org/t/p/original${review.backdrop}`
-  : "/default-backdrop.jpg";
+    const backdropUrl = review?.customBackdrop
+  ? review.customBackdrop
+  : review?.backdrop
+    ? `https://image.tmdb.org/t/p/original${review.backdrop}`
+    : "/default-backdrop.jpg";
+
 
 
 
