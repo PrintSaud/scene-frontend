@@ -146,8 +146,8 @@ const backdrop =
         {review.user && (
           <>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <img
-                src={avatarUrl}
+            <img
+  src={review.user?.avatar || "/default-avatar.jpg"}
                 alt="Avatar"
                 style={{
                   width: 28,
