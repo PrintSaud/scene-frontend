@@ -29,9 +29,10 @@ export default function ReviewHeader({
     const TMDB_BACKDROP = "https://image.tmdb.org/t/p/original";
     const DEFAULT_BACKDROP = "/default-backdrop.jpg";
 
-    const backdropUrl = log?.backdrop
-  ? `https://image.tmdb.org/t/p/original${log.backdrop}`
+    const backdropUrl = review?.backdrop
+  ? `https://image.tmdb.org/t/p/original${review.backdrop}`
   : "/default-backdrop.jpg";
+
 
 
 
@@ -65,7 +66,12 @@ export default function ReviewHeader({
       <>
         {/* Backdrop section */}
         <div style={{ position: "relative", width: "100%", height: 220, overflow: "hidden", marginBottom: -30 }}>
-        <img src={backdrop} alt="Backdrop" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+        <img
+  src={backdropUrl}
+  alt="Backdrop"
+  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+/>
+
           <div style={{ position: "absolute", bottom: 0, width: "100%", height: "70%", background: "linear-gradient(to top, #0e0e0e, transparent)" }} />
   
           {/* Top buttons */}
