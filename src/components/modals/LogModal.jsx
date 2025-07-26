@@ -72,10 +72,7 @@ formData.append("rewatchCount", rewatchCount.toString());         // Actual nume
         "poster",
         movieData?.poster || `https://image.tmdb.org/t/p/w500${movieData?.poster_path}`
       );
-      formData.append(
-        "backdrop",
-        movieData?.backdrop_path?.startsWith("/") ? movieData.backdrop_path : ""
-      );           
+      formData.append("backdrop", movieData?.backdrop_path || "");          
       if (uploadedImageFile) {
         formData.append("image", uploadedImageFile);
       }

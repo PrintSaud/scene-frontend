@@ -38,6 +38,7 @@ export default function ReviewHeader({
 
 
 
+
       const posterUrl = review.posterOverride
   || review.poster
   || review.movie?.poster
