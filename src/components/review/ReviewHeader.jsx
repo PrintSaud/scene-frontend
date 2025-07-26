@@ -26,7 +26,10 @@ export default function ReviewHeader({
       setShowOptions(false);
     };
   
-    const backdropUrl = review.customBackdrop || review.backdrop || "/default-backdrop.jpg";
+    const rawBackdrop = review.customBackdrop || review.backdrop || "";
+    const backdropUrl = rawBackdrop.startsWith("http")
+      ? `https://scene-backend.up.railway.app/api/logs/proxy/tmdb?url=${encodeURIComponent(rawBackdrop)}`
+      : "/default-backdrop.jpg";    
     console.log("🧪 Backdrop being used:", backdropUrl);
 
 
