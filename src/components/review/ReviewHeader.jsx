@@ -67,7 +67,7 @@ console.log("🧪 Backdrop being used:", backdrop);
       <>
         {/* Backdrop section */}
         <div style={{ position: "relative", width: "100%", height: 220, overflow: "hidden", marginBottom: -30 }}>
-          <img src={backdropUrl} alt="Backdrop" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+        <img src={backdrop} alt="Backdrop" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           <div style={{ position: "absolute", bottom: 0, width: "100%", height: "70%", background: "linear-gradient(to top, #0e0e0e, transparent)" }} />
   
           {/* Top buttons */}
