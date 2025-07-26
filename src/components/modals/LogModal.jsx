@@ -46,7 +46,7 @@ export default function LogModal({ movie, onClose, refreshLogs, editLogId }) {
         // Check favorite status when editing
         if (user && movieId) {
           try {
-            const favRes = await api.get(`/api/${user._id}/favorites`);
+            const favRes = await api.get(`/api/users/${user._id}/favorites`);
 const favIds = favRes.data.favorites.map((m) => m.id || m);
 setIsFavorite(favIds.includes(Number(data.movie?.id || data.movie?._id)));
           } catch (err) {
@@ -93,7 +93,7 @@ formData.append("rewatchCount", rewatchCount.toString());         // Actual nume
       
 
       if (isFavorite && user) {
-        await api.post(`/users/${user._id}/favorites/${movieId}`);
+        await api.post(`/api/users/${user._id}/favorites/${movieId}`);
       }
 
       onClose();
