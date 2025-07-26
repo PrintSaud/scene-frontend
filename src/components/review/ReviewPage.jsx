@@ -30,6 +30,10 @@ export default function ReviewPage() {
     return then.toLocaleDateString();
   }
 
+  const handleReply = () => {
+    console.log("💬 Reply clicked");
+  };
+  
 
   const handleDelete = async () => {
     const confirmDelete = window.confirm("Delete this review?");
