@@ -25,15 +25,16 @@ export default function ReviewHeader({
       toast.success("🔗 Link copied!");
       setShowOptions(false);
     };
-  
-    const rawBackdrop = review.customBackdrop || review.backdrop || "";
-    const backdropUrl = rawBackdrop.startsWith("http")
-      ? `https://scene-backend.up.railway.app/api/logs/proxy/tmdb?url=${encodeURIComponent(rawBackdrop)}`
-      : "/default-backdrop.jpg";    
-    console.log("🧪 Backdrop being used:", backdropUrl);
 
+    const TMDB_BACKDROP = "https://image.tmdb.org/t/p/original";
+const DEFAULT_BACKDROP = "/default-backdrop.jpg";
 
-  
+const backdrop = review.customBackdrop
+  || (review.backdrop?.startsWith("http") ? review.backdrop : `${TMDB_BACKDROP}${review.backdrop}`)
+  || DEFAULT_BACKDROP;
+
+console.log("🧪 Backdrop being used:", backdrop);
+
     const avatarUrl = review.user?.avatar
       ? review.user.avatar
       : "/default-avatar.jpg";
