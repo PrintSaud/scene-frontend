@@ -41,15 +41,6 @@ export default function ReviewHeader({
   (review?.movie?.backdrop_path ? `https://image.tmdb.org/t/p/original${review.movie.backdrop_path}` : "") ||
   "/default-backdrop.jpg";
 
-
-
-
-
-
-
-
-
-
       const posterUrl = review.posterOverride
   || review.poster
   || review.movie?.poster

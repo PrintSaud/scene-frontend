@@ -129,16 +129,18 @@ setReview(data);
       paddingBottom: "80px"  // ⭐️ Add this line (adjust if needed)
     }}>
     
-      <ReviewHeader
+    <ReviewHeader
   review={review}
   userId={userId}
-  rewatchCount={review.rewatchCount}  // ✅ Add this line
+  rewatchCount={review.rewatchCount}
   onLike={handleLike}
+  onReply={handleReply} // ✅ this line was missing!
   onProfile={handleProfile}
   onChangeBackdrop={() => navigate(`/review/${review._id}/change-backdrop`)}
   onEdit={handleEdit}
   onDelete={handleDelete}
 />
+
 
 
 
