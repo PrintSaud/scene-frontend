@@ -21,7 +21,7 @@ export default function EditListPage() {
   useEffect(() => {
     const fetchList = async () => {
       try {
-        const { data } = await axios.get(`/lists/${id}`);
+        const { data } = await axios.get(`/api/lists/${id}`); // ✅ ADDED /api
         if (data.user._id !== user._id) return navigate("/");
         setTitle(data.title);
         setDescription(data.description || "");
@@ -33,6 +33,7 @@ export default function EditListPage() {
         console.error("❌ Failed to load list", err);
       }
     };
+    
     fetchList();
   }, [id]);
 
