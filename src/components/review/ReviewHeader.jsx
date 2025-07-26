@@ -27,6 +27,9 @@ export default function ReviewHeader({
     };
   
     const backdropUrl = review.customBackdrop || review.backdrop || "/default-backdrop.jpg";
+    console.log("🧪 Backdrop being used:", backdropUrl);
+
+
   
     const avatarUrl = review.user?.avatar
       ? review.user.avatar
