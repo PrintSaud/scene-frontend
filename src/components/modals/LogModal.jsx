@@ -34,7 +34,7 @@ export default function LogModal({ movie, onClose, refreshLogs, editLogId }) {
   useEffect(() => {
     if (logId) {
       setIsEditMode(true);
-      axios.get(`${backend}/api/logs/${logId}`).then(async ({ data }) => {
+      api.get(`/logs/${logId}`).then(async ({ data }) => {
         setRating(data.rating || 0);
         setReview(data.review || "");
         setRewatchCount(data.rewatch || 0);
@@ -46,7 +46,7 @@ export default function LogModal({ movie, onClose, refreshLogs, editLogId }) {
         // Check favorite status when editing
         if (user && movieId) {
           try {
-            const favRes = await axios.get(`${backend}/api/users/${user._id}/favorites`);
+            const favRes = await api.get(`/users/${user._id}/favorites`);
             const favIds = favRes.data.map((m) => m.id || m);
             setIsFavorite(favIds.includes(Number(data.movie?.id || data.movie?._id)));
           } catch (err) {
@@ -92,7 +92,7 @@ formData.append("rewatchCount", rewatchCount.toString());         // Actual nume
       
 
       if (isFavorite && user) {
-        await axios.post(`${backend}/api/users/${user._id}/favorites/${movieId}`);
+        await api.post(`/users/${user._id}/favorites/${movieId}`);
       }
 
       onClose();

@@ -21,7 +21,7 @@ export default function EditListPage() {
   useEffect(() => {
     const fetchList = async () => {
       try {
-        const { data } = await axios.get(`${backend}/api/lists/${id}`);
+        const { data } = await axios.get(`/lists/${id}`);
         if (data.user._id !== user._id) return navigate("/");
         setTitle(data.title);
         setDescription(data.description || "");
@@ -49,7 +49,8 @@ export default function EditListPage() {
         movies,
       };
 
-      await axios.patch(`${backend}/api/lists/${id}`, payload, {
+      await axios.patch(`/lists/${id}`, payload, {
+
       });
       
 
@@ -64,7 +65,7 @@ export default function EditListPage() {
     const confirm = window.confirm("Are you sure you want to delete this list?");
     if (!confirm) return;
     try {
-      await axios.delete(`${backend}/api/lists/${id}`, {
+      await axios.delete(`/lists/${id}`, {
       });
       navigate("/profile");
     } catch (err) {
@@ -81,9 +82,9 @@ export default function EditListPage() {
     formData.append("image", file);
 
     try {
-        const { data } = await axios.post(`${backend}/api/upload/list-cover`, formData, {
-            headers: { "Content-Type": "multipart/form-data" },
-          });          
+      const { data } = await axios.post("/upload/list-cover", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });              
       setCoverImage(data.url);
     } catch (err) {
       console.error("❌ Upload failed", err);

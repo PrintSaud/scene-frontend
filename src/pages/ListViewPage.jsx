@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "../api/api";
-import { backend } from "../config";
 import toast from "react-hot-toast";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 
@@ -23,7 +22,7 @@ export default function ListViewPage({ customPosters = {} }) {
   useEffect(() => {
     const fetchList = async () => {
       try {
-        const { data } = await axios.get(`${backend}/api/lists/${id}`);
+        const { data } = await axios.get(`/api/lists/${id}`);
         setList(data);
         if (user) {
           setIsLiked(data.likes?.includes(user._id));
@@ -31,7 +30,7 @@ export default function ListViewPage({ customPosters = {} }) {
         }
 
         // ✅ Fetch viewer's posters instead of list creator
-        const posterRes = await axios.get(`${backend}/api/posters/user/${user._id}`);
+        const posterRes = await axios.get(`/api/posters/user/${user._id}`);
         const posterMap = {};
         posterRes.data.forEach((p) => (posterMap[p.movieId] = p.url));
         setExternalCustomPosters(posterMap);
@@ -45,7 +44,7 @@ export default function ListViewPage({ customPosters = {} }) {
 
   const handleLike = async () => {
     try {
-      await axios.post(`${backend}/api/lists/${id}/like`);
+      await axios.post(`/api/lists/${id}/like`);
       setIsLiked(!isLiked);
       setList((prev) => ({
         ...prev,
@@ -60,7 +59,7 @@ export default function ListViewPage({ customPosters = {} }) {
 
   const handleSave = async () => {
     try {
-      await axios.post(`${backend}/api/lists/${id}/save`);
+      await axios.post(`/api/lists/${id}/save`);
       setIsSaved(!isSaved);
       toast.success(isSaved ? "List unsaved!" : "List saved!");
     } catch (err) {
@@ -73,7 +72,7 @@ export default function ListViewPage({ customPosters = {} }) {
     const confirmDelete = window.confirm("Are you sure you want to delete this list?");
     if (!confirmDelete) return;
     try {
-      await axios.delete(`${backend}/api/lists/${id}`);
+      await axios.delete(`/api/lists/${id}`);
       toast.success("List deleted!");
       navigate(`/profile/${user._id}`);
     } catch (err) {

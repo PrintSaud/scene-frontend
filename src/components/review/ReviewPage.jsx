@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import axios from "../../api/api";
 import { likeLog, likeReply } from "../../api/api";
 import { backend } from "../../config";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
@@ -56,18 +55,21 @@ export default function ReviewPage() {
 
   const fetchData = async () => {
     try {
-      const { data } = await axios.get(`${backend}/api/logs/${id}`);
+      const { data } = await api.get(`/api/logs/${id}`);
       setReview(data);
       setReplies(data.replies || []);
+  
       if (data.user?._id) {
-        const res = await axios.get(`${backend}/api/logs/user/${data.user._id}`);
+        const res = await api.get(`/api/logs/user/${data.user._id}`);
         const filtered = res.data.filter((r) => r._id !== id);
         setMoreReviews(filtered.slice(0, 3));
       }
     } catch (err) {
+      console.error("❌ Failed to fetch review:", err);
       toast.error("Failed to load review.");
     }
   };
+  
 
   useEffect(() => {
     fetchData();

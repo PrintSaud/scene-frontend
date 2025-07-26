@@ -17,9 +17,7 @@ export default function ChangePosterModal({ movieId, onClose }) {
   useEffect(() => {
     const fetchPosters = async () => {
       try {
-        const { data } = await axios.get(
-            `${backend}/api/logs/proxy/tmdb/images/${movieId}`
-          );          
+        const { data } = await axios.get(`/api/logs/proxy/tmdb/images/${movieId}`);
         const sorted = (data.posters || []).sort(
           (a, b) => (b.vote_count || 0) - (a.vote_count || 0)
         );
@@ -28,9 +26,10 @@ export default function ChangePosterModal({ movieId, onClose }) {
         console.error("Failed to fetch posters", err);
       }
     };
-
+  
     fetchPosters();
   }, [movieId]);
+  
 
   const handleSave = async () => {
     if (!selectedPoster) return;

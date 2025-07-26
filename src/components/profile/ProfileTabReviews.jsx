@@ -70,7 +70,26 @@ export default function ProfileTabReviews({ logs, filter, setFilter, navigate, h
         return (
           <div
             key={log._id}
-            onClick={() => navigate(`/review/${log._id}`)}
+            onClick={() => {
+              const hasReview = log.review?.trim();
+              const tmdbId = log.tmdbId || log.movie?.id || log.movie;
+            
+              const user = JSON.parse(localStorage.getItem("user"));
+              const token = user?.token;
+            
+              // 🚀 Prefer review if exists
+              if (hasReview) {
+                return navigate(`/review/${log._id}`);
+              }
+            
+              // 🧠 Fallback to movie page if logged in or guest
+              if (tmdbId) {
+                return navigate(`/movie/${tmdbId}`);
+              }
+            
+              console.warn("⚠️ No TMDB ID or review for log:", log);
+            }}
+                    
             style={{
               backgroundColor: "#181818",
               padding: "12px",

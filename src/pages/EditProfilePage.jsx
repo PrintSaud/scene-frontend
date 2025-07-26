@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../api/api";
-import { backend } from "../config";
 import toast from "react-hot-toast";
 import { getPlatformIcon } from "../utils/getPlatformIcon.jsx";
 import MovieListSortable from "../components/lists/MovieListSortable";
@@ -106,9 +105,8 @@ export default function EditProfilePage() {
       };
       
   
-      const res = await axios.patch(`${backend}/api/users/${user._id}`, updatedUser, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.patch(`/api/users/${user._id}`, updatedUser);
+
   
       // 🔥 Save updated user (includes favoriteMovies)
       localStorage.setItem("user", JSON.stringify({ ...user, ...res.data.user }));
@@ -131,15 +129,15 @@ export default function EditProfilePage() {
 
     try {
       const res = await axios.post(
-        `${backend}/api/upload/avatar/${user._id}`,
+        `/api/upload/avatar/${user._id}`,
         formData,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
             "Content-Type": "multipart/form-data",
           },
         }
       );
+      
 
       setAvatar(res.data.avatar);
       toast.success("✅ Avatar uploaded!");
@@ -387,11 +385,7 @@ export default function EditProfilePage() {
                 if (!window.confirm("⚠️ Are you sure you want to delete your account? This cannot be undone.")) return;
 
                 try {
-                  await axios.delete(`${backend}/api/users/${user._id}`, {
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                    },
-                  });
+                  await axios.delete(`/api/users/${user._id}`);
 
                   localStorage.clear();
                   toast.success("🗑️ Account deleted.");

@@ -20,10 +20,19 @@ export default function MovieTopBar({
     const fetchMyLog = async () => {
       try {
         const user = JSON.parse(localStorage.getItem("user"));
-        if (!user) return;
-
-        const res = await axios.get(`${backend}/api/logs/user/${user._id}`);
-        const log = res.data.find((l) => String(l.movie.id) === String(movie.id));
+        const token = user?.token;
+        if (!user || !token) return; // Skip if not logged in
+  
+        const res = await axios.get(
+          `${backend}/api/logs/user/${user._id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+  
+        const log = res.data.find(
+          (l) => String(l.tmdbId || l.movie?.id || l.movie) === String(movie.id)
+        );
         setMyLog(log || null);
       } catch (err) {
         console.error("Failed to fetch user logs:", err);
@@ -31,6 +40,7 @@ export default function MovieTopBar({
     };
     fetchMyLog();
   }, [movie.id]);
+  
 
   const handleToggleWatchlist = async () => {
     try {
@@ -60,12 +70,17 @@ export default function MovieTopBar({
       const movieId = Number(movie.id || movie._id);
 
       if (isFavorite) {
-        await axios.delete(`${backend}/api/users/${user._id}/favorites/${movieId}`);
+        await axios.delete(`${backend}/api/users/${user._id}/favorites/${movieId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         toast.success("❌ Removed from Favorites");
       } else {
-        await axios.post(`${backend}/api/users/${user._id}/favorites/${movieId}`);
+        await axios.post(`${backend}/api/users/${user._id}/favorites/${movieId}`, null, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         toast.success("❤️ Added to Favorites");
       }
+      
 
       setIsFavorite(!isFavorite);
     } catch (err) {

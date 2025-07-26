@@ -86,7 +86,19 @@ export default function FilmReviewsPage() {
           return (
             <div
               key={log._id}
-              onClick={() => navigate(`/review/${log._id}`)}
+              onClick={() => {
+                const hasReview = log.review?.trim();
+                const tmdbId = log.tmdbId || log.movie?.id || log.movie;
+              
+                if (hasReview) {
+                  navigate(`/review/${log._id}`);
+                } else if (tmdbId) {
+                  navigate(`/movie/${tmdbId}`);
+                } else {
+                  console.warn("⚠️ Missing TMDB ID or review for log:", log);
+                }
+              }}
+              
               style={{
                 backgroundColor: "#181818",
                 padding: "12px",

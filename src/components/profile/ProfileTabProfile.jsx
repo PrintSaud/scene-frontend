@@ -54,9 +54,19 @@ export default function ProfileTabProfile({
 
   const handleLogClick = (log) => {
     if (!navigate) return;
-    if (log.review) navigate(`/review/${log._id}`);
-    else navigate(`/movie/${log.movie?._id || log.movieId}`);
+  
+    if (log.review?.trim()) {
+      navigate(`/review/${log._id}`);
+    } else {
+      const tmdbId = log.tmdbId || log.movie?._id || log.movieId || log.movie;
+      if (tmdbId) {
+        navigate(`/movie/${tmdbId}`);
+      } else {
+        console.warn("❌ No valid movie ID found in log:", log);
+      }
+    }
   };
+  
 
   const hasFavorites = favoriteMovies && favoriteMovies.length > 0;
 

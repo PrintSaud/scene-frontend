@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "../../api/api";
-import { backend } from "../../config";
+import api from "../../api/api";
 import toast from "react-hot-toast";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 
@@ -13,14 +12,12 @@ export default function ListPickerModal({ movie, onClose }) {
   useEffect(() => {
     const fetchLists = async () => {
       try {
-        const { data } = await axios.get(`${backend}/api/lists/user/${user._id}`, {
-          headers: { Authorization: `Bearer ${user.token}` },
-        });
-
+        const { data } = await api.get(`/api/lists/user/${user._id}`);
         setLists(data.filter((list) => !list.isPrivate));
         setLoading(false);
       } catch (err) {
         console.error("❌ Failed to load lists", err);
+        toast.error("Failed to load your lists");
       }
     };
 
@@ -29,17 +26,11 @@ export default function ListPickerModal({ movie, onClose }) {
 
   const handleAddToList = async (listId) => {
     try {
-      await axios.post(
-        `${backend}/api/lists/${listId}/add`,
-        {
-          id: movie.id,
-          title: movie.title,
-          poster: movie.poster,
-        },
-        {
-          headers: { Authorization: `Bearer ${user.token}` },
-        }
-      );
+      await api.post(`/api/lists/${listId}/add`, {
+        id: movie.id,
+        title: movie.title,
+        poster: movie.poster,
+      });
 
       window.dispatchEvent(new Event("refreshMyLists"));
       toast.success("✅ Added to list!");
@@ -99,7 +90,6 @@ export default function ListPickerModal({ movie, onClose }) {
               onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
               onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
             >
-              {/* 🔥 Only show coverImage if it exists */}
               {list.coverImage && (
                 <img
                   src={list.coverImage}
@@ -131,20 +121,19 @@ export default function ListPickerModal({ movie, onClose }) {
                 </div>
 
                 <div style={{
-  display: "flex",
-  alignItems: "center",
-  gap: "4px",
-  fontSize: "12px",
-  marginTop: "4px"
-}}>
-  {list.likes?.includes(user?._id) ? (
-    <AiFillHeart style={{ fontSize: "14px", color: "#B327F6" }} />
-  ) : (
-    <AiOutlineHeart style={{ fontSize: "14px", color: "#999" }} />
-  )}
-  <span style={{ fontSize: "12px", color: "#bbb" }}>{list.likes?.length || 0}</span>
-</div>
-
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px",
+                  fontSize: "12px",
+                  marginTop: "4px"
+                }}>
+                  {list.likes?.includes(user?._id) ? (
+                    <AiFillHeart style={{ fontSize: "14px", color: "#B327F6" }} />
+                  ) : (
+                    <AiOutlineHeart style={{ fontSize: "14px", color: "#999" }} />
+                  )}
+                  <span style={{ fontSize: "12px", color: "#bbb" }}>{list.likes?.length || 0}</span>
+                </div>
               </div>
             </div>
           ))}

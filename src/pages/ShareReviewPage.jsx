@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
 import html2canvas from "html2canvas";
-import { backend } from "../config";
 import { FiEye, FiDownload } from "react-icons/fi";
 import StarRating from "../components/StarRating";
+import api from "../api/api";
 
 export default function ShareReviewPage() {
   const { id } = useParams();
@@ -13,7 +12,7 @@ export default function ShareReviewPage() {
   const [previewMode, setPreviewMode] = useState(false);
 
   useEffect(() => {
-    axios.get(`${backend}/api/logs/${id}`).then(({ data }) => setReview(data));
+    api.get(`/api/logs/${id}`).then(({ data }) => setReview(data));
   }, [id]);
 
   const handleSaveImage = () => {

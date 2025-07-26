@@ -11,7 +11,7 @@ import ProfileTabFilms from "../components/profile/ProfileTabFilms";
 import api, { getUserProfile } from "../api/api";
 import toast from "react-hot-toast";
 import { followUser } from "../api/api";
-
+  
 export default function ProfilePage() {
   const navigate = useNavigate();
   const { id: paramId } = useParams();

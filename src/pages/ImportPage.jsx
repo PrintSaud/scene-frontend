@@ -8,7 +8,7 @@ const importEndpoints = {
     watchlist: "/api/letterboxd/watchlist",
   };
   
-  
+    
 
 export default function ImportPage() {
   const navigate = useNavigate();

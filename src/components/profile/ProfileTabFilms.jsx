@@ -129,19 +129,34 @@ export default function ProfileTabFilms({ logs, favorites = [] }) {
 
             // Inside map:
             const handleClick = async () => {
+              const user = JSON.parse(localStorage.getItem("user"));
+              const token = user?.token;
+              const ownerId = log.user?._id || log.user; // fallback in case it's not populated
+            
+              // Not logged in → go to movie page
+              if (!token || !ownerId) {
+                return navigate(`/movie/${movieId}`);
+              }
+            
               try {
-                const { data: logsForThisMovie } = await axios.get(`/api/logs/user/${log.user._id}/movie/${movieId}`);
+                const { data: logsForThisMovie } = await axios.get(
+                  `/api/logs/user/${ownerId}/movie/${movieId}`,
+                  {
+                    headers: { Authorization: `Bearer ${token}` },
+                  }
+                );
+            
                 if (logsForThisMovie.length === 1) {
                   navigate(`/review/${logsForThisMovie[0]._id}`);
                 } else {
-                  navigate(`/film-reviews/${movieId}/${log.user._id}`);
+                  navigate(`/film-reviews/${movieId}/${ownerId}`);
                 }
               } catch (err) {
                 console.error("Failed to fetch logs for this movie", err);
+                navigate(`/movie/${movieId}`); // fallback
               }
             };
             
-
             return (
               <div key={log._id} onClick={handleClick} style={{ position: "relative", cursor: "pointer" }}>
                 <img

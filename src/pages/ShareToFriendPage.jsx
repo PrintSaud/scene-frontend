@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { FaArrowLeft } from "react-icons/fa";
-import { backend } from "../config";
+import api from "../api/api";
+
+
 
 export default function ShareToFriendPage() {
   const { type, id } = useParams(); // 🔥 universal support
@@ -32,27 +33,27 @@ export default function ShareToFriendPage() {
         const loggedIn = JSON.parse(stored);
     
         // 🔥 FIX: Fetch fresh current user data with following/followers included
-        const { data: freshUser } = await axios.get(`${backend}/api/users/${loggedIn._id}`);
+        const { data: freshUser } = await api.get(`/api/users/${loggedIn._id}`);
         setCurrentUser(freshUser);
     
-        const usersRes = await axios.get(`${backend}/api/users`);
+        const usersRes = await api.get(`/api/users`);
         setAllUsers(usersRes.data);
     
         let title = "";
     
         if (type === "movie") {
           try {
-            const res = await axios.get(`${backend}/api/movies/${id}`);
+            const res = await api.get(`/api/movies/${id}`);
             title = res.data.title;
           } catch {
             const tmdbRes = await axios.get(`https://api.themoviedb.org/3/movie/${id}?api_key=${TMDB_KEY}`);
             title = tmdbRes.data.title;
           }
         } else if (type === "log") {
-          const res = await axios.get(`${backend}/api/logs/${id}`);
+          const res = await api.get(`/api/logs/${id}`);
           title = res.data.movie?.title || "Untitled Log";
         } else if (type === "list") {
-          const res = await axios.get(`${backend}/api/lists/${id}`);
+          const res = await api.get(`/api/lists/${id}`);
           title = res.data.title || "Untitled List";
         }
     
@@ -71,11 +72,12 @@ export default function ShareToFriendPage() {
 
   const handleSend = async () => {
     try {
-      await axios.post(`${backend}/api/users/${currentUser._id}/suggest`, {
+      await api.post(`/api/users/${currentUser._id}/suggest`, {
         friends: selected,
         resourceType: type,
         resourceTitle: resourceTitle,
       });
+      
   
       toast.success(`✅ Suggested to ${selected.length} friend(s)!`);
       navigate(-1);

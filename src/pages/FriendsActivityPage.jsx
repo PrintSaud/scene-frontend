@@ -14,10 +14,7 @@ export default function FriendsActivityPage() {
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const { data } = await axios.get(`/api/logs/${filter}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const { data } = await axios.get(`/api/logs/${filter}`);
         setLogs(data);
       } catch (err) {
         console.error("Failed to fetch logs:", err);
@@ -25,6 +22,7 @@ export default function FriendsActivityPage() {
     };
     fetchLogs();
   }, [filter]);
+  
 
   return (
     <div

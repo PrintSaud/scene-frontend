@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "../api/api";
+import api from "../api/api";
 import { format } from "timeago.js";
 import { useNavigate } from "react-router-dom";
 import { socket } from "../socket";
@@ -27,7 +27,7 @@ export default function NotificationsPage({ setHasUnread }) {
   useEffect(() => {
     const markAllAsRead = async () => {
       try {
-        await axios.patch("/api/notifications/read");
+        await api.patch("/api/notifications/read");
         setHasUnread(false);
       } catch (err) {
         console.error("Failed to mark all as read", err);
@@ -36,7 +36,7 @@ export default function NotificationsPage({ setHasUnread }) {
 
     const fetchNotifications = async () => {
       try {
-        const { data } = await axios.get("/api/notifications");
+        const { data } = await api.get("/api/notifications");
         setNotifications(data);
         const hasUnread = data.some((n) => !n.read);
         if (setHasUnread) setHasUnread(hasUnread);
@@ -60,7 +60,7 @@ export default function NotificationsPage({ setHasUnread }) {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`/api/notifications/${id}`);
+      await api.delete(`/api/notifications/${id}`);
       setNotifications((prev) => prev.filter((n) => n._id !== id));
     } catch (err) {
       console.error("Failed to delete notification", err);
@@ -69,7 +69,7 @@ export default function NotificationsPage({ setHasUnread }) {
 
   const markAsReadAndNavigate = async (n, destination) => {
     try {
-      await axios.patch(`/api/notifications/read-single/${n._id}`);
+      await api.patch(`/api/notifications/read-single/${n._id}`);
       navigate(destination);
     } catch (err) {
       console.error("Failed to mark notification as read", err);

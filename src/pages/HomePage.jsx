@@ -196,7 +196,13 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
             >
               <div style={{ position: "relative" }}>
                 <img
-                  src={log.movie?.poster}
+                src={
+                  log.customPoster ||
+                  log.movie?.poster ||
+                  `https://image.tmdb.org/t/p/w500${log.poster_path || ""}` ||
+                  "/default-poster.png"
+                }
+                
                   alt="poster"
                   style={{
                     width: "100%",

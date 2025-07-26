@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api/api";
 import toast from "react-hot-toast";
-import { backend } from "../config";
+
+
 
 export default function ShareListPage() {
   const { id } = useParams();  // listId
@@ -31,7 +32,7 @@ export default function ShareListPage() {
         const storedUser = JSON.parse(stored);
         setCurrentUser(storedUser);
 
-        const usersRes = await axios.get(`${backend}/api/users`);
+        const usersRes = await api.get("/api/users");
         setAllUsers(usersRes.data);
 
         setLoading(false);
@@ -49,7 +50,7 @@ export default function ShareListPage() {
       return;
     }
     try {
-      await axios.post(`${backend}/api/lists/${id}/share`, { recipients: selected });
+      await api.post(`/api/lists/${id}/share`, { recipients: selected });
       toast.success("Shared successfully!");
       navigate(-1);
     } catch (err) {

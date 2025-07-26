@@ -26,9 +26,10 @@ export default function CreateListPage() {
     formData.append("image", file);
 
     try {
-      const { data } = await axios.post(`${backend}/api/upload/list-cover`, formData, {
+      const { data } = await axios.post("/upload/list-cover", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+      
       setCoverImage(data.url);
     } catch (err) {
       console.error("❌ Upload failed", err);
@@ -60,9 +61,7 @@ export default function CreateListPage() {
         })),
       };
   
-      await axios.post(`${backend}/api/lists`, payload, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
+      await axios.post("/lists", payload); // token auto-included from api interceptor
   
       window.dispatchEvent(new Event("refreshMyLists"));
       toast.success("✅ List created!");
