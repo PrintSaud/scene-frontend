@@ -26,11 +26,7 @@ export default function ReviewHeader({
       setShowOptions(false);
     };
   
-    const backdropUrl = review.customBackdrop
-      ? review.customBackdrop
-      : review.movie?.backdrop_path
-        ? `https://image.tmdb.org/t/p/original${review.movie.backdrop_path}`
-        : "/default-backdrop.jpg";
+    const backdropUrl = review.customBackdrop || review.backdrop || "/default-backdrop.jpg";
   
     const avatarUrl = review.user?.avatar
       ? review.user.avatar
