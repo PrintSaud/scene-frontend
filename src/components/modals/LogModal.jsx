@@ -74,8 +74,8 @@ formData.append("rewatchCount", rewatchCount.toString());         // Actual nume
       );
       formData.append(
         "backdrop",
-        movieData?.backdrop_path || ""
-      );      
+        movieData?.backdrop_path?.startsWith("/") ? movieData.backdrop_path : ""
+      );           
       if (uploadedImageFile) {
         formData.append("image", uploadedImageFile);
       }
