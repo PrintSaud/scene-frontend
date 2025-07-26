@@ -223,7 +223,7 @@ export default function ProfileTabProfile({
               {hasReview && <FaRegComment size={9} style={{ position: "relative", top: "-1.5px" }} />}
               {log.rewatchCount > 1 && (
   <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-    <HiOutlineRefresh size={9} color="#aaa" />
+    <HiOutlineRefresh size={12} color="#aaa" />
   </div>
 )}
 
