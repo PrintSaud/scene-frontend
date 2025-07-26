@@ -4,7 +4,6 @@ import StarRating from "../StarRating";
 import { AiFillHeart } from "react-icons/ai";
 import { FaRegComment } from "react-icons/fa";
 import axios from "../../api/api"; // or wherever you import your axios instance
-import React, { useState, useMemo, useEffect } from "react";
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const FALLBACK_POSTER = "/default-poster.jpg";
