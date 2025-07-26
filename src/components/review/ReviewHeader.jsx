@@ -204,10 +204,11 @@ export default function ReviewHeader({
   <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
     <HiOutlineRefresh size={16} color="#aaa" />
     <span style={{ fontSize: 10, color: "#aaa" }}>
-      {log.rewatchCount}x
+      {rewatchCount}x
     </span>
   </div>
 )}
+
   </div>
   {timestamp && (
     <div style={{ fontSize: 11, color: "#aaa" }}>

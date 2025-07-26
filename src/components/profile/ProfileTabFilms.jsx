@@ -83,7 +83,7 @@ export default function ProfileTabFilms({ logs, favorites = [] }) {
         fontSize: "18px",
         color: "#888",
       }}>
-        🎞️ Loading your Films...
+        🎞️ Loading your Scenes...
       </div>
     );
   }

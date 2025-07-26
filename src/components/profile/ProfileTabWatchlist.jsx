@@ -25,29 +25,28 @@ export default function ProfileTabWatchlist({
   useEffect(() => {
     const fetchWatchlist = async () => {
       try {
+        setIsLoading(true); // ✅ Only set loading here once
         const res = await api.get(
           `/api/users/${profileUserId}/watchlist?sort=${sortType}&order=${order}&genre=${selectedGenre}`
         );
-        setWatchList(isOwner ? res.data : res.data.filter((movie) => !movie.isPrivate));
+        const visibleWatchlist = isOwner ? res.data : res.data.filter((movie) => !movie.isPrivate);
+        setWatchList(visibleWatchlist);
+  
+        // Optional: Smooth fade for large watchlists
+        if (visibleWatchlist.length > 100) {
+          setTimeout(() => setIsLoading(false), 800); // Smooth delay
+        } else {
+          setIsLoading(false);
+        }
       } catch (err) {
         console.error("Failed to fetch watchlist", err);
+        setIsLoading(false);
       }
     };
-
+  
     if (profileUserId) fetchWatchlist();
   }, [profileUserId, sortType, order, selectedGenre]);
-
-  useEffect(() => {
-    if (watchList.length > 100) {
-      setIsLoading(true);
-      const timeout = setTimeout(() => {
-        setIsLoading(false);
-      }, 1000);
-      return () => clearTimeout(timeout);
-    } else {
-      setIsLoading(false);
-    }
-  }, [watchList]);
+  
   
 
   if (isLoading) {
@@ -60,7 +59,7 @@ export default function ProfileTabWatchlist({
         fontSize: "18px",
         color: "#888",
       }}>
-        🎞️ Loading your Films...
+        🎞️ Loading your Scenes...
       </div>
     );
   }
