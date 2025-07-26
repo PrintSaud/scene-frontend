@@ -33,15 +33,14 @@ export default function ReviewHeader({
       customBackdrop: review?.customBackdrop,
       reviewBackdrop: review?.backdrop,
       movieBackdrop: review?.movie?.backdropPath,
-    });    
+    });
 
-    const backdropUrl = review?.customBackdrop
-  ? review.customBackdrop
-  : review?.backdrop
-    ? `https://image.tmdb.org/t/p/original${review.backdrop}`
-    : review?.movie?.backdropPath
-      ? `https://image.tmdb.org/t/p/original${review.movie.backdropPath}`
-      : "/default-backdrop.jpg";
+    const backdropUrl =
+  review?.customBackdrop ||
+  (review?.reviewBackdrop ? `https://image.tmdb.org/t/p/original${review.reviewBackdrop}` : "") ||
+  (review?.movie?.backdrop_path ? `https://image.tmdb.org/t/p/original${review.movie.backdrop_path}` : "") ||
+  "/default-backdrop.jpg";
+
 
 
 
