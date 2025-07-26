@@ -31,11 +31,12 @@ const DEFAULT_BACKDROP = "/default-backdrop.jpg";
 
 const backdrop =
   review.customBackdrop ||
-  (review.backdrop && review.backdrop.startsWith("http")
-    ? review.backdrop
-    : review.backdrop
-    ? `${TMDB_BACKDROP}${review.backdrop}`
+  (review.backdrop && review.backdrop !== "default-backdrop.jpg"
+    ? (review.backdrop.startsWith("http")
+      ? review.backdrop
+      : `${TMDB_BACKDROP}${review.backdrop}`)
     : DEFAULT_BACKDROP);
+
 
 
       const posterUrl = review.posterOverride
