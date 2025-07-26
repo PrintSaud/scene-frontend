@@ -37,7 +37,7 @@ export default function LogModal({ movie, onClose, refreshLogs, editLogId }) {
       api.get(`/api/logs/${logId}`).then(async ({ data }) => {
         setRating(data.rating || 0);
         setReview(data.review || "");
-        setRewatchCount(data.rewatch || 0);
+        setRewatchCount(data.rewatchCount || 0);
         setGifUrl(data.gif || null);
         setUploadedImageFile(null);
         setMovieId(data.movie?._id || data.movie?.id);
