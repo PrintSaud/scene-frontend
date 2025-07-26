@@ -131,9 +131,8 @@ export default function ProfileTabFilms({ logs, favorites = [] }) {
             const handleClick = async () => {
               const user = JSON.parse(localStorage.getItem("user"));
               const token = user?.token;
-              const ownerId = log.user?._id || log.user; // fallback in case it's not populated
+              const ownerId = log.user?._id || log.user;
             
-              // Not logged in → go to movie page
               if (!token || !ownerId) {
                 return navigate(`/movie/${movieId}`);
               }
@@ -146,16 +145,20 @@ export default function ProfileTabFilms({ logs, favorites = [] }) {
                   }
                 );
             
-                if (logsForThisMovie.length === 1) {
-                  navigate(`/review/${logsForThisMovie[0]._id}`);
+                // 🛠️ Check if at least one of them has a review
+                const reviewedLog = logsForThisMovie.find((log) => log.review?.trim());
+            
+                if (reviewedLog) {
+                  navigate(`/review/${reviewedLog._id}`);
                 } else {
-                  navigate(`/film-reviews/${movieId}/${ownerId}`);
+                  navigate(`/movie/${movieId}`);
                 }
               } catch (err) {
                 console.error("Failed to fetch logs for this movie", err);
                 navigate(`/movie/${movieId}`); // fallback
               }
             };
+            
             
             return (
               <div key={log._id} onClick={handleClick} style={{ position: "relative", cursor: "pointer" }}>
