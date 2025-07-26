@@ -3,11 +3,11 @@ import axios from "../api/api";
 import { useNavigate } from "react-router-dom";
 
 const importEndpoints = {
-    diary: "/api/letterboxd/diary",       // ✅ fixed
-    ratings: "/api/letterboxd/ratings",   // ✅ still works
-    watchlist: "/api/letterboxd/watchlist", // ✅ fixed
-    reviews: "/api/letterboxd/reviews",   // ✅ still works
+    diary: "/api/letterboxd/logs",
+    ratings: "/api/letterboxd/logs",
+    watchlist: "/api/letterboxd/watchlist",
   };
+  
   
 
 export default function ImportPage() {
@@ -16,7 +16,6 @@ export default function ImportPage() {
     diary: null,
     ratings: null,
     watchlist: null,
-    reviews: null,
   });
 
   const [previews, setPreviews] = useState({});
@@ -63,7 +62,7 @@ export default function ImportPage() {
   };
 
   const undoImport = () => {
-    setFiles({ diary: null, ratings: null, watchlist: null, reviews: null });
+    setFiles({ diary: null, ratings: null, watchlist: null, });
     setPreviews({});
     setUploadComplete(false);
     setMessage("🗑️ Cleared last import.");
@@ -96,10 +95,10 @@ export default function ImportPage() {
       </button>
 
       <p style={{ fontSize: "14px", color: "#aaa", marginBottom: "16px", fontFamily: "Inter, sans-serif" }}>
-        Upload your exported files one by one from the Letterboxd data folder (diary.csv, ratings.csv, etc.).
+        Upload your exported files one by one from the Letterboxd data folder (watchlist.csv, ratings.csv, etc.).
       </p>
 
-      {["diary", "ratings", "reviews", "watchlist"].map((type) => (
+      {["diary", "ratings","watchlist"].map((type) => (
         <div key={type} style={{ marginBottom: "16px" }}>
           <label style={{ fontWeight: "bold", fontSize: "13px", display: "block", marginBottom: "4px" }}>
             {type.charAt(0).toUpperCase() + type.slice(1)}.csv
@@ -160,7 +159,7 @@ export default function ImportPage() {
         </button>
       )}
 
-      {(previews.diary || previews.ratings || previews.watchlist || previews.reviews) && (
+      {(previews.diary || previews.ratings || previews.watchlist ) && (
         <button
           onClick={undoImport}
           style={{
