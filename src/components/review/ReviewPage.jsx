@@ -56,7 +56,9 @@ export default function ReviewPage() {
   const fetchData = async () => {
     try {
       const { data } = await api.get(`/api/logs/${id}`);
-      setReview(data);
+console.log("🐛 Fetched review:", data);
+setReview(data);
+
       setReplies(data.replies || []);
   
       if (data.user?._id) {
@@ -74,6 +76,8 @@ export default function ReviewPage() {
   useEffect(() => {
     fetchData();
   }, [id]);
+
+  
 
   const handleLike = async () => {
     if (!userId) return toast.error("You must be logged in to like.");
