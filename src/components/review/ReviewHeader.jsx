@@ -33,7 +33,10 @@ export default function ReviewHeader({
   ? review.customBackdrop
   : review?.backdrop
     ? `https://image.tmdb.org/t/p/original${review.backdrop}`
-    : "/default-backdrop.jpg";
+    : review?.movie?.backdropPath
+      ? `https://image.tmdb.org/t/p/original${review.movie.backdropPath}`
+      : "/default-backdrop.jpg";
+
 
 
 
