@@ -47,8 +47,8 @@ export default function LogModal({ movie, onClose, refreshLogs, editLogId }) {
         if (user && movieId) {
           try {
             const favRes = await api.get(`/api/${user._id}/favorites`);
-            const favIds = favRes.data.map((m) => m.id || m);
-            setIsFavorite(favIds.includes(Number(data.movie?.id || data.movie?._id)));
+const favIds = favRes.data.favorites.map((m) => m.id || m);
+setIsFavorite(favIds.includes(Number(data.movie?.id || data.movie?._id)));
           } catch (err) {
             console.warn("⚠️ Failed to check favorite status");
           }
