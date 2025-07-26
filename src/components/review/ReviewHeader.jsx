@@ -151,7 +151,11 @@ export default function ReviewHeader({
               cursor: "pointer",
               fontFamily: "Inter, sans-serif"
             }}
-            onClick={() => navigate(`/movie/${review.movie?.id || review.movie}`)}
+            onClick={() => {
+              const movieId = review?.movie?.id || review?.movie;
+              if (movieId) navigate(`/movie/${movieId}`);
+            }}
+            
           >
             Go to Movie
           </button>
