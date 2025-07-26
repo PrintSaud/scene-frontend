@@ -29,15 +29,14 @@ export default function ReviewHeader({
     const TMDB_BACKDROP = "https://image.tmdb.org/t/p/original";
 const DEFAULT_BACKDROP = "/default-backdrop.jpg";
 
-const backdrop = review.customBackdrop
-  || (review.backdrop?.startsWith("http") ? review.backdrop : `${TMDB_BACKDROP}${review.backdrop}`)
-  || DEFAULT_BACKDROP;
+const backdrop =
+  review.customBackdrop ||
+  (review.backdrop && review.backdrop.startsWith("http")
+    ? review.backdrop
+    : review.backdrop
+    ? `${TMDB_BACKDROP}${review.backdrop}`
+    : DEFAULT_BACKDROP);
 
-console.log("🧪 Backdrop being used:", backdrop);
-
-    const avatarUrl = review.user?.avatar
-      ? review.user.avatar
-      : "/default-avatar.jpg";
 
       const posterUrl = review.posterOverride
   || review.poster
