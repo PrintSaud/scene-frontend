@@ -82,9 +82,9 @@ export default function EditListPage() {
     formData.append("image", file);
 
     try {
-      const { data } = await axios.post("/upload/list-cover", formData, {
+      const { data } = await axios.post("/api/upload/list-cover", formData, {
         headers: { "Content-Type": "multipart/form-data" },
-      });              
+      });                    
       setCoverImage(data.url);
     } catch (err) {
       console.error("❌ Upload failed", err);
