@@ -4,19 +4,34 @@ import StarRating from "../StarRating";
 import { AiFillHeart } from "react-icons/ai";
 import { FaRegComment } from "react-icons/fa";
 import axios from "../../api/api"; // or wherever you import your axios instance
+import React, { useState, useMemo, useEffect } from "react";
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const FALLBACK_POSTER = "/default-poster.jpg";
 
 export default function ProfileTabFilms({ logs, favorites = [] }) {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
 
   const [sortType, setSortType] = useState("added");
   const [order, setOrder] = useState("desc");
 
+  useEffect(() => {
+    if (logs.length > 100) {
+      setIsLoading(true);
+      const timeout = setTimeout(() => {
+        setIsLoading(false);
+      }, 1000); // 1s loading screen for heavy logs
+  
+      return () => clearTimeout(timeout);
+    } else {
+      setIsLoading(false);
+    }
+  }, [logs]);
+
   const sortedLogs = useMemo(() => {
     let filtered = [...logs];
-  
+    
     // ⭐ FIX favorites filter to ensure numeric comparison
     if (sortType === "favorites") {
       filtered = filtered.filter((log) => {
@@ -58,6 +73,22 @@ export default function ProfileTabFilms({ logs, favorites = [] }) {
   
     return filtered;
   }, [logs, sortType, order, favorites]);
+
+  if (isLoading) {
+    return (
+      <div style={{
+        minHeight: "300px",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        fontSize: "18px",
+        color: "#888",
+      }}>
+        🎞️ Loading your Films...
+      </div>
+    );
+  }
+  
   
 
   return (
@@ -105,6 +136,8 @@ export default function ProfileTabFilms({ logs, favorites = [] }) {
         </select>
       </div>
 
+      
+
       {/* 🎬 Grid or empty state */}
       {sortedLogs.length === 0 ? (
         <div style={{ textAlign: "center", color: "#888", marginTop: "30px", fontSize: "14px" }}>
@@ -112,6 +145,7 @@ export default function ProfileTabFilms({ logs, favorites = [] }) {
             ? "You haven’t marked any favorite films yet."
             : "No films found for this filter."}
         </div>
+        
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "4px", padding: "0" }}>
           {sortedLogs.map((log) => {

@@ -19,6 +19,8 @@ export default function ProfileTabWatchlist({
   const navigate = useNavigate();
   const [selectedGenre, setSelectedGenre] = useState("");
   const isOwner = user?._id === profileUserId;
+  const [isLoading, setIsLoading] = useState(true);
+
 
   useEffect(() => {
     const fetchWatchlist = async () => {
@@ -34,6 +36,35 @@ export default function ProfileTabWatchlist({
 
     if (profileUserId) fetchWatchlist();
   }, [profileUserId, sortType, order, selectedGenre]);
+
+  useEffect(() => {
+    if (watchList.length > 100) {
+      setIsLoading(true);
+      const timeout = setTimeout(() => {
+        setIsLoading(false);
+      }, 1000);
+      return () => clearTimeout(timeout);
+    } else {
+      setIsLoading(false);
+    }
+  }, [watchList]);
+  
+
+  if (isLoading) {
+    return (
+      <div style={{
+        minHeight: "300px",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        fontSize: "18px",
+        color: "#888",
+      }}>
+        🎞️ Loading your Films...
+      </div>
+    );
+  }
+  
 
   return (
     <div style={{ padding: "0" }}>
