@@ -73,9 +73,13 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
   useEffect(() => {
     const fetchFeed = async () => {
       if (!user?._id) return;
-      const res = await api.get(`/api/logs/feed/${user._id}`);
-      setFeedLogs(res.data);
-    };
+      try {
+        const res = await api.get(`/api/logs/feed/${user._id}`);
+        setFeedLogs(res.data);
+      } catch (err) {
+        console.error("🔥 Failed to fetch feed logs:", err);
+      }
+    };    
     fetchFeed();
   }, [user]);
 
