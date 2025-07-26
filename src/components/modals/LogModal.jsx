@@ -34,7 +34,7 @@ export default function LogModal({ movie, onClose, refreshLogs, editLogId }) {
   useEffect(() => {
     if (logId) {
       setIsEditMode(true);
-      api.get(`/logs/${logId}`).then(async ({ data }) => {
+      api.get(`/api/logs/${logId}`).then(async ({ data }) => {
         setRating(data.rating || 0);
         setReview(data.review || "");
         setRewatchCount(data.rewatch || 0);
@@ -42,7 +42,7 @@ export default function LogModal({ movie, onClose, refreshLogs, editLogId }) {
         setUploadedImageFile(null);
         setMovieId(data.movie?._id || data.movie?.id);
         setMovieData(data.movie);
-
+  
         // Check favorite status when editing
         if (user && movieId) {
           try {
@@ -56,6 +56,7 @@ export default function LogModal({ movie, onClose, refreshLogs, editLogId }) {
       });
     }
   }, [logId]);
+  
 
   const handleLogSubmit = async () => {
     try {
