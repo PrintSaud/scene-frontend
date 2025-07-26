@@ -61,7 +61,8 @@ export default function CreateListPage() {
         })),
       };
   
-      await axios.post("/lists", payload); // token auto-included from api interceptor
+      await axios.post("/api/lists", payload);
+
   
       window.dispatchEvent(new Event("refreshMyLists"));
       toast.success("✅ List created!");

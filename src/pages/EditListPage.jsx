@@ -48,31 +48,29 @@ export default function EditListPage() {
         isRanked,
         movies,
       };
-
-      await axios.patch(`/lists/${id}`, payload, {
-
-      });
-      
-
+  
+      await axios.patch(`/api/lists/${id}`, payload); // ✅ updated path
+  
       navigate(`/list/${id}`);
     } catch (err) {
       console.error("❌ Failed to update list", err);
       alert("Failed to update list.");
     }
   };
+  
 
   const handleDelete = async () => {
     const confirm = window.confirm("Are you sure you want to delete this list?");
     if (!confirm) return;
     try {
-      await axios.delete(`/lists/${id}`, {
-      });
+      await axios.delete(`/api/lists/${id}`); // ✅ correct path
       navigate("/profile");
     } catch (err) {
       console.error("❌ Failed to delete list", err);
       alert("Failed to delete list.");
     }
   };
+  
 
   const handleCoverUpload = async (e) => {
     const file = e.target.files[0];
