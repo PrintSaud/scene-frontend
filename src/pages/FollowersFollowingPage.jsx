@@ -123,12 +123,10 @@ export default function FollowersFollowingPage() {
         style={{
           display: "flex",
           alignItems: "center",
-          justifyContent: "space-between",
-          gap: "12px",
-          padding: "4px 0",
+          width: "100%",
         }}
       >
-        {/* Avatar + Username clickable */}
+        {/* Avatar + Username clickable section - forced to far left */}
         <div
           onClick={() => navigate(`/profile/${u._id}`)}
           style={{
@@ -136,7 +134,6 @@ export default function FollowersFollowingPage() {
             alignItems: "center",
             gap: "12px",
             cursor: "pointer",
-            flex: 1,
           }}
         >
           <img
@@ -152,11 +149,12 @@ export default function FollowersFollowingPage() {
           <span style={{ fontSize: "13px", fontWeight: "600" }}>{u.username}</span>
         </div>
 
-        {/* Follow/Unfollow button */}
+        {/* Follow/Unfollow button on far right */}
         {u._id !== currentUser._id && (
           <button
             onClick={() => toggleFollow(u._id)}
             style={{
+              marginLeft: "auto", // 👈 Forces it to far right
               padding: "4px 10px",
               borderRadius: "20px",
               fontSize: "12px",
@@ -173,6 +171,7 @@ export default function FollowersFollowingPage() {
     ))}
   </ul>
 )}
+
 
     </div>
   );
