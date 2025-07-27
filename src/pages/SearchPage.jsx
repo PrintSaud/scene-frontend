@@ -87,6 +87,9 @@ export default function SearchPage() {
         const token = user?.token;
   
         const res = await fetch(`${backend}/api/lists/search?q=${q}`, {
+   
+  
+          
           headers: {
             Authorization: `Bearer ${token}`,
           },

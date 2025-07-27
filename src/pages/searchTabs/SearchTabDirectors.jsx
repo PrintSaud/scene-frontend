@@ -12,20 +12,14 @@ export default function SearchTabDirectors({ results = [] }) {
   }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center", // ✅ Center horizontally
-        padding: "0 16px",
-      }}
-    >
+    <div style={{ display: "flex", justifyContent: "center", padding: "0 16px" }}>
       <div
         style={{
           width: "100%",
-          maxWidth: "460px", // ✅ Lock width to center the card stack
+          maxWidth: "480px", // match actor layout
           display: "flex",
           flexDirection: "column",
-          gap: "14px",
+          gap: "16px",
         }}
       >
         {filteredDirectors.map((director) => (
@@ -33,35 +27,35 @@ export default function SearchTabDirectors({ results = [] }) {
             key={director.id}
             onClick={() => navigate(`/director/${director.id}`)}
             style={{
-              width: "95%",
               background: "#1a1a1a",
-              borderRadius: "14px",
+              borderRadius: "16px",
               overflow: "hidden",
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
-              gap: "14px",
-              padding: "12px",
-              boxShadow: "0 3px 8px rgba(0,0,0,0.3)",
+              gap: "18px",
+              padding: "16px",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
+              transition: "transform 0.2s ease",
             }}
           >
             <img
               src={`${TMDB_IMG}${director.profile_path}`}
               alt={director.name}
               style={{
-                width: "68px",
-                height: "68px",
-                borderRadius: "12px",
+                width: "76px",
+                height: "76px",
+                borderRadius: "14px",
                 objectFit: "cover",
                 background: "#333",
                 flexShrink: 0,
               }}
             />
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: "15px", fontWeight: "600", color: "#fff" }}>
+              <div style={{ fontSize: "17px", fontWeight: "700", color: "#fff" }}>
                 {director.name}
               </div>
-              <div style={{ fontSize: "13px", color: "#bbb" }}>Director</div>
+              <div style={{ fontSize: "14px", color: "#bbb" }}>Director</div>
             </div>
           </div>
         ))}

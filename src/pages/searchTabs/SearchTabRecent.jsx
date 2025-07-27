@@ -21,7 +21,7 @@ export default function SearchTabRecent({ recentSearches, onSearch }) {
               color: "#fff",
               textAlign: "left",
               cursor: "pointer",
-              width: "100%",
+              width: "100vw",          
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
