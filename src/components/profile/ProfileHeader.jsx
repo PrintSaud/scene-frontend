@@ -241,42 +241,44 @@ export default function ProfileHeader({
         </div>
       )}
 
+   
       {/* STATS */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          gap: "40px",
-          fontSize: "14px",
-          marginTop: "20px",
-          marginBottom: "8px",
-          opacity: 0.9,
-          textAlign: "center",
-          padding: "0px 7px 5px",
-        }}
-      >
-        <div onClick={() => navigate(`/profile/${user._id}/following`)} style={{ cursor: "pointer", fontFamily: "Inter" }}>
-          <strong>{user.following?.length || 0}</strong>
+<div
+  style={{
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: "28px", // tighter spacing
+    fontSize: "14px",
+    marginTop: "12px",
+    marginBottom: "12px",
+    opacity: 0.9,
+    textAlign: "center",
+    fontFamily: "Inter",
+  }}
+>
+  <div onClick={() => navigate(`/profile/${user._id}/following`)} style={{ cursor: "pointer" }}>
+    <strong>{user.following?.length || 0}</strong>
+    <div>Following</div>
+  </div>
 
-          <div>Following</div>
-        </div>
+  <div onClick={() => navigate(`/profile/${user._id}/followers`)} style={{ cursor: "pointer" }}>
+    <strong>{user.followers?.length || 0}</strong>
+    <div>Followers</div>
+  </div>
 
-        <div onClick={() => navigate(`/profile/${user._id}/followers`)} style={{ cursor: "pointer", fontFamily: "Inter" }}>
-        <strong>{user.followers?.length || 0}</strong>
-          <div>Followers</div>
-        </div>
+  <div
+    onClick={() => {
+      const event = new CustomEvent("navigateToFilms");
+      window.dispatchEvent(event);
+    }}
+    style={{ cursor: "pointer" }}
+  >
+    <strong>{logs.length || 0}</strong>
+    <div>Films</div>
+  </div>
+</div>
 
-        <div
-          onClick={() => {
-            const event = new CustomEvent("navigateToFilms");
-            window.dispatchEvent(event);
-          }}
-          style={{ cursor: "pointer", fontFamily: "Inter" }}
-        >
-          <strong>{logs.length || 0}</strong>
-          <div>Films</div>
-        </div>
-      </div>
     </>
   );
 }
