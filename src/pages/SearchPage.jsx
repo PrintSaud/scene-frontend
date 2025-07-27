@@ -207,12 +207,8 @@ export default function SearchPage() {
                     <div style={{ fontWeight: 600 }}>{movie.title}</div>
                     <div style={{ fontSize: "0.85rem", color: "#aaa" }}>{movie.release_date?.slice(0, 4) || "N/A"}</div>
                     <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-  <StarRating rating={1} size={16} /> {/* ✅ One full star only */}
-  <span style={{ fontSize: "14px", color: "#ccc" }}>
-    {(movie.vote_average || 0).toFixed(1)} / 10
-  </span>
+  <StarRating rating={movie.vote_average || 0} size={16} compact />
 </div>
-
                   </div>
                 </div>
               ))}

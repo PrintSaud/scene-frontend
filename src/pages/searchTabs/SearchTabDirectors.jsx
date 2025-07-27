@@ -12,7 +12,7 @@ export default function SearchTabDirectors({ results = [] }) {
   }
 
   return (
-        <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: "16px" }}>
+    <div style={{ padding: "0 16px", display: "flex", flexDirection: "column", gap: "14px" }}>
       {filteredDirectors.map((director) => (
         <div
           key={director.id}
@@ -25,23 +25,22 @@ export default function SearchTabDirectors({ results = [] }) {
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
-            gap: "16px",
-            padding: "14px 16px",
-            boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
-          }}          
+            gap: "14px",
+            padding: "12px",
+            boxShadow: "0 3px 8px rgba(0,0,0,0.3)",
+          }}
         >
           <img
             src={`${TMDB_IMG}${director.profile_path}`}
             alt={director.name}
             style={{
-                width: "70px",
-                height: "70px",
-                borderRadius: "14px",
-                objectFit: "cover",
-                background: "#333",
-                flexShrink: 0,
-              }}
-              
+              width: "68px",
+              height: "68px",
+              borderRadius: "12px",
+              objectFit: "cover",
+              background: "#333",
+              flexShrink: 0,
+            }}
           />
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: "15px", fontWeight: "600", color: "#fff" }}>
