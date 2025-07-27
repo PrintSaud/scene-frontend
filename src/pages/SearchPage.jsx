@@ -4,11 +4,12 @@ import filterMovies, { isQueryBanned } from "../utils/filterMovies";
 import { backend } from "../config";
 import StarRating from "../components/StarRating";
 
-import SearchTabUsers from "./SearchTabUsers";
-import SearchTabLists from "./SearchTabLists";
-import SearchTabActors from "./SearchTabActors";
-import SearchTabDirectors from "./SearchTabDirectors";
-import SearchTabRecent from "./SearchTabRecent";
+import SearchTabUsers from "./searchTabs/SearchTabUsers";
+import SearchTabLists from "./searchTabs/SearchTabLists";
+import SearchTabActors from "./searchTabs/SearchTabActors";
+import SearchTabDirectors from "./searchTabs/SearchTabDirectors";
+import SearchTabRecent from "./searchTabs/SearchTabRecent";
+
 
 export default function SearchPage() {
   const [query, setQuery] = useState("");
