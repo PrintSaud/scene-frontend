@@ -123,24 +123,36 @@ export default function FollowersFollowingPage() {
         style={{
           display: "flex",
           alignItems: "center",
+          justifyContent: "space-between",
           gap: "12px",
           padding: "4px 0",
         }}
       >
-        {/* Avatar + username */}
-        <img
-          src={u.avatar || "/default-avatar.jpg"}
-          alt={u.username}
+        {/* Avatar + Username clickable */}
+        <div
+          onClick={() => navigate(`/profile/${u._id}`)}
           style={{
-            width: "40px",
-            height: "40px",
-            borderRadius: "50%",
-            objectFit: "cover",
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            cursor: "pointer",
+            flex: 1,
           }}
-        />
-        <span style={{ fontSize: "13px", fontWeight: "600" }}>{u.username}</span>
+        >
+          <img
+            src={u.avatar || "/default-avatar.jpg"}
+            alt={u.username}
+            style={{
+              width: "40px",
+              height: "40px",
+              borderRadius: "50%",
+              objectFit: "cover",
+            }}
+          />
+          <span style={{ fontSize: "13px", fontWeight: "600" }}>{u.username}</span>
+        </div>
 
-        {/* Follow/Unfollow button far right */}
+        {/* Follow/Unfollow button */}
         {u._id !== currentUser._id && (
           <button
             onClick={() => toggleFollow(u._id)}
@@ -152,7 +164,6 @@ export default function FollowersFollowingPage() {
               color: currentUser.following.includes(u._id) ? "#fff" : "#000",
               border: "1px solid #444",
               cursor: "pointer",
-              marginLeft: "auto",  // 👉 Ensures button moves far right
             }}
           >
             {currentUser.following.includes(u._id) ? "Unfollow" : "Follow"}

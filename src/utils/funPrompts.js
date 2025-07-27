@@ -1,12 +1,10 @@
-// 🎲 Fun prompts
+
 
 export const funPrompts = {
     english: [
-    "Suggest a movie where the villain was actually right",
     "What's a movie that completely messes with your head?",
     "Give me a film that has no happy ending, but it's still amazing",
     "Recommend an underrated animated movie",
-    "Tell me a movie where the twist shocked you",
     "What’s a comforting movie to watch after a long day?",
     "List a film where the soundtrack makes it 10x better",
     "What's a hilarious movie I’ve probably never heard of?",
