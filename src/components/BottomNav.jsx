@@ -13,15 +13,11 @@ export default function BottomNav({ hasUnread }) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // 👇 Hide on certain pages like Upload Avatar
   const hiddenRoutes = ["/upload-avatar"];
   if (hiddenRoutes.includes(location.pathname)) return null;
 
-  // 👀 Count unread from localStorage or props (optional upgrade)
-  const unreadCount = JSON.parse(localStorage.getItem("notifications") || "[]")
-    .filter((n) => !n.read).length;
-
-  const showDot = hasUnread && location.pathname !== "/notifications";
+  const unreadCount = hasUnread || 0;
+  const showDot = unreadCount > 0 && location.pathname !== "/notifications";
 
   return (
     <div
@@ -69,7 +65,7 @@ export default function BottomNav({ hasUnread }) {
               {route === "/notifications" ? (
                 <div style={{ position: "relative" }}>
                   <Bell size={26} strokeWidth={isActive ? 2.4 : 1.8} />
-                  {showDot && unreadCount > 0 && (
+                  {showDot && (
                     <div
                       style={{
                         position: "absolute",
@@ -85,7 +81,7 @@ export default function BottomNav({ hasUnread }) {
                         textAlign: "center",
                       }}
                     >
-                      {unreadCount}
+                      {unreadCount > 9 ? "9+" : unreadCount}
                     </div>
                   )}
                 </div>

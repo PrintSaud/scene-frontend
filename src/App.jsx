@@ -47,7 +47,7 @@ import ImportPage from "./pages/ImportPage";
 
 function App() {
   const location = useLocation();
-  const [hasUnread, setHasUnread] = useState(false);
+  const [hasUnreadCount, setHasUnreadCount] = useState(0);
 
   let user = null;
   try {
@@ -65,7 +65,7 @@ function App() {
         const res = await getNotifications(); // ✅ keep this
 console.log("✅ Token test:", user?.token);
 const unread = res.data.notifications?.filter((n) => !n.read) || [];
-setHasUnread(unread.length > 0);
+setHasUnreadCount(unread.length);
 
       } catch (err) {
         console.error("❌ Failed to check unread notifs:", err);
@@ -83,7 +83,7 @@ setHasUnread(unread.length > 0);
 
     socket.off("notification").on("notification", (notif) => {
       console.log("📩 New real-time notif:", notif);
-      setHasUnread(true);
+      setHasUnreadCount((prev) => prev + 1);
     });
 
     return () => socket.disconnect();
@@ -161,7 +161,7 @@ setHasUnread(unread.length > 0);
           <Route path="/choose-backdrop" element={<BackdropSearchPage />} />
           <Route path="/avatar-upload-test" element={<AvatarUploadTestPage />} />
           <Route path="/scenebot" element={<SceneBotPage />} />
-          <Route path="/notifications" element={<NotificationsPage setHasUnread={setHasUnread} />} />
+          <Route path="/notifications" element={<NotificationsPage setHasUnread={setHasUnreadCount} />} />
           <Route path="/create-list" element={<CreateListPage />} />
           <Route path="/list/:id" element={<ListViewPage />} />
           <Route path="/list/:id/edit" element={<EditListPage />} />
@@ -181,7 +181,7 @@ setHasUnread(unread.length > 0);
           <Route path="/share/:type/:id" element={<ShareToFriendPage />} />
         </Routes>
       </div>
-      {shouldShowNav && <BottomNav hasUnread={hasUnread} />}
+      {shouldShowNav && <BottomNav hasUnread={hasUnreadCount} />}
     </div>
   );
 }

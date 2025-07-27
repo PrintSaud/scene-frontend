@@ -13,22 +13,21 @@ export default function NotificationsPage({ setHasUnread }) {
     switch (type) {
       case "follow": return "just followed you";
       case "review_like": return "liked your review";
-      case "reply": return "replied to your review";
-      case "reaction": return "liked your reply";
-      case "suggest_movie": return "suggested a movie for you";
-      case "share-list": return "shared a list with you";
-      case "share-movie": return "shared a movie with you";
-      case "share-review": return "shared a review with you";
-      default: return "sent you a notification";
+      case "reaction": return "liked your comment";
+      case "reply": return "replied to your comment";
+      case "suggest_movie": return "suggested you check out this film!";
+      case "share-list": return "suggested you check out their list!";
+      case "share-movie": return "suggested you check out this film!";
+      case "share-review": return "suggested you read their review!";
+      default: return "sent you something!";
     }
   };
 
-  // ✅ Auto-mark all as read when opening
   useEffect(() => {
     const markAllAsRead = async () => {
       try {
         await api.patch("/api/notifications/read");
-        setHasUnread(false);
+        setHasUnread(0); // ✅ Clear count on open
       } catch (err) {
         console.error("Failed to mark all as read", err);
       }
@@ -38,8 +37,8 @@ export default function NotificationsPage({ setHasUnread }) {
       try {
         const { data } = await api.get("/api/notifications");
         setNotifications(data);
-        const hasUnread = data.some((n) => !n.read);
-        if (setHasUnread) setHasUnread(hasUnread);
+        const unreadCount = data.filter((n) => !n.read).length;
+        if (setHasUnread) setHasUnread(unreadCount);
       } catch (err) {
         console.error("Failed to fetch notifications", err);
       }
@@ -51,21 +50,14 @@ export default function NotificationsPage({ setHasUnread }) {
     socket.off("notification");
     socket.on("notification", (newNotif) => {
       setNotifications((prev) => [newNotif, ...prev]);
-      if (setHasUnread) setHasUnread(true);
+      if (setHasUnread) {
+        setHasUnread((prev) => prev + 1);
+      }
       toast(`🔔 ${newNotif.message}`);
     });
 
     return () => socket.off("notification");
   }, []);
-
-  const handleDelete = async (id) => {
-    try {
-      await api.delete(`/api/notifications/${id}`);
-      setNotifications((prev) => prev.filter((n) => n._id !== id));
-    } catch (err) {
-      console.error("Failed to delete notification", err);
-    }
-  };
 
   const markAsReadAndNavigate = async (n, destination) => {
     try {
@@ -78,18 +70,27 @@ export default function NotificationsPage({ setHasUnread }) {
 
   return (
     <div
-  style={{
-    background: "#0e0e0e",
-    height: "100vh",
-    overflowY: "auto", // ✅ enable vertical scroll
-    padding: "24px",
-    color: "#fff",
-    WebkitOverflowScrolling: "touch", // ✅ smooth scroll on mobile
-  }}
->
+      style={{
+        background: "#0e0e0e",
+        minHeight: "100vh",
+        padding: "24px",
+        color: "#fff",
+        overflowY: "scroll",
+        scrollbarWidth: "none",
+        msOverflowStyle: "none",
+      }}
+    >
+      {/* Hide scrollbar */}
+      <style>
+        {`
+          div::-webkit-scrollbar {
+            display: none;
+          }
+        `}
+      </style>
 
       {/* 🔔 Heading */}
-      <h2 style={{ marginBottom: "16px", fontWeight: "bold" }}>
+      <h2 style={{ marginBottom: "16px", fontWeight: "bold", fontFamily: "Inter" }}>
         🔔 Notifications
       </h2>
 
@@ -99,16 +100,6 @@ export default function NotificationsPage({ setHasUnread }) {
         notifications.map((n) => (
           <div
             key={n._id}
-            onContextMenu={(e) => {
-              e.preventDefault();
-              if (window.confirm("🗑️ Delete this notification?")) handleDelete(n._id);
-            }}
-            onTouchStart={(e) => {
-              const timeout = setTimeout(() => {
-                if (window.confirm("🗑️ Delete this notification?")) handleDelete(n._id);
-              }, 600);
-              e.target.addEventListener("touchend", () => clearTimeout(timeout), { once: true });
-            }}
             style={{
               display: "flex",
               alignItems: "center",
@@ -141,8 +132,8 @@ export default function NotificationsPage({ setHasUnread }) {
                     markAsReadAndNavigate(n, `/review/${n.relatedId}`);
                   } else if (n.type === "share-list") {
                     markAsReadAndNavigate(n, `/list/${n.listId}`);
-                  } else if (n.type === "share-movie") {
-                    markAsReadAndNavigate(n, `/movie/${n.movieId}`);
+                  } else if (n.type === "share-movie" || n.type === "suggest_movie") {
+                    markAsReadAndNavigate(n, `/movie/${n.movieId || n.relatedId}`);
                   } else if (n.type === "share-review") {
                     markAsReadAndNavigate(n, `/review/${n.reviewId}`);
                   }
@@ -155,7 +146,7 @@ export default function NotificationsPage({ setHasUnread }) {
                 {getActionText(n.type)}
               </div>
 
-              {/* 🎬 View content buttons by type */}
+              {/* 🎬 View content buttons */}
               {n.type === "suggest_movie" && (
                 <button
                   onClick={() => markAsReadAndNavigate(n, `/movie/${n.relatedId}`)}
@@ -164,7 +155,6 @@ export default function NotificationsPage({ setHasUnread }) {
                   🎬 View Movie
                 </button>
               )}
-
               {n.type === "share-list" && (
                 <button
                   onClick={() => markAsReadAndNavigate(n, `/list/${n.listId}`)}
@@ -173,7 +163,6 @@ export default function NotificationsPage({ setHasUnread }) {
                   📋 View List
                 </button>
               )}
-
               {n.type === "share-review" && (
                 <button
                   onClick={() => markAsReadAndNavigate(n, `/review/${n.reviewId}`)}
@@ -187,11 +176,20 @@ export default function NotificationsPage({ setHasUnread }) {
             </div>
 
             {!n.read && (
-              <div style={{ width: 10, height: 10, borderRadius: "50%", background: "red" }} />
+              <div
+                style={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: "50%",
+                  background: "#b46eff", // Scene purple dot
+                }}
+              />
             )}
           </div>
         ))
       )}
+
+      <div style={{ height: "80px" }} /> {/* bottom padding for scroll */}
     </div>
   );
 }
