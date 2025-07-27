@@ -13,7 +13,7 @@ import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
       console.log("📤 Calling /lists/search with:", searchTerm);
   
       try {
-        const res = await api.get(`/lists/search?q=${searchTerm}`);
+        const res = await api.get(`/lists/search?query=${searchTerm}`);
         console.log("📥 Response from list search:", res.data);
   
         if (Array.isArray(res.data)) {
