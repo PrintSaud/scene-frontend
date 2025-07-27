@@ -116,45 +116,52 @@ export default function FollowersFollowingPage() {
 {users.length === 0 ? (
   <div style={{ textAlign: "center", color: "#888" }}>No users found.</div>
 ) : (
-  <ul style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+  <div style={{ padding: 0 }}>
     {users.map((u) => (
-      <li
+      <div
         key={u._id}
         style={{
           display: "flex",
           alignItems: "center",
-          width: "100%",
+          paddingTop: 10,
+          paddingBottom: 10,
+          paddingRight: 16,
+          paddingLeft: 12,
+          marginLeft: -24,         // ⬅️ Pull all the way left
+          width: "100vw",          // ⬅️ Full bleed width
+          borderBottom: "1px solid #222",
+          boxSizing: "border-box",
         }}
       >
-        {/* Avatar + Username clickable section - forced to far left */}
+        {/* Avatar + Username → link to profile */}
         <div
           onClick={() => navigate(`/profile/${u._id}`)}
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "12px",
             cursor: "pointer",
+            flex: 1,
           }}
         >
           <img
             src={u.avatar || "/default-avatar.jpg"}
             alt={u.username}
             style={{
-              width: "40px",
-              height: "40px",
+              width: "36px",
+              height: "36px",
               borderRadius: "50%",
               objectFit: "cover",
+              marginRight: "12px",
             }}
           />
           <span style={{ fontSize: "13px", fontWeight: "600" }}>{u.username}</span>
         </div>
 
-        {/* Follow/Unfollow button on far right */}
+        {/* Follow/Unfollow button */}
         {u._id !== currentUser._id && (
           <button
             onClick={() => toggleFollow(u._id)}
             style={{
-              marginLeft: "auto", // 👈 Forces it to far right
               padding: "4px 10px",
               borderRadius: "20px",
               fontSize: "12px",
@@ -162,15 +169,17 @@ export default function FollowersFollowingPage() {
               color: currentUser.following.includes(u._id) ? "#fff" : "#000",
               border: "1px solid #444",
               cursor: "pointer",
+              marginLeft: "auto",
             }}
           >
             {currentUser.following.includes(u._id) ? "Unfollow" : "Follow"}
           </button>
         )}
-      </li>
+      </div>
     ))}
-  </ul>
+  </div>
 )}
+
 
 
     </div>
