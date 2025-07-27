@@ -10,7 +10,6 @@ import SearchTabActors from "./searchTabs/SearchTabActors";
 import SearchTabDirectors from "./searchTabs/SearchTabDirectors";
 import SearchTabRecent from "./searchTabs/SearchTabRecent";
 
-
 export default function SearchPage() {
   const [query, setQuery] = useState("");
   const [activeTab, setActiveTab] = useState("films");
@@ -36,31 +35,34 @@ export default function SearchPage() {
     sessionStorage.setItem("sceneSearchTab", activeTab);
   }, [query, activeTab]);
 
+  const handleResultClick = (q, tab) => {
+    const updated = [
+      { query: q, tab },
+      ...recentSearches.filter((item) => item.query !== q || item.tab !== tab),
+    ].slice(0, 10);
+
+    localStorage.setItem("sceneRecentSearches", JSON.stringify(updated));
+    setRecentSearches(updated);
+    setQuery(q);
+    setActiveTab(tab);
+  };
+
   const handleSearch = async (q) => {
     if (!q) return;
     if (isQueryBanned(q)) {
       setResults([]);
       return;
     }
-
-    // Save to recent searches
-    const updated = [
-      { query: q, tab: activeTab },
-      ...recentSearches.filter((item) => item.query !== q)
-    ].slice(0, 6);
-    
-    localStorage.setItem("sceneRecentSearches", JSON.stringify(updated));
-    setRecentSearches(updated);
-    
-
+  
     const apiKey = import.meta.env.VITE_TMDB_API_KEY;
+  
     try {
       if (activeTab === "films") {
         const res = await fetch(`https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(q)}&api_key=${apiKey}`);
         const data = await res.json();
         const filtered = filterMovies(data.results || []);
         setResults(filtered);
-
+  
         const userId = JSON.parse(localStorage.getItem("user"))?._id;
         if (userId) {
           const overrides = {};
@@ -73,15 +75,29 @@ export default function SearchPage() {
           }));
           setPosterOverrides(overrides);
         }
-
+  
       } else if (activeTab === "users") {
         const res = await fetch(`${backend}/api/users?query=${q}`);
         setResults(await res.json());
-
+  
       } else if (activeTab === "lists") {
-        const res = await fetch(`${backend}/api/lists/search?query=${q}`);
-        setResults(await res.json());
-
+        const user = JSON.parse(localStorage.getItem("user"));
+        const token = user?.token;
+  
+        const res = await fetch(`${backend}/api/lists/search?query=${q}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setResults(data);
+        } else {
+          console.error("❌ Unexpected list search response:", data);
+          setResults([]);
+        }
+  
       } else if (activeTab === "actors" || activeTab === "directors") {
         const res = await fetch(`https://api.themoviedb.org/3/search/person?query=${encodeURIComponent(q)}&api_key=${apiKey}`);
         const data = await res.json();
@@ -97,6 +113,7 @@ export default function SearchPage() {
       setResults([]);
     }
   };
+  
 
   useEffect(() => {
     const delay = setTimeout(() => {
@@ -114,7 +131,7 @@ export default function SearchPage() {
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search"
         style={{
-          width: "90%",
+          width: "95%",
           height: "40px",
           borderRadius: "16px",
           padding: "0 14px",
@@ -189,8 +206,8 @@ export default function SearchPage() {
                   <div style={{ padding: "8px" }}>
                     <div style={{ fontWeight: 600 }}>{movie.title}</div>
                     <div style={{ fontSize: "0.85rem", color: "#aaa" }}>{movie.release_date?.slice(0, 4) || "N/A"}</div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-  <StarRating rating={10} size={16} /> {/* Just show 1 full star */}
+                    <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+  <StarRating rating={1} size={16} /> {/* ✅ One full star only */}
   <span style={{ fontSize: "14px", color: "#ccc" }}>
     {(movie.vote_average || 0).toFixed(1)} / 10
   </span>
@@ -202,10 +219,22 @@ export default function SearchPage() {
             </div>
           )}
 
-          {activeTab === "users" && <SearchTabUsers results={results} />}
-          {activeTab === "lists" && <SearchTabLists results={results} />}
-          {activeTab === "actors" && <SearchTabActors results={results} />}
-          {activeTab === "directors" && <SearchTabDirectors results={results} />}
+{activeTab === "lists" && (
+        <SearchTabLists results={results} onSearch={handleResultClick} />
+      )}
+      {activeTab === "users" && (
+        <SearchTabUsers results={results} onSearch={handleResultClick} />
+      )}
+      {activeTab === "actors" && (
+        <SearchTabActors results={results} onSearch={handleResultClick} />
+      )}
+      {activeTab === "directors" && (
+        <SearchTabDirectors results={results} onSearch={handleResultClick} />
+      )}
+
+      {activeTab === "recent" && (
+        <SearchTabRecent recentSearches={recentSearches} onSearch={handleResultClick} />
+      )}
         </>
       ) : (
         <SearchTabRecent

@@ -119,7 +119,7 @@ export default function ProfileHeader({
     <div
       style={{
         position: "absolute",
-        top: "15px",  // ⬅️ Pushed further down
+        top: "10px",  // ⬅️ Pushed further down
         right: 0,
         background: "#1a1a1a",
         border: "1px solid #333",
