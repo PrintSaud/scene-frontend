@@ -227,18 +227,11 @@ export default function SearchPage() {
       {activeTab === "directors" && (
         <SearchTabDirectors results={results} onSearch={handleResultClick} />
       )}
-
-      {activeTab === "recent" && (
-        <SearchTabRecent recentSearches={recentSearches} onSearch={handleResultClick} />
-      )}
         </>
       ) : (
         <SearchTabRecent
   recentSearches={recentSearches}
-  onSearch={(q, tab) => {
-    setQuery(q);
-    setActiveTab(tab);
-  }}
+  onSearch={handleResultClick}
 />
 
       )}

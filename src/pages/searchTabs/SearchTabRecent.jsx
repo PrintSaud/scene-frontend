@@ -17,7 +17,7 @@ export default function SearchTabRecent({ recentSearches, onSearch }) {
               background: "#1a1a1a",
               border: "none",
               borderRadius: "10px",
-              padding: "12px 14px",
+              padding: "6px 14px",
               color: "#fff",
               textAlign: "left",
               cursor: "pointer",
