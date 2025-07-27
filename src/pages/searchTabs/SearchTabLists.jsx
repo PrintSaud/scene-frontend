@@ -9,8 +9,12 @@ export default function SearchTabLists({ searchTerm }) {
 
   useEffect(() => {
     const fetchLists = async () => {
+      console.log("📤 Calling /lists/search with:", searchTerm);
+  
       try {
         const res = await api.get(`/lists/search?q=${searchTerm}`);
+        console.log("📥 Response from list search:", res.data);
+  
         if (Array.isArray(res.data)) {
           setLists(res.data);
         } else {
@@ -22,9 +26,12 @@ export default function SearchTabLists({ searchTerm }) {
         setLists([]);
       }
     };
-
-    if (searchTerm?.trim()) fetchLists();
-  }, [searchTerm]);
+  
+    if (activeTab === "lists" && searchTerm) {
+      fetchLists();
+    }
+  }, [activeTab, searchTerm]);
+  
 
   const user = JSON.parse(localStorage.getItem("user"));
 
