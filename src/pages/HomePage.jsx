@@ -184,9 +184,7 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
             scrollSnapType: "x mandatory",
           }}
         >
-          {feedLogs.map((log, index) => (
-  
-            
+          {feedLogs.slice(0, 12).map((log, index) => (    
             <div
               key={index}
               style={{
