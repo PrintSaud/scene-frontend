@@ -48,7 +48,7 @@ export default function MovieHeader({
           }}
         >
           <div>
-            <h1 style={{ fontSize: "20px", fontWeight: "600", marginBottom: "2px" }}>
+            <h1 style={{ fontSize: "16px", fontWeight: "600", marginBottom: "2px" }}>
               {movie.title}
             </h1>
             {movie.tagline && (

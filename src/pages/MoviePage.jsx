@@ -244,7 +244,7 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
         handleSceneBotReview={() =>
           navigate("/chat", {
             state: {
-              prompt: `Can you write me a smart, fun review for the film "${movie.title}"?`,
+              prompt: `Can you write me a review for the film "${movie.title}"?`,
             },
           })
         }

@@ -167,7 +167,7 @@ formData.append("rewatchCount", rewatchCount.toString());         // Actual nume
         <div>
           <h2
             style={{
-              fontSize: "18px",
+              fontSize: "14px",
               fontWeight: "bold",
               fontFamily: "Inter",
             }}
