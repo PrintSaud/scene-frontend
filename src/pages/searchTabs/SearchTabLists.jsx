@@ -10,7 +10,7 @@ export default function SearchTabLists({ searchTerm }) {
   useEffect(() => {
     const fetchLists = async () => {
       try {
-        const res = await api.get(`/lists/search?query=${searchTerm}`);
+        const res = await api.get(`/lists/search?q=${searchTerm}`);
         if (Array.isArray(res.data)) {
           setLists(res.data);
         } else {
