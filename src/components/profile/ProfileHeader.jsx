@@ -27,6 +27,7 @@ export default function ProfileHeader({
   const [menuOpen, setMenuOpen] = useState(false);
   const isMobile = window.innerWidth <= 768;
   const backdropHeight = isMobile ? 180 : 300;
+  const currentUser = JSON.parse(localStorage.getItem("user"));
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -118,7 +119,7 @@ export default function ProfileHeader({
     <div
       style={{
         position: "absolute",
-        top: "50px",  // ⬅️ Pushed further down
+        top: "20px",  // ⬅️ Pushed further down
         right: 0,
         background: "#1a1a1a",
         border: "1px solid #333",
@@ -261,7 +262,7 @@ export default function ProfileHeader({
     textAlign: "center",
     fontFamily: "Inter",
     position: "relative",
-    left: "-8px", // 👈 Shift whole block slightly to the left
+    left: "-10px", // 👈 Shift whole block slightly to the left
   }}
 >
   <div onClick={() => navigate(`/profile/${user._id}/following`)} style={{ cursor: "pointer" }}>
