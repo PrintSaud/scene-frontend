@@ -1,7 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function SearchTabUsers({ results }) {
+export default function SearchTabUsers({ results, onSearch, saveToRecentSearches }) {
+
   const navigate = useNavigate();
 
   return (
@@ -9,7 +10,10 @@ export default function SearchTabUsers({ results }) {
       {results.map((user) => (
         <div
           key={user._id}
-          onClick={() => navigate(`/profile/${user._id}`)}
+          onClick={() => {
+            saveToRecentSearches(user.username, "users");
+            navigate(`/user/${user._id}`);
+          }}          
           style={{
             display: "flex",
             alignItems: "center",

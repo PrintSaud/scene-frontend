@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w185";
 
-export default function SearchTabDirectors({ results = [] }) {
+export default function SearchTabDirectors({ results, onSearch, saveToRecentSearches }) {
+
   const navigate = useNavigate();
   const filteredDirectors = results.filter((director) => director.profile_path);
 
@@ -25,7 +26,10 @@ export default function SearchTabDirectors({ results = [] }) {
         {filteredDirectors.map((director) => (
           <div
             key={director.id}
-            onClick={() => navigate(`/director/${director.id}`)}
+            onClick={() => {
+                saveToRecentSearches(director.name, "directors");
+                navigate(`/director/${director.id}`);
+              }}              
             style={{
               background: "#1a1a1a",
               borderRadius: "16px",

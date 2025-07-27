@@ -265,13 +265,13 @@ export default function SearchPage() {
 )}
 
       {activeTab === "users" && (
-        <SearchTabUsers results={results} onSearch={handleResultClick} />
+        <SearchTabUsers results={results} onSearch={handleResultClick} saveToRecentSearches={saveToRecentSearches} />
       )}
       {activeTab === "actors" && (
-        <SearchTabActors results={results} onSearch={handleResultClick} />
+        <SearchTabActors results={results} onSearch={handleResultClick} saveToRecentSearches={saveToRecentSearches} />
       )}
       {activeTab === "directors" && (
-        <SearchTabDirectors results={results} onSearch={handleResultClick} />
+        <SearchTabDirectors results={results} onSearch={handleResultClick} saveToRecentSearches={saveToRecentSearches} />
       )}
         </>
       ) : (

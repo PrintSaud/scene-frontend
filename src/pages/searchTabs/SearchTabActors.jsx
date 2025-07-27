@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w185";
 
-export default function SearchTabActors({ results = [] }) {
+export default function SearchTabActors({ results, onSearch, saveToRecentSearches }) {
+
   const navigate = useNavigate();
   const filteredActors = results.filter((actor) => actor.profile_path);
 
@@ -25,7 +26,10 @@ export default function SearchTabActors({ results = [] }) {
         {filteredActors.map((actor) => (
           <div
             key={actor.id}
-            onClick={() => navigate(`/actor/${actor.id}`)}
+            onClick={() => {
+                saveToRecentSearches(actor.name, "actors");
+                navigate(`/actor/${actor.id}`);
+              }}              
             style={{
               background: "#1a1a1a",
               borderRadius: "16px",

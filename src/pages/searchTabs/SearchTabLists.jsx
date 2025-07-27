@@ -4,7 +4,8 @@ import api from "../../api/api"; // 👈 uses token automatically
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import axios from "../../api/api"; // ✅ or wherever your axios instance is
 
-    export default function SearchTabLists({ searchTerm, activeTab }) {
+export default function SearchTabLists({ searchTerm, activeTab, saveToRecentSearches }) {
+
 
   const navigate = useNavigate();
   const [lists, setLists] = useState([]);
