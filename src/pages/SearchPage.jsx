@@ -238,8 +238,9 @@ export default function SearchPage() {
           )}
 
 {activeTab === "lists" && (
-        <SearchTabLists results={results} onSearch={handleResultClick} />
-      )}
+  <SearchTabLists searchTerm={searchTerm} activeTab={activeTab} />
+)}
+
       {activeTab === "users" && (
         <SearchTabUsers results={results} onSearch={handleResultClick} />
       )}

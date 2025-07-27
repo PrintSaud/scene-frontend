@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import api from "../../api/api"; // 👈 uses token automatically
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 
-export default function SearchTabLists({ searchTerm }) {
+    export default function SearchTabLists({ searchTerm, activeTab }) {
+
   const navigate = useNavigate();
   const [lists, setLists] = useState([]);
 
@@ -31,6 +32,7 @@ export default function SearchTabLists({ searchTerm }) {
       fetchLists();
     }
   }, [activeTab, searchTerm]);
+  
   
 
   const user = JSON.parse(localStorage.getItem("user"));
