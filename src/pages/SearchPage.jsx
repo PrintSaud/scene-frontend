@@ -82,27 +82,27 @@ export default function SearchPage() {
         const res = await fetch(`${backend}/api/users?query=${q}`);
         setResults(await res.json());
   
-      } else if (activeTab === "lists") {
-        const user = JSON.parse(localStorage.getItem("user"));
-        const token = user?.token;
-  
-        const res = await fetch(`${backend}/api/lists/search?q=${q}`, {
-   
-  
-          
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        if (activeTab === "lists") {
+          const user = JSON.parse(localStorage.getItem("user"));
+          const token = user?.token;
         
-  
-        const data = await res.json();
-        if (Array.isArray(data)) {
-          setResults(data);
-        } else {
-          console.error("❌ Unexpected list search response:", data);
-          setResults([]);
+          const res = await fetch(`${backend}/api/lists/search?query=${q}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+        
+          const data = await res.json();
+          console.log("📦 List Search Result:", data);
+        
+          if (Array.isArray(data)) {
+            setResults(data);
+          } else {
+            console.error("❌ Unexpected list search response:", data);
+            setResults([]);
+          }
         }
+        
   
       } else if (activeTab === "actors" || activeTab === "directors") {
         const res = await fetch(`https://api.themoviedb.org/3/search/person?query=${encodeURIComponent(q)}&api_key=${apiKey}`);
