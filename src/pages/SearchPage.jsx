@@ -18,7 +18,7 @@ export default function SearchPage() {
   const [recentSearches, setRecentSearches] = useState([]);
 
   const navigate = useNavigate();
-  const tabs = ["films", "lists", "actors", "directors"]; // "users"
+  const tabs = ["films", "users", "lists", "actors", "directors"]; 
 
   useEffect(() => {
     const savedQuery = sessionStorage.getItem("sceneSearchQuery");
@@ -45,8 +45,23 @@ export default function SearchPage() {
     setRecentSearches(updated);
     setQuery(q);
     setActiveTab(tab);
-    handleSearch(q); // 🔥 Directly trigger the search
+  
+    setTimeout(() => {
+      handleSearch(q); // wait for state to settle
+    }, 50);
   };
+
+  const saveToRecentSearches = (q, tab) => {
+    const updated = [
+      { query: q, tab },
+      ...recentSearches.filter((item) => item.query !== q || item.tab !== tab),
+    ].slice(0, 10);
+  
+    localStorage.setItem("sceneRecentSearches", JSON.stringify(updated));
+    setRecentSearches(updated);
+  };
+  
+  
   
 
   const handleSearch = async (q) => {
@@ -77,12 +92,12 @@ export default function SearchPage() {
           }));
           setPosterOverrides(overrides);
         }
-  
-      } else if (activeTab === "users") {
-        const res = await fetch(`${backend}/api/users?query=${q}`);
-        setResults(await res.json());
-  
-        if (activeTab === "lists") {
+
+        if (activeTab === "users") {
+          const res = await fetch(`${backend}/api/users?query=${q}`);
+          setResults(await res.json());
+        
+        } else if (activeTab === "lists") {
           console.log("📨 Searching Lists tab with query:", q);
         
           const user = JSON.parse(localStorage.getItem("user"));
@@ -118,8 +133,8 @@ export default function SearchPage() {
           }
         }
         
-        
   
+
       } else if (activeTab === "actors" || activeTab === "directors") {
         const res = await fetch(`https://api.themoviedb.org/3/search/person?query=${encodeURIComponent(q)}&api_key=${apiKey}`);
         const data = await res.json();
@@ -201,7 +216,10 @@ export default function SearchPage() {
               {results.map((movie) => (
                 <div
                   key={movie.id}
-                  onClick={() => navigate(`/movie/${movie.id}`)}
+                  onClick={() => {
+                    saveToRecentSearches(movie.title, "films");
+                    navigate(`/movie/${movie.id}`);
+                  }}                  
                   style={{
                     background: "#111",
                     borderRadius: "12px",
@@ -238,7 +256,12 @@ export default function SearchPage() {
           )}
 
 {activeTab === "lists" && (
-  <SearchTabLists searchTerm={query} activeTab={activeTab} />
+  <SearchTabLists
+  searchTerm={query}
+  activeTab={activeTab}
+  onSearch={handleResultClick}
+  saveToRecentSearches={saveToRecentSearches} // ✅ pass this manually
+/>
 )}
 
       {activeTab === "users" && (

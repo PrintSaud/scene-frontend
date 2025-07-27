@@ -11,11 +11,9 @@ import axios from "../../api/api"; // ✅ or wherever your axios instance is
 
   useEffect(() => {
     const fetchLists = async () => {
-      console.log("📤 Calling /lists/search with:", searchTerm);
   
       try {
         const res = await axios.get(`/api/lists/search?query=${searchTerm}`);
-        console.log("📥 Response from list search:", res.data);
   
         if (Array.isArray(res.data)) {
           setLists(res.data);
@@ -54,7 +52,10 @@ import axios from "../../api/api"; // ✅ or wherever your axios instance is
       {lists.map((list) => (
         <div
           key={list._id}
-          onClick={() => navigate(`/list/${list._id}`)}
+          onClick={() => {
+            saveToRecentSearches(list.title, "lists");
+            navigate(`/list/${list._id}`);
+          }}          
           style={{
             background: "#1a1a1a",
             borderRadius: "14px",
