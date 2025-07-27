@@ -94,42 +94,41 @@ export default function ProfileHeader({
   </button>
 )}
 
-        {/* Options */}
-        <div style={{ position: "relative" }}>
-          <button
-            onClick={() => setShowOptions((prev) => !prev)}
-            style={{
-              background: "rgba(0,0,0,0.5)",
-              border: "none",
-              borderRadius: "50%",
-              width: "32px",
-              height: "32px",
-              color: "#fff",
-              fontSize: "22px",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            ⋯
-          </button>
+{/* ⋯ Options */}
+<div style={{ position: "absolute", top: "16px", right: "16px", zIndex: 10 }}>
+  <button
+    onClick={() => setMenuOpen((prev) => !prev)}
+    style={{
+      background: "rgba(0,0,0,0.5)",
+      border: "none",
+      borderRadius: "50%",
+      width: "32px",
+      height: "36px",
+      color: "#fff",
+      fontSize: "22px",
+      cursor: "pointer",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    }}
+  >
+    ⋯
+  </button>
 
-          {showOptions && (
-            <div
-              style={{
-                position: "absolute",
-                top: "38px",
-                right: "0",
-                background: "#1a1a1a",
-                border: "1px solid #333",
-                borderRadius: "12px",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
-                padding: "12px 0",
-                width: "180px",
-                zIndex: 20,
-              }}
-            >
+  {menuOpen && (
+    <div
+      style={{
+        position: "absolute",
+        top: "10px",  // ⬅️ Pushed further down
+        right: 0,
+        background: "#1a1a1a",
+        border: "1px solid #333",
+        borderRadius: "12px",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
+        padding: "12px 0",
+        width: "180px",
+      }}
+    >
       {(isOwner
         ? [
             { label: "✏️ Edit Profile", onClick: () => navigate("/edit-profile") },
