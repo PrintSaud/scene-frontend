@@ -33,7 +33,7 @@ export default function SearchTabDirectors({ results = [] }) {
             key={director.id}
             onClick={() => navigate(`/director/${director.id}`)}
             style={{
-              width: "100%",
+              width: "95%",
               background: "#1a1a1a",
               borderRadius: "14px",
               overflow: "hidden",

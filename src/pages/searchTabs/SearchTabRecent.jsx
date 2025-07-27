@@ -4,8 +4,8 @@ export default function SearchTabRecent({ recentSearches, onSearch }) {
   if (recentSearches.length === 0) return null;
 
   return (
-    <div style={{ padding: "0 16px 80px" }}>
-      <h3 style={{ fontSize: "16px", color: "#aaa", marginBottom: "12px" }}>
+    <div style={{ paddingRight: "16px", paddingBottom: "80px", paddingLeft: "0" }}>
+      <h3 style={{ fontSize: "16px", color: "#aaa", marginBottom: "12px", paddingLeft: "16px" }}>
         Recent Searches
       </h3>
       <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
@@ -20,8 +20,8 @@ export default function SearchTabRecent({ recentSearches, onSearch }) {
               padding: "12px 14px",
               color: "#fff",
               textAlign: "left",
-              cursor: "pointer",        
-              width: "85vw",
+              cursor: "pointer",
+              width: "100%",
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",

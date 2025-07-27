@@ -40,12 +40,14 @@ export default function SearchPage() {
       { query: q, tab },
       ...recentSearches.filter((item) => item.query !== q || item.tab !== tab),
     ].slice(0, 10);
-
+  
     localStorage.setItem("sceneRecentSearches", JSON.stringify(updated));
     setRecentSearches(updated);
     setQuery(q);
     setActiveTab(tab);
+    handleSearch(q); // 🔥 Directly trigger the search
   };
+  
 
   const handleSearch = async (q) => {
     if (!q) return;
