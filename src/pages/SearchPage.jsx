@@ -86,11 +86,12 @@ export default function SearchPage() {
           const user = JSON.parse(localStorage.getItem("user"));
           const token = user?.token;
         
-          const res = await fetch(`${backend}/api/lists/search?query=${q}`, {
+          const res = await fetch(`${backend}/api/lists/search?q=${encodeURIComponent(q)}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           });
+          
         
           const data = await res.json();
           console.log("📦 List Search Result:", data);
