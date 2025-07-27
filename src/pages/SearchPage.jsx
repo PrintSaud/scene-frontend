@@ -19,7 +19,7 @@ export default function SearchPage() {
   const [recentSearches, setRecentSearches] = useState([]);
 
   const navigate = useNavigate();
-  const tabs = ["films", "users", "lists", "actors", "directors"];
+  const tabs = ["films", "lists", "actors", "directors"]; // "users"
 
   useEffect(() => {
     const savedQuery = sessionStorage.getItem("sceneSearchQuery");
@@ -114,7 +114,7 @@ export default function SearchPage() {
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search"
         style={{
-          width: "100%",
+          width: "90%",
           height: "40px",
           borderRadius: "16px",
           padding: "0 14px",
@@ -189,7 +189,13 @@ export default function SearchPage() {
                   <div style={{ padding: "8px" }}>
                     <div style={{ fontWeight: 600 }}>{movie.title}</div>
                     <div style={{ fontSize: "0.85rem", color: "#aaa" }}>{movie.release_date?.slice(0, 4) || "N/A"}</div>
-                    <StarRating rating={movie.vote_average || 0} size={16} />
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+  <StarRating rating={10} size={16} /> {/* Just show 1 full star */}
+  <span style={{ fontSize: "14px", color: "#ccc" }}>
+    {(movie.vote_average || 0).toFixed(1)} / 10
+  </span>
+</div>
+
                   </div>
                 </div>
               ))}

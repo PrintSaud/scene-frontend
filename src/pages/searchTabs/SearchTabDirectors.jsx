@@ -3,8 +3,15 @@ import { useNavigate } from "react-router-dom";
 
 const FALLBACK_IMG = "/default-profile.png";
 
-export default function SearchTabDirectors({ results }) {
+export default function SearchTabDirectors({ results = [] }) {
   const navigate = useNavigate();
+
+  // ✅ Filter out directors with no profile picture
+  const filteredDirectors = results.filter((d) => d.profile_path);
+
+  if (filteredDirectors.length === 0) {
+    return <p style={{ color: "#888", textAlign: "center" }}>No directors found.</p>;
+  }
 
   return (
     <div
@@ -15,7 +22,7 @@ export default function SearchTabDirectors({ results }) {
         padding: "0 16px 80px",
       }}
     >
-      {results.map((director) => (
+      {filteredDirectors.map((director) => (
         <div
           key={director.id}
           onClick={() => navigate(`/director/${director.id}`)}
@@ -32,11 +39,7 @@ export default function SearchTabDirectors({ results }) {
           }}
         >
           <img
-            src={
-              director.profile_path
-                ? `https://image.tmdb.org/t/p/w185${director.profile_path}`
-                : FALLBACK_IMG
-            }
+            src={`https://image.tmdb.org/t/p/w185${director.profile_path}`}
             alt={director.name}
             style={{
               width: "70px",

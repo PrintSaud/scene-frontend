@@ -1,10 +1,36 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../../api/api"; // 👈 uses token automatically
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 
-export default function SearchTabLists({ results }) {
+export default function SearchTabLists({ searchTerm }) {
   const navigate = useNavigate();
+  const [lists, setLists] = useState([]);
+
+  useEffect(() => {
+    const fetchLists = async () => {
+      try {
+        const res = await api.get(`/lists/search?query=${searchTerm}`);
+        if (Array.isArray(res.data)) {
+          setLists(res.data);
+        } else {
+          console.warn("⚠️ Lists response is not an array:", res.data);
+          setLists([]);
+        }
+      } catch (err) {
+        console.error("❌ Failed to fetch lists:", err);
+        setLists([]);
+      }
+    };
+
+    if (searchTerm?.trim()) fetchLists();
+  }, [searchTerm]);
+
   const user = JSON.parse(localStorage.getItem("user"));
+
+  if (!Array.isArray(lists) || lists.length === 0) {
+    return <p style={{ color: "#888", textAlign: "center" }}>No lists found.</p>;
+  }
 
   return (
     <div
@@ -12,10 +38,10 @@ export default function SearchTabLists({ results }) {
         display: "grid",
         gridTemplateColumns: "1fr",
         gap: "16px",
-        padding: "0 16px 16px",
+        padding: "0 16px 80px",
       }}
     >
-      {results.map((list) => (
+      {lists.map((list) => (
         <div
           key={list._id}
           onClick={() => navigate(`/list/${list._id}`)}
@@ -34,11 +60,7 @@ export default function SearchTabLists({ results }) {
             <img
               src={list.coverImage}
               alt={list.title}
-              style={{
-                width: "100%",
-                height: "150px",
-                objectFit: "cover",
-              }}
+              style={{ width: "100%", height: "150px", objectFit: "cover" }}
             />
           )}
 
@@ -55,13 +77,7 @@ export default function SearchTabLists({ results }) {
             >
               {list.title}
             </div>
-            <div
-              style={{
-                color: "#aaa",
-                fontSize: "12px",
-                marginTop: "4px",
-              }}
-            >
+            <div style={{ color: "#aaa", fontSize: "12px", marginTop: "4px" }}>
               @{list.user?.username || "unknown"}
             </div>
             <div
@@ -77,7 +93,9 @@ export default function SearchTabLists({ results }) {
               ) : (
                 <AiOutlineHeart style={{ fontSize: "14px", color: "#999" }} />
               )}
-              <span style={{ fontSize: "12px", color: "#bbb" }}>{list.likes?.length || 0}</span>
+              <span style={{ fontSize: "12px", color: "#bbb" }}>
+                {list.likes?.length || 0}
+              </span>
             </div>
           </div>
         </div>

@@ -6,13 +6,16 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w185";
 export default function SearchTabActors({ results = [] }) {
   const navigate = useNavigate();
 
-  if (results.length === 0) {
+  // ✅ Filter out actors with no profile photo
+  const filteredActors = results.filter((actor) => actor.profile_path);
+
+  if (filteredActors.length === 0) {
     return <p style={{ color: "#888", textAlign: "center" }}>No actors found.</p>;
   }
 
   return (
     <div style={{ padding: "0 16px", display: "flex", flexDirection: "column", gap: "16px" }}>
-      {results.map((actor) => (
+      {filteredActors.map((actor) => (
         <div
           key={actor.id}
           onClick={() => navigate(`/actor/${actor.id}`)}
@@ -28,7 +31,7 @@ export default function SearchTabActors({ results = [] }) {
           }}
         >
           <img
-            src={actor.profile_path ? `${TMDB_IMG}${actor.profile_path}` : "/default-avatar.png"}
+            src={`${TMDB_IMG}${actor.profile_path}`}
             alt={actor.name}
             style={{
               width: "60px",
