@@ -83,26 +83,41 @@ export default function SearchPage() {
         setResults(await res.json());
   
         if (activeTab === "lists") {
+          console.log("📨 Searching Lists tab with query:", q);
+        
           const user = JSON.parse(localStorage.getItem("user"));
           const token = user?.token;
         
-          const res = await fetch(`${backend}/api/lists/search?q=${encodeURIComponent(q)}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          
+          if (!token) {
+            console.warn("⚠️ No token found in localStorage — user not logged in?");
+            return;
+          }
         
-          const data = await res.json();
-          console.log("📦 List Search Result:", data);
+          try {
+            const url = `${backend}/api/lists/search?q=${encodeURIComponent(q)}`;
+            console.log("🌍 Sending fetch to:", url);
         
-          if (Array.isArray(data)) {
-            setResults(data);
-          } else {
-            console.error("❌ Unexpected list search response:", data);
+            const res = await fetch(url, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+        
+            const data = await res.json();
+            console.log("📦 List Search Result:", data);
+        
+            if (Array.isArray(data)) {
+              setResults(data);
+            } else {
+              console.error("❌ Unexpected list search response format:", data);
+              setResults([]);
+            }
+          } catch (error) {
+            console.error("🚨 Fetch failed for list search:", error);
             setResults([]);
           }
         }
+        
         
   
       } else if (activeTab === "actors" || activeTab === "directors") {
