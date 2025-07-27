@@ -119,7 +119,7 @@ export default function ProfileHeader({
     <div
       style={{
         position: "absolute",
-        top: "20px",  // ⬅️ Pushed further down
+        top: "15px",  // ⬅️ Pushed further down
         right: 0,
         background: "#1a1a1a",
         border: "1px solid #333",
@@ -262,7 +262,7 @@ export default function ProfileHeader({
     textAlign: "center",
     fontFamily: "Inter",
     position: "relative",
-    left: "-10px", // 👈 Shift whole block slightly to the left
+    left: "-12px", // 👈 Shift whole block slightly to the left
   }}
 >
   <div onClick={() => navigate(`/profile/${user._id}/following`)} style={{ cursor: "pointer" }}>
