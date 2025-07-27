@@ -238,7 +238,7 @@ export default function SearchPage() {
           )}
 
 {activeTab === "lists" && (
-  <SearchTabLists searchTerm={searchTerm} activeTab={activeTab} />
+  <SearchTabLists searchTerm={query} activeTab={activeTab} />
 )}
 
       {activeTab === "users" && (
