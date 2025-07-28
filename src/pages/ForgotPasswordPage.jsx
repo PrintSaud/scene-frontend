@@ -42,14 +42,25 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="login-container" style={{ minHeight: "100vh", paddingTop: "20vh" }}>
+    <div
+      className="login-container"
+      style={{
+        minHeight: "100vh",
+        paddingTop: "20vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        textAlign: "center",
+      }}
+    >
       <h1 className="scene-logo">Forgot Password?</h1>
-      <p style={{ color: "#aaa", marginBottom: "24px", textAlign: "center" }}>
+      <p style={{ color: "#aaa", marginBottom: "24px" }}>
         Enter your Scene username and email to receive a reset code.
       </p>
-
-      {error && <p style={{ color: "red", marginBottom: "12px" }}>{error}</p>}
-
+  
+      {error && (
+        <p style={{ color: "red", marginBottom: "12px" }}>{error}</p>
+      )}
       <input
         type="text"
         placeholder="Your Scene username"

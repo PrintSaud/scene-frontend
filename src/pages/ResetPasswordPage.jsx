@@ -59,6 +59,7 @@ export default function ResetPasswordPage() {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        justifyContent: "flex-start", // or "center" if you want full vertical center
         textAlign: "center",
       }}
     >
@@ -71,7 +72,6 @@ export default function ResetPasswordPage() {
       {error && (
         <p style={{ color: "red", marginBottom: "12px" }}>{error}</p>
       )}
-  
       <input
         type="password"
         placeholder="New password"
