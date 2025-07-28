@@ -130,19 +130,19 @@ export default function NotificationsPage({ setHasUnread }) {
             <div style={{ flex: 1 }}>
               {/* 🧠 Notification text */}
               <div
-                onClick={() => {
-                  if (n.type === "follow") {
-                    navigate(`/profile/${n.from?._id}`);
-                  } else if (["review_like", "reaction", "reply"].includes(n.type)) {
-                    markAsReadAndNavigate(n, `/review/${n.relatedId}`);
-                  } else if (n.type === "share-list") {
-                    markAsReadAndNavigate(n, `/list/${n.listId}`);
-                  } else if (n.type === "share-movie" || n.type === "suggest_movie") {
-                    markAsReadAndNavigate(n, `/movie/${n.movieId || n.relatedId}`);
-                  } else if (n.type === "share-review") {
-                    markAsReadAndNavigate(n, `/review/${n.reviewId}`);
-                  }
-                }}
+              onClick={() => {
+                if (n.type === "follow") {
+                  navigate(`/profile/${n.from?._id}`);
+                } else if (["review_like", "reaction", "reply"].includes(n.type)) {
+                  markAsReadAndNavigate(n, `/review/${n.relatedId}`);
+                } else if (n.type === "share-list" || n.type === "list_like") {
+                  markAsReadAndNavigate(n, `/list/${n.listId}`);
+                } else if (n.type === "share-movie" || n.type === "suggest_movie") {
+                  markAsReadAndNavigate(n, `/movie/${n.movieId || n.relatedId}`);
+                } else if (n.type === "share-review") {
+                  markAsReadAndNavigate(n, `/review/${n.reviewId}`);
+                }
+              }}              
                 style={{ fontSize: "14px", color: "#ddd", cursor: "pointer" }}
               >
                 <span style={{ fontFamily: "Inter", fontWeight: "500", color: "#fff" }}>
@@ -154,29 +154,31 @@ export default function NotificationsPage({ setHasUnread }) {
               {/* 🎬 View content buttons */}
               {n.type === "suggest_movie" && (
   <button
-    onClick={() => markAsReadAndNavigate(n, `/movie/${n.movieId}`)} // ✅ DIRECT movieId field
+    onClick={() => markAsReadAndNavigate(n, `/movie/${n.movieId}`)}
     style={buttonStyle}
   >
     🎬 View Movie
   </button>
 )}
 
-              {n.type === "share-list" && (
-                <button
-                  onClick={() => markAsReadAndNavigate(n, `/list/${n.listId}`)}
-                  style={buttonStyle}
-                >
-                  📋 View List
-                </button>
-              )}
-              {n.type === "share-review" && (
-                <button
-                  onClick={() => markAsReadAndNavigate(n, `/review/${n.reviewId}`)}
-                  style={buttonStyle}
-                >
-                  ✍️ View Review
-                </button>
-              )}
+{n.type === "share-list" && (
+  <button
+    onClick={() => markAsReadAndNavigate(n, `/list/${n.listId}`)}
+    style={buttonStyle}
+  >
+    📋 View List
+  </button>
+)}
+
+{n.type === "share-review" && (
+  <button
+    onClick={() => markAsReadAndNavigate(n, `/review/${n.reviewId}`)}
+    style={buttonStyle}
+  >
+    ✍️ View Review
+  </button>
+)}
+
 
               <div style={{ fontSize: "12px", color: "#888" }}>{format(n.createdAt)}</div>
             </div>
