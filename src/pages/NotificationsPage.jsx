@@ -153,13 +153,14 @@ export default function NotificationsPage({ setHasUnread }) {
 
               {/* 🎬 View content buttons */}
               {n.type === "suggest_movie" && (
-                <button
-                  onClick={() => markAsReadAndNavigate(n, `/movie/${n.relatedId}`)}
-                  style={buttonStyle}
-                >
-                  🎬 View Movie
-                </button>
-              )}
+  <button
+    onClick={() => markAsReadAndNavigate(n, `/movie/${n.movieId}`)} // ✅ DIRECT movieId field
+    style={buttonStyle}
+  >
+    🎬 View Movie
+  </button>
+)}
+
               {n.type === "share-list" && (
                 <button
                   onClick={() => markAsReadAndNavigate(n, `/list/${n.listId}`)}
