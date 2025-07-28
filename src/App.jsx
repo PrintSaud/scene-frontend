@@ -89,7 +89,7 @@ function App() {
 
     return () => socket.disconnect();
   }, [user?._id]);
-
+  
   const hideNavRoutes = [
     '/login',
     '/signup',
@@ -97,7 +97,9 @@ function App() {
     '/verify-code',
     '/reset-password',
     '/choose-avatar',
+    '/verify-email', // ✅ NEW
   ];
+  
 
   const shouldShowNav = !(
     hideNavRoutes.includes(location.pathname) ||

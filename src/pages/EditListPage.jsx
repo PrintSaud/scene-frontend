@@ -4,6 +4,7 @@ import axios from "../api/api";
 import AddMovieModal from "../components/lists/AddMovieModal";
 import MovieListSortable from "../components/lists/MovieListSortable";
 import { backend } from "../config";
+import CropperModal from "../components/CropperModal";
 
 export default function EditListPage() {
   const { id } = useParams();
@@ -17,7 +18,9 @@ export default function EditListPage() {
   const [isRanked, setIsRanked] = useState(false);
   const [movies, setMovies] = useState([]);
   const [showModal, setShowModal] = useState(false);
-
+  const [rawCoverFile, setRawCoverFile] = useState(null);
+  const [showCropper, setShowCropper] = useState(false);
+  
   useEffect(() => {
     const fetchList = async () => {
       try {
@@ -72,24 +75,29 @@ export default function EditListPage() {
     }
   };
   
-
-  const handleCoverUpload = async (e) => {
+  const handleCoverUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
+    setRawCoverFile(file);
+    setShowCropper(true);
+  };
+  
+  const handleCroppedCover = async (croppedBlob) => {
     const formData = new FormData();
-    formData.append("image", file);
-
+    formData.append("image", croppedBlob);
+  
     try {
       const { data } = await axios.post("/api/upload/list-cover", formData, {
         headers: { "Content-Type": "multipart/form-data" },
-      });                    
+      });
+  
       setCoverImage(data.url);
     } catch (err) {
       console.error("❌ Upload failed", err);
       alert("Upload failed.");
     }
   };
+  
 
   return (
     <div style={{ background: "#0e0e0e", color: "white", minHeight: "100vh", paddingBottom: "80px" }}>
@@ -178,6 +186,15 @@ export default function EditListPage() {
           existing={movies}
         />
       )}
+      {showCropper && rawCoverFile && (
+  <CropperModal
+    file={rawCoverFile}
+    shape="rect"
+    onClose={() => setShowCropper(false)}
+    onCropComplete={handleCroppedCover}
+  />
+)}
+
     </div>
   );
 }

@@ -5,6 +5,7 @@ import AddMovieModal from "../components/lists/AddMovieModal";
 import MovieListSortable from "../components/lists/MovieListSortable";
 import { backend } from "../config";
 import toast from "react-hot-toast";
+import CropperModal from "../components/CropperModal";
 
 export default function CreateListPage() {
   const navigate = useNavigate();
@@ -17,25 +18,33 @@ export default function CreateListPage() {
   const [isRanked, setIsRanked] = useState(false);
   const [movies, setMovies] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [rawCoverFile, setRawCoverFile] = useState(null);
+const [showCropper, setShowCropper] = useState(false);
 
-  const handleCoverUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
 
-    const formData = new FormData();
-    formData.append("image", file);
+const handleCoverUpload = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  setRawCoverFile(file);
+  setShowCropper(true);
+};
 
-    try {
-      const { data } = await axios.post("/api/upload/list-cover", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      
-      setCoverImage(data.url);
-    } catch (err) {
-      console.error("❌ Upload failed", err);
-      toast.error("Upload failed.");
-    }
-  };
+const handleCroppedCover = async (croppedBlob) => {
+  const formData = new FormData();
+  formData.append("image", croppedBlob);
+
+  try {
+    const { data } = await axios.post("/api/upload/list-cover", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    setCoverImage(data.url);
+  } catch (err) {
+    console.error("❌ Upload failed", err);
+    toast.error("Upload failed.");
+  }
+};
+
 
 
   const canSave = title.trim().length > 0 && movies.length > 0;
@@ -153,6 +162,14 @@ export default function CreateListPage() {
           existing={movies}
         />
       )}
+      {showCropper && rawCoverFile && (
+  <CropperModal
+    file={rawCoverFile}
+    shape="rect"
+    onClose={() => setShowCropper(false)}
+    onCropComplete={handleCroppedCover}
+  />
+)}
     </div>
   );
 }

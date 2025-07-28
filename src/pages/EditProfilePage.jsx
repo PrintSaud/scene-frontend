@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { getPlatformIcon } from "../utils/getPlatformIcon.jsx";
 import MovieListSortable from "../components/lists/MovieListSortable";
 import AddMovieModal       from "../components/lists/AddMovieModal";
+import CropperModal from "../components/CropperModal";
 
 import ReactModal from "react-modal";
 import { BLOCKED_MOVIE_IDS } from "../utils/blockedMovies";
@@ -60,6 +61,9 @@ export default function EditProfilePage() {
   const [backdropOptions, setBackdropOptions] = useState([]);
   const [selectedBackdrop, setSelectedBackdrop] = useState("");
   const [showAddMovieModal, setShowAddMovieModal] = useState(false);
+  const [rawAvatarFile, setRawAvatarFile] = useState(null);
+const [showCropper, setShowCropper] = useState(false);
+
 
   useEffect(() => {
     if (user) {
@@ -120,13 +124,17 @@ export default function EditProfilePage() {
     }
   };
   
-  const handleAvatarUpload = async (e) => {
+  const handleAvatarUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
+    setRawAvatarFile(file);
+    setShowCropper(true);
+  };
+  
+  const handleCroppedAvatar = async (croppedBlob) => {
     const formData = new FormData();
-    formData.append("avatar", file);
-
+    formData.append("avatar", croppedBlob);
+  
     try {
       const res = await axios.post(
         `/api/upload/avatar/${user._id}`,
@@ -137,8 +145,6 @@ export default function EditProfilePage() {
           },
         }
       );
-      
-
       setAvatar(res.data.avatar);
       toast.success("✅ Avatar uploaded!");
     } catch (err) {
@@ -146,6 +152,7 @@ export default function EditProfilePage() {
       toast.error("❌ Avatar upload failed.");
     }
   };
+  
 
   const onDragEnd = (result) => {
     if (!result.destination) return;
@@ -416,6 +423,15 @@ export default function EditProfilePage() {
           onClose={() => setShowBackdropModal(false)}
         />
       )}
+      {showCropper && rawAvatarFile && (
+  <CropperModal
+    file={rawAvatarFile}
+    shape="circle"
+    onClose={() => setShowCropper(false)}
+    onCropComplete={handleCroppedAvatar}
+  />
+)}
+
     </>
   );
 }
