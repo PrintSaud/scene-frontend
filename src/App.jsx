@@ -12,6 +12,7 @@ import { NotificationProvider } from "./context/NotificationContext";
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
+import VerifyEmailPage from './pages/VerifyEmailPage';
 import ForgotPassword from "./pages/ForgotPassword";
 import VerifyResetCode from "./pages/VerifyResetCode";
 import ResetPassword from "./pages/ResetPassword";
@@ -89,7 +90,7 @@ function App() {
 
     return () => socket.disconnect();
   }, [user?._id]);
-  
+
   const hideNavRoutes = [
     '/login',
     '/signup',
@@ -113,6 +114,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
           <Route path="/signup" element={<PublicRoute><SignupPage /></PublicRoute>} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/" element={<PrivateRoute><HomePage /></PrivateRoute>} />
           <Route path="/home" element={<PrivateRoute><HomePage /></PrivateRoute>} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
