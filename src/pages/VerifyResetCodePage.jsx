@@ -64,9 +64,18 @@ export default function ResetPasswordPage() {
       }}
     >
       <h1 className="scene-logo">Reset Password</h1>
-      <p style={{ color: "#aaa", marginBottom: "24px" }}>
-        Enter your new password below to complete the reset.
-      </p>
+      <p
+  style={{
+    color: "#aaa",
+    marginBottom: "24px",
+    maxWidth: "320px",       // ✅ prevents it from stretching edge-to-edge
+    textAlign: "center",     // ✅ forces proper alignment
+    lineHeight: "1.4",       // ✅ optional for better mobile reading
+  }}
+>
+  Enter your new password below to complete the reset.
+</p>
+
 
       {error && (
         <p style={{ color: "red", marginBottom: "12px" }}>{error}</p>
