@@ -1,22 +1,23 @@
-import { useLocation, useNavigate } from 'react-router-dom';
-import { Home, Search, Bot, Bell, User } from 'lucide-react';
+import { useLocation, useNavigate } from "react-router-dom";
+import { Home, Search, Bot, Bell, User } from "lucide-react";
+import { useNotification } from "../context/NotificationContext"; // ✅ Import context
 
 const navItems = [
-  { icon: Home, route: '/', label: 'Home' },
-  { icon: Search, route: '/search', label: 'Search' },
-  { icon: Bot, route: '/scenebot', label: 'SceneBot' },
-  { icon: Bell, route: '/notifications', label: 'Notifications' },
-  { icon: User, route: '/profile', label: 'Profile' },
+  { icon: Home, route: "/", label: "Home" },
+  { icon: Search, route: "/search", label: "Search" },
+  { icon: Bot, route: "/scenebot", label: "SceneBot" },
+  { icon: Bell, route: "/notifications", label: "Notifications" },
+  { icon: User, route: "/profile", label: "Profile" },
 ];
 
-export default function BottomNav({ hasUnread }) {
+export default function BottomNav() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { unreadCount } = useNotification(); // ✅ Live count from context
 
   const hiddenRoutes = ["/upload-avatar"];
   if (hiddenRoutes.includes(location.pathname)) return null;
 
-  const unreadCount = hasUnread || 0;
   const showDot = unreadCount > 0 && location.pathname !== "/notifications";
 
   return (

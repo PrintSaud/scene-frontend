@@ -4,10 +4,12 @@ import { format } from "timeago.js";
 import { useNavigate } from "react-router-dom";
 import { socket } from "../socket";
 import { toast } from "react-hot-toast";
+import { useNotification } from "../context/NotificationContext";
 
-export default function NotificationsPage({ setHasUnread }) {
+export default function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);
   const navigate = useNavigate();
+  const { setHasUnread } = useNotification();
 
   const getActionText = (type) => {
     switch (type) {

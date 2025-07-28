@@ -7,7 +7,7 @@ import CreateListPage from "./pages/CreateListPage";
 import PrivateRoute from './components/PrivateRoute';
 import PublicRoute from './components/PublicRoute';
 import { getNotifications } from "./api/api";
-
+import { NotificationProvider } from "./context/NotificationContext";
 // Pages
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
@@ -151,6 +151,7 @@ function App() {
         </Routes>
       </div>
       {shouldShowNav && <BottomNav hasUnread={hasUnreadCount} />}
+      
     </div>
   );
 }
