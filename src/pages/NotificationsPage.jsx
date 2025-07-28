@@ -15,13 +15,17 @@ export default function NotificationsPage({ setHasUnread }) {
       case "review_like": return "liked your review";
       case "reaction": return "liked your comment";
       case "reply": return "replied to your comment";
-      case "suggest_movie": return "suggested you to check out this film!";
+      case "list_like": return "liked your list!";
       case "share-list": return "suggested you to check out this list!";
-      case "share-movie": return "suggested you to check out this film!";
-      case "share-review": return "suggested you to see this review!";
-      default: return "sent you something!";
+      case "suggest_movie": return "suggested you to check out this film!";
+      case "share-review": return "suggested you to check out this review!";
+      default:
+        console.warn("❓ Unknown type:", type);
+        return "sent you something!";
     }
   };
+  
+  
 
   useEffect(() => {
     const markAllAsRead = async () => {
@@ -98,6 +102,7 @@ export default function NotificationsPage({ setHasUnread }) {
         <p style={{ color: "#888" }}>You're all caught up. No notifications yet!</p>
       ) : (
         notifications.map((n) => (
+          
           <div
             key={n._id}
             style={{
