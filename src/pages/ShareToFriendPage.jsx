@@ -92,11 +92,12 @@ export default function ShareToFriendPage() {
             suggestMovieToFriends(friendId, currentUser._id, resourceId)
           )
         );
-      } else if (type === "review") {
+      } else if (type === "log") { // ✅ FIXED from "review"
         await suggestReviewToFriends(resourceId, selected);
       } else if (type === "list") {
         await suggestListToFriends(resourceId, selected);
       }
+      
   
       toast.success(`✅ Suggested to ${selected.length} friend(s)!`);
       navigate(-1);
