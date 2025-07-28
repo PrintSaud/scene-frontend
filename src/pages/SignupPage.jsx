@@ -4,10 +4,13 @@ import "../styles/LoginPage.css";
 import toast from "react-hot-toast";
 import { FaSpinner } from "react-icons/fa";
 import { TbUpload } from "react-icons/tb";
+import CropperModal from "../components/CropperModal";
 
 export default function SignupPage() {
-  const [avatar, setAvatar] = useState(null);
+  const [avatar, setAvatar] = useState(null); // final cropped blob
   const [avatarPreview, setAvatarPreview] = useState(null);
+  const [showCropper, setShowCropper] = useState(false);
+  const [rawAvatarFile, setRawAvatarFile] = useState(null);
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -62,7 +65,7 @@ export default function SignupPage() {
   const uploadToCloudinary = async (file) => {
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", "scene_avatar"); // ✅ your preset
+    formData.append("upload_preset", "scene_avatar");
 
     const res = await fetch("https://api.cloudinary.com/v1_1/scenewebapp/image/upload", {
       method: "POST",
@@ -73,11 +76,17 @@ export default function SignupPage() {
     return data.secure_url;
   };
 
-  const handleAvatarChange = async (e) => {
+  const handleAvatarChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    setAvatarPreview(URL.createObjectURL(file));
-    setAvatar(file);
+    setRawAvatarFile(file);
+    setShowCropper(true);
+  };
+
+  const handleCropped = (croppedBlob) => {
+    const previewURL = URL.createObjectURL(croppedBlob);
+    setAvatar(croppedBlob);
+    setAvatarPreview(previewURL);
   };
 
   const handleSignup = async (e) => {
@@ -112,8 +121,6 @@ export default function SignupPage() {
       localStorage.setItem("token", res.data.token);
 
       toast.success("Signed up successfully!");
-
-      // ⏭️ NEXT: go to Verify Email page
       window.location.href = "/verify-email";
     } catch (err) {
       setError(err.response?.data?.error || "Signup failed.");
@@ -171,6 +178,15 @@ export default function SignupPage() {
         <span>Already have an account?</span>
         <a href="/login" className="signup-link">Log in</a>
       </div>
+
+      {showCropper && rawAvatarFile && (
+        <CropperModal
+          file={rawAvatarFile}
+          shape="circle"
+          onClose={() => setShowCropper(false)}
+          onCropComplete={handleCropped}
+        />
+      )}
     </div>
   );
 }
