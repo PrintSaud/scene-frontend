@@ -7,7 +7,8 @@ import {
   suggestMovieToFriends,
   suggestReviewToFriends,
   suggestListToFriends,
-} from "../api"; // 🔁 adjust path if needed (e.g., "../../api")
+} from "../api/api"; // ✅ correct path to the file
+
 
 
 
