@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { Toaster } from 'react-hot-toast';
-import { socket } from './socket'; // ✅ Socket.IO
+import { socket } from './socket';
 import CreateListPage from "./pages/CreateListPage";
 import PrivateRoute from './components/PrivateRoute';
 import PublicRoute from './components/PublicRoute';
@@ -38,7 +38,7 @@ import DirectorPage from "./pages/DirectorPage";
 import ActorPage from "./pages/ActorPage"; 
 import PersonPage from "./pages/PersonPage";
 import UploadAvatarPage from './pages/UploadAvatarPage';
-import FilmReviewsPage from "./pages/FilmReviewsPage"; // ✅ check the correct relative path!
+import FilmReviewsPage from "./pages/FilmReviewsPage";
 import ShareListPage from './pages/ShareListPage';
 import RepliesPage from "./components/review/RepliesPage";
 import ChangeReviewBackdropPage from "./pages/ChangeReviewBackdropPage";
@@ -62,11 +62,9 @@ function App() {
     if (!user?.token) return;
     const checkUnread = async () => {
       try {
-        const res = await getNotifications(); // ✅ keep this
-console.log("✅ Token test:", user?.token);
-const unread = res.data.notifications?.filter((n) => !n.read) || [];
-setHasUnreadCount(unread.length);
-
+        const res = await getNotifications();
+        const unread = res.data.notifications?.filter((n) => !n.read) || [];
+        setHasUnreadCount(unread.length);
       } catch (err) {
         console.error("❌ Failed to check unread notifs:", err);
       }
@@ -83,7 +81,10 @@ setHasUnreadCount(unread.length);
 
     socket.off("notification").on("notification", (notif) => {
       console.log("📩 New real-time notif:", notif);
-      setHasUnreadCount((prev) => prev + 1);
+      setHasUnreadCount((prev) => {
+        const safePrev = typeof prev === "number" && prev >= 0 ? prev : 0;
+        return safePrev + 1;
+      });
     });
 
     return () => socket.disconnect();
@@ -102,48 +103,16 @@ setHasUnreadCount(unread.length);
     hideNavRoutes.includes(location.pathname) ||
     location.pathname.startsWith('/share')
   ) && user;
-  
 
   return (
     <div style={{ overflowX: "hidden", width: "100%", maxWidth: "100vw" }}>
       <Toaster position="top-right" />
       <div className="min-h-screen pb-16 bg-[#0e0e0e]">
         <Routes>
-        <Route
-  path="/login"
-  element={
-    <PublicRoute>
-      <LoginPage />
-    </PublicRoute>
-  }
-/>
-
-<Route
-  path="/signup"
-  element={
-    <PublicRoute>
-      <SignupPage />
-    </PublicRoute>
-  } 
-  ></Route>
-  <Route
-  path="/"
-  element={
-    <PrivateRoute>
-      <HomePage />
-    </PrivateRoute>
-  }
-/>
-
-<Route
-  path="/home"
-  element={
-    <PrivateRoute>
-      <HomePage />
-    </PrivateRoute>
-  }
-/>
-
+          <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+          <Route path="/signup" element={<PublicRoute><SignupPage /></PublicRoute>} />
+          <Route path="/" element={<PrivateRoute><HomePage /></PrivateRoute>} />
+          <Route path="/home" element={<PrivateRoute><HomePage /></PrivateRoute>} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/verify-code" element={<VerifyResetCode />} />
           <Route path="/reset-password" element={<ResetPassword />} />

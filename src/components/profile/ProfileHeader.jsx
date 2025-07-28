@@ -262,7 +262,7 @@ export default function ProfileHeader({
     textAlign: "center",
     fontFamily: "Inter",
     position: "relative",
-    left: "-12px", // 👈 Shift whole block slightly to the left
+    left: "-13px", // 👈 Shift whole block slightly to the left
   }}
 >
   <div onClick={() => navigate(`/profile/${user._id}/following`)} style={{ cursor: "pointer" }}>

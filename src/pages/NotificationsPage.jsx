@@ -15,10 +15,10 @@ export default function NotificationsPage({ setHasUnread }) {
       case "review_like": return "liked your review";
       case "reaction": return "liked your comment";
       case "reply": return "replied to your comment";
-      case "suggest_movie": return "suggested you check out this film!";
-      case "share-list": return "suggested you check out their list!";
-      case "share-movie": return "suggested you check out this film!";
-      case "share-review": return "suggested you read their review!";
+      case "suggest_movie": return "suggested you to check out this film!";
+      case "share-list": return "suggested you to check out this list!";
+      case "share-movie": return "suggested you to check out this film!";
+      case "share-review": return "suggested you to see this review!";
       default: return "sent you something!";
     }
   };
