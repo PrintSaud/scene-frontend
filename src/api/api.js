@@ -30,8 +30,6 @@ export const logout = () => api.post("/api/auth/logout");
 //
 export const createLog = (data) => {
   const user = JSON.parse(localStorage.getItem("user"));
-  console.log("📦 createLog user:", user);
-  console.log("📦 createLog token:", user?.token);
   return api.post("/api/logs/full", data);
 };
 export const getRepliesForLog = (logId) =>
@@ -43,9 +41,14 @@ export const addLogReply = (logId, data) => api.post(`/api/logs/${logId}/reply`,
 export const reactToLog = (logId, emoji) => api.post(`/api/logs/${logId}/react`, { emoji });
 export const deleteReply = (logId, replyId) => api.delete(`/api/logs/${logId}/replies/${replyId}`);
 
-export const suggestMovieToFriends = (userId, movieId, { friends, movieTitle }) =>
-  api.post(`/api/users/${userId}/suggest/${movieId}`, { friends, movieTitle });
-
+export const suggestMovieToFriends = (recipientId, fromUserId, movieId) =>
+  api.post(`/api/users/${recipientId}/notify/share`, {
+    fromUserId,
+    movieId
+  });
+  export const suggestReviewToFriends = (reviewId, recipients) =>
+    api.post(`/api/logs/${reviewId}/share`, { recipients });
+  
 
 // Likes for reviews/logs
 export const likeLog = (logId) => api.post(`/api/logs/${logId}/like`);
@@ -81,6 +84,9 @@ export const getPopularLists = () => api.get("/api/lists/popular");
 export const getFriendsLists = () => api.get("/api/lists/friends");
 export const toggleSaveList = (listId) => api.post(`/api/lists/${listId}/save`);
 export const likeList = (listId) => api.post(`/api/lists/${listId}/like`);
+export const suggestListToFriends = (listId, recipients) =>
+  api.post(`/api/lists/${listId}/share`, { recipients });
+
 
 
 //
@@ -106,7 +112,6 @@ export const sceneBotAsk = (message) => api.post("/api/scenebot", { message });
 // 🎬 MOVIE EXTRAS (Change Poster, Backdrop, etc.)
 //
 export const changePoster = (movieId, { posterUrl }) => api.post(`/api/posters/${movieId}`, { posterUrl });
-
 export const updateBackdrop = (userId, backdropUrl) => api.patch(`/api/users/${userId}/backdrop`, { backdrop: backdropUrl });
 
 //
