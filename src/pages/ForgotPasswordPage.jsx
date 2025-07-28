@@ -49,27 +49,29 @@ export default function ForgotPasswordPage() {
         paddingTop: "20vh",
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
+        alignItems: "center",       // ✅ center horizontally
+        justifyContent: "flex-start", // ✅ push content from top
         textAlign: "center",
       }}
     >
       <h1 className="scene-logo">Forgot Password?</h1>
+  
       <p
-  style={{
-    color: "#aaa",
-    marginBottom: "24px",
-    maxWidth: "320px",       // ✅ limit width so it doesn’t stretch
-    textAlign: "center",     // ✅ enforce center alignment
-    lineHeight: "1.4",       // ✅ (optional) improves mobile readability
-  }}
->
-  Enter your Scene username and email to receive a reset code.
-</p>
-
+        style={{
+          color: "#aaa",
+          marginBottom: "24px",
+          maxWidth: "320px",       // ✅ limit width so it doesn’t stretch
+          textAlign: "center",     // ✅ enforce center alignment
+          lineHeight: "1.4",       // ✅ improves mobile readability
+        }}
+      >
+        Enter your Scene username and email to receive a reset code.
+      </p>
   
       {error && (
         <p style={{ color: "red", marginBottom: "12px" }}>{error}</p>
       )}
+  
       <input
         type="text"
         placeholder="Your Scene username"

@@ -99,14 +99,15 @@ export default function ResetPasswordPage() {
         style={{ marginTop: "12px" }}
       />
 
-      <button
-        onClick={handleReset}
-        className="login-button"
-        style={{ marginTop: "18px" }}
-        disabled={isLoading}
-      >
+<button
+  onClick={handleReset}
+  className="login-button"
+  style={{ marginTop: "18px" }}
+  disabled={isLoading}
+>
+  {isLoading ? "Updating..." : "Update Password"}
+</button>
 
-      </button>
     </div>
   );
 }
