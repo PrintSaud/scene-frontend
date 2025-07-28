@@ -1,21 +1,36 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: import.meta.env.VITE_BACKEND_URL || "https://scene-backend-production.up.railway.app",
-    withCredentials: true, // ✅ KEY FIX
-  });
-  
+  baseURL: import.meta.env.VITE_BACKEND_URL || "https://scene-backend-production.up.railway.app",
+  withCredentials: true,
+});
 
-// ✅ Automatically add token to every request
+// ✅ Automatically add token only when needed
 api.interceptors.request.use((config) => {
   const user = JSON.parse(localStorage.getItem("user"));
   const token = user?.token;
-  if (token) {
+
+  // 🔐 Skip adding token for public auth routes
+  const isPublicAuthRoute =
+    config.url.includes("/auth/login") ||
+    config.url.includes("/auth/signup") ||
+    config.url.includes("/auth/forgot-password") ||
+    config.url.includes("/auth/reset-password");
+
+  if (!isPublicAuthRoute && token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-  console.log("👉 API REQUEST:", config.method, config.url, config.headers.Authorization || "No token");
+
+  console.log(
+    "👉 API REQUEST:",
+    config.method,
+    config.url,
+    config.headers.Authorization ? "✅ token" : "No token"
+  );
+
   return config;
 });
+
 
 //
 // 🧠 AUTH
