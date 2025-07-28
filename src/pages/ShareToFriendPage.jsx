@@ -72,12 +72,22 @@ export default function ShareToFriendPage() {
 
   const handleSend = async () => {
     try {
-      await api.post(`/api/users/${currentUser._id}/suggest`, {
-        friends: selected,
-        resourceType: type,
-        resourceTitle: resourceTitle,
-      });
-      
+      if (!selected.length) {
+        toast.error("No friends selected.");
+        return;
+      }
+  
+      if (type === "movie") {
+        for (const friendId of selected) {
+          await suggestMovieToFriends(friendId, currentUser._id, resourceId);
+        }
+      } else if (type === "list") {
+        await suggestListToFriends(resourceId, selected);
+      } else if (type === "review") {
+        await suggestReviewToFriends(resourceId, selected);
+      } else {
+        throw new Error("Unsupported resource type");
+      }
   
       toast.success(`✅ Suggested to ${selected.length} friend(s)!`);
       navigate(-1);
@@ -86,6 +96,7 @@ export default function ShareToFriendPage() {
       toast.error("Failed to send suggestions.");
     }
   };
+  
   
   
 
