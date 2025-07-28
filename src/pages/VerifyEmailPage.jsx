@@ -43,7 +43,19 @@ export default function VerifyEmailPage() {
   };
 
   return (
-    <div className="login-container" style={{ minHeight: "100vh", paddingTop: "20vh" }}>
+    <div
+  className="login-container"
+  style={{
+    minHeight: "100vh",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "0 24px",
+    transform: "translateY(-10%)",
+  }}
+>
+
       <h1 className="scene-logo">Verify Your Email</h1>
       <p style={{ color: "#aaa", marginBottom: "24px", textAlign: "center" }}>
         We've sent a 6-digit code to <b>{user.email}</b><br />
