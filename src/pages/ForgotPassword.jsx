@@ -26,6 +26,8 @@ export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
 
   const handleSendCode = async (e) => {
     e.preventDefault();
