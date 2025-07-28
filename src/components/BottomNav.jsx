@@ -67,18 +67,20 @@ export default function BottomNav() {
                 <div style={{ position: "relative" }}>
                   <Bell size={26} strokeWidth={isActive ? 2.4 : 1.8} />
                   {showDot && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: -2,
-                        right: -2,
-                        width: 8,
-                        height: 8,
-                        backgroundColor: "#a855f7", // Scene purple
-                        borderRadius: "50%",
-                      }}
-                    />
-                  )}
+  <div
+    style={{
+      position: "absolute",
+      top: -4,
+      right: -4,
+      width: 12,
+      height: 12,
+      backgroundColor: "#a855f7", // Scene purple
+      borderRadius: "50%",
+      boxShadow: "0 0 4px #a855f7", // optional glow for pop
+    }}
+  />
+)}
+
                 </div>
               ) : (
                 <Icon size={26} strokeWidth={isActive ? 2.4 : 1.8} />
