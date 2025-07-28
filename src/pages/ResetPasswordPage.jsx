@@ -33,11 +33,12 @@ export default function ResetPasswordPage() {
 
     setIsLoading(true);
     try {
-      const res = await api.post("/api/auth/reset-password", {
-        email,
-        code,
-        newPassword: password,
-      });
+        const res = await api.post("/auth/reset-password", {
+            email,
+            code,
+            newPassword: password,
+          });
+          
 
       toast.success("Password updated!");
       localStorage.removeItem("resetEmail");
@@ -104,7 +105,7 @@ export default function ResetPasswordPage() {
         style={{ marginTop: "18px" }}
         disabled={isLoading}
       >
-        {isLoading ? "Updating..." : "Update Password"}
+
       </button>
     </div>
   );

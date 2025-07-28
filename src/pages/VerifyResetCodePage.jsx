@@ -72,6 +72,7 @@ export default function ResetPasswordPage() {
     textAlign: "center",     // ✅ forces proper alignment
     lineHeight: "1.4",       // ✅ optional for better mobile reading
   }}
+  
 >
   Enter your new password below to complete the reset.
 </p>
