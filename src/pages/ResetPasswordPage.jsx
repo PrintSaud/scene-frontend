@@ -50,16 +50,28 @@ export default function ResetPasswordPage() {
       setIsLoading(false);
     }
   };
-
   return (
-    <div className="login-container" style={{ minHeight: "100vh", paddingTop: "20vh" }}>
+    <div
+      className="login-container"
+      style={{
+        minHeight: "100vh",
+        paddingTop: "20vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        textAlign: "center",
+      }}
+    >
       <h1 className="scene-logo">Reset Password</h1>
-      <p style={{ color: "#aaa", marginBottom: "24px", textAlign: "center" }}>
+  
+      <p style={{ color: "#aaa", marginBottom: "24px" }}>
         Enter your new password below to complete the reset.
       </p>
-
-      {error && <p style={{ color: "red", marginBottom: "12px" }}>{error}</p>}
-
+  
+      {error && (
+        <p style={{ color: "red", marginBottom: "12px" }}>{error}</p>
+      )}
+  
       <input
         type="password"
         placeholder="New password"
@@ -67,7 +79,7 @@ export default function ResetPasswordPage() {
         onChange={(e) => setPassword(e.target.value)}
         className="login-input"
       />
-
+  
       <input
         type="password"
         placeholder="Confirm password"
@@ -75,7 +87,7 @@ export default function ResetPasswordPage() {
         onChange={(e) => setConfirm(e.target.value)}
         className="login-input"
       />
-
+  
       <button
         onClick={handleReset}
         className="login-button"
@@ -86,4 +98,5 @@ export default function ResetPasswordPage() {
       </button>
     </div>
   );
+  
 }

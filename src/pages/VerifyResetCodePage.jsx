@@ -25,13 +25,9 @@ export default function VerifyResetCodePage() {
 
     setIsLoading(true);
     try {
-      const res = await api.post("/api/auth/verify-reset-code", {
-        email,
-        code,
-      });
-
+      await api.post("/api/auth/verify-reset-code", { email, code });
       toast.success("Code verified!");
-      localStorage.setItem("resetCode", code); // Save for reset-password step
+      localStorage.setItem("resetCode", code);
       navigate("/reset-password");
     } catch (err) {
       setError(err.response?.data?.error || "Invalid code.");
@@ -42,9 +38,19 @@ export default function VerifyResetCodePage() {
   };
 
   return (
-    <div className="login-container" style={{ minHeight: "100vh", paddingTop: "20vh" }}>
+    <div
+      className="login-container"
+      style={{
+        minHeight: "100vh",
+        paddingTop: "20vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        textAlign: "center",
+      }}
+    >
       <h1 className="scene-logo">Enter Reset Code</h1>
-      <p style={{ color: "#aaa", marginBottom: "24px", textAlign: "center" }}>
+      <p style={{ color: "#aaa", marginBottom: "24px" }}>
         A 6-digit code was sent to <b>{email}</b>. Enter it below to continue.
       </p>
 
@@ -57,7 +63,11 @@ export default function VerifyResetCodePage() {
         onChange={(e) => setCode(e.target.value)}
         maxLength={6}
         className="login-input"
-        style={{ textAlign: "center", letterSpacing: "6px", fontSize: "18px" }}
+        style={{
+          textAlign: "center",
+          letterSpacing: "6px",
+          fontSize: "18px",
+        }}
       />
 
       <button

@@ -65,14 +65,6 @@ export default function ForgotPassword() {
         <button type="submit" className="login-button">Send Reset Code</button>
       </form>
 
-      <button disabled={isLoading} style={{ padding: "10px 20px", borderRadius: "5px" }}>
-  {isLoading ? (
-    <FaSpinner className="spin" style={{ fontSize: "18px" }} />
-  ) : (
-    "Forgot Password"
-  )}
-</button>
-
 
       <div className="signup-row">
         <a href="/login" className="signup-link">Back to login</a>
