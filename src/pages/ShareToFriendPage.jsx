@@ -3,6 +3,11 @@ import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { FaArrowLeft } from "react-icons/fa";
 import api from "../api/api";
+import {
+  suggestMovieToFriends,
+  suggestReviewToFriends,
+  suggestListToFriends,
+} from "../api"; // 🔁 adjust path if needed (e.g., "../../api")
 
 
 
@@ -70,23 +75,26 @@ export default function ShareToFriendPage() {
     if (type && id) fetchData();
   }, [type, id]);
 
+  const resourceId = id; // 👈 fix undefined variable
+
+
   const handleSend = async () => {
     try {
-      if (!selected.length) {
-        toast.error("No friends selected.");
+      if (!selected || selected.length === 0) {
+        toast.error("Select at least one friend.");
         return;
       }
   
       if (type === "movie") {
-        for (const friendId of selected) {
-          await suggestMovieToFriends(friendId, currentUser._id, resourceId);
-        }
-      } else if (type === "list") {
-        await suggestListToFriends(resourceId, selected);
+        await Promise.all(
+          selected.map((friendId) =>
+            suggestMovieToFriends(friendId, currentUser._id, resourceId)
+          )
+        );
       } else if (type === "review") {
         await suggestReviewToFriends(resourceId, selected);
-      } else {
-        throw new Error("Unsupported resource type");
+      } else if (type === "list") {
+        await suggestListToFriends(resourceId, selected);
       }
   
       toast.success(`✅ Suggested to ${selected.length} friend(s)!`);
@@ -96,6 +104,7 @@ export default function ShareToFriendPage() {
       toast.error("Failed to send suggestions.");
     }
   };
+  
   
   
   
