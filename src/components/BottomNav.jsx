@@ -70,20 +70,14 @@ export default function BottomNav() {
                     <div
                       style={{
                         position: "absolute",
-                        top: -6,
-                        right: -10,
-                        minWidth: 18,
-                        padding: "2px 5px",
+                        top: -2,
+                        right: -2,
+                        width: 8,
+                        height: 8,
                         backgroundColor: "#a855f7", // Scene purple
-                        color: "white",
-                        fontSize: "10px",
-                        fontWeight: "bold",
-                        borderRadius: "999px",
-                        textAlign: "center",
+                        borderRadius: "50%",
                       }}
-                    >
-                      {unreadCount > 9 ? "9+" : unreadCount}
-                    </div>
+                    />
                   )}
                 </div>
               ) : (
@@ -96,3 +90,4 @@ export default function BottomNav() {
     </div>
   );
 }
+

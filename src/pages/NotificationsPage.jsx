@@ -9,7 +9,8 @@ import { useNotification } from "../context/NotificationContext";
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);
   const navigate = useNavigate();
-  const { setHasUnread } = useNotification();
+  const { markAllRead, syncUnreadCount } = useNotification();
+
 
   const getActionText = (type) => {
     switch (type) {
@@ -33,37 +34,35 @@ export default function NotificationsPage() {
     const markAllAsRead = async () => {
       try {
         await api.patch("/api/notifications/read");
-        setHasUnread(0); // ✅ Clear count on open
+        markAllRead();        // ✅ clears purple dot globally
+        syncUnreadCount();    // ✅ just in case backend was out of sync
       } catch (err) {
         console.error("Failed to mark all as read", err);
       }
     };
-
+  
     const fetchNotifications = async () => {
       try {
         const { data } = await api.get("/api/notifications");
         setNotifications(data);
-        const unreadCount = data.filter((n) => !n.read).length;
-        if (setHasUnread) setHasUnread(unreadCount);
       } catch (err) {
         console.error("Failed to fetch notifications", err);
       }
     };
-
+  
     fetchNotifications();
     markAllAsRead();
-
+  
     socket.off("notification");
     socket.on("notification", (newNotif) => {
       setNotifications((prev) => [newNotif, ...prev]);
-      if (setHasUnread) {
-        setHasUnread((prev) => prev + 1);
-      }
       toast(`🔔 ${newNotif.message}`);
+      syncUnreadCount(); // ✅ increase dot count via backend check
     });
-
+  
     return () => socket.off("notification");
   }, []);
+  
 
   const markAsReadAndNavigate = async (n, destination) => {
     try {
