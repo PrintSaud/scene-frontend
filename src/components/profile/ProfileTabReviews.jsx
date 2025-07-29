@@ -40,26 +40,6 @@ const getRelativeTime = (date) => {
       if (filter === "likes") return (b.likes?.length || 0) - (a.likes?.length || 0);
       return new Date(b.watchedAt) - new Date(a.watchedAt);
     });
-
-    const handleLike = async (logId) => {
-      try {
-        const token = JSON.parse(localStorage.getItem("user"))?.token;
-        await axios.post(
-          `/api/logs/${logId}/like`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-    
-        // Optional: trigger a refresh or mutate the state if needed
-        console.log("✅ Liked!");
-      } catch (err) {
-        console.error("❌ Failed to like log", err);
-      }
-    };
     
 
   return (
