@@ -260,11 +260,10 @@ export default function ProfilePage() {
 
   {activeTab === "Films" && (
     <ProfileTabFilms
-      logs={logs}
-      favorites={user.favorites || []}
-      profileUserId={id}
-      customPosters={customPosters} // ✅
-    />
+    logs={logs}
+    favorites={user.favoriteFilms || []}
+    profileUserId={user._id}
+  />  
   )}
 </div>
 

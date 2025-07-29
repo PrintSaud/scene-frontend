@@ -30,25 +30,32 @@ export default function ProfileTabFilms({ logs, favorites = [], profileUserId })
   useEffect(() => {
     const fetchCustomPosters = async () => {
       const userId = profileUserId;
-      if (!userId) return;
+      if (!userId) {
+        console.warn("🚫 No userId passed to ProfileTabFilms");
+        return;
+      }
   
       const movieIds = logs
         .map((log) => {
           const movie = log.movie;
           if (typeof movie === "object" && movie?.id) return Number(movie.id);
-          if (typeof movie === "string" || typeof movie === "number") return Number(movie);
+          if (typeof movie === "number") return movie;
+          if (typeof movie === "string") return parseInt(movie);
           return null;
         })
-        .filter((id) => !isNaN(id)) // ✅ Remove NaN
-        .filter((id, index, self) => self.indexOf(id) === index); // ✅ Remove duplicates
+        .filter((id) => !isNaN(id))
+        .filter((id, index, arr) => arr.indexOf(id) === index);
   
       if (!movieIds.length) {
         console.warn("⚠️ No valid movieIds found for custom poster fetch");
         return;
       }
   
+      console.log("📤 Fetching custom posters for:", { userId, movieIds });
+  
       try {
         const { data } = await axios.post("/api/posters/batch", { userId, movieIds });
+        console.log("✅ Received custom posters:", data);
         setCustomPosters(data);
       } catch (err) {
         console.error("❌ Failed to fetch custom posters", err);
@@ -57,6 +64,7 @@ export default function ProfileTabFilms({ logs, favorites = [], profileUserId })
   
     if (logs?.length > 0) fetchCustomPosters();
   }, [logs, profileUserId]);
+  
   
 
 
@@ -165,10 +173,16 @@ export default function ProfileTabFilms({ logs, favorites = [], profileUserId })
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "4px" }}>
           {sortedLogs.map((log) => {
-            const movieId = log.movie?.id || log.movie;
+            const movieId =
+            log.tmdbId ||
+            log.movie?.id ||
+            log.movie?.tmdbId ||
+            (typeof log.movie === "number" ? log.movie : undefined);
+
             const posterUrl =
   customPosters[movieId] ||
   (log.movie?.poster_path ? `${TMDB_IMG}${log.movie.poster_path}` : FALLBACK_POSTER);
+
 
 
             const isFavorite = favorites.includes(Number(movieId));
