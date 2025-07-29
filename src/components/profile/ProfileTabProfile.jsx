@@ -89,13 +89,10 @@ export default function ProfileTabProfile({
               const id = movie.id || movie._id || movie.tmdbId;
               const customPoster = customPosters?.[id];
               const fallbackPoster =
-                movie.poster?.startsWith("http")
-                  ? movie.poster
-                  : movie.poster
-                  ? `${TMDB_IMG}${movie.poster}`
-                  : FALLBACK_POSTER;
+  movie.poster_path ? `${TMDB_IMG}${movie.poster_path}` : FALLBACK_POSTER;
 
-              const posterToShow = customPoster || tmdbPosters[id] || fallbackPoster;
+const posterToShow = customPoster || tmdbPosters[id] || fallbackPoster;
+
 
               return (
                 <img
@@ -153,19 +150,14 @@ export default function ProfileTabProfile({
     >
       {recentlyWatched.map((log) => {
         const movieId =
-          typeof log.movie === "string"
-            ? log.movie
-            : log.movie?._id || log.movie?.id || log.movieId;
+        typeof log.movie === "string"
+          ? log.movie
+          : log.movie?.id || log.movie?._id || log.movieId || log.tmdbId;      
 
             const posterUrl =
             customPosters[movieId] ||
-            (log.poster?.startsWith("http")
-              ? log.poster
-              : log.poster
-              ? `${TMDB_IMG}${log.poster}`
-              : log.movie?.poster_path
-              ? `${TMDB_IMG}${log.movie.poster_path}`
-              : FALLBACK_POSTER);
+            (log.movie?.poster_path ? `${TMDB_IMG}${log.movie.poster_path}` : FALLBACK_POSTER);
+          
           
 
         const hasReview = log.review && log.review.length > 0;

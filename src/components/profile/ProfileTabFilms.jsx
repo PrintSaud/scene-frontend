@@ -166,11 +166,10 @@ export default function ProfileTabFilms({ logs, favorites = [], profileUserId })
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "4px" }}>
           {sortedLogs.map((log) => {
             const movieId = log.movie?.id || log.movie;
-            const posterUrl = customPosters[movieId]
-              || (log.poster?.startsWith("http") ? log.poster
-              : log.poster ? `${TMDB_IMG}${log.poster}`
-              : log.movie?.poster_path ? `${TMDB_IMG}${log.movie.poster_path}`
-              : FALLBACK_POSTER);
+            const posterUrl =
+  customPosters[movieId] ||
+  (log.movie?.poster_path ? `${TMDB_IMG}${log.movie.poster_path}` : FALLBACK_POSTER);
+
 
             const isFavorite = favorites.includes(Number(movieId));
             const hasReview = log.review && log.review.trim().length > 0;
