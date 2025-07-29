@@ -19,7 +19,7 @@ export default function ResetPasswordPage() {
       document.body.classList.remove("hide-navbar");
     };
   }, []);
-
+  
   const handleReset = async () => {
     if (!password || password.length < 6) {
       setError("Password must be at least 6 characters.");
@@ -33,12 +33,11 @@ export default function ResetPasswordPage() {
 
     setIsLoading(true);
     try {
-        const res = await api.post("/auth/reset-password", {
-            email,
-            code,
-            newPassword: password,
-          });
-          
+      await api.post("/api/auth/reset-password", {
+        email,
+        code,
+        newPassword: password,
+      });
 
       toast.success("Password updated!");
       localStorage.removeItem("resetEmail");
@@ -60,28 +59,28 @@ export default function ResetPasswordPage() {
         paddingTop: "20vh",
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
+        alignItems: "center",      // ✅ Horizontally center children
+        justifyContent: "flex-start", // ✅ Vertically push from top
         textAlign: "center",
       }}
     >
-      <h1 className="scene-logo">Set New Password 🔐</h1>
-
+  
       <p
         style={{
           color: "#aaa",
           marginBottom: "24px",
-          maxWidth: "320px",
-          textAlign: "center",
-          lineHeight: "1.4",
+          maxWidth: "320px",   // ✅ Prevents full-width stretching
+          textAlign: "center", // ✅ Aligns text inside the box
+          lineHeight: "1.4",   // ✅ Optional but improves mobile UX
         }}
       >
-        Make it something secure
+        Enter your new password below to complete the reset.
       </p>
-
+  
       {error && (
         <p style={{ color: "red", marginBottom: "12px" }}>{error}</p>
       )}
-
+  
       <input
         type="password"
         placeholder="New password"
@@ -96,18 +95,16 @@ export default function ResetPasswordPage() {
         value={confirm}
         onChange={(e) => setConfirm(e.target.value)}
         className="login-input"
-        style={{ marginTop: "12px" }}
       />
 
-<button
-  onClick={handleReset}
-  className="login-button"
-  style={{ marginTop: "18px" }}
-  disabled={isLoading}
->
-  {isLoading ? "Updating..." : "Update Password"}
-</button>
-
+      <button
+        onClick={handleReset}
+        className="login-button"
+        style={{ marginTop: "18px" }}
+        disabled={isLoading}
+      >
+        {isLoading ? "Updating..." : "Update Password"}
+      </button>
     </div>
   );
 }

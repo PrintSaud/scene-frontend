@@ -11,9 +11,7 @@ export default function VerifyEmailPage() {
   const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
-    // Hide navbar (Scene-specific logic if needed)
     document.body.classList.add("hide-navbar");
-
     return () => {
       document.body.classList.remove("hide-navbar");
     };
@@ -27,8 +25,8 @@ export default function VerifyEmailPage() {
 
     setIsLoading(true);
     try {
-      const res = await api.post("/api/auth/verify-email-code", {
-        email: user.email,
+      await api.post("/api/auth/verify-email-code", {
+        email: user?.email,
         code,
       });
 
@@ -44,25 +42,30 @@ export default function VerifyEmailPage() {
 
   return (
     <div
-  className="login-container"
-  style={{
-    minHeight: "100vh",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "0 24px",
-    transform: "translateY(-10%)",
-  }}
->
-
+      className="login-container"
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "flex-start",
+        paddingTop: "10vh",
+        padding: "0 24px",
+        textAlign: "center",
+      }}
+    >
       <h1 className="scene-logo">Verify Your Email</h1>
-      <p style={{ color: "#aaa", marginBottom: "24px", textAlign: "center" }}>
-        We've sent a 6-digit code to <b>{user.email}</b><br />
+
+      <p style={{ color: "#aaa", marginBottom: "24px" }}>
+        We've sent a 6-digit code to <b>{user?.email || "your email"}</b><br />
         Enter it below to activate your account.
       </p>
 
-      {error && <p style={{ color: "red", marginBottom: "12px" }}>{error}</p>}
+      {error && (
+        <p style={{ color: "red", marginBottom: "12px", fontWeight: "500" }}>
+          {error}
+        </p>
+      )}
 
       <input
         type="text"

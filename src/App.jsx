@@ -3,19 +3,19 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { Toaster } from 'react-hot-toast';
 import { socket } from './socket';
-import CreateListPage from "./pages/CreateListPage";
 import PrivateRoute from './components/PrivateRoute';
 import PublicRoute from './components/PublicRoute';
 import { getNotifications } from "./api/api";
 import { NotificationProvider } from "./context/NotificationContext";
+
 // Pages
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import VerifyEmailPage from './pages/VerifyEmailPage';
-import ForgotPassword from "./pages/ForgotPassword";
-import VerifyResetCode from "./pages/VerifyResetCode";
-import LogModal from "./components/modals/LogModal";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import VerifyResetCode from "./pages/VerifyResetCode"; // ✅ Make sure this is the 6-digit input
+import ResetPasswordPage from './pages/ResetPasswordPage'; // ✅ This sets new password
 import UploadAvatar from "./pages/UploadAvatar";
 import FriendsActivityPage from "./pages/FriendsActivityPage";
 import TrendingPage from "./pages/TrendingPage";
@@ -28,14 +28,14 @@ import EditProfilePage from "./pages/EditProfilePage";
 import NotificationsPage from "./pages/NotificationsPage";
 import BottomNav from './components/BottomNav';
 import SceneBotPage from "./pages/SceneBotPage";
+import CreateListPage from "./pages/CreateListPage";
 import ListViewPage from "./pages/ListViewPage";
 import EditListPage from "./pages/EditListPage";
 import FollowersFollowingPage from "./pages/FollowersFollowingPage";
 import MoviePage from "./pages/MoviePage";
 import AddToListPage from "./pages/AddToListPage";
-import ShareToFriendPage from "./pages/ShareToFriendPage";
 import DirectorPage from "./pages/DirectorPage";
-import ActorPage from "./pages/ActorPage"; 
+import ActorPage from "./pages/ActorPage";
 import PersonPage from "./pages/PersonPage";
 import UploadAvatarPage from './pages/UploadAvatarPage';
 import FilmReviewsPage from "./pages/FilmReviewsPage";
@@ -44,7 +44,8 @@ import RepliesPage from "./components/review/RepliesPage";
 import ChangeReviewBackdropPage from "./pages/ChangeReviewBackdropPage";
 import ShareReviewPage from "./pages/ShareReviewPage";
 import ImportPage from "./pages/ImportPage";
-import ResetPasswordPage from './pages/ResetPasswordPage';
+import LogModal from "./components/modals/LogModal";
+import ShareToFriendPage from "./pages/ShareToFriendPage";
 
 function App() {
   const location = useLocation();
@@ -58,7 +59,6 @@ function App() {
     user = null;
   }
 
-  // 🔁 Check unread notifications on mount
   useEffect(() => {
     if (!user?.token) return;
     const checkUnread = async () => {
@@ -73,19 +73,14 @@ function App() {
     checkUnread();
   }, []);
 
-  // 📡 Real-time notifications via Socket.IO
   useEffect(() => {
     if (!user?._id) return;
-
     socket.connect();
     socket.emit("join", user._id);
 
     socket.off("notification").on("notification", (notif) => {
       console.log("📩 New real-time notif:", notif);
-      setHasUnreadCount((prev) => {
-        const safePrev = typeof prev === "number" && prev >= 0 ? prev : 0;
-        return safePrev + 1;
-      });
+      setHasUnreadCount((prev) => Math.max(prev || 0, 0) + 1);
     });
 
     return () => socket.disconnect();
@@ -95,12 +90,11 @@ function App() {
     '/login',
     '/signup',
     '/forgot-password',
-    '/verify-code',
+    '/verify-reset-code',
     '/reset-password',
     '/choose-avatar',
-    '/verify-email', // ✅ NEW
+    '/verify-email',
   ];
-  
 
   const shouldShowNav = !(
     hideNavRoutes.includes(location.pathname) ||
@@ -115,11 +109,11 @@ function App() {
           <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
           <Route path="/signup" element={<PublicRoute><SignupPage /></PublicRoute>} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/verify-reset-code" element={<VerifyResetCode />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/" element={<PrivateRoute><HomePage /></PrivateRoute>} />
           <Route path="/home" element={<PrivateRoute><HomePage /></PrivateRoute>} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/verify-code" element={<VerifyResetCode />} />
-          <Route path="/reset-password" element={<ResetPasswordPage/>} />
           <Route path="/choose-avatar" element={<UploadAvatar />} />
           <Route path="/friends-activity" element={<FriendsActivityPage />} />
           <Route path="/trending" element={<TrendingPage />} />
@@ -144,18 +138,17 @@ function App() {
           <Route path="/add-to-list/:movieId" element={<AddToListPage />} />
           <Route path="/director/:id" element={<DirectorPage />} />
           <Route path="/actor/:id" element={<ActorPage />} />
-          <Route path="/director/:id" element={<PersonPage isDirector={true} />} />
+          <Route path="/person/:id" element={<PersonPage />} />
           <Route path="/upload-avatar" element={<UploadAvatarPage />} />
           <Route path="/share-review/:id" element={<ShareReviewPage />} />
           <Route path="/review/:id/replies" element={<RepliesPage />} />
-          <Route path="/replies/:id" element={<RepliesPage />} />
           <Route path="/import" element={<ImportPage />} />
           <Route path="/log/:logId" element={<LogModal />} />
           <Route path="/share/:type/:id" element={<ShareToFriendPage />} />
         </Routes>
       </div>
+
       {shouldShowNav && <BottomNav hasUnread={hasUnreadCount} />}
-      
     </div>
   );
 }
