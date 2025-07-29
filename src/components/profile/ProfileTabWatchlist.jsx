@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../../api/api";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import getPosterUrl from "../../utils/getPosterUrl";
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const FALLBACK_POSTER = "/default-poster.jpg";
@@ -151,17 +152,7 @@ export default function ProfileTabWatchlist({
           }}
         >
           {watchList.map((movie) => {
-            let image = FALLBACK_POSTER;
-
-            if (movie.posterOverride) {
-              image = movie.posterOverride;
-            } else if (movie.poster_path) {
-              image = `${TMDB_IMG}${movie.poster_path}`;
-            } else if (movie.poster?.startsWith("http")) {
-              image = movie.poster;
-            } else if (movie.poster) {
-              image = `${TMDB_IMG}${movie.poster}`;
-            }
+            const image = getPosterUrl(movie.tmdbId || movie.id, movie.poster_path, movie.posterOverride);
 
             return (
               <img
