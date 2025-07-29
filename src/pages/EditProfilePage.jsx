@@ -424,12 +424,13 @@ const [showCropper, setShowCropper] = useState(false);
         />
       )}
       {showCropper && rawAvatarFile && (
-  <CropperModal
-    file={rawAvatarFile}
-    shape="circle"
-    onClose={() => setShowCropper(false)}
-    onCropComplete={handleCroppedAvatar}
-  />
+        <CropperModal
+        file={avatarFile}
+        onClose={() => setShowCrop(false)}
+        onCropComplete={(blob) => uploadAvatar(blob)}
+        shape="circle"
+        aspectRatio={1}
+      />      
 )}
 
     </>

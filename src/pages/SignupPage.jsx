@@ -181,11 +181,12 @@ export default function SignupPage() {
 
       {showCropper && rawAvatarFile && (
         <CropperModal
-          file={rawAvatarFile}
-          shape="circle"
-          onClose={() => setShowCropper(false)}
-          onCropComplete={handleCropped}
-        />
+        file={avatarFile}
+        onClose={() => setShowCrop(false)}
+        onCropComplete={(blob) => uploadAvatar(blob)}
+        shape="circle"
+        aspectRatio={1}
+      />      
       )}
     </div>
   );
