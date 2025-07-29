@@ -58,6 +58,38 @@ if (customPosters[String(id)]) continue;
     fetchFallbackPosters();
   }, [logs, customPosters]);
 
+  const [customPostersState, setCustomPostersState] = useState({});
+
+useEffect(() => {
+  const fetchCustomPosters = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const token = user?.token;
+
+      const movieIds = logs
+        .map((log) => log.tmdbId || log.movie?.id || log.movie?._id || log.movie)
+        .filter(Boolean);
+
+      const uniqueIds = [...new Set(movieIds)];
+
+      const { data } = await axios.post(
+        "/api/posters/batch",
+        { userId: profileUserId, movieIds: uniqueIds },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setCustomPostersState(data || {});
+    } catch (err) {
+      console.error("❌ Failed to load custom posters", err);
+    }
+  };
+
+  fetchCustomPosters();
+}, [logs, profileUserId]);
+
+
   const sortedLogs = useMemo(() => {
     let filtered = [...logs];
     if (sortType === "favorites") {
@@ -166,7 +198,7 @@ if (customPosters[String(id)]) continue;
             const movieId = log.tmdbId || log.movie?.id || log.movie?._id || log.movie;
 
             const posterUrl =
-            customPosters[String(movieId)] ||
+            customPostersState[String(movieId)] ||
             tmdbFallbacks[String(movieId)] ||
             (log.movie?.poster_path ? `${TMDB_IMG}${log.movie.poster_path}` : FALLBACK_POSTER);
           
