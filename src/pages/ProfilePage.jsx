@@ -77,11 +77,12 @@ export default function ProfilePage() {
     useEffect(() => {
       const fetchCustomPosters = async () => {
         const userId = id;
-    
+
         const movieIds = [
           ...logs.map((log) => Number(log.tmdbId)),
-          ...(user.favoriteFilms || []).map((m) => Number(m.tmdbId || m.id || m._id))
+          ...(user?.favoriteFilms || []).map((m) => Number(m.tmdbId || m.id || m._id))
         ].filter((id) => !isNaN(id));
+        
         
       
       
