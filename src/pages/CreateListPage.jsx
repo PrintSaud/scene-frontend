@@ -6,6 +6,7 @@ import MovieListSortable from "../components/lists/MovieListSortable";
 import { backend } from "../config";
 import toast from "react-hot-toast";
 import CropperModal from "../components/CropperModal";
+import CropListImageModal from "../components/CropListImageModal"; // ✅ NEW
 
 export default function CreateListPage() {
   const navigate = useNavigate();
@@ -120,7 +121,18 @@ const handleCroppedCover = async (croppedBlob) => {
           </div>
         ) : (
           <div style={{ marginTop: "12px" }}>
-            <img src={coverImage} alt="Cover" style={{ width: "100%", borderRadius: "10px", objectFit: "cover" }} />
+            <img
+  src={coverImage}
+  alt="Cover"
+  style={{
+    width: "100%",
+    aspectRatio: "16 / 9",  // ✅ Ensures consistent rectangle
+    borderRadius: "10px",
+    objectFit: "cover",
+    backgroundColor: "#222", // ✅ prevents visual pop while loading
+  }}
+/>
+
             <button onClick={() => setCoverImage("")} style={removeBtn}>❌ Remove</button>
           </div>
         )}
@@ -163,13 +175,13 @@ const handleCroppedCover = async (croppedBlob) => {
         />
       )}
       {showCropper && rawCoverFile && (
-  <CropperModal
+  <CropListImageModal
     file={rawCoverFile}
-    shape="rect"
     onClose={() => setShowCropper(false)}
     onCropComplete={handleCroppedCover}
   />
 )}
+
     </div>
   );
 }

@@ -5,6 +5,7 @@ import AddMovieModal from "../components/lists/AddMovieModal";
 import MovieListSortable from "../components/lists/MovieListSortable";
 import { backend } from "../config";
 import CropperModal from "../components/CropperModal";
+import CropListImageModal from "../components/CropListImageModal"; // ✅ NEW
 
 export default function EditListPage() {
   const { id } = useParams();
@@ -140,7 +141,18 @@ export default function EditListPage() {
           </div>
         ) : (
           <div>
-            <img src={coverImage} alt="Cover" style={{ width: "100%", borderRadius: "10px", objectFit: "cover" }} />
+            <img
+  src={coverImage}
+  alt="Cover"
+  style={{
+    width: "100%",
+    aspectRatio: "16 / 9",  // ✅ Ensures consistent rectangle
+    borderRadius: "10px",
+    objectFit: "cover",
+    backgroundColor: "#222", // ✅ prevents visual pop while loading
+  }}
+/>
+
             <button onClick={() => setCoverImage("")} style={removeBtn}>❌ Remove</button>
           </div>
         )}
@@ -187,9 +199,8 @@ export default function EditListPage() {
         />
       )}
       {showCropper && rawCoverFile && (
-  <CropperModal
+  <CropListImageModal
     file={rawCoverFile}
-    shape="rect"
     onClose={() => setShowCropper(false)}
     onCropComplete={handleCroppedCover}
   />

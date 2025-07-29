@@ -1,6 +1,13 @@
 import { createImage } from "./createImage";
 
-export default async function getCroppedImg(imageSrc, pixelCrop) {
+/**
+ * Crop and return a blob from the image source and pixel crop area.
+ * @param {string} imageSrc - Source URL of the image
+ * @param {Object} pixelCrop - { x, y, width, height }
+ * @param {string} [format="image/jpeg"] - Output format: "image/jpeg" or "image/png"
+ * @returns {Promise<Blob>} - Cropped image as a blob
+ */
+export default async function getCroppedImg(imageSrc, pixelCrop, format = "image/jpeg") {
   const image = await createImage(imageSrc);
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
@@ -20,9 +27,13 @@ export default async function getCroppedImg(imageSrc, pixelCrop) {
     pixelCrop.height
   );
 
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     canvas.toBlob((blob) => {
+      if (!blob) {
+        console.error("❌ Failed to generate cropped image blob");
+        return reject(new Error("Canvas blob is null"));
+      }
       resolve(blob);
-    }, "image/jpeg");
+    }, format);
   });
 }
