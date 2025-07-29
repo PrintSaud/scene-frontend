@@ -72,32 +72,41 @@ export default function ProfilePage() {
     fetchLogs();
   }, [id]);
 
-  useEffect(() => {
-    const fetchCustomPosters = async () => {
-      const userId = id; // Always use the profile owner's ID
-  
-      const movieIds = logs
-        .map((log) => {
-          const movie = log.movie;
-          if (typeof movie === "object" && movie?.id) return Number(movie.id);
-          if (typeof movie === "string" || typeof movie === "number") return Number(movie);
-          return null;
-        })
-        .filter(Boolean);
-  
-      if (!movieIds.length) return;
-  
-      try {
-        const { data } = await api.post("/api/posters/batch", { userId, movieIds });
-        setCustomPosters(data);
-      } catch (err) {
-        console.error("❌ Failed to fetch custom posters", err);
-      }
-    };
-  
-    if (logs.length > 0) fetchCustomPosters();
-  }, [logs, id]);
-  
+
+    useEffect(() => {
+      const fetchCustomPosters = async () => {
+        const userId = id;
+    
+        const movieIds = logs
+          .map((log) => {
+            const movie = log.movie;
+            if (typeof movie === "object" && movie?.tmdbId) return Number(movie.tmdbId);
+            if (typeof movie === "object" && movie?.id) return Number(movie.id);
+            if (typeof movie === "number") return movie;
+            if (typeof movie === "string") return parseInt(movie);
+            return null;
+          })
+          .filter((id) => !isNaN(id))
+          .filter((id, index, arr) => arr.indexOf(id) === index); // remove duplicates
+    
+        if (!movieIds.length || !userId) {
+          console.warn("⚠️ Missing userId or valid movieIds for custom posters");
+          return;
+        }
+    
+        try {
+          console.log("📤 Fetching custom posters for:", { userId, movieIds });
+          const data = await getCustomPostersBatch(userId, movieIds);
+          console.log("✅ Custom posters received:", data);
+          setCustomPosters(data);
+        } catch (err) {
+          console.error("❌ Failed to fetch custom posters", err);
+        }
+      };
+    
+      if (logs.length > 0) fetchCustomPosters();
+    }, [logs, id]);
+    
 
   useEffect(() => {
     if (stored && user) {

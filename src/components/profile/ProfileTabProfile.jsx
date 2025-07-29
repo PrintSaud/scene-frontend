@@ -8,6 +8,7 @@ import { FaRegComment } from "react-icons/fa";
 import { subDays, isBefore, formatDistanceToNowStrict } from "date-fns";
 import { FiExternalLink } from "react-icons/fi";
 import { AiOutlineCheck } from "react-icons/ai";
+import { getCustomPostersBatch } from "../../api/api";
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const FALLBACK_POSTER = "/default-poster.jpg";
@@ -29,26 +30,32 @@ export default function ProfileTabProfile({
         .slice(0, 6)
     : [];
 
-  useEffect(() => {
-    const fetchPosters = async () => {
-      const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY;
-      const updated = {};
-      for (const movie of favoriteMovies) {
-        const id = movie.id || movie._id || movie.tmdbId;
-        if (!customPosters[id]) {
-          try {
-            const res = await fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${TMDB_KEY}`);
-            const data = await res.json();
-            updated[id] = data.poster_path ? `${TMDB_IMG}${data.poster_path}` : FALLBACK_POSTER;
-          } catch {
-            updated[id] = FALLBACK_POSTER;
+    useEffect(() => {
+      const fetchPosters = async () => {
+        const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY;
+        const updated = {};
+        const validIds = [];
+    
+        for (const movie of favoriteMovies) {
+          const id = movie.tmdbId || movie.id || movie._id;
+          if (!customPosters[id]) {
+            validIds.push(id);
+            try {
+              const res = await fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${TMDB_KEY}`);
+              const data = await res.json();
+              updated[id] = data.poster_path ? `${TMDB_IMG}${data.poster_path}` : FALLBACK_POSTER;
+            } catch {
+              updated[id] = FALLBACK_POSTER;
+            }
           }
         }
-      }
-      setTmdbPosters(updated);
-    };
-    fetchPosters();
-  }, [favoriteMovies]);
+    
+        setTmdbPosters(updated);
+      };
+    
+      fetchPosters();
+    }, [favoriteMovies, customPosters]);
+    
 
   const handleLogClick = (log) => {
     if (!navigate) return;
