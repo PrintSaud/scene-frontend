@@ -93,6 +93,9 @@ export default function ProfilePage() {
           console.log("📤 Fetching custom posters for:", { userId, movieIds });
           const data = await getCustomPostersBatch(userId, movieIds);
           console.log("✅ Custom posters received:", data);
+Object.keys(data).forEach((k) =>
+  console.log(`🔑 Key: ${k} — Poster: ${data[k]}`)
+);
           setCustomPosters(data);
         } catch (err) {
           console.error("❌ Failed to fetch custom posters", err);
@@ -267,6 +270,7 @@ export default function ProfilePage() {
     logs={logs}
     favorites={user.favoriteFilms || []}
     profileUserId={user._id}
+    customPosters={customPosters}
   />  
   )}
 </div>

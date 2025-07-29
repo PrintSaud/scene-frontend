@@ -8,8 +8,9 @@ import axios from "../../api/api";
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const FALLBACK_POSTER = "/default-poster.jpg";
 
-export default function ProfileTabFilms({ logs, favorites = [], profileUserId }) {
-  const [customPosters, setCustomPosters] = useState({});
+
+  export default function ProfileTabFilms({ logs, favorites = [], profileUserId, customPosters = {} }) {
+
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [sortType, setSortType] = useState("added");
@@ -175,8 +176,9 @@ export default function ProfileTabFilms({ logs, favorites = [], profileUserId })
 
 
             const posterUrl =
-  customPosters[movieId] ||
-  (log.movie?.poster_path ? `${TMDB_IMG}${log.movie.poster_path}` : FALLBACK_POSTER);
+            customPosters[String(movieId)] ||
+            (log.movie?.poster_path ? `${TMDB_IMG}${log.movie.poster_path}` : FALLBACK_POSTER);
+          
 
 
 
