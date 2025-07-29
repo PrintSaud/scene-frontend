@@ -106,12 +106,21 @@ export const suggestListToFriends = (listId, recipients) =>
 //
 // 🖼️ POSTERS
 //
-export const getCustomPostersBatch = (userId, movieIds) => {
-  return api.post("/api/posters/batch", {
-    userId,
-    movieIds,
-  }).then((res) => res.data);
+export const getCustomPostersBatch = async (userId, movieIds) => {
+  const token = JSON.parse(localStorage.getItem("user"))?.token;
+
+  const res = await api.post(
+    "/api/posters/batch",
+    { userId, movieIds }, // ✅ send correct userId
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return res.data;
 };
+
 
 
 //
