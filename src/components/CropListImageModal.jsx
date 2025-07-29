@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
 import Cropper from "react-easy-crop";
-import getCroppedImg from "../../utils/cropImage";
+import getCroppedImg from "../utils/cropImage";
 import { AiOutlineClose } from "react-icons/ai";
 
 export default function CropListImageModal({ file, onClose, onCropComplete }) {
