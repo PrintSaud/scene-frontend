@@ -56,14 +56,18 @@ export default function ProfileTabReviews({ logs, filter, setFilter, navigate, h
 
       {/* 📝 Reviews */}
       {filtered.map((log) => {
-        let poster = "/default-poster.png";
-        if (log.posterOverride) {
-          poster = log.posterOverride;
-        } else if (log.poster) {
+        let poster = log.posterOverride || "/default-poster.png";
+        const movieId =
+          typeof log.movie === "string"
+            ? log.movie
+            : log.movie?.id || log.movie?._id || log.movieId;
+        
+        if (!poster && movieId && log.poster) {
           poster = log.poster.startsWith("http")
             ? log.poster
             : `${TMDB_IMG}${log.poster}`;
         }
+        
 
         const isLikedByMe = log.likes?.includes(userId);
 

@@ -53,7 +53,8 @@ if (!userId) return;
     
 
     if (logs?.length > 0) fetchCustomPosters();
-  }, [logs]);
+  }, [logs, profileUserId]);
+
 
   const sortedLogs = useMemo(() => {
     let filtered = [...logs];

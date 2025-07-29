@@ -150,59 +150,60 @@ export default function ProfilePage() {
 />
 
 
-      <ProfileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+<ProfileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      <div style={{ padding: "0 16px" }}>
+<div style={{ padding: "0 16px" }}>
+  {activeTab === "Profile" && (
+    <ProfileTabProfile
+      user={user}
+      logs={logs}
+      favoriteMovies={user.favoriteMovies || []}
+      navigate={navigate}
+      profileUserId={id} // ✅ Add this
+    />
+  )}
 
-      {activeTab === "Profile" && (
-        <ProfileTabProfile
-        user={user}
-        logs={logs}
-        favoriteMovies={user.favoriteMovies || []}
-        customPosters={user.customPosters || {}}
-        navigate={navigate}
-      />      
-)}
+  {activeTab === "Reviews" && (
+    <ProfileTabReviews
+      logs={logs}
+      filter={reviewFilter}
+      setFilter={setReviewFilter}
+      navigate={navigate}
+      profileUserId={id} // ✅ Add this
+    />
+  )}
 
-        {activeTab === "Reviews" && (
-          <ProfileTabReviews
-            logs={logs}
-            filter={reviewFilter}
-            setFilter={setReviewFilter}
-            navigate={navigate}
-          />
-        )}
-        {activeTab === "Watchlist" && (
-          <ProfileTabWatchlist
-            user={user}
-            sortType={sortType}
-            setSortType={setSortType}
-            order={order}
-            setOrder={setOrder}
-            watchList={watchlist}
-            setWatchList={setWatchlist}
-            profileUserId={id}
-          />
-        )}
-        {activeTab === "Lists" && (
-          <ProfileTabLists
-            user={stored}
-            profileUserId={id}
-            refreshTrigger={listRefreshKey}
-            triggerRefresh={() => setListRefreshKey((prev) => prev + 1)}
-          />
-        )}
-        {activeTab === "Films" && (
-          
-<ProfileTabFilms
-  logs={logs}
-  favorites={user.favorites || []}
-  profileUserId={id}
-/>
-     
-)}
+  {activeTab === "Watchlist" && (
+    <ProfileTabWatchlist
+      user={user}
+      sortType={sortType}
+      setSortType={setSortType}
+      order={order}
+      setOrder={setOrder}
+      watchList={watchlist}
+      setWatchList={setWatchlist}
+      profileUserId={id}
+    />
+  )}
 
-      </div>
+  {activeTab === "Lists" && (
+    <ProfileTabLists
+      user={stored}
+      profileUserId={id}
+      refreshTrigger={listRefreshKey}
+      triggerRefresh={() => setListRefreshKey((prev) => prev + 1)}
+    />
+  )}
+
+  {activeTab === "Films" && (
+    <ProfileTabFilms
+      logs={logs}
+      favorites={user.favorites || []}
+      profileUserId={id} // ✅ Already correct
+    />
+  )}
+</div>
+
     </div>
   );
 }

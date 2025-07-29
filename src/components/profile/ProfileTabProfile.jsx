@@ -157,15 +157,16 @@ export default function ProfileTabProfile({
             ? log.movie
             : log.movie?._id || log.movie?.id || log.movieId;
 
-        const posterUrl =
-          log.posterOverride ||
-          (log.poster?.startsWith("http")
-            ? log.poster
-            : log.poster
-            ? `${TMDB_IMG}${log.poster}`
-            : log.movie?.poster_path
-            ? `${TMDB_IMG}${log.movie.poster_path}`
-            : FALLBACK_POSTER);
+            const posterUrl =
+            customPosters[movieId] ||
+            (log.poster?.startsWith("http")
+              ? log.poster
+              : log.poster
+              ? `${TMDB_IMG}${log.poster}`
+              : log.movie?.poster_path
+              ? `${TMDB_IMG}${log.movie.poster_path}`
+              : FALLBACK_POSTER);
+          
 
         const hasReview = log.review && log.review.length > 0;
 
