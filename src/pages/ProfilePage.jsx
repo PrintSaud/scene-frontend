@@ -74,39 +74,36 @@ export default function ProfilePage() {
   }, [id]);
 
 
-    useEffect(() => {
-      const fetchCustomPosters = async () => {
-        const userId = id;
-
-        const movieIds = [
-          ...logs.map((log) => Number(log.tmdbId)),
-          ...(user?.favoriteFilms || []).map((m) => Number(m.tmdbId || m.id || m._id))
-        ].filter((id) => !isNaN(id));
-        
-        
-      
-      
-    
-        if (!movieIds.length || !userId) {
-          console.warn("⚠️ Missing userId or valid movieIds for custom posters");
-          return;
-        }
-    
-        try {
-          console.log("📤 Fetching custom posters for:", { userId, movieIds });
-          const data = await getCustomPostersBatch(userId, movieIds);
-          console.log("✅ Custom posters received:", data);
-Object.keys(data).forEach((k) =>
-  console.log(`🔑 Key: ${k} — Poster: ${data[k]}`)
-);
-          setCustomPosters(data);
-        } catch (err) {
-          console.error("❌ Failed to fetch custom posters", err);
-        }
-      };
-    
-      if (logs.length > 0) fetchCustomPosters();
-    }, [logs, id]);
+  useEffect(() => {
+    if (!logs.length || !user) return;
+  
+    const fetchCustomPosters = async () => {
+      const userId = id;
+  
+      const logIds = logs.map((log) => Number(log.tmdbId)).filter(Boolean);
+      const favIds = (user.favoriteFilms || []).map(
+        (m) => Number(m.tmdbId || m.id || m._id)
+      ).filter(Boolean);
+  
+      const movieIds = [...new Set([...logIds, ...favIds])];
+  
+      if (!movieIds.length || !userId) {
+        console.warn("⚠️ Missing userId or valid movieIds for custom posters");
+        return;
+      }
+  
+      try {
+        console.log("📤 Fetching custom posters for:", { userId, movieIds });
+        const data = await getCustomPostersBatch(userId, movieIds);
+        setCustomPosters(data);
+      } catch (err) {
+        console.error("❌ Failed to fetch custom posters", err);
+      }
+    };
+  
+    fetchCustomPosters();
+  }, [logs, user, id]);
+  
     
 
   useEffect(() => {
