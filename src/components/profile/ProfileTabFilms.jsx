@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import StarRating from "../StarRating";
 import { AiFillHeart } from "react-icons/ai";
 import { FaRegComment } from "react-icons/fa";
-import axios from "../../api/api"; // or wherever you import your axios instance
+import axios from "../../api/api";
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const FALLBACK_POSTER = "/default-poster.jpg";
@@ -11,27 +11,40 @@ const FALLBACK_POSTER = "/default-poster.jpg";
 export default function ProfileTabFilms({ logs, favorites = [] }) {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
-
   const [sortType, setSortType] = useState("added");
   const [order, setOrder] = useState("desc");
+  const [customPosters, setCustomPosters] = useState({});
 
   useEffect(() => {
     if (logs.length > 100) {
       setIsLoading(true);
-      const timeout = setTimeout(() => {
-        setIsLoading(false);
-      }, 1000); // 1s loading screen for heavy logs
-  
+      const timeout = setTimeout(() => setIsLoading(false), 1000);
       return () => clearTimeout(timeout);
     } else {
       setIsLoading(false);
     }
   }, [logs]);
 
+  // ✅ Fetch profile owner's poster overrides
+  useEffect(() => {
+    const fetchCustomPosters = async () => {
+      const userId = logs?.[0]?.user?._id || logs?.[0]?.user;
+      if (!userId) return;
+      const movieIds = logs.map((log) => log.movie?.id || log.movie).filter(Boolean);
+
+      try {
+        const { data } = await axios.post("/api/posters/batch", { userId, movieIds });
+        setCustomPosters(data);
+      } catch (err) {
+        console.error("❌ Failed to fetch custom posters", err);
+      }
+    };
+
+    if (logs?.length > 0) fetchCustomPosters();
+  }, [logs]);
+
   const sortedLogs = useMemo(() => {
     let filtered = [...logs];
-    
-    // ⭐ FIX favorites filter to ensure numeric comparison
     if (sortType === "favorites") {
       filtered = filtered.filter((log) => {
         const movieId = log.movie?.id || log.movie;
@@ -39,7 +52,7 @@ export default function ProfileTabFilms({ logs, favorites = [] }) {
       });
       return filtered;
     }
-  
+
     filtered.sort((a, b) => {
       let valA, valB;
       switch (sortType) {
@@ -48,20 +61,12 @@ export default function ProfileTabFilms({ logs, favorites = [] }) {
           valB = b.rating || 0;
           break;
         case "release":
-          valA = a.movie && a.movie.release_date
-            ? new Date(a.movie.release_date).getTime()
-            : 0;
-          valB = b.movie && b.movie.release_date
-            ? new Date(b.movie.release_date).getTime()
-            : 0;
+          valA = new Date(a.movie?.release_date || 0).getTime();
+          valB = new Date(b.movie?.release_date || 0).getTime();
           break;
         case "runtime":
-          valA = a.movie && a.movie.runtime
-            ? a.movie.runtime
-            : 0;
-          valB = b.movie && b.movie.runtime
-            ? b.movie.runtime
-            : 0;
+          valA = a.movie?.runtime || 0;
+          valB = b.movie?.runtime || 0;
           break;
         default:
           valA = new Date(a.watchedAt || 0).getTime();
@@ -69,7 +74,7 @@ export default function ProfileTabFilms({ logs, favorites = [] }) {
       }
       return (valA - valB) * (order === "asc" ? 1 : -1);
     });
-  
+
     return filtered;
   }, [logs, sortType, order, favorites]);
 
@@ -87,8 +92,6 @@ export default function ProfileTabFilms({ logs, favorites = [] }) {
       </div>
     );
   }
-  
-  
 
   return (
     <>
@@ -135,21 +138,18 @@ export default function ProfileTabFilms({ logs, favorites = [] }) {
         </select>
       </div>
 
-      
-
-      {/* 🎬 Grid or empty state */}
+      {/* 🎬 Grid */}
       {sortedLogs.length === 0 ? (
         <div style={{ textAlign: "center", color: "#888", marginTop: "30px", fontSize: "14px" }}>
           {sortType === "favorites"
             ? "You haven’t marked any favorite films yet."
             : "No films found for this filter."}
         </div>
-        
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "4px", padding: "0" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "4px" }}>
           {sortedLogs.map((log) => {
             const movieId = log.movie?.id || log.movie;
-            const posterUrl = log.posterOverride
+            const posterUrl = customPosters[movieId]
               || (log.poster?.startsWith("http") ? log.poster
               : log.poster ? `${TMDB_IMG}${log.poster}`
               : log.movie?.poster_path ? `${TMDB_IMG}${log.movie.poster_path}`
@@ -158,18 +158,13 @@ export default function ProfileTabFilms({ logs, favorites = [] }) {
             const isFavorite = favorites.includes(Number(movieId));
             const hasReview = log.review && log.review.trim().length > 0;
 
-
-
-            // Inside map:
             const handleClick = async () => {
               const user = JSON.parse(localStorage.getItem("user"));
               const token = user?.token;
               const ownerId = log.user?._id || log.user;
-            
-              if (!token || !ownerId) {
-                return navigate(`/movie/${movieId}`);
-              }
-            
+
+              if (!token || !ownerId) return navigate(`/movie/${movieId}`);
+
               try {
                 const { data: logsForThisMovie } = await axios.get(
                   `/api/logs/user/${ownerId}/movie/${movieId}`,
@@ -177,22 +172,16 @@ export default function ProfileTabFilms({ logs, favorites = [] }) {
                     headers: { Authorization: `Bearer ${token}` },
                   }
                 );
-            
-                // 🛠️ Check if at least one of them has a review
+
                 const reviewedLog = logsForThisMovie.find((log) => log.review?.trim());
-            
-                if (reviewedLog) {
-                  navigate(`/review/${reviewedLog._id}`);
-                } else {
-                  navigate(`/movie/${movieId}`);
-                }
+                if (reviewedLog) navigate(`/review/${reviewedLog._id}`);
+                else navigate(`/movie/${movieId}`);
               } catch (err) {
                 console.error("Failed to fetch logs for this movie", err);
-                navigate(`/movie/${movieId}`); // fallback
+                navigate(`/movie/${movieId}`);
               }
             };
-            
-            
+
             return (
               <div key={log._id} onClick={handleClick} style={{ position: "relative", cursor: "pointer" }}>
                 <img

@@ -157,24 +157,27 @@ export default function FollowersFollowingPage() {
           <span style={{ fontSize: "13px", fontWeight: "600" }}>{u.username}</span>
         </div>
 
-        {/* Follow/Unfollow button */}
-        {u._id !== currentUser._id && (
-          <button
-            onClick={() => toggleFollow(u._id)}
-            style={{
-              padding: "4px 10px",
-              borderRadius: "20px",
-              fontSize: "12px",
-              background: currentUser.following.includes(u._id) ? "#222" : "#fff",
-              color: currentUser.following.includes(u._id) ? "#fff" : "#000",
-              border: "1px solid #444",
-              cursor: "pointer",
-              marginLeft: "auto",
-            }}
-          >
-            {currentUser.following.includes(u._id) ? "Unfollow" : "Follow"}
-          </button>
-        )}
+{/* Follow/Unfollow button */}
+{u._id !== currentUser._id && (
+  <button
+    onClick={() => toggleFollow(u._id)}
+    style={{
+      padding: "4px 10px",
+      borderRadius: "20px",
+      fontSize: "12px",
+      background: (currentUser?.following || []).includes(u._id)
+        ? "#222" : "#fff",
+      color: (currentUser?.following || []).includes(u._id)
+        ? "#fff" : "#000",
+      border: "1px solid #444",
+      cursor: "pointer",
+      marginLeft: "auto",
+    }}
+  >
+    {(currentUser?.following || []).includes(u._id) ? "Unfollow" : "Follow"}
+  </button>
+)}
+
       </div>
     ))}
   </div>
