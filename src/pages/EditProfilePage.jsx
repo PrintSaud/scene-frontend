@@ -63,6 +63,7 @@ export default function EditProfilePage() {
   const [showAddMovieModal, setShowAddMovieModal] = useState(false);
   const [rawAvatarFile, setRawAvatarFile] = useState(null);
 const [showCropper, setShowCropper] = useState(false);
+const [avatarFile, setAvatarFile] = useState(null);
 
 
   useEffect(() => {
@@ -424,13 +425,13 @@ const [showCropper, setShowCropper] = useState(false);
         />
       )}
       {showCropper && rawAvatarFile && (
-        <CropperModal
-        file={avatarFile}
-        onClose={() => setShowCrop(false)}
-        onCropComplete={(blob) => uploadAvatar(blob)}
-        shape="circle"
-        aspectRatio={1}
-      />      
+  <CropperModal
+    file={rawAvatarFile}                      // ✅ fix here
+    onClose={() => setShowCropper(false)}     // ✅ typo fix here
+    onCropComplete={(blob) => handleCroppedAvatar(blob)}
+    shape="circle"
+    aspectRatio={1}
+  />
 )}
 
     </>

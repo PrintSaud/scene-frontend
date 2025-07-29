@@ -178,16 +178,16 @@ export default function SignupPage() {
         <span>Already have an account?</span>
         <a href="/login" className="signup-link">Log in</a>
       </div>
-
       {showCropper && rawAvatarFile && (
-        <CropperModal
-        file={avatarFile}
-        onClose={() => setShowCrop(false)}
-        onCropComplete={(blob) => uploadAvatar(blob)}
-        shape="circle"
-        aspectRatio={1}
-      />      
-      )}
+  <CropperModal
+    file={rawAvatarFile}                         // ✅ Fix: use raw file
+    onClose={() => setShowCropper(false)}        // ✅ Fix typo
+    onCropComplete={handleCropped}               // ✅ Hook up correct handler
+    shape="circle"
+    aspectRatio={1}
+  />
+)}
+
     </div>
   );
 }
