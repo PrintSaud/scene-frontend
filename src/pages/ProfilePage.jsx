@@ -29,6 +29,8 @@ export default function ProfilePage() {
   const imgRef = useRef();
   const [isFollowing, setIsFollowing] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
+  const [resolvedPosters, setResolvedPosters] = useState({});
+
 
   useEffect(() => {
     try {
@@ -104,6 +106,19 @@ export default function ProfilePage() {
     fetchCustomPosters();
   }, [logs, user]); // ✅ Removed `id` dependency to avoid confusion
   
+  useEffect(() => {
+    if (!logs.length || !user) return;
+  
+    const finalPosters = {};
+    logs.forEach((log) => {
+      const tmdbId = log.tmdbId;
+      const custom = customPosters[tmdbId];
+      const tmdb = log.poster_path ? `https://image.tmdb.org/t/p/w500${log.poster_path}` : null;
+      finalPosters[tmdbId] = custom || tmdb || "/fallback.jpg"; // or your default image
+    });
+  
+    setResolvedPosters(finalPosters); // ✅ new state
+  }, [logs, customPosters]);
   
     
 
@@ -267,11 +282,11 @@ export default function ProfilePage() {
 
 {activeTab === "Films" && (
   <ProfileTabFilms
-    logs={logs}
-    favorites={user.favoriteFilms || []}
-    profileUserId={id} // ✅ fixed
-    customPosters={customPosters}
-  />
+  logs={logs}
+  favorites={user.favoriteFilms || []}
+  profileUserId={id}
+  posters={resolvedPosters} // ✅ pass this instead of raw customPosters
+/>
 )}
 
 </div>

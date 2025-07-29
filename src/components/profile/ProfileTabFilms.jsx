@@ -201,16 +201,18 @@ if (customPosters[String(id)]) continue;
             return (
               <div key={log._id} onClick={handleClick} style={{ position: "relative", cursor: "pointer" }}>
                 <img
-                  src={posterUrl}
-                  alt={log.title}
-                  style={{
-                    width: "100%",
-                    aspectRatio: "2/3",
-                    objectFit: "cover",
-                    borderRadius: "6px",
-                  }}
-                  onError={(e) => (e.currentTarget.src = FALLBACK_POSTER)}
-                />
+  src={posterUrl}
+  loading="lazy" // ✅ THIS line adds the lazy loading boost
+  alt={log.title}
+  style={{
+    width: "100%",
+    aspectRatio: "2/3",
+    objectFit: "cover",
+    borderRadius: "6px",
+  }}
+  onError={(e) => (e.currentTarget.src = FALLBACK_POSTER)}
+/>
+
 
                 <div
                   style={{
