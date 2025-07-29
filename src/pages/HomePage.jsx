@@ -165,7 +165,7 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 
       {/* 👀 Friends Just Watched */}
       <h2 style={{ marginTop: "50px", fontSize: "22px" }}>
-        Your friends just watched 👀
+        Recent activiies
         <span
           onClick={() => navigate("/friends-activity")}
           style={{ float: "right", cursor: "pointer" }}

@@ -16,6 +16,17 @@ export default function ChangePosterModal({ movieId, onClose }) {
 
   useEffect(() => {
     const fetchPosters = async () => {
+      // 🔒 If movie is Possession (11020), override all logic
+      if (movieId === "11020" || movieId === 11020) {
+        setPosters([
+          {
+            file_path: "/iAdsTUNjpHIREH4C4UNhkbVDWYi.jpg",
+            vote_count: 999,
+          },
+        ]);
+        return;
+      }
+  
       try {
         const { data } = await axios.get(`/api/logs/proxy/tmdb/images/${movieId}`);
         const sorted = (data.posters || []).sort(
@@ -30,15 +41,25 @@ export default function ChangePosterModal({ movieId, onClose }) {
     fetchPosters();
   }, [movieId]);
   
+  
 
   const handleSave = async () => {
     if (!selectedPoster) return;
 
     try {
       setLoading(true);
-      await changePoster(movieId, {
-        posterUrl: `https://image.tmdb.org/t/p/w500${selectedPoster}`,
-      });
+      const posterUrl = `https://image.tmdb.org/t/p/w500${selectedPoster}`;
+
+if (
+  movieId === "11020" &&
+  posterUrl !== "https://image.tmdb.org/t/p/w500/iAdsTUNjpHIREH4C4UNhkbVDWYi.jpg"
+) {
+  alert("Only the approved poster can be used for this film.");
+  return;
+}
+
+await changePoster(movieId, { posterUrl });
+
       onClose();
     } catch (err) {
       console.error("Failed to update poster", err);
@@ -140,7 +161,7 @@ export default function ChangePosterModal({ movieId, onClose }) {
         ref={scrollRef}
         style={{
           marginTop: "48px",
-          paddingBottom: "100px", // ✅ Extra scrollable room
+          paddingBottom: "120px", // ✅ Extra scrollable room
           textAlign: "center",
         }}
       >
