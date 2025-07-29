@@ -15,7 +15,6 @@ import SignupPage from './pages/SignupPage';
 import VerifyEmailPage from './pages/VerifyEmailPage';
 import ForgotPassword from "./pages/ForgotPassword";
 import VerifyResetCode from "./pages/VerifyResetCode";
-import ResetPassword from "./pages/ResetPassword";
 import LogModal from "./components/modals/LogModal";
 import UploadAvatar from "./pages/UploadAvatar";
 import FriendsActivityPage from "./pages/FriendsActivityPage";
@@ -119,7 +118,6 @@ function App() {
           <Route path="/home" element={<PrivateRoute><HomePage /></PrivateRoute>} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/verify-code" element={<VerifyResetCode />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/choose-avatar" element={<UploadAvatar />} />
           <Route path="/friends-activity" element={<FriendsActivityPage />} />
           <Route path="/trending" element={<TrendingPage />} />
