@@ -17,8 +17,10 @@ export default function ProfileTabProfile({
   favoriteMovies = [],
   logs = [],
   navigate,
+  profileUserId, // ✅ ADD THIS
   customPosters = {},
-}) {
+})
+{
   const [showConnections, setShowConnections] = useState(true);
   const [tmdbPosters, setTmdbPosters] = useState({});
 

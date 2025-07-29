@@ -33,7 +33,8 @@ export default function ProfileTabFilms({ logs, favorites = [], profileUserId, c
 
       for (const log of logs) {
         const id = log.tmdbId || log.movie?.id || log.movie?._id || log.movie;
-        if (!id || customPosters[id]) continue;
+        if (!id) continue;
+if (customPosters[String(id)]) continue;
         idsToFetch.push(id);
       }
 
@@ -165,9 +166,10 @@ export default function ProfileTabFilms({ logs, favorites = [], profileUserId, c
             const movieId = log.tmdbId || log.movie?.id || log.movie?._id || log.movie;
 
             const posterUrl =
-              customPosters[movieId] ||
-              tmdbFallbacks[movieId] ||
-              (log.movie?.poster_path ? `${TMDB_IMG}${log.movie.poster_path}` : FALLBACK_POSTER);
+            customPosters[String(movieId)] ||
+            tmdbFallbacks[String(movieId)] ||
+            (log.movie?.poster_path ? `${TMDB_IMG}${log.movie.poster_path}` : FALLBACK_POSTER);
+          
 
             const isFavorite = favorites.includes(Number(movieId));
             const hasReview = log.review && log.review.trim().length > 0;

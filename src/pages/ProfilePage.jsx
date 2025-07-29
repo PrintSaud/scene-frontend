@@ -78,9 +78,11 @@ export default function ProfilePage() {
       const fetchCustomPosters = async () => {
         const userId = id;
     
-        const movieIds = logs
-        .map((log) => Number(log.tmdbId))
-        .filter((id) => !isNaN(id));
+        const movieIds = [
+          ...logs.map((log) => Number(log.tmdbId)),
+          ...(user.favoriteFilms || []).map((m) => Number(m.tmdbId || m.id || m._id))
+        ].filter((id) => !isNaN(id));
+        
       
       
     
@@ -222,13 +224,13 @@ Object.keys(data).forEach((k) =>
 <div style={{ padding: "0 16px" }}>
   {activeTab === "Profile" && (
     <ProfileTabProfile
-      user={user}
-      logs={logs}
-      favoriteMovies={user.favoriteMovies || []}
-      navigate={navigate}
-      profileUserId={id}
-      customPosters={customPosters} // ✅
-    />
+  user={user}
+  logs={logs}
+  favoriteMovies={user.favoriteFilms}
+  profileUserId={user._id} // ✅ make sure this is passed
+  customPosters={customPosters}
+/>
+
   )}
 
 {activeTab === "Reviews" && (
@@ -265,14 +267,15 @@ Object.keys(data).forEach((k) =>
     />
   )}
 
-  {activeTab === "Films" && (
-    <ProfileTabFilms
+{activeTab === "Films" && (
+  <ProfileTabFilms
     logs={logs}
     favorites={user.favoriteFilms || []}
-    profileUserId={user._id}
+    profileUserId={id} // ✅ fixed
     customPosters={customPosters}
-  />  
-  )}
+  />
+)}
+
 </div>
 
 
