@@ -41,6 +41,27 @@ const getRelativeTime = (date) => {
       return new Date(b.watchedAt) - new Date(a.watchedAt);
     });
 
+    const handleLike = async (logId) => {
+      try {
+        const token = JSON.parse(localStorage.getItem("user"))?.token;
+        await axios.post(
+          `/api/logs/${logId}/like`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+    
+        // Optional: trigger a refresh or mutate the state if needed
+        console.log("✅ Liked!");
+      } catch (err) {
+        console.error("❌ Failed to like log", err);
+      }
+    };
+    
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "24px" }}>
       {/* ⬇️ Dropdown Filter */}
@@ -78,6 +99,8 @@ const getRelativeTime = (date) => {
         
 
         const isLikedByMe = log.likes?.includes(userId);
+
+        
 
         return (
           <div

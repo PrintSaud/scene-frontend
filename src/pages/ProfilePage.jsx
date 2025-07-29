@@ -192,16 +192,17 @@ export default function ProfilePage() {
     />
   )}
 
-  {activeTab === "Reviews" && (
-    <ProfileTabReviews
-      logs={logs}
-      filter={reviewFilter}
-      setFilter={setReviewFilter}
-      navigate={navigate}
-      handleLike={handleLike}
-      customPosters={customPosters} // ✅
-    />
-  )}
+{activeTab === "Reviews" && (
+  <ProfileTabReviews
+    logs={logs}
+    filter={reviewFilter}
+    setFilter={setReviewFilter}
+    navigate={navigate}
+    handleLike={handleLike} // ✅ now passed
+    customPosters={customPosters}
+  />
+)}
+
 
   {activeTab === "Watchlist" && (
     <ProfileTabWatchlist
