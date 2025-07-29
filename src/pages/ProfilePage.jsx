@@ -78,7 +78,7 @@ export default function ProfilePage() {
     if (!logs.length || !user) return;
   
     const fetchCustomPosters = async () => {
-      const userId = id;
+      const userId = user._id; // ✅ Use the profile owner's ID
   
       const logIds = logs.map((log) => Number(log.tmdbId)).filter(Boolean);
       const favIds = (user.favoriteFilms || []).map(
@@ -102,7 +102,8 @@ export default function ProfilePage() {
     };
   
     fetchCustomPosters();
-  }, [logs, user, id]);
+  }, [logs, user]); // ✅ Removed `id` dependency to avoid confusion
+  
   
     
 
