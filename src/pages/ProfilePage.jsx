@@ -161,6 +161,38 @@ export default function ProfilePage() {
     window.addEventListener("navigateToFilms", handleNavigateToFilms);
     return () => window.removeEventListener("navigateToFilms", handleNavigateToFilms);
   }, []);
+
+  const handleLike = async (logId) => {
+    try {
+      const token = JSON.parse(localStorage.getItem("user"))?.token;
+      await api.post(
+        `/api/logs/${logId}/like`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      // ✅ Optional: update log likes in real-time
+      setLogs((prevLogs) =>
+        prevLogs.map((log) =>
+          log._id === logId
+            ? {
+                ...log,
+                likes: log.likes.includes(stored._id)
+                  ? log.likes.filter((id) => id !== stored._id)
+                  : [...log.likes, stored._id],
+              }
+            : log
+        )
+      );
+    } catch (err) {
+      console.error("❌ Failed to like log", err);
+    }
+  };
+  
   
   
   if (!user) return <div style={{ color: "white", padding: "20px" }}>Loading...</div>;
