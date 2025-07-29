@@ -29,20 +29,21 @@ export default function ProfileTabFilms({ logs, favorites = [], profileUserId, c
   useEffect(() => {
     const fetchFallbackPosters = async () => {
       const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY;
-      const idsToFetch = [];
-
-      for (const log of logs) {
-        const id = log.tmdbId || log.movie?.id || log.movie?._id || log.movie;
-        if (!id) continue;
-if (customPosters[String(id)]) continue;
-        idsToFetch.push(id);
-      }
-
+  
+      // ✅ Get IDs with no custom posters
+      const idsToFetch = logs
+        .map((log) => log.tmdbId || log.movie?.id || log.movie?._id || log.movie)
+        .filter((id) => id && !customPosters[String(id)]);
+  
       const uniqueIds = [...new Set(idsToFetch)];
-
+  
       const posterMap = {};
-
-      for (const id of uniqueIds) {
+      const preloadCount = 60;
+  
+      const preloadIds = uniqueIds.slice(0, preloadCount);
+      const backgroundIds = uniqueIds.slice(preloadCount);
+  
+      const fetchPoster = async (id) => {
         try {
           const res = await fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${TMDB_KEY}`);
           const data = await res.json();
@@ -50,13 +51,22 @@ if (customPosters[String(id)]) continue;
         } catch (err) {
           posterMap[id] = FALLBACK_POSTER;
         }
-      }
-
-      setTmdbFallbacks(posterMap);
+      };
+  
+      // ✅ Preload first 30–60 immediately
+      await Promise.all(preloadIds.map(fetchPoster));
+      setTmdbFallbacks({ ...posterMap });
+  
+      // ⏳ Fetch the rest in background
+      setTimeout(async () => {
+        await Promise.all(backgroundIds.map(fetchPoster));
+        setTmdbFallbacks((prev) => ({ ...prev, ...posterMap }));
+      }, 0); // can adjust delay if needed
     };
-
+  
     fetchFallbackPosters();
   }, [logs, customPosters]);
+  
 
   const sortedLogs = useMemo(() => {
     let filtered = [...logs];
