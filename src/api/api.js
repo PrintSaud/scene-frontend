@@ -102,6 +102,15 @@ export const likeList = (listId) => api.post(`/api/lists/${listId}/like`);
 export const suggestListToFriends = (listId, recipients) =>
   api.post(`/api/lists/${listId}/share`, { recipients });
 
+//
+// 🖼️ POSTERS
+//
+export const getCustomPostersBatch = (userId, movieIds) => {
+  return api.post("/api/posters/batch", {
+    userId,
+    movieIds,
+  }).then((res) => res.data);
+};
 
 
 //

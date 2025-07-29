@@ -136,9 +136,9 @@ export default function ProfileTabProfile({
             {recentlyWatched.map((log) => {
               const movieId = log.movie?.id || log.movie?._id || log.movieId || log.tmdbId || log.movie;
 
-              const posterUrl =
-                customPosters[movieId] ||
-                (log.movie?.poster_path ? `${TMDB_IMG}${log.movie.poster_path}` : FALLBACK_POSTER);
+              const customPoster = customPosters[id];
+              const tmdbPoster = tmdbPosters[id];
+              const fallback = movie.poster_path ? `${TMDB_IMG}${movie.poster_path}` : FALLBACK_POSTER;
 
               const hasReview = log.review && log.review.length > 0;
 
