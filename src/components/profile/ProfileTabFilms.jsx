@@ -8,12 +8,13 @@ import axios from "../../api/api";
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const FALLBACK_POSTER = "/default-poster.jpg";
 
-export default function ProfileTabFilms({ logs, favorites = [] }) {
+export default function ProfileTabFilms({ logs, favorites = [], profileUserId }) {
+  const [customPosters, setCustomPosters] = useState({});
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [sortType, setSortType] = useState("added");
   const [order, setOrder] = useState("desc");
-  const [customPosters, setCustomPosters] = useState({});
+
 
   useEffect(() => {
     if (logs.length > 100) {
@@ -28,8 +29,8 @@ export default function ProfileTabFilms({ logs, favorites = [] }) {
   // ✅ Fetch profile owner's poster overrides
   useEffect(() => {
     const fetchCustomPosters = async () => {
-      const userId = logs?.[0]?.user?._id || logs?.[0]?.user;
-      if (!userId) return;
+      const userId = profileUserId;
+if (!userId) return;
     
       const movieIds = logs
         .map((log) => {
