@@ -222,16 +222,15 @@ Object.keys(data).forEach((k) =>
 <ProfileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
 <div style={{ padding: "0 16px" }}>
-  {activeTab === "Profile" && (
-    <ProfileTabProfile
-  user={user}
-  logs={logs}
-  favoriteMovies={user.favoriteFilms}
-  profileUserId={user._id} // ✅ make sure this is passed
-  customPosters={customPosters}
-/>
-
-  )}
+{activeTab === "Profile" && user && (
+  <ProfileTabProfile
+    user={user}
+    logs={logs}
+    favoriteMovies={user.favoriteFilms || []}
+    profileUserId={user._id}
+    customPosters={customPosters}
+  />
+)}
 
 {activeTab === "Reviews" && (
   <ProfileTabReviews
