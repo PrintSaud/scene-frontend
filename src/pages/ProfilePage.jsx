@@ -19,6 +19,7 @@ export default function ProfilePage() {
   const [user, setUser] = useState(null);
   const [logs, setLogs] = useState([]);
   const [watchlist, setWatchlist] = useState([]);
+  const [customPosters, setCustomPosters] = useState({});
   const [reviewFilter, setReviewFilter] = useState("recent");
   const [sortType, setSortType] = useState("added");
   const [order, setOrder] = useState("desc");
@@ -70,6 +71,33 @@ export default function ProfilePage() {
     fetchUser();
     fetchLogs();
   }, [id]);
+
+  useEffect(() => {
+    const fetchCustomPosters = async () => {
+      const userId = id; // Always use the profile owner's ID
+  
+      const movieIds = logs
+        .map((log) => {
+          const movie = log.movie;
+          if (typeof movie === "object" && movie?.id) return Number(movie.id);
+          if (typeof movie === "string" || typeof movie === "number") return Number(movie);
+          return null;
+        })
+        .filter(Boolean);
+  
+      if (!movieIds.length) return;
+  
+      try {
+        const { data } = await api.post("/api/posters/batch", { userId, movieIds });
+        setCustomPosters(data);
+      } catch (err) {
+        console.error("❌ Failed to fetch custom posters", err);
+      }
+    };
+  
+    if (logs.length > 0) fetchCustomPosters();
+  }, [logs, id]);
+  
 
   useEffect(() => {
     if (stored && user) {
@@ -159,7 +187,8 @@ export default function ProfilePage() {
       logs={logs}
       favoriteMovies={user.favoriteMovies || []}
       navigate={navigate}
-      profileUserId={id} // ✅ Add this
+      profileUserId={id}
+      customPosters={customPosters} // ✅
     />
   )}
 
@@ -169,7 +198,8 @@ export default function ProfilePage() {
       filter={reviewFilter}
       setFilter={setReviewFilter}
       navigate={navigate}
-      profileUserId={id} // ✅ Add this
+      handleLike={handleLike}
+      customPosters={customPosters} // ✅
     />
   )}
 
@@ -199,10 +229,12 @@ export default function ProfilePage() {
     <ProfileTabFilms
       logs={logs}
       favorites={user.favorites || []}
-      profileUserId={id} // ✅ Already correct
+      profileUserId={id}
+      customPosters={customPosters} // ✅
     />
   )}
 </div>
+
 
     </div>
   );

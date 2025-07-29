@@ -30,8 +30,8 @@ export default function ProfileTabFilms({ logs, favorites = [], profileUserId })
   useEffect(() => {
     const fetchCustomPosters = async () => {
       const userId = profileUserId;
-if (!userId) return;
-    
+      if (!userId) return;
+  
       const movieIds = logs
         .map((log) => {
           const movie = log.movie;
@@ -39,10 +39,14 @@ if (!userId) return;
           if (typeof movie === "string" || typeof movie === "number") return Number(movie);
           return null;
         })
-        .filter(Boolean);
-    
-      if (!movieIds.length) return;
-    
+        .filter((id) => !isNaN(id)) // ✅ Remove NaN
+        .filter((id, index, self) => self.indexOf(id) === index); // ✅ Remove duplicates
+  
+      if (!movieIds.length) {
+        console.warn("⚠️ No valid movieIds found for custom poster fetch");
+        return;
+      }
+  
       try {
         const { data } = await axios.post("/api/posters/batch", { userId, movieIds });
         setCustomPosters(data);
@@ -50,10 +54,10 @@ if (!userId) return;
         console.error("❌ Failed to fetch custom posters", err);
       }
     };
-    
-
+  
     if (logs?.length > 0) fetchCustomPosters();
   }, [logs, profileUserId]);
+  
 
 
   const sortedLogs = useMemo(() => {

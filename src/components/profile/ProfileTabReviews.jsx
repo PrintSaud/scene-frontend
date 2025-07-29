@@ -23,7 +23,15 @@ const getRelativeTime = (date) => {
   };
   
 
-export default function ProfileTabReviews({ logs, filter, setFilter, navigate, handleLike }) {
+  export default function ProfileTabReviews({
+    logs,
+    filter,
+    setFilter,
+    navigate,
+    handleLike,
+    customPosters = {},
+  }) {
+  
   const userId = JSON.parse(localStorage.getItem("user"))?._id;
 
   const filtered = logs
