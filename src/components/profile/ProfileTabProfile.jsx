@@ -8,7 +8,6 @@ import { FaRegComment } from "react-icons/fa";
 import { subDays, isBefore, formatDistanceToNowStrict } from "date-fns";
 import { FiExternalLink } from "react-icons/fi";
 import { AiOutlineCheck } from "react-icons/ai";
-import { getCustomPostersBatch } from "../../api/api";
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const FALLBACK_POSTER = "/default-poster.jpg";
@@ -30,33 +29,32 @@ export default function ProfileTabProfile({
         .slice(0, 6)
     : [];
 
-    useEffect(() => {
-      const fetchPosters = async () => {
-        const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY;
-        const updated = {};
-        const validIds = [];
-    
-        for (const movie of favoriteMovies) {
-          const id = movie.tmdbId || movie.id || movie._id;
-          if (!id || customPosters[String(id)]) continue;
-        
-          validIds.push(id);
-          try {
-            const res = await fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${TMDB_KEY}`);
-            const data = await res.json();
-            updated[id] = data.poster_path ? `${TMDB_IMG}${data.poster_path}` : FALLBACK_POSTER;
-          } catch {
-            updated[id] = FALLBACK_POSTER;
-          }
+  // 🧠 Fetch TMDB posters if not overridden
+  useEffect(() => {
+    const fetchPosters = async () => {
+      const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY;
+      const updated = {};
+
+      const allIds = [
+        ...favoriteMovies.map((m) => m.tmdbId || m.id || m._id),
+        ...recentlyWatched.map((log) => log.tmdbId || log.movie?.id || log.movie),
+      ].filter((id, i, arr) => id && !customPosters[id] && arr.indexOf(id) === i);
+
+      for (const id of allIds) {
+        try {
+          const res = await fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${TMDB_KEY}`);
+          const data = await res.json();
+          updated[id] = data.poster_path ? `${TMDB_IMG}${data.poster_path}` : FALLBACK_POSTER;
+        } catch {
+          updated[id] = FALLBACK_POSTER;
         }
-        
-    
-        setTmdbPosters(updated);
-      };
-    
-      fetchPosters();
-    }, [favoriteMovies, customPosters]);
-    
+      }
+
+      setTmdbPosters(updated);
+    };
+
+    fetchPosters();
+  }, [favoriteMovies, logs, customPosters]);
 
   const handleLogClick = (log) => {
     if (!navigate) return;
@@ -68,12 +66,10 @@ export default function ProfileTabProfile({
     }
   };
 
-  const hasFavorites = favoriteMovies.length > 0;
-
   return (
     <>
       {/* 🎬 Favorite Movies */}
-      {hasFavorites ? (
+      {favoriteMovies.length > 0 ? (
         <div style={{ marginTop: "16px" }}>
           <h3 style={{ fontSize: "12px", fontWeight: "600" }}>Favorite Movies</h3>
           <div style={{
@@ -85,16 +81,15 @@ export default function ProfileTabProfile({
           }}>
             {favoriteMovies.map((movie) => {
               const id = movie.tmdbId || movie.id || movie._id;
-              const customPoster = customPosters[String(id)];
+              const customPoster = customPosters[id];
               const tmdbPoster = tmdbPosters[id];
               const fallback = movie.poster_path ? `${TMDB_IMG}${movie.poster_path}` : FALLBACK_POSTER;
-              
-              const posterToShow = customPoster || tmdbPoster || fallback;
-            
+              const posterUrl = customPoster || tmdbPoster || fallback;
+
               return (
                 <img
                   key={id}
-                  src={posterToShow}
+                  src={posterUrl}
                   alt={movie.title}
                   style={{
                     width: "21vw",
@@ -142,14 +137,13 @@ export default function ProfileTabProfile({
             marginTop: "12px",
           }}>
             {recentlyWatched.map((log) => {
-              const movieId = log.tmdbId;
-              const customPoster = customPosters[String(movieId)];
-              const tmdbPoster = tmdbPosters[movieId];
+              const id = log.tmdbId || log.movie?.id || log.movie;
+              const customPoster = customPosters[id];
+              const tmdbPoster = tmdbPosters[id];
               const fallback = log.movie?.poster_path ? `${TMDB_IMG}${log.movie.poster_path}` : FALLBACK_POSTER;
               const posterUrl = customPoster || tmdbPoster || fallback;
-              
 
-              const hasReview = log.review && log.review.length > 0;
+              const hasReview = log.review && log.review.trim().length > 0;
 
               const logDate = new Date(log.createdAt);
               const sevenDaysAgo = subDays(new Date(), 7);

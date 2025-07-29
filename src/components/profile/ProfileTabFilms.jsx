@@ -8,14 +8,12 @@ import axios from "../../api/api";
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const FALLBACK_POSTER = "/default-poster.jpg";
 
-
-  export default function ProfileTabFilms({ logs, favorites = [], profileUserId, customPosters = {} }) {
-
+export default function ProfileTabFilms({ logs, favorites = [], profileUserId, customPosters = {} }) {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [sortType, setSortType] = useState("added");
   const [order, setOrder] = useState("desc");
-
+  const [tmdbFallbacks, setTmdbFallbacks] = useState({});
 
   useEffect(() => {
     if (logs.length > 100) {
@@ -27,45 +25,37 @@ const FALLBACK_POSTER = "/default-poster.jpg";
     }
   }, [logs]);
 
-  // ✅ Fetch profile owner's poster overrides
+  // ✅ Fetch TMDB posters if no custom exists
   useEffect(() => {
-    const fetchCustomPosters = async () => {
-      const userId = profileUserId;
-      if (!userId) {
-        console.warn("🚫 No userId passed to ProfileTabFilms");
-        return;
-      }
-  
-      const movieIds = logs
-      .map((log) => {
-        const tmdbId = log.tmdbId || log.movie?.tmdbId || log.movie?.id || log.movie;
-        return Number(tmdbId);
-      })
-      .filter((id) => !isNaN(id))
-      .filter((id, index, arr) => arr.indexOf(id) === index); // remove duplicates
-    
-  
-      if (!movieIds.length) {
-        console.warn("⚠️ No valid movieIds found for custom poster fetch");
-        return;
-      }
-  
-      console.log("📤 Fetching custom posters for:", { userId, movieIds });
-  
-      try {
-        const { data } = await axios.post("/api/posters/batch", { userId, movieIds });
-        console.log("✅ Received custom posters:", data);
-        setCustomPosters(data);
-      } catch (err) {
-        console.error("❌ Failed to fetch custom posters", err);
-      }
-    };
-  
-    if (logs?.length > 0) fetchCustomPosters();
-  }, [logs, profileUserId]);
-  
-  
+    const fetchFallbackPosters = async () => {
+      const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY;
+      const idsToFetch = [];
 
+      for (const log of logs) {
+        const id = log.tmdbId || log.movie?.id || log.movie?._id || log.movie;
+        if (!id || customPosters[id]) continue;
+        idsToFetch.push(id);
+      }
+
+      const uniqueIds = [...new Set(idsToFetch)];
+
+      const posterMap = {};
+
+      for (const id of uniqueIds) {
+        try {
+          const res = await fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${TMDB_KEY}`);
+          const data = await res.json();
+          posterMap[id] = data?.poster_path ? `${TMDB_IMG}${data.poster_path}` : FALLBACK_POSTER;
+        } catch (err) {
+          posterMap[id] = FALLBACK_POSTER;
+        }
+      }
+
+      setTmdbFallbacks(posterMap);
+    };
+
+    fetchFallbackPosters();
+  }, [logs, customPosters]);
 
   const sortedLogs = useMemo(() => {
     let filtered = [...logs];
@@ -172,15 +162,12 @@ const FALLBACK_POSTER = "/default-poster.jpg";
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "4px" }}>
           {sortedLogs.map((log) => {
-            const movieId = log.tmdbId;
-
+            const movieId = log.tmdbId || log.movie?.id || log.movie?._id || log.movie;
 
             const posterUrl =
-            customPosters[String(movieId)] ||
-            (log.movie?.poster_path ? `${TMDB_IMG}${log.movie.poster_path}` : FALLBACK_POSTER);
-          
-
-
+              customPosters[movieId] ||
+              tmdbFallbacks[movieId] ||
+              (log.movie?.poster_path ? `${TMDB_IMG}${log.movie.poster_path}` : FALLBACK_POSTER);
 
             const isFavorite = favorites.includes(Number(movieId));
             const hasReview = log.review && log.review.trim().length > 0;
