@@ -44,6 +44,7 @@ import RepliesPage from "./components/review/RepliesPage";
 import ChangeReviewBackdropPage from "./pages/ChangeReviewBackdropPage";
 import ShareReviewPage from "./pages/ShareReviewPage";
 import ImportPage from "./pages/ImportPage";
+import ResetPasswordPage from './pages/ResetPasswordPage';
 
 function App() {
   const location = useLocation();
@@ -118,6 +119,7 @@ function App() {
           <Route path="/home" element={<PrivateRoute><HomePage /></PrivateRoute>} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/verify-code" element={<VerifyResetCode />} />
+          <Route path="/reset-password" element={<ResetPasswordPage/>} />
           <Route path="/choose-avatar" element={<UploadAvatar />} />
           <Route path="/friends-activity" element={<FriendsActivityPage />} />
           <Route path="/trending" element={<TrendingPage />} />

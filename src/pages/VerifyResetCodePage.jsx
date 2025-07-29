@@ -64,7 +64,6 @@ export default function ResetPasswordPage() {
         textAlign: "center",
       }}
     >
-      <h1 className="scene-logo">Reset Password</h1>
   
       <p
         style={{
