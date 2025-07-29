@@ -83,9 +83,11 @@ export default function ProfileTabProfile({
             justifyContent: "flex-start",
           }}>
             {favoriteMovies.map((movie) => {
-              const id = movie.id || movie._id || movie.tmdbId;
+              const id = movie.tmdbId || movie.id || movie._id;
+              
               const customPoster = customPosters[id];
               const tmdbPoster = tmdbPosters[id];
+              
               const fallback = movie.poster_path ? `${TMDB_IMG}${movie.poster_path}` : FALLBACK_POSTER;
 
               const posterToShow = customPoster || tmdbPoster || fallback;
@@ -141,8 +143,7 @@ export default function ProfileTabProfile({
             marginTop: "12px",
           }}>
             {recentlyWatched.map((log) => {
-              const movieId = log.movie?.id || log.movie?._id || log.movieId || log.tmdbId || log.movie;
-
+              const movieId = log.tmdbId;
               const customPoster = customPosters[movieId];
               const tmdbPoster = tmdbPosters[movieId];
               const fallback = log.movie?.poster_path ? `${TMDB_IMG}${log.movie.poster_path}` : FALLBACK_POSTER;

@@ -36,15 +36,13 @@ export default function ProfileTabFilms({ logs, favorites = [], profileUserId })
       }
   
       const movieIds = logs
-        .map((log) => {
-          const movie = log.movie;
-          if (typeof movie === "object" && movie?.id) return Number(movie.id);
-          if (typeof movie === "number") return movie;
-          if (typeof movie === "string") return parseInt(movie);
-          return null;
-        })
-        .filter((id) => !isNaN(id))
-        .filter((id, index, arr) => arr.indexOf(id) === index);
+      .map((log) => {
+        const tmdbId = log.tmdbId || log.movie?.tmdbId || log.movie?.id || log.movie;
+        return Number(tmdbId);
+      })
+      .filter((id) => !isNaN(id))
+      .filter((id, index, arr) => arr.indexOf(id) === index); // remove duplicates
+    
   
       if (!movieIds.length) {
         console.warn("⚠️ No valid movieIds found for custom poster fetch");
@@ -173,11 +171,8 @@ export default function ProfileTabFilms({ logs, favorites = [], profileUserId })
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "4px" }}>
           {sortedLogs.map((log) => {
-            const movieId =
-            log.tmdbId ||
-            log.movie?.id ||
-            log.movie?.tmdbId ||
-            (typeof log.movie === "number" ? log.movie : undefined);
+            const movieId = log.tmdbId;
+
 
             const posterUrl =
   customPosters[movieId] ||

@@ -11,7 +11,8 @@ import ProfileTabFilms from "../components/profile/ProfileTabFilms";
 import api, { getUserProfile } from "../api/api";
 import toast from "react-hot-toast";
 import { followUser } from "../api/api";
-  
+import { getCustomPostersBatch } from "../api/api";
+
 export default function ProfilePage() {
   const navigate = useNavigate();
   const { id: paramId } = useParams();
@@ -78,16 +79,10 @@ export default function ProfilePage() {
         const userId = id;
     
         const movieIds = logs
-          .map((log) => {
-            const movie = log.movie;
-            if (typeof movie === "object" && movie?.tmdbId) return Number(movie.tmdbId);
-            if (typeof movie === "object" && movie?.id) return Number(movie.id);
-            if (typeof movie === "number") return movie;
-            if (typeof movie === "string") return parseInt(movie);
-            return null;
-          })
-          .filter((id) => !isNaN(id))
-          .filter((id, index, arr) => arr.indexOf(id) === index); // remove duplicates
+        .map((log) => Number(log.tmdbId))
+        .filter((id) => !isNaN(id));
+      
+      
     
         if (!movieIds.length || !userId) {
           console.warn("⚠️ Missing userId or valid movieIds for custom posters");
