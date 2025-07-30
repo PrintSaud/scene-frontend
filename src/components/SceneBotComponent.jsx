@@ -10,6 +10,7 @@ export default function SceneBotComponent() {
   const [loading, setLoading] = useState(false);
   const [typingText, setTypingText] = useState("");
   const messagesEndRef = useRef(null);
+  console.log("✅ SceneBotComponent.jsx LOADED — SAUD DEBUG v9");
 
   // 🧠 Get a prompt by lang (fallback to English)
   const getRandomPrompt = (lang) => {
@@ -86,6 +87,8 @@ export default function SceneBotComponent() {
   
     // 🚀 Call the bot
     const lang = forcedLang || localStorage.getItem("sceneLang") || "english";
+    console.log("🧠 CONFIRMATION — calling callSceneBot with:", question);
+console.trace();
     const result = await callSceneBot(question, lang);
     console.log("🔔 Raw API result =", result);
     console.log("📦 typeof result =", typeof result);
