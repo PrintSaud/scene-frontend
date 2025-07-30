@@ -118,21 +118,29 @@ useEffect(() => {
   });
 }, [currentSection]);
 
-// 🎯 Update currentSection when user manually swipes
 useEffect(() => {
   const container = scrollRef.current;
   if (!container) return;
 
+  let ticking = false;
+
   const handleScroll = () => {
-    const sectionWidth = container.getBoundingClientRect().width;
-    const scrollLeft = container.scrollLeft;
-    const newSection = Math.round(scrollLeft / sectionWidth);
-    setCurrentSection(newSection); // ❗ no condition
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        const sectionWidth = container.getBoundingClientRect().width;
+        const scrollLeft = container.scrollLeft;
+        const section = Math.round(scrollLeft / sectionWidth);
+        setCurrentSection(section);
+        ticking = false;
+      });
+      ticking = true;
+    }
   };
 
   container.addEventListener("scroll", handleScroll, { passive: true });
   return () => container.removeEventListener("scroll", handleScroll);
-}, []); // ❗ empty dependency array!
+}, []); // no dependency
+
 
 
 
