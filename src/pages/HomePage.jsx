@@ -111,25 +111,31 @@ useEffect(() => {
   const container = scrollRef.current;
   if (!container) return;
 
-  let animationFrameId;
+  const sections = Array.from(container.children);
 
-  const handleScroll = () => {
-    if (animationFrameId) cancelAnimationFrame(animationFrameId);
-    animationFrameId = requestAnimationFrame(() => {
-      const scrollLeft = container.scrollLeft;
-      const sectionWidth = container.offsetWidth;
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.9) {
+          const index = sections.indexOf(entry.target);
+          if (index !== -1) {
+            setCurrentSection(index);
+          }
+        }
+      });
+    },
+    {
+      root: container,
+      threshold: 0.9, // almost fully visible
+    }
+  );
 
-      const index = Math.floor((scrollLeft + sectionWidth / 2) / sectionWidth);
-      setCurrentSection(index);
-    });
-  };
+  sections.forEach((section) => observer.observe(section));
 
-  container.addEventListener("scroll", handleScroll, { passive: true });
   return () => {
-    container.removeEventListener("scroll", handleScroll);
-    if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    sections.forEach((section) => observer.unobserve(section));
   };
-}, []); // ✅ Attach once on mount, not on [currentSection]
+}, [feedLogs]);
 
   if (!user) {
 
@@ -369,7 +375,7 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
                   >
                     <StarRating rating={log.rating} size={12} />
                      {hasReview && <FaRegComment size={9} style={{ position: "relative", top: "-1.5px" }} />}
-                    {log.rewatchCount > 0 && <HiOutlineRefresh size={11} />}
+                    {log.rewatchCount > 0 && <HiOutlineRefresh size={11} style={{ position: "relative", top: "-0.5px" }} />}
                   </div>
                 </div>
               );
