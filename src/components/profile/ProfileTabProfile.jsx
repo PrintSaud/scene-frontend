@@ -11,6 +11,7 @@ import { AiOutlineCheck } from "react-icons/ai";
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const FALLBACK_POSTER = "/default-poster.jpg";
+const navigate = useNavigate();
 
 export default function ProfileTabProfile({
   user,
@@ -21,7 +22,6 @@ export default function ProfileTabProfile({
   customPosters = {},
 })
 {
-  const navigate = useNavigate();
   const [showConnections, setShowConnections] = useState(true);
   const [tmdbPosters, setTmdbPosters] = useState({});
 
