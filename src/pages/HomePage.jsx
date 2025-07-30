@@ -150,9 +150,10 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
      {/* 🎬 Daily Movie */}
 {dailyMovie && (
   <>
-    <h2 style={{ fontSize: "24px", textAlign: "center", marginBottom: "20px" }}>
-      A great Scene For Our Great SceneMakers Everyday 🎬
-    </h2>
+<h2 style={{ fontSize: "24px", textAlign: "center", marginBottom: "20px" }}>
+New Day. New Amazing Film. It’s a Scene Thing. 🎥
+</h2>
+
     <div
       onClick={() => navigate(`/movie/${dailyMovie.id}`)}
       style={{
@@ -189,7 +190,7 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 
       {/* 👀 Friends Just Watched */}
       <h2 style={{ marginTop: "50px", fontSize: "22px" }}>
-        Recent activiies
+      Recent activities
         <span
           onClick={() => navigate("/friends-activity")}
           style={{ float: "right", cursor: "pointer" }}
