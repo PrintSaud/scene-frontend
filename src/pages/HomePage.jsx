@@ -386,11 +386,11 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
         marginBottom: "24px",
       }}
     >
-      {Array.from({ length: Math.max(1, Math.ceil(feedLogs.length / 6)) }).map((_, idx) => (
+      {[0, 1, 2].map((_, idx) => (
         <div
           key={idx}
           style={{
-            width: currentSection === idx ? "24px" : "12px",
+            width: currentSection === idx ? "32px" : "14px",
             height: "6px",
             borderRadius: "999px",
             background: currentSection === idx ? "#a855f7" : "#555",
