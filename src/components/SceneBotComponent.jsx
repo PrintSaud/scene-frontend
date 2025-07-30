@@ -43,9 +43,12 @@ export default function SceneBotComponent() {
   };
 
   const handleAsk = async (customPrompt, forcedLang = null) => {
-    const question = (customPrompt || input || "").toString().trim();
+    // ✅ Force input to a string
+    const rawInput = customPrompt || input || "";
+    const question = String(rawInput).trim();
     if (!question) return;
-
+  
+    // 🌍 Language Switch Triggers
     const lower = question.toLowerCase();
     if (lower.includes("reply in english")) {
       localStorage.setItem("sceneLang", "english");
@@ -56,33 +59,34 @@ export default function SceneBotComponent() {
     } else if (lower.includes("reset language")) {
       localStorage.removeItem("sceneLang");
     }
-
+  
+    // 🧠 Save user message
     const userMsg = { sender: "user", text: question };
     const newMessages = [...messages, userMsg];
     setMessages(newMessages);
     saveToStorage(newMessages);
     setLoading(true);
     setInput("");
-
+  
+    // 🚀 Get bot reply
     const lang = forcedLang || localStorage.getItem("sceneLang") || "english";
     const result = await callSceneBot(question, lang);
-console.log("🔔 Raw API result =", result);
+    console.log("🔔 Raw API result =", result);
     const replyText = result?.reply?.text || result?.reply || result;
-
-
-
+  
     setLoading(false);
-
+  
     if (result) {
       setTypingText("");
       const botMsg = { sender: "bot", text: "" };
       const updated = [...newMessages, botMsg];
       setMessages(updated);
-
+  
+      // 🎬 Typewriter Effect
       let i = 0;
       const typeChar = () => {
         if (i < replyText.length) {
-            updated[updated.length - 1].text += replyText[i];          
+          updated[updated.length - 1].text += replyText[i];
           setMessages([...updated]);
           i++;
           setTimeout(typeChar, 15);
@@ -90,10 +94,11 @@ console.log("🔔 Raw API result =", result);
           saveToStorage(updated);
         }
       };
-
+  
       typeChar();
     }
   };
+  
 
   const translatePrompt = async (text, lang) => {
     if (lang === "english" || lang === "arabic") return text;
@@ -145,7 +150,7 @@ console.log("🔔 Raw API result =", result);
 <div
   onClick={() => alert(`🌍 To change language, just type:\n\nreply in "arabic"\nreply in "french"\nreply in "english"\n\nTo reset, type: reset language`)}
   style={{
-    position: "fixed",
+    position: "absolute",
     top: "18px",
     right: "18px",
     fontSize: "20px",
@@ -153,6 +158,7 @@ console.log("🔔 Raw API result =", result);
     color: "#ccc",
     zIndex: "1000",
   }}
+
   title="Language Info"
 >
   ❓
@@ -160,7 +166,7 @@ console.log("🔔 Raw API result =", result);
 
       {/* 🧠 Header */}
       <div style={{ padding: "24px 16px", fontSize: "20px", fontWeight: "600", textAlign: "center" }}>
-        Scene’s Chatbot 🤖
+      SceneBot 🎬
       </div>
 
       {/* 🗨️ Messages */}
@@ -189,7 +195,7 @@ console.log("🔔 Raw API result =", result);
               border: msg.sender === "bot" ? "1px solid #333" : "none",
             }}
           >
-            {msg.text}
+            {typeof msg.text === "string" ? msg.text : JSON.stringify(msg.text)}
           </div>
         ))}
 
@@ -228,7 +234,7 @@ console.log("🔔 Raw API result =", result);
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleAsk()}
-          placeholder="Ask Chatbot Anything about Movies..."
+          placeholder="Ask Anything about Movies..."
           style={{
             flex: 1,
             padding: "12px 16px",
@@ -250,6 +256,7 @@ console.log("🔔 Raw API result =", result);
             color: "#fff",
             fontSize: "22px",
             cursor: "pointer",
+            top: "0.5px",
           }}
         >
           <FiSend />
