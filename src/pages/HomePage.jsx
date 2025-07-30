@@ -128,6 +128,25 @@ useEffect(() => {
   return () => clearInterval(interval);
 }, [feedLogs, totalSections]);
 
+useEffect(() => {
+  const interval = setInterval(() => {
+    setCurrentSection((prev) => (prev + 1) % 3); // loop between 0, 1, 2
+  }, 5000);
+
+  return () => clearInterval(interval);
+}, []);
+
+useEffect(() => {
+  if (!scrollRef.current) return;
+  const container = scrollRef.current;
+  const sectionWidth = container.clientWidth;
+  container.scrollTo({
+    left: sectionWidth * currentSection,
+    behavior: "smooth",
+  });
+}, [currentSection]);
+
+
     return (
       <div
         style={{
@@ -233,7 +252,6 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
 
 {feedLogs.length > 0 ? (
   <>
-    {/* 🔄 Auto-swiping container */}
     <div
       ref={scrollRef}
       style={{
@@ -266,11 +284,11 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
               ? `${TMDB_IMG}${log.movie.poster_path}`
               : "/default-poster.jpg";
             const posterUrl = customPoster || fallback;
+
             const hasReview = log.review && log.review.trim().length > 0;
-            const timestamp = formatDistanceToNowStrict(
-              new Date(log.createdAt),
-              { addSuffix: true }
-            );
+            const timestamp = formatDistanceToNowStrict(new Date(log.createdAt), {
+              addSuffix: true,
+            });
 
             return (
               <div
@@ -295,6 +313,7 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
                   {timestamp}
                 </div>
 
+                {/* Poster */}
                 <img
                   src={posterUrl}
                   alt={log.title}
@@ -307,6 +326,7 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
                   onError={(e) => (e.currentTarget.src = "/default-poster.jpg")}
                 />
 
+                {/* Avatar + Username */}
                 <div
                   style={{
                     marginTop: "6px",
@@ -331,11 +351,10 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
                       objectFit: "cover",
                     }}
                   />
-                  <p style={{ fontSize: "12px", margin: 0 }}>
-                    {log.user?.username}
-                  </p>
+                  <p style={{ fontSize: "12px", margin: 0 }}>{log.user?.username}</p>
                 </div>
 
+                {/* Rating + Icons */}
                 <div
                   style={{
                     display: "flex",
@@ -357,32 +376,26 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
       ))}
     </div>
 
-    {/* ⬇️ Pagination dots */}
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        gap: "8px",
-        marginTop: "10px",
-      }}
-    >
-      {[...Array(totalSections)].map((_, idx) => (
+    {/* ✅ Scene Dot Indicator */}
+    <div style={{ display: "flex", justifyContent: "center", marginTop: "16px", gap: "6px" }}>
+      {[0, 1, 2].map((index) => (
         <div
-          key={idx}
+          key={index}
           style={{
-            width: "12px",
+            width: "30px",
             height: "4px",
-            borderRadius: "2px",
-            backgroundColor: currentSection === idx ? "#aa66ff" : "#444",
-            transition: "background-color 0.3s",
+            borderRadius: "4px",
+            backgroundColor: currentSection === index ? "#a259ff" : "#333",
+            transition: "all 0.3s ease",
           }}
-        ></div>
+        />
       ))}
     </div>
   </>
 ) : (
   <p style={{ color: "#888", marginTop: "20px" }}>No recent logs yet.</p>
 )}
+
 
 
 
