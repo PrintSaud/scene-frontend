@@ -106,46 +106,33 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
     fetchFeed();
   }, [user]);
 
-
-// 🔁 Auto scroll to section when currentSection changes
+  // 🟣 Sync dot indicator when user scrolls manually
 useEffect(() => {
   const container = scrollRef.current;
   if (!container) return;
-  const sectionWidth = container.getBoundingClientRect().width;
+
+  const handleScroll = () => {
+    const sectionWidth = container.offsetWidth;
+    const scrollLeft = container.scrollLeft;
+    const section = Math.round(scrollLeft / sectionWidth);
+    setCurrentSection(section); // no condition
+  };
+
+  container.addEventListener("scroll", handleScroll, { passive: true });
+  return () => container.removeEventListener("scroll", handleScroll);
+}, []);
+
+// 🟣 Auto scroll when dot indicator is clicked (or manually set)
+useEffect(() => {
+  const container = scrollRef.current;
+  if (!container) return;
+
+  const sectionWidth = container.offsetWidth;
   container.scrollTo({
     left: sectionWidth * currentSection,
     behavior: "smooth",
   });
 }, [currentSection]);
-
-useEffect(() => {
-  const container = scrollRef.current;
-  if (!container) return;
-
-  let ticking = false;
-
-  const handleScroll = () => {
-    if (!ticking) {
-      window.requestAnimationFrame(() => {
-        const sectionWidth = container.getBoundingClientRect().width;
-        const scrollLeft = container.scrollLeft;
-        const section = Math.round(scrollLeft / sectionWidth);
-        setCurrentSection(section);
-        ticking = false;
-      });
-      ticking = true;
-    }
-  };
-
-  container.addEventListener("scroll", handleScroll, { passive: true });
-  return () => container.removeEventListener("scroll", handleScroll);
-}, []); // no dependency
-
-
-
-
-
-  
 
   if (!user) {
 
