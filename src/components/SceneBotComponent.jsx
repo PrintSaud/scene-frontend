@@ -43,12 +43,22 @@ export default function SceneBotComponent() {
   };
 
   const handleAsk = async (customPrompt, forcedLang = null) => {
-    // ✅ Force input to a string
-    const rawInput = customPrompt || input || "";
-    const question = String(rawInput).trim();
+    // 🧹 Normalize input
+    let rawInput = customPrompt || input || "";
+    if (typeof rawInput !== "string") {
+      console.warn("⚠️ Input was not string. Converting to string:", rawInput);
+      rawInput = String(rawInput);
+    }
+  
+    const question = rawInput.trim();
+  
+    // 🧪 Log input and types
+    console.log("🟢 Raw Input =", rawInput, "Type:", typeof rawInput);
+    console.log("🟢 Final Question =", question, "Type:", typeof question);
+  
     if (!question) return;
   
-    // 🌍 Language Switch Triggers
+    // 🌍 Language Triggers
     const lower = question.toLowerCase();
     if (lower.includes("reply in english")) {
       localStorage.setItem("sceneLang", "english");
@@ -61,34 +71,37 @@ export default function SceneBotComponent() {
     }
   
     // 🧠 Save user message
-    const userMsg = { sender: "user", text: question };
+    const userMsg = {
+      sender: "user",
+      text: String(question), // 🔒 Final defense
+    };
+  
+    console.log("👤 Saved userMsg =", userMsg, "Type of text:", typeof userMsg.text);
+  
     const newMessages = [...messages, userMsg];
     setMessages(newMessages);
     saveToStorage(newMessages);
     setLoading(true);
     setInput("");
   
-    // 🚀 Get bot reply
+    // 🚀 Call the bot
     const lang = forcedLang || localStorage.getItem("sceneLang") || "english";
     const result = await callSceneBot(question, lang);
-console.log("🔔 Raw API result =", result);
-console.log("📦 typeof result =", typeof result);
-
-const replyText = typeof result === "string" ? result : JSON.stringify(result);
-console.log("🎬 Final replyText =", replyText);
-
-
-
+    console.log("🔔 Raw API result =", result);
+    console.log("📦 typeof result =", typeof result);
+  
+    const replyText = typeof result === "string" ? result : JSON.stringify(result);
+    console.log("🎬 Final replyText =", replyText);
   
     setLoading(false);
   
     if (result) {
       setTypingText("");
-      const botMsg = { sender: "bot", text: "" + replyText }; // force string type
+      const botMsg = { sender: "bot", text: replyText }; // 💬 Already string
       const updated = [...newMessages, botMsg];
       setMessages(updated);
   
-      // 🎬 Typewriter Effect
+      // ✍️ Typewriter Effect
       let i = 0;
       const typeChar = () => {
         if (i < replyText.length) {
@@ -104,6 +117,7 @@ console.log("🎬 Final replyText =", replyText);
       typeChar();
     }
   };
+  
   
 
   const translatePrompt = async (text, lang) => {
