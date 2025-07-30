@@ -12,9 +12,9 @@ export const callSceneBot = async (message, lang) => {
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        message: typeof message === "string" ? message : message?.text || "",
+        message: String(message), // ✅ always a clean string
         lang: preferredLang,
-      }),      
+      }),
     });
 
     const data = await res.json();
@@ -30,7 +30,7 @@ export const callSceneBot = async (message, lang) => {
     if (typeof replyRaw === "string") return replyRaw;
     if (replyRaw?.text && typeof replyRaw.text === "string") return replyRaw.text;
 
-    return JSON.stringify(replyRaw); // <-- final fallback for object replies
+    return JSON.stringify(replyRaw);
   } catch (err) {
     console.error("SceneBot Error:", err);
     return "❌ SceneBot is currently unavailable. Please try again later.";
