@@ -4,6 +4,7 @@ import html2canvas from "html2canvas";
 import { FiEye, FiDownload } from "react-icons/fi";
 import StarRating from "../components/StarRating";
 import api from "../api/api";
+import { backend } from "../config";
 
 export default function ShareReviewPage() {
   const { id } = useParams();
