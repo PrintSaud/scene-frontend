@@ -71,8 +71,9 @@ export default function SceneBotComponent() {
     // 🚀 Get bot reply
     const lang = forcedLang || localStorage.getItem("sceneLang") || "english";
     const result = await callSceneBot(question, lang);
-    console.log("🔔 Raw API result =", result);
-    const replyText = result?.reply?.text || result?.reply || result;
+console.log("🔔 Raw API result =", result);
+const replyText = typeof result === "string" ? result : String(result);
+
   
     setLoading(false);
   
@@ -146,28 +147,43 @@ export default function SceneBotComponent() {
       fontFamily: "Inter, sans-serif",
       position: "relative",
     }}>
-        {/* ❓ Language Info Icon */}
+{/* 🧠 Sticky Header with ❓ Icon */}
 <div
-  onClick={() => alert(`🌍 To change language, just type:\n\nreply in "arabic"\nreply in "french"\nreply in "english"\n\nTo reset, type: reset language`)}
   style={{
-    position: "absolute",
-    top: "18px",
-    right: "18px",
-    fontSize: "20px",
-    cursor: "pointer",
-    color: "#ccc",
-    zIndex: "1000",
+    position: "sticky",
+    top: 0,
+    background: "#0e0e0e",
+    zIndex: 100,
+    padding: "20px 16px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    borderBottom: "1px solid #222",
   }}
-
-  title="Language Info"
 >
-  ❓
+  <div style={{ fontSize: "20px", fontWeight: "600", flex: 1, textAlign: "center" }}>
+    SceneBot 🎬
+  </div>
+
+  <div
+    onClick={() =>
+      alert(
+        `🌍 To change language, just type:\n\nreply in "arabic"\nreply in "french"\nreply in "english"\n\nTo reset, type: reset language`
+      )
+    }
+    style={{
+      position: "absolute",
+      right: "18px",
+      fontSize: "20px",
+      cursor: "pointer",
+      color: "#ccc",
+    }}
+    title="Language Info"
+  >
+    ❓
+  </div>
 </div>
 
-      {/* 🧠 Header */}
-      <div style={{ padding: "24px 16px", fontSize: "20px", fontWeight: "600", textAlign: "center" }}>
-      SceneBot 🎬
-      </div>
 
       {/* 🗨️ Messages */}
       <div style={{
