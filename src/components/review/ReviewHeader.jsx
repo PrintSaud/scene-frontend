@@ -153,65 +153,70 @@ export default function ReviewHeader({
         </div>
       </div>
 
-      {/* Content section (unchanged) */}
-      <div style={{ padding: "0 16px", position: "relative", zIndex: 2 }}>
-        {review.user && (
-          <>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <img
-  src={review.user?.avatar || "/default-avatar.jpg"}
-                alt="Avatar"
-                style={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: "50%",
-                  cursor: "pointer",
-                  objectFit: "cover"
-                }}
-                onClick={() => onProfile(review.user._id)}
-              />
-              <span
-                style={{
-                  fontFamily: "Inter, sans-serif",
-                  fontSize: 13,
-                  opacity: 0.9,
-                  cursor: "pointer"
-                }}
-                onClick={() => onProfile(review.user._id)}
-              >
-                @{review.user.username}
-              </span>
-            </div>
-            <div style={{
-  marginTop: 4,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between"
-}}>
-  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-    <StarRating rating={review.rating} />
-    {rewatchCount > 1 && (
-      <div style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 4,
-        paddingLeft: 4,
-        marginTop: 1,
-        position: "relative",
-        top: "-1px"
-      }}>
-        <HiOutlineRefresh size={14} color="#aaa" />
-        <span style={{ fontSize: 10, color: "#aaa" }}>{rewatchCount}x</span>
+{/* Content section (unchanged) */}
+<div style={{ padding: "0 16px", position: "relative", zIndex: 2 }}>
+  {review.user && (
+    <>
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <img
+          src={review.user?.avatar || "/default-avatar.jpg"}
+          alt="Avatar"
+          style={{
+            width: 28,
+            height: 28,
+            borderRadius: "50%",
+            cursor: "pointer",
+            objectFit: "cover"
+          }}
+          onClick={() => onProfile(review.user._id)}
+        />
+        <span
+          style={{
+            fontFamily: "Inter, sans-serif",
+            fontSize: 13,
+            opacity: 0.9,
+            cursor: "pointer"
+          }}
+          onClick={() => onProfile(review.user._id)}
+        >
+          @{review.user.username}
+        </span>
       </div>
-    )}
-  </div>
 
-  {timestamp && (
-    <div style={{ fontSize: 11, color: "#aaa" }}>
-      {timestamp}
-    </div>
-  )}
-</div>
+      <div
+        style={{
+          marginTop: 4,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between"
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <StarRating rating={review.rating} />
+
+          {/* ✅ Rewatch Icon (if rewatchCount > 0) */}
+          {rewatchCount > 0 && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+                paddingLeft: 4,
+                marginTop: 1,
+                position: "relative",
+                top: "-1px"
+              }}
+            >
+              <HiOutlineRefresh size={14} color="#aaa" />
+              <span style={{ fontSize: 10, color: "#aaa" }}>{rewatchCount}x</span>
+            </div>
+          )}
+        </div>
+
+        {timestamp && (
+          <div style={{ fontSize: 11, color: "#aaa" }}>{timestamp}</div>
+        )}
+      </div>
 
           </>
         )}
