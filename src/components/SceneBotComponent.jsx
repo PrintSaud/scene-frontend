@@ -72,7 +72,11 @@ export default function SceneBotComponent() {
     const lang = forcedLang || localStorage.getItem("sceneLang") || "english";
     const result = await callSceneBot(question, lang);
 console.log("🔔 Raw API result =", result);
+console.log("📦 typeof result =", typeof result);
+
 const replyText = typeof result === "string" ? result : JSON.stringify(result);
+console.log("🎬 Final replyText =", replyText);
+
 
 
   
@@ -231,7 +235,7 @@ const replyText = typeof result === "string" ? result : JSON.stringify(result);
           </div>
         )}
 
-        <div ref={messagesEndRef} />
+<div ref={messagesEndRef} style={{ height: "100px" }} />
       </div>
 
       {/* ✍️ Input + Buttons */}
