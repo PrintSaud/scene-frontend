@@ -3,6 +3,7 @@ import { callSceneBot } from "../utils/callSceneBot";
 import { FiSend } from "react-icons/fi";
 import { funPrompts } from "../utils/funPrompts";
 import { backend } from "../config";
+import { useLocation } from "react-router-dom";
 
 export default function SceneBotComponent() {
   const [input, setInput] = useState("");
@@ -10,7 +11,7 @@ export default function SceneBotComponent() {
   const [loading, setLoading] = useState(false);
   const [typingText, setTypingText] = useState("");
   const messagesEndRef = useRef(null);
-  console.log("✅ SceneBotComponent.jsx LOADED — SAUD DEBUG v9");
+  const location = useLocation();
 
   // 🧠 Get a prompt by lang (fallback to English)
   const getRandomPrompt = (lang) => {
@@ -124,6 +125,13 @@ console.trace();
     }
   };
   
+  useEffect(() => {
+    if (location.state?.autoAsk) {
+      const text = location.state.autoAsk;
+      setInput(""); // clear input UI
+      handleAsk(text); // auto fire
+    }
+  }, [location.state]);
   
 
   const translatePrompt = async (text, lang) => {

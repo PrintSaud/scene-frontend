@@ -15,7 +15,7 @@ export default function MovieHeader({
   const finalPoster =
     posterOverride ||
     (movie.poster_path ? `${TMDB_IMG}${movie.poster_path}` : defaultPoster);
-
+  
   return (
     <div style={{ padding: "24px", marginTop: "-90px", position: "relative", zIndex: 3 }}>
       <div

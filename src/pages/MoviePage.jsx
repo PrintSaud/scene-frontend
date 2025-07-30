@@ -242,9 +242,9 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
           setShowTrailer(true);
         }}
         handleSceneBotReview={() =>
-          navigate("/chat", {
+          navigate("/scenebot", {
             state: {
-              prompt: `Can you write me a review for the film "${movie.title}"?`,
+              autoAsk: `What do you think about "${movie.title}"?`,
             },
           })
         }
