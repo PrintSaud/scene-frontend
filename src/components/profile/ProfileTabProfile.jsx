@@ -21,9 +21,10 @@ export default function ProfileTabProfile({
   customPosters = {},
 })
 {
+  const navigate = useNavigate();
   const [showConnections, setShowConnections] = useState(true);
   const [tmdbPosters, setTmdbPosters] = useState({});
-  const navigate = useNavigate();
+
 
   const recentlyWatched = Array.isArray(logs)
     ? logs
