@@ -11,7 +11,10 @@ export const callSceneBot = async (message, lang) => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ message: String(message?.text || message), lang: preferredLang }),
+      body: JSON.stringify({
+        message: typeof message === "string" ? message : message?.text || "",
+        lang: preferredLang,
+      }),      
     });
 
     const data = await res.json();
