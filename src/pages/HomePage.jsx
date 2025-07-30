@@ -106,27 +106,6 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
     fetchFeed();
   }, [user]);
 
-  const totalSections = Math.max(1, Math.ceil(feedLogs.length / 6)); // ✅ Safe loop
-
-
-useEffect(() => {
-  if (!feedLogs.length) return;
-
-  const interval = setInterval(() => {
-    setCurrentSection((prevIndex) => {
-      const nextIndex = (prevIndex + 1) % totalSections;
-      if (scrollRef.current) {
-        scrollRef.current.scrollTo({
-          left: nextIndex * scrollRef.current.offsetWidth,
-          behavior: "smooth",
-        });
-      }
-      return nextIndex;
-    });
-  }, 5000);
-
-  return () => clearInterval(interval);
-}, [feedLogs, totalSections]);
 
 useEffect(() => {
   if (!scrollRef.current) return;
@@ -376,29 +355,32 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
       ))}
     </div>
 
-    {/* 🎯 Scene Dot Indicators */}
+{/* 🎯 Scene Dot Indicators */}
+<div
+  style={{
+    display: "flex",
+    justifyContent: "center",
+    gap: "12px",
+    marginTop: "14px",
+    marginBottom: "24px",
+    padding: "0 16px",
+  }}
+>
+  {[0, 1, 2].map((_, idx) => (
     <div
+      key={idx}
       style={{
-        display: "flex",
-        justifyContent: "center",
-        gap: "12px",
-        marginTop: "14px",
-        marginBottom: "24px",
+        width: currentSection === idx ? "100%" : "8px",
+        maxWidth: currentSection === idx ? "120px" : "8px",
+        height: "6px",
+        borderRadius: "999px",
+        background: currentSection === idx ? "#a855f7" : "#555",
+        transition: "all 0.3s ease",
       }}
-    >
-      {[0, 1, 2].map((_, idx) => (
-        <div
-          key={idx}
-          style={{
-            width: currentSection === idx ? "32px" : "14px",
-            height: "6px",
-            borderRadius: "999px",
-            background: currentSection === idx ? "#a855f7" : "#555",
-            transition: "all 0.3s ease",
-          }}
-        />
-      ))}
-    </div>
+    />
+  ))}
+</div>
+
   </>
 ) : (
   <p style={{ color: "#888", marginTop: "20px" }}>No recent logs yet.</p>
