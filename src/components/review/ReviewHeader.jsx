@@ -182,7 +182,6 @@ export default function ReviewHeader({
                 @{review.user.username}
               </span>
             </div>
-
             <div style={{
   marginTop: 4,
   display: "flex",
@@ -192,22 +191,27 @@ export default function ReviewHeader({
   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
     <StarRating rating={review.rating} />
     {rewatchCount > 1 && (
-  <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-    <HiOutlineRefresh size={16} color="#aaa" />
-    <span style={{ fontSize: 10, color: "#aaa" }}>
-      {rewatchCount}x
-    </span>
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 4,
+        paddingLeft: 4,
+        marginTop: 1,
+        position: "relative",
+        top: "-1px"
+      }}>
+        <HiOutlineRefresh size={14} color="#aaa" />
+        <span style={{ fontSize: 10, color: "#aaa" }}>{rewatchCount}x</span>
+      </div>
+    )}
   </div>
-)}
 
-  </div>
   {timestamp && (
     <div style={{ fontSize: 11, color: "#aaa" }}>
       {timestamp}
     </div>
   )}
 </div>
-
 
           </>
         )}
