@@ -252,7 +252,7 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
         flexDirection: "row",
         overflowX: "scroll",
         scrollSnapType: "x mandatory",
-        gap: "0px",
+        gap: "24px",
         padding: "12px 0 8px 0",
         scrollBehavior: "smooth",
         scrollbarWidth: "none",
