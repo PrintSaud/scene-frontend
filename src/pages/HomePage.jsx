@@ -117,6 +117,25 @@ useEffect(() => {
   });
 }, [currentSection]);
 
+useEffect(() => {
+  if (!scrollRef.current) return;
+
+  const container = scrollRef.current;
+
+  const handleScroll = () => {
+    const sectionWidth = container.clientWidth;
+    const scrollLeft = container.scrollLeft;
+    const newSection = Math.round(scrollLeft / sectionWidth);
+    if (newSection !== currentSection) {
+      setCurrentSection(newSection);
+    }
+  };
+
+  container.addEventListener("scroll", handleScroll);
+  return () => container.removeEventListener("scroll", handleScroll);
+}, [currentSection]);
+
+
 
   
 
@@ -370,8 +389,8 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
     <div
       key={idx}
       style={{
-        width: currentSection === idx ? "100%" : "8px",
-        maxWidth: currentSection === idx ? "120px" : "8px",
+        width: currentSection === idx ? "100%" : "30px",
+        maxWidth: currentSection === idx ? "120px" : "30px",
         height: "6px",
         borderRadius: "999px",
         background: currentSection === idx ? "#a855f7" : "#555",
