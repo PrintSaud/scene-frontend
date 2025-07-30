@@ -1,4 +1,10 @@
 export const callSceneBot = async (message, lang) => {
+  if (typeof message !== "string") {
+    console.error("🛑 BLOCKED — callSceneBot received non-string message:", message);
+    console.trace(); // 🔍 will show which file called it
+    return "❌ SceneBot can only receive plain text.";
+  }
+
   try {
     const user = JSON.parse(localStorage.getItem("user"));
     const token = user?.token;
@@ -12,25 +18,15 @@ export const callSceneBot = async (message, lang) => {
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        message: String(message), // ✅ always a clean string
+        message, // ✅ now guaranteed to be string
         lang: preferredLang,
       }),
     });
 
     const data = await res.json();
-    console.log("🧠 SceneBot API result:", data);
-
-    if (!res.ok) {
-      console.error("❌ Backend error:", data);
-      return "🤖 SceneBot is currently unavailable.";
-    }
-
-    const replyRaw = data.reply;
-
-    if (typeof replyRaw === "string") return replyRaw;
-    if (replyRaw?.text && typeof replyRaw.text === "string") return replyRaw.text;
-
-    return JSON.stringify(replyRaw);
+    return typeof data.reply === "string"
+      ? data.reply
+      : JSON.stringify(data.reply);
   } catch (err) {
     console.error("SceneBot Error:", err);
     return "❌ SceneBot is currently unavailable. Please try again later.";
