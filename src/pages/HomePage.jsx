@@ -20,7 +20,7 @@ export default function HomePage() {
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 
-
+ 
   useEffect(() => {
     const stored = localStorage.getItem("user");
     let parsedUser;
