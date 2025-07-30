@@ -106,7 +106,8 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
     fetchFeed();
   }, [user]);
 
-// 🟣 Sync dot indicator when user scrolls manually
+
+// ✅ Bulletproof scroll detection
 useEffect(() => {
   const container = scrollRef.current;
   if (!container) return;
@@ -119,8 +120,10 @@ useEffect(() => {
       const scrollLeft = container.scrollLeft;
       const sectionWidth = container.offsetWidth;
 
-      const index = Math.round(scrollLeft / sectionWidth);
-      setCurrentSection(index);
+      const index = Math.floor((scrollLeft + sectionWidth / 2) / sectionWidth); // ✅ buffer added
+      if (index !== currentSection) {
+        setCurrentSection(index);
+      }
     });
   };
 
@@ -129,20 +132,8 @@ useEffect(() => {
     container.removeEventListener("scroll", handleScroll);
     if (animationFrameId) cancelAnimationFrame(animationFrameId);
   };
-}, []);
-
-
-// Scroll when indicator/dot changes it
-useEffect(() => {
-  const container = scrollRef.current;
-  if (!container) return;
-
-  const sectionWidth = container.offsetWidth;
-  container.scrollTo({
-    left: sectionWidth * currentSection,
-    behavior: "smooth",
-  });
 }, [currentSection]);
+
 
 
 
