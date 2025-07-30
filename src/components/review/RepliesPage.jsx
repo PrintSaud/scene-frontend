@@ -264,6 +264,12 @@ const { parentCommentId, parentUsername } = location.state || {};
                 <span style={{ fontSize: 10, color: "#888" }}>{getRelativeTime(parent.createdAt)}</span>
               </div>
               <span style={{ fontSize: 14, color: "#ddd", marginTop: 2, display: "block" }}>{parent.text}</span>
+              {parent.rating && (
+  <div style={{ marginTop: 4 }}>
+    <StarRating rating={parent.rating} size={12} />
+  </div>
+)}
+
               {parent.gif && <img src={parent.gif} alt="gif" style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }} />}
               {parent.image && <img src={parent.image} alt="img" style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }} />}
               <button
@@ -335,6 +341,12 @@ const { parentCommentId, parentUsername } = location.state || {};
                     <span style={{ fontSize: 10, color: "#888" }}>{getRelativeTime(child.createdAt)}</span>
                   </div>
                   <span style={{ fontSize: 13, color: "#ddd", marginTop: 2, display: "block" }}>{child.text}</span>
+                  {child.rating && (
+  <div style={{ marginTop: 4 }}>
+    <StarRating rating={child.rating} size={11} />
+  </div>
+)}
+
                   {child.gif && <img src={child.gif} alt="gif" style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }} />}
                   {child.image && <img src={child.image} alt="img" style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }} />}
                   <button
