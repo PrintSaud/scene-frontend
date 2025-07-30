@@ -37,6 +37,8 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
     
   }, []);
 
+
+
   useEffect(() => {
     async function fetchTrending() {
       try {
@@ -89,6 +91,8 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
     fetchTrending();
   }, []);
 
+
+
   useEffect(() => {
     const fetchFeed = async () => {
       if (!user?._id) return;
@@ -102,12 +106,7 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
     fetchFeed();
   }, [user]);
 
-  
-
-  if (!user) {
-
-    const scrollRef = useRef(null);
-const totalSections = Math.ceil(feedLogs.length / 6);
+  const totalSections = Math.ceil(feedLogs.length / 6);
 
 useEffect(() => {
   if (!feedLogs.length) return;
@@ -123,18 +122,10 @@ useEffect(() => {
       }
       return nextIndex;
     });
-  }, 5000); // every 5 seconds
-
-  return () => clearInterval(interval);
-}, [feedLogs, totalSections]);
-
-useEffect(() => {
-  const interval = setInterval(() => {
-    setCurrentSection((prev) => (prev + 1) % 3); // loop between 0, 1, 2
   }, 5000);
 
   return () => clearInterval(interval);
-}, []);
+}, [feedLogs, totalSections]);
 
 useEffect(() => {
   if (!scrollRef.current) return;
@@ -145,6 +136,11 @@ useEffect(() => {
     behavior: "smooth",
   });
 }, [currentSection]);
+
+
+  
+
+  if (!user) {
 
 
     return (
