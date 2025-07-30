@@ -38,12 +38,13 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
           `https://api.themoviedb.org/3/trending/movie/week?api_key=${import.meta.env.VITE_TMDB_API_KEY}`
         );
         const data = await res.json();
-        setMovies(data.results || []);
-
-        // ✅ Daily Movie Logic
+        const results = data.results || [];
+        setMovies(results);
+    
+        // ✅ Check daily cache
         const stored = localStorage.getItem("dailyMovie");
         const today = new Date().toDateString();
-
+    
         if (stored) {
           const parsed = JSON.parse(stored);
           if (parsed.date === today) {
@@ -51,21 +52,33 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
             return;
           }
         }
-
-        const random = data.results[Math.floor(Math.random() * data.results.length)];
+    
+        // ✅ Filter valid movies
+        const eligible = results.filter(
+          (m) => m.vote_average >= 7.5 && m.vote_count >= 3000
+        );
+    
+        // ✅ Fallback in case nothing matches
+        const fallback = results[Math.floor(Math.random() * results.length)];
+    
+        const selected = eligible.length
+          ? eligible[Math.floor(Math.random() * eligible.length)]
+          : fallback;
+    
         const daily = {
-          id: random.id,
-          title: random.title,
-          poster: `https://image.tmdb.org/t/p/w500${random.poster_path}`,
-          overview: random.overview,
+          id: selected.id,
+          title: selected.title,
+          poster: `https://image.tmdb.org/t/p/w500${selected.poster_path}`,
+          overview: selected.overview,
         };
-
+    
         setDailyMovie(daily);
         localStorage.setItem("dailyMovie", JSON.stringify({ date: today, movie: daily }));
       } catch (err) {
         console.error("Failed to fetch trending:", err);
       }
     }
+    
 
     fetchTrending();
   }, []);
@@ -96,7 +109,7 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
           fontSize: "18px",
         }}
       >
-        Loading your Scene...
+        Loading your Scenes...
       </div>
     );
   }
@@ -134,34 +147,45 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
         />
       </div>
 
-      {/* 🎬 Daily Movie */}
-      {dailyMovie && (
-        <>
-          <h2 style={{ fontSize: "24px", textAlign: "center", marginBottom: "20px" }}>
-            A great Scene For Our Great SceneMakers Everyday 🎬
-          </h2>
-          <div
+     {/* 🎬 Daily Movie */}
+{dailyMovie && (
+  <>
+    <h2 style={{ fontSize: "24px", textAlign: "center", marginBottom: "20px" }}>
+      A great Scene For Our Great SceneMakers Everyday 🎬
+    </h2>
+    <div
+      onClick={() => navigate(`/movie/${dailyMovie.id}`)}
+      style={{
+        display: "flex",
+        backgroundColor: "#111",
+        borderRadius: "12px",
+        overflow: "hidden",
+        cursor: "pointer",
+      }}
+    >
+      <img
+        src={dailyMovie.poster}
+        alt={dailyMovie.title}
+        style={{ width: "150px", height: "220px", objectFit: "cover" }}
+      />
+      <div style={{ padding: "15px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+        <h3 style={{ fontSize: "16px", fontWeight: "600", margin: "0 0 8px 0", lineHeight: "1.3" }}>
+          {dailyMovie.title}
+        </h3>
+        <p style={{ fontSize: "12px", color: "#ccc", lineHeight: "1.5", marginBottom: 0 }}>
+          {dailyMovie.overview.split(" ").slice(0, 20).join(" ")}...
+          <span
             onClick={() => navigate(`/movie/${dailyMovie.id}`)}
-            style={{
-              display: "flex",
-              backgroundColor: "#111",
-              borderRadius: "12px",
-              overflow: "hidden",
-              cursor: "pointer",
-            }}
+            style={{ color: "#aaa", marginLeft: "6px", fontWeight: "500", cursor: "pointer" }}
           >
-            <img
-              src={dailyMovie.poster}
-              alt={dailyMovie.title}
-              style={{ width: "150px", height: "220px", objectFit: "cover" }}
-            />
-            <div style={{ padding: "15px" }}>
-              <h3>{dailyMovie.title}</h3>
-              <p>{dailyMovie.overview}</p>
-            </div>
-          </div>
-        </>
-      )}
+            Read more
+          </span>
+        </p>
+      </div>
+    </div>
+  </>
+)}
+
 
       {/* 👀 Friends Just Watched */}
       <h2 style={{ marginTop: "50px", fontSize: "22px" }}>
