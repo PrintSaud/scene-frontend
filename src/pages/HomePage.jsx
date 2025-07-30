@@ -106,7 +106,8 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
     fetchFeed();
   }, [user]);
 
-  const totalSections = Math.ceil(feedLogs.length / 6);
+  const totalSections = Math.max(1, Math.ceil(feedLogs.length / 6)); // ✅ Safe loop
+
 
 useEffect(() => {
   if (!feedLogs.length) return;
@@ -248,16 +249,19 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
 
 {feedLogs.length > 0 ? (
   <>
+    {/* 🔄 Scroll Sections */}
     <div
       ref={scrollRef}
       style={{
         display: "flex",
         flexDirection: "row",
-        overflowX: "auto",
+        overflowX: "scroll",
         scrollSnapType: "x mandatory",
         gap: "24px",
         padding: "12px 0 8px 0",
         scrollBehavior: "smooth",
+        scrollbarWidth: "none",
+        msOverflowStyle: "none",
       }}
     >
       {[0, 6, 12].map((start, i) => (
@@ -315,7 +319,7 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
                   alt={log.title}
                   style={{
                     width: "100%",
-                    height: "180px",
+                    height: "170px",
                     objectFit: "cover",
                     borderRadius: "6px",
                   }}
@@ -372,16 +376,24 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
       ))}
     </div>
 
-    {/* ✅ Scene Dot Indicator */}
-    <div style={{ display: "flex", justifyContent: "center", marginTop: "16px", gap: "6px" }}>
-      {[0, 1, 2].map((index) => (
+    {/* 🎯 Scene Dot Indicators */}
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        gap: "12px",
+        marginTop: "14px",
+        marginBottom: "24px",
+      }}
+    >
+      {Array.from({ length: Math.max(1, Math.ceil(feedLogs.length / 6)) }).map((_, idx) => (
         <div
-          key={index}
+          key={idx}
           style={{
-            width: "30px",
-            height: "4px",
-            borderRadius: "4px",
-            backgroundColor: currentSection === index ? "#a259ff" : "#333",
+            width: currentSection === idx ? "24px" : "12px",
+            height: "6px",
+            borderRadius: "999px",
+            background: currentSection === idx ? "#a855f7" : "#555",
             transition: "all 0.3s ease",
           }}
         />
@@ -391,6 +403,7 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
 ) : (
   <p style={{ color: "#888", marginTop: "20px" }}>No recent logs yet.</p>
 )}
+
 
 
 
