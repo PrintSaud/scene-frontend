@@ -107,33 +107,33 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
   }, [user]);
 
 
+// 🔁 Auto scroll to section when currentSection changes
 useEffect(() => {
-  if (!scrollRef.current) return;
   const container = scrollRef.current;
-  const sectionWidth = container.clientWidth;
+  if (!container) return;
+  const sectionWidth = container.getBoundingClientRect().width;
   container.scrollTo({
     left: sectionWidth * currentSection,
     behavior: "smooth",
   });
 }, [currentSection]);
 
+// 🎯 Update currentSection when user manually swipes
 useEffect(() => {
-  if (!scrollRef.current) return;
-
   const container = scrollRef.current;
+  if (!container) return;
 
   const handleScroll = () => {
-    const sectionWidth = container.clientWidth;
+    const sectionWidth = container.getBoundingClientRect().width;
     const scrollLeft = container.scrollLeft;
     const newSection = Math.round(scrollLeft / sectionWidth);
-    if (newSection !== currentSection) {
-      setCurrentSection(newSection);
-    }
+    setCurrentSection(newSection); // ❗ no condition
   };
 
-  container.addEventListener("scroll", handleScroll);
+  container.addEventListener("scroll", handleScroll, { passive: true });
   return () => container.removeEventListener("scroll", handleScroll);
-}, [currentSection]);
+}, []); // ❗ empty dependency array!
+
 
 
 
@@ -412,7 +412,7 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
 
       {/* 🔥 Trending */}
       <h2 style={{ marginTop: "40px", fontSize: "22px" }}>
-        🔥 Trending Films
+        🔥 Trending Movies
         <span
           onClick={() => navigate("/trending")}
           style={{ float: "right", cursor: "pointer" }}
