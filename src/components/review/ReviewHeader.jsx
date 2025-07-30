@@ -204,11 +204,11 @@ export default function ReviewHeader({
                 paddingLeft: 4,
                 marginTop: 1,
                 position: "relative",
-                top: "-1px"
+                top: "-1.5px"
               }}
             >
               <HiOutlineRefresh size={14} color="#aaa" />
-              <span style={{ fontSize: 10, color: "#aaa" }}>{rewatchCount}x</span>
+              <span style={{ fontSize: 10, color: "#aaa" , top: "-1px" }}>{rewatchCount}x</span>
             </div>
           )}
         </div>

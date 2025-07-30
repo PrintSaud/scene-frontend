@@ -267,13 +267,14 @@ formData.append("rewatchCount", rewatchCount.toString());         // Actual nume
           >
             <HiOutlineRefresh size={18} />
             <span style={{ fontSize: "13px" }}>
-              {rewatchCount > 1
+              {rewatchCount > 0
                 ? `${rewatchCount}x`
                 : "Mark as Rewatch"}
             </span>
           </div>
         </div>
       </div>
+
 
       {/* Rest of your component unchanged... */}
       {/* (Textarea, upload buttons, submit button, gif modal, etc) */}
