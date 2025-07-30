@@ -203,14 +203,16 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
 </h2>
 
 {feedLogs.length > 0 ? (
-  <div style={{ marginTop: "16px", display: "flex", flexDirection: "column", gap: "24px" }}>
+  <div style={{ marginTop: "16px", display: "flex", flexDirection: "column", gap: "32px" }}>
     {[0, 6, 12].map((start, idx) => (
       <div
         key={idx}
         style={{
           display: "flex",
+          flexDirection: "row",
+          justifyContent: "flex-start",
+          gap: "12px",
           overflowX: "auto",
-          gap: "10px",
           scrollSnapType: "x mandatory",
           paddingBottom: "4px",
         }}
@@ -230,8 +232,25 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
             <div
               key={log._id}
               onClick={() => navigate(hasReview ? `/review/${log._id}` : `/movie/${id}`)}
-              style={{ position: "relative", cursor: "pointer", minWidth: "100px" }}
+              style={{ position: "relative", cursor: "pointer", width: "100px" }}
             >
+              {/* 🕒 Timestamp Top Right */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: "4px",
+                  right: "4px",
+                  backgroundColor: "rgba(0, 0, 0, 0.6)",
+                  padding: "2px 6px",
+                  fontSize: "10px",
+                  borderRadius: "8px",
+                  color: "#ccc",
+                  zIndex: 2,
+                }}
+              >
+                {timestamp}
+              </div>
+
               <img
                 src={posterUrl}
                 alt={log.title}
@@ -244,6 +263,7 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
                 onError={(e) => (e.currentTarget.src = "/default-poster.jpg")}
               />
 
+              {/* Avatar + Username */}
               <div
                 style={{
                   marginTop: "6px",
@@ -271,14 +291,17 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
                 <p style={{ fontSize: "12px", margin: 0 }}>{log.user?.username}</p>
               </div>
 
-              <div style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "4px",
-                marginTop: "2px",
-                fontSize: "11px",
-                color: "#aaa",
-              }}>
+              {/* Star + Icons */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px",
+                  marginTop: "2px",
+                  fontSize: "11px",
+                  color: "#aaa",
+                }}
+              >
                 <StarRating rating={log.rating} size={12} />
                 {hasReview && <FaRegComment size={9} />}
                 {log.rewatchCount > 1 && <HiOutlineRefresh size={11} />}
@@ -292,6 +315,7 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
 ) : (
   <p style={{ color: "#888", marginTop: "20px" }}>No recent logs yet.</p>
 )}
+
 
 
       {/* 🔥 Trending */}
