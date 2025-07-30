@@ -106,21 +106,28 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
     fetchFeed();
   }, [user]);
 
-  // 🟣 Sync dot indicator when user scrolls manually
+// 🟣 Sync dot indicator when user scrolls manually
 useEffect(() => {
   const container = scrollRef.current;
   if (!container) return;
 
   const handleScroll = () => {
-    const sectionWidth = container.offsetWidth;
+    const sections = container.querySelectorAll(".scroll-section");
+    if (!sections.length) return;
+
+    const sectionWidth = sections[0].offsetWidth;
+    const gap = 24; // match your CSS gap
+    const fullSectionWidth = sectionWidth + gap;
+
     const scrollLeft = container.scrollLeft;
-    const section = Math.round(scrollLeft / sectionWidth);
-    setCurrentSection(section); // no condition
+    const section = Math.round(scrollLeft / fullSectionWidth);
+    setCurrentSection(section);
   };
 
   container.addEventListener("scroll", handleScroll, { passive: true });
   return () => container.removeEventListener("scroll", handleScroll);
 }, []);
+
 
 // 🟣 Auto scroll when dot indicator is clicked (or manually set)
 useEffect(() => {
@@ -260,6 +267,7 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
       {[0, 6, 12].map((start, i) => (
         <div
           key={i}
+          className="scroll-section"  
           style={{
             scrollSnapAlign: "start",
             flex: "0 0 100%",
