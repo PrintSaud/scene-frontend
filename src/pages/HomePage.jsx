@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/api";
 import { subDays, isBefore, formatDistanceToNowStrict } from "date-fns";
@@ -13,7 +13,9 @@ export default function HomePage() {
   const [movies, setMovies] = useState([]);
   const [feedLogs, setFeedLogs] = useState([]);
   const [dailyMovie, setDailyMovie] = useState(null);
-
+  const [currentSection, setCurrentSection] = useState(0);
+  const scrollRef = useRef();
+   
 
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
@@ -100,7 +102,32 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
     fetchFeed();
   }, [user]);
 
+  
+
   if (!user) {
+
+    const scrollRef = useRef(null);
+const totalSections = Math.ceil(feedLogs.length / 6);
+
+useEffect(() => {
+  if (!feedLogs.length) return;
+
+  const interval = setInterval(() => {
+    setCurrentSection((prevIndex) => {
+      const nextIndex = (prevIndex + 1) % totalSections;
+      if (scrollRef.current) {
+        scrollRef.current.scrollTo({
+          left: nextIndex * scrollRef.current.offsetWidth,
+          behavior: "smooth",
+        });
+      }
+      return nextIndex;
+    });
+  }, 5000); // every 5 seconds
+
+  return () => clearInterval(interval);
+}, [feedLogs, totalSections]);
+
     return (
       <div
         style={{
@@ -123,6 +150,8 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
     : user?.avatar
     ? `${import.meta.env.VITE_BACKEND_URL}${user.avatar}`
     : "/default-avatar.png";
+
+    
 
   return (
     <div
@@ -203,127 +232,154 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
 </h2>
 
 {feedLogs.length > 0 ? (
-  <div
-    style={{
-      display: "flex",
-      flexDirection: "row",
-      overflowX: "auto",
-      scrollSnapType: "x mandatory",
-      gap: "24px",
-      padding: "12px 0 8px 0",
-    }}
-  >
-    {[0, 6, 12].map((start, i) => (
-      <div
-        key={i}
-        style={{
-          scrollSnapAlign: "start",
-          flex: "0 0 100%",
-          display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
-          gridTemplateRows: "repeat(2, auto)",
-          gap: "12px",
-          padding: "0 4px",
-        }}
-      >
-        {feedLogs.slice(start, start + 6).map((log) => {
-          const id = log.tmdbId || log.movie?.id || log.movie;
-          const customPoster = log.posterOverride;
-          const fallback = log.movie?.poster_path
-            ? `${TMDB_IMG}${log.movie.poster_path}`
-            : "/default-poster.jpg";
-          const posterUrl = customPoster || fallback;
+  <>
+    {/* 🔄 Auto-swiping container */}
+    <div
+      ref={scrollRef}
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        overflowX: "auto",
+        scrollSnapType: "x mandatory",
+        gap: "24px",
+        padding: "12px 0 8px 0",
+        scrollBehavior: "smooth",
+      }}
+    >
+      {[0, 6, 12].map((start, i) => (
+        <div
+          key={i}
+          style={{
+            scrollSnapAlign: "start",
+            flex: "0 0 100%",
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gridTemplateRows: "repeat(2, auto)",
+            gap: "12px",
+            padding: "0 4px",
+          }}
+        >
+          {feedLogs.slice(start, start + 6).map((log) => {
+            const id = log.tmdbId || log.movie?.id || log.movie;
+            const customPoster = log.posterOverride;
+            const fallback = log.movie?.poster_path
+              ? `${TMDB_IMG}${log.movie.poster_path}`
+              : "/default-poster.jpg";
+            const posterUrl = customPoster || fallback;
+            const hasReview = log.review && log.review.trim().length > 0;
+            const timestamp = formatDistanceToNowStrict(
+              new Date(log.createdAt),
+              { addSuffix: true }
+            );
 
-          const hasReview = log.review && log.review.trim().length > 0;
-          const timestamp = formatDistanceToNowStrict(new Date(log.createdAt), {
-            addSuffix: true,
-          });
-
-          return (
-            <div
-              key={log._id}
-              onClick={() => navigate(hasReview ? `/review/${log._id}` : `/movie/${id}`)}
-              style={{ position: "relative", cursor: "pointer" }}
-            >
-              {/* 🕒 Timestamp Top Right */}
+            return (
               <div
-                style={{
-                  position: "absolute",
-                  top: "4px",
-                  right: "4px",
-                  backgroundColor: "rgba(0, 0, 0, 0.6)",
-                  padding: "2px 6px",
-                  fontSize: "10px",
-                  borderRadius: "8px",
-                  color: "#ccc",
-                  zIndex: 2,
-                }}
+                key={log._id}
+                onClick={() => navigate(hasReview ? `/review/${log._id}` : `/movie/${id}`)}
+                style={{ position: "relative", cursor: "pointer" }}
               >
-                {timestamp}
-              </div>
-
-              {/* Poster */}
-              <img
-                src={posterUrl}
-                alt={log.title}
-                style={{
-                  width: "100%",
-                  height: "150px",
-                  objectFit: "cover",
-                  borderRadius: "6px",
-                }}
-                onError={(e) => (e.currentTarget.src = "/default-poster.jpg")}
-              />
-
-              {/* Avatar + Username */}
-              <div
-                style={{
-                  marginTop: "6px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px",
-                }}
-              >
-                <img
-                  src={
-                    log.user?.avatar?.startsWith("http")
-                      ? log.user.avatar
-                      : log.user?.avatar
-                      ? `${import.meta.env.VITE_BACKEND_URL}${log.user.avatar}`
-                      : "/default-avatar.png"
-                  }
-                  alt="avatar"
+                {/* 🕒 Timestamp */}
+                <div
                   style={{
-                    width: "20px",
-                    height: "20px",
-                    borderRadius: "50%",
-                    objectFit: "cover",
+                    position: "absolute",
+                    top: "4px",
+                    right: "4px",
+                    backgroundColor: "rgba(0, 0, 0, 0.6)",
+                    padding: "2px 6px",
+                    fontSize: "10px",
+                    borderRadius: "8px",
+                    color: "#ccc",
+                    zIndex: 2,
                   }}
-                />
-                <p style={{ fontSize: "12px", margin: 0 }}>{log.user?.username}</p>
-              </div>
+                >
+                  {timestamp}
+                </div>
 
-              {/* Star + Icons */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "4px",
-                  marginTop: "2px",
-                  fontSize: "11px",
-                  color: "#aaa",
-                }}
-              >
-                <StarRating rating={log.rating} size={12} />
-                {hasReview && <FaRegComment size={9} />}
-                {log.rewatchCount > 1 && <HiOutlineRefresh size={11} />}
+                <img
+                  src={posterUrl}
+                  alt={log.title}
+                  style={{
+                    width: "100%",
+                    height: "180px",
+                    objectFit: "cover",
+                    borderRadius: "6px",
+                  }}
+                  onError={(e) => (e.currentTarget.src = "/default-poster.jpg")}
+                />
+
+                <div
+                  style={{
+                    marginTop: "6px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                  }}
+                >
+                  <img
+                    src={
+                      log.user?.avatar?.startsWith("http")
+                        ? log.user.avatar
+                        : log.user?.avatar
+                        ? `${import.meta.env.VITE_BACKEND_URL}${log.user.avatar}`
+                        : "/default-avatar.png"
+                    }
+                    alt="avatar"
+                    style={{
+                      width: "20px",
+                      height: "20px",
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                    }}
+                  />
+                  <p style={{ fontSize: "12px", margin: 0 }}>
+                    {log.user?.username}
+                  </p>
+                </div>
+
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "4px",
+                    marginTop: "2px",
+                    fontSize: "11px",
+                    color: "#aaa",
+                  }}
+                >
+                  <StarRating rating={log.rating} size={12} />
+                  {hasReview && <FaRegComment size={9} />}
+                  {log.rewatchCount > 1 && <HiOutlineRefresh size={11} />}
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
-    ))}
-  </div>
+            );
+          })}
+        </div>
+      ))}
+    </div>
+
+    {/* ⬇️ Pagination dots */}
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        gap: "8px",
+        marginTop: "10px",
+      }}
+    >
+      {[...Array(totalSections)].map((_, idx) => (
+        <div
+          key={idx}
+          style={{
+            width: "12px",
+            height: "4px",
+            borderRadius: "2px",
+            backgroundColor: currentSection === idx ? "#aa66ff" : "#444",
+            transition: "background-color 0.3s",
+          }}
+        ></div>
+      ))}
+    </div>
+  </>
 ) : (
   <p style={{ color: "#888", marginTop: "20px" }}>No recent logs yet.</p>
 )}
