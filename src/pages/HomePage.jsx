@@ -106,8 +106,7 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
     fetchFeed();
   }, [user]);
 
-
-// ✅ Bulletproof scroll detection
+// ✅ Bulletproof scroll detection (FINAL FIX)
 useEffect(() => {
   const container = scrollRef.current;
   if (!container) return;
@@ -120,10 +119,8 @@ useEffect(() => {
       const scrollLeft = container.scrollLeft;
       const sectionWidth = container.offsetWidth;
 
-      const index = Math.floor((scrollLeft + sectionWidth / 2) / sectionWidth); // ✅ buffer added
-      if (index !== currentSection) {
-        setCurrentSection(index);
-      }
+      const index = Math.floor((scrollLeft + sectionWidth / 2) / sectionWidth);
+      setCurrentSection(index);
     });
   };
 
@@ -132,13 +129,9 @@ useEffect(() => {
     container.removeEventListener("scroll", handleScroll);
     if (animationFrameId) cancelAnimationFrame(animationFrameId);
   };
-}, [currentSection]);
-
-
-
+}, []); // ✅ Attach once on mount, not on [currentSection]
 
   if (!user) {
-
 
     return (
       <div
@@ -262,13 +255,15 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
     >
       {[0, 6, 12].map((start, i) => (
         <div
-          key={i}
-          style={{
-            flex: "0 0 100%",
-            scrollSnapAlign: "start",
-            padding: "0 4px",
-          }}
-        >
+        key={i}
+        style={{
+          flex: "0 0 100%",
+          scrollSnapAlign: "start",
+          padding: "0px",         // ✅ Remove horizontal padding
+          boxSizing: "border-box" // ✅ Ensure layout doesn't overflow
+        }}
+      >
+      
           <div
             className="scroll-section"
             style={{
@@ -374,7 +369,7 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
                   >
                     <StarRating rating={log.rating} size={12} />
                      {hasReview && <FaRegComment size={9} style={{ position: "relative", top: "-1.5px" }} />}
-                    {log.rewatchCount > 1 && <HiOutlineRefresh size={11} />}
+                    {log.rewatchCount > 0 && <HiOutlineRefresh size={11} />}
                   </div>
                 </div>
               );
@@ -413,12 +408,6 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
 ) : (
   <p style={{ color: "#888", marginTop: "20px" }}>No recent logs yet.</p>
 )}
-
-
-
-
-
-
 
       {/* 🔥 Trending */}
       <h2 style={{ marginTop: "40px", fontSize: "22px" }}>

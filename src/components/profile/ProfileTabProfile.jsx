@@ -198,7 +198,7 @@ export default function ProfileTabProfile({
             }}>
               <StarRating rating={log.rating} size={12} />
               {hasReview && <FaRegComment size={9} style={{ position: "relative", top: "-1.5px" }} />}
-              {log.rewatchCount > 1 && (
+              {log.rewatchCount > 0 && (
                 <HiOutlineRefresh size={11} color="#aaa" style={{ position: "relative", top: "-1.2px" }} />
               )}
             </div>
