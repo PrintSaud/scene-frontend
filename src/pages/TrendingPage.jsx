@@ -20,16 +20,16 @@ export default function TrendingPage() {
     fetchTrending();
   }, []);
 
-
   return (
-    <div style={{ padding: "20px", color: "#fff", position: "relative" }}>
+    <div style={{ padding: "20px", color: "#fff", minHeight: "100vh", backgroundColor: "#0e0e0e" }}>
       {/* 🔙 Back to Home */}
       <button
         onClick={() => navigate("/home")}
         style={{
-          position: "absolute",
+          position: "fixed",
           top: "20px",
           left: "20px",
+          zIndex: 10,
           background: "transparent",
           border: "1px solid #fff",
           color: "#fff",
@@ -41,15 +41,15 @@ export default function TrendingPage() {
         ← Home
       </button>
 
-      <h1 style={{ textAlign: "center", fontSize: "16px", marginBottom: "30px" }}>
+      <h1 style={{ textAlign: "center", fontSize: "20px", marginTop: "60px", marginBottom: "30px" }}>
         🔥 Trending Films This Week
       </h1>
 
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
-          gap: "10px",
+          gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
+          gap: "16px",
           justifyItems: "center",
         }}
       >
@@ -57,20 +57,27 @@ export default function TrendingPage() {
           movies.map((movie) => (
             <div
               key={movie.id}
-              style={{ cursor: "pointer", width: "100%", maxWidth: "140px" }}
-              onClick={() => navigate(`/movie/${movie.id}`)}
+              style={{ cursor: "pointer", width: "100%", maxWidth: "160px" }}
+              onClick={() => {
+                navigate(`/movie/${movie.id}`);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
             >
               <div
                 style={{
                   width: "100%",
                   aspectRatio: "2 / 3",
-                  overflow: "hidden",
                   borderRadius: "12px",
+                  overflow: "hidden",
                   boxShadow: "0 6px 12px rgba(0, 0, 0, 0.3)",
                 }}
               >
                 <img
-                  src={movie.poster}
+                  src={
+                    movie.poster_path
+                      ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+                      : "/default-poster.png"
+                  }
                   alt={movie.title}
                   style={{
                     width: "100%",

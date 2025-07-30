@@ -156,12 +156,6 @@ useEffect(() => {
     );
   }
 
-  const avatar = user?.avatar?.startsWith("http")
-    ? user.avatar
-    : user?.avatar
-    ? `${import.meta.env.VITE_BACKEND_URL}${user.avatar}`
-    : "/default-avatar.png";
-
     
 
   return (
@@ -175,21 +169,31 @@ useEffect(() => {
       }}
     >
       {/* 👋 Welcome Header */}
-      <div style={{ textAlign: "center", marginBottom: "40px" }}>
-        <h1>Welcome back, {user.username || user.name} 🎬</h1>
-        <img
-          src={avatar}
-          alt="Profile"
-          onError={(e) => (e.target.src = "/default-avatar.png")}
-          style={{
-            borderRadius: "50%",
-            marginTop: "20px",
-            width: "100px",
-            height: "100px",
-            objectFit: "cover",
-          }}
-        />
-      </div>
+<div style={{ textAlign: "center", marginBottom: "40px" }}>
+  <h1>Welcome back, {user.username || user.name} 🎬</h1>
+  <img
+    src={
+      user?.avatar?.startsWith("http")
+        ? user.avatar
+        : user?.avatar
+        ? `${import.meta.env.VITE_BACKEND_URL}${user.avatar}`
+        : "/default-avatar.png"
+    }
+    alt="Profile"
+    onError={(e) => {
+      console.warn("❌ Avatar failed to load:", user?.avatar);
+      e.target.src = "/default-avatar.png";
+    }}
+    style={{
+      borderRadius: "50%",
+      marginTop: "20px",
+      width: "100px",
+      height: "100px",
+      objectFit: "cover",
+    }}
+  />
+</div>
+
 
      {/* 🎬 Daily Movie */}
 {dailyMovie && (
