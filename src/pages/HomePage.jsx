@@ -115,13 +115,21 @@ useEffect(() => {
     const sections = container.querySelectorAll(".scroll-section");
     if (!sections.length) return;
 
-    const sectionWidth = sections[0].offsetWidth;
-    const gap = 24; // match your CSS gap
-    const fullSectionWidth = sectionWidth + gap;
+    const containerRect = container.getBoundingClientRect();
 
-    const scrollLeft = container.scrollLeft;
-    const section = Math.round(scrollLeft / fullSectionWidth);
-    setCurrentSection(section);
+    let closestIndex = 0;
+    let minDistance = Infinity;
+
+    sections.forEach((section, index) => {
+      const rect = section.getBoundingClientRect();
+      const distance = Math.abs(rect.left - containerRect.left);
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestIndex = index;
+      }
+    });
+
+    setCurrentSection(closestIndex);
   };
 
   container.addEventListener("scroll", handleScroll, { passive: true });
@@ -129,17 +137,21 @@ useEffect(() => {
 }, []);
 
 
+
 // 🟣 Auto scroll when dot indicator is clicked (or manually set)
 useEffect(() => {
   const container = scrollRef.current;
   if (!container) return;
 
-  const sectionWidth = container.offsetWidth;
-  container.scrollTo({
-    left: sectionWidth * currentSection,
-    behavior: "smooth",
-  });
+  const sections = container.querySelectorAll(".scroll-section");
+  if (!sections.length) return;
+
+  const section = sections[currentSection];
+  if (!section) return;
+
+  section.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
 }, [currentSection]);
+
 
   if (!user) {
 
