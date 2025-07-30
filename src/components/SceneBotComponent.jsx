@@ -41,7 +41,7 @@ export default function SceneBotComponent() {
     const withTime = msgArray.map((msg) => ({ ...msg, time: Date.now() }));
     localStorage.setItem("scenebotHistory", JSON.stringify(withTime));
   };
-
+  
   const handleAsk = async (customPrompt, forcedLang = null) => {
     // 🧹 Normalize input
     let rawInput = customPrompt || input || "";
@@ -73,7 +73,7 @@ export default function SceneBotComponent() {
     // 🧠 Save user message
     const userMsg = {
       sender: "user",
-      text: String(question), // 🔒 Final defense
+      text: typeof question === "string" ? question : JSON.stringify(question),
     };
   
     console.log("👤 Saved userMsg =", userMsg, "Type of text:", typeof userMsg.text);
@@ -97,7 +97,10 @@ export default function SceneBotComponent() {
   
     if (result) {
       setTypingText("");
-      const botMsg = { sender: "bot", text: replyText }; // 💬 Already string
+      const botMsg = {
+        sender: "bot",
+        text: typeof replyText === "string" ? replyText : JSON.stringify(replyText),
+      };
       const updated = [...newMessages, botMsg];
       setMessages(updated);
   
