@@ -116,22 +116,11 @@ useEffect(() => {
   const handleScroll = () => {
     if (animationFrameId) cancelAnimationFrame(animationFrameId);
     animationFrameId = requestAnimationFrame(() => {
-      const sections = Array.from(container.children);
-      const containerRect = container.getBoundingClientRect();
+      const scrollLeft = container.scrollLeft;
+      const sectionWidth = container.offsetWidth;
 
-      let closestIndex = 0;
-      let minDistance = Infinity;
-
-      sections.forEach((section, index) => {
-        const sectionRect = section.getBoundingClientRect();
-        const distance = Math.abs(sectionRect.left - containerRect.left);
-        if (distance < minDistance) {
-          minDistance = distance;
-          closestIndex = index;
-        }
-      });
-
-      setCurrentSection(closestIndex);
+      const index = Math.round(scrollLeft / sectionWidth);
+      setCurrentSection(index);
     });
   };
 
@@ -143,11 +132,6 @@ useEffect(() => {
 }, []);
 
 
-
-
-
-
-// 🟣 Auto scroll when dot indicator is clicked (or manually set)
 // Scroll when indicator/dot changes it
 useEffect(() => {
   const container = scrollRef.current;
@@ -398,7 +382,7 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
                     }}
                   >
                     <StarRating rating={log.rating} size={12} />
-                    {hasReview && <FaRegComment size={9} />}
+                     {hasReview && <FaRegComment size={9} style={{ position: "relative", top: "-1.5px" }} />}
                     {log.rewatchCount > 1 && <HiOutlineRefresh size={11} />}
                   </div>
                 </div>
