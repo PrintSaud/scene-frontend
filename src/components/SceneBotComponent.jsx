@@ -72,14 +72,15 @@ export default function SceneBotComponent() {
     const lang = forcedLang || localStorage.getItem("sceneLang") || "english";
     const result = await callSceneBot(question, lang);
 console.log("🔔 Raw API result =", result);
-const replyText = typeof result === "string" ? result : String(result);
+const replyText = typeof result === "string" ? result : JSON.stringify(result);
+
 
   
     setLoading(false);
   
     if (result) {
       setTypingText("");
-      const botMsg = { sender: "bot", text: "" };
+      const botMsg = { sender: "bot", text: "" + replyText }; // force string type
       const updated = [...newMessages, botMsg];
       setMessages(updated);
   
@@ -211,7 +212,7 @@ const replyText = typeof result === "string" ? result : String(result);
               border: msg.sender === "bot" ? "1px solid #333" : "none",
             }}
           >
-            {typeof msg.text === "string" ? msg.text : JSON.stringify(msg.text)}
+            {String(msg.text)}
           </div>
         ))}
 
@@ -286,6 +287,7 @@ const replyText = typeof result === "string" ? result : String(result);
             color: "#fff",
             fontSize: "22px",
             cursor: "pointer",
+            top: "-0.5px",
           }}
           title="Surprise me!"
         >

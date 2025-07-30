@@ -22,15 +22,12 @@ export const callSceneBot = async (message, lang) => {
       return "🤖 SceneBot is currently unavailable.";
     }
 
-    // 🔥 Robust reply parsing:
-    const reply =
-      typeof data.reply === "string"
-        ? data.reply
-        : data.reply?.text
-        ? data.reply.text
-        : String(data.reply || "");
+    const replyRaw = data.reply;
 
-    return reply || "🤖 SceneBot had no answer.";
+    if (typeof replyRaw === "string") return replyRaw;
+    if (replyRaw?.text && typeof replyRaw.text === "string") return replyRaw.text;
+
+    return JSON.stringify(replyRaw); // <-- final fallback for object replies
   } catch (err) {
     console.error("SceneBot Error:", err);
     return "❌ SceneBot is currently unavailable. Please try again later.";
