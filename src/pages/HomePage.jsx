@@ -217,7 +217,7 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
       >
         {feedLogs.slice(start, start + 6).map((log) => {
           const id = log.tmdbId || log.movie?.id || log.movie;
-          const customPoster = log.customPoster;
+          const customPoster = log.posterOverride;
           const fallback = log.movie?.poster_path
             ? `${TMDB_IMG}${log.movie.poster_path}`
             : "/default-poster.jpg";
