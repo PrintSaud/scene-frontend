@@ -113,16 +113,14 @@ useEffect(() => {
 
   const handleScroll = () => {
     const sections = container.querySelectorAll(".scroll-section");
-    if (!sections.length) return;
-
     const containerRect = container.getBoundingClientRect();
 
     let closestIndex = 0;
     let minDistance = Infinity;
 
     sections.forEach((section, index) => {
-      const rect = section.getBoundingClientRect();
-      const distance = Math.abs(rect.left - containerRect.left);
+      const sectionRect = section.getBoundingClientRect();
+      const distance = Math.abs(sectionRect.left - containerRect.left);
       if (distance < minDistance) {
         minDistance = distance;
         closestIndex = index;
@@ -138,19 +136,21 @@ useEffect(() => {
 
 
 
+
+
 // 🟣 Auto scroll when dot indicator is clicked (or manually set)
+// Scroll when indicator/dot changes it
 useEffect(() => {
   const container = scrollRef.current;
   if (!container) return;
 
-  const sections = container.querySelectorAll(".scroll-section");
-  if (!sections.length) return;
-
-  const section = sections[currentSection];
-  if (!section) return;
-
-  section.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
+  const sectionWidth = container.offsetWidth;
+  container.scrollTo({
+    left: sectionWidth * currentSection,
+    behavior: "smooth",
+  });
 }, [currentSection]);
+
 
 
   if (!user) {
@@ -269,7 +269,7 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
         flexDirection: "row",
         overflowX: "scroll",
         scrollSnapType: "x mandatory",
-        gap: "24px",
+        gap: "0px",
         padding: "12px 0 8px 0",
         scrollBehavior: "smooth",
         scrollbarWidth: "none",
