@@ -289,7 +289,7 @@ console.trace();
           }}
         />
         <button
-          onClick={handleAsk}
+        onClick={() => handleAsk()}
           style={{
             marginLeft: "8px",
             background: "transparent",
