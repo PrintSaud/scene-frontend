@@ -17,7 +17,6 @@ export default function ProfileTabProfile({
   user,
   favoriteMovies = [],
   logs = [],
-  navigate,
   profileUserId, // ✅ ADD THIS
   customPosters = {},
 })
