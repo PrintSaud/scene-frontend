@@ -119,7 +119,7 @@ export default function ProfileTabProfile({
 {recentlyWatched.length > 0 ? (
   <div style={{ marginTop: "12px" }}>
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-      <h3 style={{ fontSize: "12px", fontWeight: "600" }}>Recent Activity</h3>
+      <h3 style={{ fontSize: "12px", fontWeight: "600" }}>Recent Activities</h3>
       <button
         onClick={() => window.dispatchEvent(new CustomEvent("navigateToFilms"))}
         style={{

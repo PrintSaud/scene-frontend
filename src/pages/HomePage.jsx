@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/api";
+import { subDays, isBefore, formatDistanceToNowStrict } from "date-fns";
+import { FaRegComment } from "react-icons/fa";
+import { HiOutlineRefresh } from "react-icons/hi";
+import StarRating from "../components/StarRating"; // adjust path if needed
 
 
 export default function HomePage() {
@@ -187,86 +191,108 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
   </>
 )}
 
+{/* 👀 Recent Activities */}
+<h2 style={{ marginTop: "50px", fontSize: "22px" }}>
+  Recent Activities
+  <span
+    onClick={() => navigate("/friends-activity")}
+    style={{ float: "right", cursor: "pointer" }}
+  >
+    More →
+  </span>
+</h2>
 
-      {/* 👀 Friends Just Watched */}
-      <h2 style={{ marginTop: "50px", fontSize: "22px" }}>
-      Recent activities
-        <span
-          onClick={() => navigate("/friends-activity")}
-          style={{ float: "right", cursor: "pointer" }}
-        >
-          More →
-        </span>
-      </h2>
+{feedLogs.length > 0 ? (
+  <div style={{ marginTop: "16px", display: "flex", flexDirection: "column", gap: "24px" }}>
+    {[0, 6, 12].map((start, idx) => (
+      <div
+        key={idx}
+        style={{
+          display: "flex",
+          overflowX: "auto",
+          gap: "10px",
+          scrollSnapType: "x mandatory",
+          paddingBottom: "4px",
+        }}
+      >
+        {feedLogs.slice(start, start + 6).map((log) => {
+          const id = log.tmdbId || log.movie?.id || log.movie;
+          const customPoster = log.customPoster;
+          const fallback = log.movie?.poster_path
+            ? `${TMDB_IMG}${log.movie.poster_path}`
+            : "/default-poster.jpg";
+          const posterUrl = customPoster || fallback;
 
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <div
-          style={{
-            display: "flex",
-            overflowX: "auto",
-            gap: "12px",
-            padding: "1px 10px",
-            scrollSnapType: "x mandatory",
-          }}
-        >
-          {feedLogs.slice(0, 12).map((log, index) => (    
+          const hasReview = log.review && log.review.trim().length > 0;
+          const timestamp = formatDistanceToNowStrict(new Date(log.createdAt), { addSuffix: true });
+
+          return (
             <div
-              key={index}
-              style={{
-                position: "relative",
-                minWidth: "65vw",
-                maxWidth: "180px",
-                background: "#111",
-                borderRadius: "10px",
-                padding: "10px",
-                textAlign: "center",
-                flexShrink: 0,
-              }}
+              key={log._id}
+              onClick={() => navigate(hasReview ? `/review/${log._id}` : `/movie/${id}`)}
+              style={{ position: "relative", cursor: "pointer", minWidth: "100px" }}
             >
-              <div style={{ position: "relative" }}>
+              <img
+                src={posterUrl}
+                alt={log.title}
+                style={{
+                  width: "100px",
+                  height: "150px",
+                  objectFit: "cover",
+                  borderRadius: "6px",
+                }}
+                onError={(e) => (e.currentTarget.src = "/default-poster.jpg")}
+              />
+
+              <div
+                style={{
+                  marginTop: "6px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                }}
+              >
                 <img
-                src={
-                  log.customPoster ||
-                  log.movie?.poster ||
-                  `https://image.tmdb.org/t/p/w500${log.poster_path || ""}` ||
-                  "/default-poster.png"
-                }
-                
-                  alt="poster"
+                  src={
+                    log.user?.avatar?.startsWith("http")
+                      ? log.user.avatar
+                      : log.user?.avatar
+                      ? `${import.meta.env.VITE_BACKEND_URL}${log.user.avatar}`
+                      : "/default-avatar.png"
+                  }
+                  alt="avatar"
                   style={{
-                    width: "100%",
-                    aspectRatio: "2/3",
+                    width: "20px",
+                    height: "20px",
+                    borderRadius: "50%",
                     objectFit: "cover",
-                    borderRadius: "10px",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
-                    backgroundColor: "#000",
                   }}
                 />
-                {log.review && (
-                  <div style={{ position: "absolute", top: 8, right: 8, fontSize: "18px" }}>
-                    📝
-                  </div>
-                )}
+                <p style={{ fontSize: "12px", margin: 0 }}>{log.user?.username}</p>
               </div>
 
-              {log.rating && (
-                <div style={{ fontSize: "14px", marginTop: "6px" }}>⭐️ {log.rating}</div>
-              )}
-              <img
-                src={log.user?.avatar || "/default-avatar.png"}
-                alt="avatar"
-                style={{
-                  width: "30px",
-                  height: "30px",
-                  borderRadius: "50%",
-                  marginTop: "6px",
-                }}
-              />
-              <p style={{ fontSize: "12px", marginTop: "4px" }}>{log.user?.username}</p>
+              <div style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+                marginTop: "2px",
+                fontSize: "11px",
+                color: "#aaa",
+              }}>
+                <StarRating rating={log.rating} size={12} />
+                {hasReview && <FaRegComment size={9} />}
+                {log.rewatchCount > 1 && <HiOutlineRefresh size={11} />}
+              </div>
             </div>
-          ))}
-        </div>
+          );
+        })}
       </div>
+    ))}
+  </div>
+) : (
+  <p style={{ color: "#888", marginTop: "20px" }}>No recent logs yet.</p>
+)}
+
 
       {/* 🔥 Trending */}
       <h2 style={{ marginTop: "40px", fontSize: "22px" }}>
