@@ -91,7 +91,7 @@ const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
     const fetchFeed = async () => {
       if (!user?._id) return;
       try {
-        const res = await api.get(`/api/logs/feed/${user._id}`);
+        const res = await api.get(`/logs/feed`);
         setFeedLogs(res.data);
       } catch (err) {
         console.error("🔥 Failed to fetch feed logs:", err);
