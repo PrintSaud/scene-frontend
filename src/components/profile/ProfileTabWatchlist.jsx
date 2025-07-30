@@ -153,7 +153,7 @@ export default function ProfileTabWatchlist({
         >
           {watchList.map((movie) => {
             const image = getPosterUrl(movie.tmdbId || movie.id, movie.poster_path, movie.posterOverride);
-
+ 
             return (
               <img
                 key={movie.id || movie.tmdbId || movie._id}

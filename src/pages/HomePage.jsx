@@ -409,59 +409,56 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
   <p style={{ color: "#888", marginTop: "20px" }}>No recent logs yet.</p>
 )}
 
-      {/* 🔥 Trending */}
-      <h2 style={{ marginTop: "40px", fontSize: "22px" }}>
-        🔥 Trending Movies
-        <span
-          onClick={() => navigate("/trending")}
-          style={{ float: "right", cursor: "pointer" }}
-        >
-          More →
-        </span>
-      </h2>
+{/* 🔥 Trending */}
+<h2 style={{ marginTop: "40px", fontSize: "22px" }}>
+  🔥 Trending Movies
+  <span
+    onClick={() => navigate("/trending")}
+    style={{ float: "right", cursor: "pointer" }}
+  >
+    More →
+  </span>
+</h2>
 
-      <div
+<div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
+    gap: "12px",
+    padding: "6px 0",
+  }}
+>
+  {Array.isArray(movies) && movies.length > 0 ? (
+    movies.slice(0, 8).map((movie) => (
+      <img
+        key={movie.id}
+        src={
+          movie.poster_path
+            ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+            : "/default-poster.png"
+        }
+        alt={movie.title}
         style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(2, 1fr)",
-          padding: "2px 0px",
-          gap: "6px",
-          justifyItems: "center",
+          width: "100%",
+          aspectRatio: "2 / 3",
+          objectFit: "cover",
+          borderRadius: "6px",
+          cursor: "pointer",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
         }}
-      >
-        {Array.isArray(movies) && movies.length > 0 ? (
-          movies.slice(0, 8).map((movie) => (
-            <img
-              key={movie.id}
-              src={
-                movie.poster_path
-                  ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-                  : "/default-poster.png"
-              }
-              alt={movie.title}
-              style={{
-                width: "100%",
-                maxWidth: "200px",
-                aspectRatio: "2 / 3",
-                height: "300px",
-                padding: "6px 0px",
-                borderRadius: "10px",
-                objectFit: "cover",
-                cursor: "pointer",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
-              }}
-              onClick={() => {
-                navigate(`/movie/${movie.id}`);
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
-            />
-          ))
-        ) : (
-          <p style={{ gridColumn: "1 / -1", textAlign: "center" }}>
-            No trending movies right now.
-          </p>
-        )}
-      </div>
+        onClick={() => {
+          navigate(`/movie/${movie.id}`);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+      />
+    ))
+  ) : (
+    <p style={{ gridColumn: "1 / -1", textAlign: "center" }}>
+      No trending movies right now.
+    </p>
+  )}
+</div>
+
     </div>
   );
 }
