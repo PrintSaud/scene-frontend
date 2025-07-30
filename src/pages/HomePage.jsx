@@ -203,18 +203,27 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
 </h2>
 
 {feedLogs.length > 0 ? (
-  <div style={{ marginTop: "16px", display: "flex", flexDirection: "column", gap: "32px" }}>
-    {[0, 6, 12].map((start, idx) => (
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "row",
+      overflowX: "auto",
+      scrollSnapType: "x mandatory",
+      gap: "24px",
+      padding: "12px 0 8px 0",
+    }}
+  >
+    {[0, 6, 12].map((start, i) => (
       <div
-        key={idx}
+        key={i}
         style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "flex-start",
+          scrollSnapAlign: "start",
+          flex: "0 0 100%",
+          display: "grid",
+          gridTemplateColumns: "repeat(3, 1fr)",
+          gridTemplateRows: "repeat(2, auto)",
           gap: "12px",
-          overflowX: "auto",
-          scrollSnapType: "x mandatory",
-          paddingBottom: "4px",
+          padding: "0 4px",
         }}
       >
         {feedLogs.slice(start, start + 6).map((log) => {
@@ -226,13 +235,15 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
           const posterUrl = customPoster || fallback;
 
           const hasReview = log.review && log.review.trim().length > 0;
-          const timestamp = formatDistanceToNowStrict(new Date(log.createdAt), { addSuffix: true });
+          const timestamp = formatDistanceToNowStrict(new Date(log.createdAt), {
+            addSuffix: true,
+          });
 
           return (
             <div
               key={log._id}
               onClick={() => navigate(hasReview ? `/review/${log._id}` : `/movie/${id}`)}
-              style={{ position: "relative", cursor: "pointer", width: "100px" }}
+              style={{ position: "relative", cursor: "pointer" }}
             >
               {/* 🕒 Timestamp Top Right */}
               <div
@@ -251,11 +262,12 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
                 {timestamp}
               </div>
 
+              {/* Poster */}
               <img
                 src={posterUrl}
                 alt={log.title}
                 style={{
-                  width: "100px",
+                  width: "100%",
                   height: "150px",
                   objectFit: "cover",
                   borderRadius: "6px",
@@ -315,6 +327,7 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
 ) : (
   <p style={{ color: "#888", marginTop: "20px" }}>No recent logs yet.</p>
 )}
+
 
 
 
