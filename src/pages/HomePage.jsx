@@ -234,12 +234,6 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
 {/* 👀 Recent Activities */}
 <h2 style={{ marginTop: "50px", fontSize: "22px" }}>
   Recent Activities
-  <span
-    onClick={() => navigate("/friends-activity")}
-    style={{ float: "right", cursor: "pointer" }}
-  >
-    More →
-  </span>
 </h2>
 
 {feedLogs.length > 0 ? (
@@ -431,7 +425,7 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
           display: "grid",
           gridTemplateColumns: "repeat(2, 1fr)",
           padding: "2px 0px",
-          gap: "18px",
+          gap: "6px",
           justifyItems: "center",
         }}
       >
@@ -446,7 +440,7 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
               }
               alt={movie.title}
               style={{
-                width: "170px",
+                width: "100%",
                 maxWidth: "200px",
                 aspectRatio: "2 / 3",
                 height: "300px",
