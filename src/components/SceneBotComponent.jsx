@@ -163,62 +163,66 @@ console.trace();
   }, [messages, loading]);
 
   return (
-    <div style={{
-      display: "flex",
-      flexDirection: "column",
-      height: "100vh",
-      background: "#0e0e0e",
-      color: "#fff",
-      fontFamily: "Inter, sans-serif",
-      position: "relative",
-    }}>
-{/* 🧠 Sticky Header with ❓ Icon */}
-<div
-  style={{
-    position: "sticky",
-    top: 0,
-    background: "#0e0e0e",
-    zIndex: 100,
-    padding: "20px 16px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    borderBottom: "1px solid #222",
-  }}
->
-  <div style={{ fontSize: "20px", fontWeight: "600", flex: 1, textAlign: "center" }}>
-    SceneBot 🎬
-  </div>
-
-  <div
-    onClick={() =>
-      alert(
-        `🌍 To change language, just type:\n\nreply in "arabic"\nreply in "french"\nreply in "english"\n\nTo reset, type: reset language`
-      )
-    }
-    style={{
-      position: "absolute",
-      right: "18px",
-      fontSize: "20px",
-      cursor: "pointer",
-      color: "#ccc",
-    }}
-    title="Language Info"
-  >
-    ❓
-  </div>
-</div>
-
-
-      {/* 🗨️ Messages */}
-      <div style={{
-        flex: 1,
-        overflowY: "auto",
-        padding: "0 16px 140px",
+    <div
+      style={{
         display: "flex",
         flexDirection: "column",
-        gap: "14px",
-      }}>
+        height: "100vh",
+        background: "#0e0e0e",
+        color: "#fff",
+        fontFamily: "Inter, sans-serif",
+        position: "relative",
+      }}
+    >
+      {/* 🧠 Sticky Header with ❓ Icon */}
+      <div
+        style={{
+          position: "sticky",
+          top: 0,
+          background: "#0e0e0e",
+          zIndex: 100,
+          padding: "20px 16px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          borderBottom: "1px solid #222",
+        }}
+      >
+        <div style={{ fontSize: "20px", fontWeight: "600", flex: 1, textAlign: "center" }}>
+          SceneBot 🎬
+        </div>
+  
+        <div
+          onClick={() =>
+            alert(
+              `🌍 To change language, just type:\n\nreply in "arabic"\nreply in "french"\nreply in "english"\n\nTo reset, type: reset language`
+            )
+          }
+          style={{
+            position: "absolute",
+            right: "18px",
+            fontSize: "20px",
+            cursor: "pointer",
+            color: "#ccc",
+          }}
+          title="Language Info"
+        >
+          ❓
+        </div>
+      </div>
+  
+      {/* 🗨️ Messages */}
+      <div
+        style={{
+          flex: 1,
+          overflowY: "auto",
+          padding: "0 16px 140px",
+          paddingTop: "0px", // ✅ REMOVE TOP GAP
+          display: "flex",
+          flexDirection: "column",
+          gap: "0px",
+        }}
+      >
         {messages.map((msg, i) => (
           <div
             key={i}
@@ -226,6 +230,7 @@ console.trace();
               alignSelf: msg.sender === "user" ? "end" : "start",
               marginLeft: msg.sender === "user" ? "auto" : 0,
               marginRight: msg.sender === "user" ? 0 : "auto",
+              marginTop: i === 0 ? "0px" : "14px", // ✅ FIRST MESSAGE NO MARGIN-TOP
               background: msg.sender === "user" ? "#fff" : "#1a1a1a",
               color: msg.sender === "user" ? "#000" : "#fff",
               padding: "14px 18px",
@@ -239,38 +244,42 @@ console.trace();
             {String(msg.text)}
           </div>
         ))}
-
+  
         {loading && !typingText && (
-          <div style={{
-            background: "#1a1a1a",
-            padding: "14px 16px",
-            borderRadius: "16px",
-            maxWidth: "80%",
-            alignSelf: "flex-start",
-            fontSize: "14px",
-            color: "#ccc",
-            fontStyle: "italic",
-          }}>
+          <div
+            style={{
+              background: "#1a1a1a",
+              padding: "14px 16px",
+              borderRadius: "16px",
+              maxWidth: "80%",
+              alignSelf: "flex-start",
+              fontSize: "14px",
+              color: "#ccc",
+              fontStyle: "italic",
+            }}
+          >
             SceneBot is typing...
           </div>
         )}
-
-<div ref={messagesEndRef} style={{ height: "100px" }} />
+  
+        <div ref={messagesEndRef} style={{ height: "100px" }} />
       </div>
-
+  
       {/* ✍️ Input + Buttons */}
-      <div style={{
-        position: "fixed",
-        bottom: "60px",
-        left: 0,
-        width: "90%",
-        padding: "14px 16px",
-        background: "#0e0e0e",
-        borderTop: "1px solid #222",
-        display: "flex",
-        alignItems: "center",
-        zIndex: 99,
-      }}>
+      <div
+        style={{
+          position: "fixed",
+          bottom: "60px",
+          left: 0,
+          width: "95%",
+          padding: "14px 16px",
+          background: "#0e0e0e",
+          borderTop: "1px solid #222",
+          display: "flex",
+          alignItems: "center",
+          zIndex: 99,
+        }}
+      >
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -289,7 +298,7 @@ console.trace();
           }}
         />
         <button
-        onClick={() => handleAsk()}
+          onClick={() => handleAsk()}
           style={{
             marginLeft: "8px",
             background: "transparent",
@@ -320,4 +329,5 @@ console.trace();
       </div>
     </div>
   );
+  
 }
