@@ -21,30 +21,50 @@ export default function TrendingPage() {
   }, []);
 
   return (
-    <div style={{ padding: "20px", color: "#fff", minHeight: "100vh", backgroundColor: "#0e0e0e" }}>
-      {/* 🔙 Back to Home */}
+    <div
+      style={{
+        padding: "20px",
+        color: "#fff",
+        backgroundColor: "#0e0e0e",
+        minHeight: "100dvh",
+        paddingBottom: "120px", // 🧽 Extra space for scroll
+        boxSizing: "border-box",
+      }}
+    >
+      {/* 🔙 Back to Home (Scene-style) */}
       <button
         onClick={() => navigate("/home")}
         style={{
+          background: "rgba(255, 255, 255, 0.1)",
+          border: "none",
+          color: "#fff",
+          borderRadius: "12px",
+          padding: "6px 12px",
+          fontSize: "14px",
           position: "fixed",
           top: "20px",
           left: "20px",
           zIndex: 10,
-          background: "transparent",
-          border: "1px solid #fff",
-          color: "#fff",
-          padding: "6px 12px",
-          borderRadius: "8px",
           cursor: "pointer",
         }}
       >
-        ← Home
+        ← Back
       </button>
 
-      <h1 style={{ textAlign: "center", fontSize: "20px", marginTop: "60px", marginBottom: "30px" }}>
+      {/* 🔥 Header */}
+      <h1
+        style={{
+          textAlign: "center",
+          fontSize: "20px",
+          marginTop: "60px",
+          marginBottom: "30px",
+          fontWeight: "600",
+        }}
+      >
         🔥 Trending Films This Week
       </h1>
 
+      {/* 🎬 Movie Grid */}
       <div
         style={{
           display: "grid",
@@ -74,7 +94,9 @@ export default function TrendingPage() {
               >
                 <img
                   src={
-                    movie.poster_path
+                    movie.poster?.startsWith("http")
+                      ? movie.poster
+                      : movie.poster_path
                       ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
                       : "/default-poster.png"
                   }
@@ -84,6 +106,7 @@ export default function TrendingPage() {
                     height: "100%",
                     objectFit: "cover",
                   }}
+                  onError={(e) => (e.target.src = "/default-poster.png")}
                 />
               </div>
               <p
