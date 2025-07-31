@@ -195,12 +195,19 @@ export default function AllReviewsPage() {
                   <img src={review.image} style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }} />
                 )}
                 <div style={{ display: "flex", gap: 12, marginTop: 6 }}>
-                  <button
-                    style={{ background: "none", border: "none", color: "#888", fontSize: 13, cursor: "pointer" }}
-                    onClick={() => handleReply(review._id, review.user.username)}
-                  >
-                    Reply
-                  </button>
+                <button
+  style={{
+    background: "none",
+    border: "none",
+    color: "#888",
+    fontSize: 13,
+    cursor: "pointer"
+  }}
+  onClick={() => handleReply(review._id, review.user.username, log._id)} // 💯
+>
+  Reply
+</button>
+
                   <div onClick={() => handleLike(review._id)} style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
                     {isLiked ? <AiFillHeart size={16} color="#B327F6" /> : <AiOutlineHeart size={16} color="#888" />}
                     <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>
