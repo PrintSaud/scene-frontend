@@ -171,7 +171,7 @@ export default function AllReviewsPage() {
               <div style={{ flex: 1 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                   <strong
-                    style={{ fontSize: 14, color: "#ddd", cursor: "pointer" }}
+                    style={{ fontSize: 14, color: "#ddd", cursor: "pointer" ,   fontFamily: "Inter, sans-serif", }}
                     onClick={() => navigate(`/profile/${review.user._id}`)}
                   >
                     @{review.user.username}
@@ -215,34 +215,45 @@ export default function AllReviewsPage() {
                     </span>
                   </div>
                 </div>
-
-                {/* 🔁 Nested replies */}
+ 
                 {review.replies?.map((reply) => {
   const isChildLiked = reply.likes?.includes(userId);
+  const avatar = reply.avatar || "/default-avatar.jpg";
+  const username = reply.username || "Unknown";
+  const rating = reply.rating;
+
   return (
     <div key={reply._id} style={{ paddingLeft: 20, marginTop: 8 }}>
       <div style={{ display: "flex", gap: 10, position: "relative" }}>
-      <img
-  src={reply.user?.avatar || "/default-avatar.jpg"}
+        <img
+          src={avatar}
           style={{ width: 26, height: 26, borderRadius: "50%", cursor: "pointer" }}
           onClick={() => navigate(`/profile/${reply.userId}`)}
         />
         <div style={{ flex: 1 }}>
           <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
             <strong
-              style={{ fontSize: 13, color: "#ddd", cursor: "pointer" }}
+              style={{ fontSize: 13, color: "#ddd", cursor: "pointer" ,    fontFamily: "Inter, sans-serif", }}
               onClick={() => navigate(`/profile/${reply.userId}`)}
             >
-              @{reply.username}
+              @{username}
             </strong>
+
+            {rating && (
+              <div style={{ marginTop: -1 }}>
+                <StarRating rating={rating} size={12} />
+              </div>
+            )}
+
             <span style={{ fontSize: 10, color: "#888" }}>
               {getRelativeTime(reply.createdAt)}
             </span>
           </div>
 
-          <div style={{ fontSize: 13, color: "#ddd", marginTop: 2, fontFamily: "Inter, sans-serif" }}>
-  {reply.text}
-</div>
+          <div style={{ fontSize: 13, color: "#ddd", marginTop: 2 }}>
+            {reply.text}
+          </div>
+
           {reply.gif && (
             <img
               src={reply.gif}
@@ -254,6 +265,7 @@ export default function AllReviewsPage() {
               }}
             />
           )}
+
           {reply.image && (
             <img
               src={reply.image}
@@ -267,7 +279,7 @@ export default function AllReviewsPage() {
           )}
 
           <button
-          onClick={() => handleReply(null, review.user.username, review._id)}
+            onClick={() => handleReply(null, review.user.username, review._id)}
             style={{
               background: "none",
               border: "none",
@@ -282,6 +294,7 @@ export default function AllReviewsPage() {
           </button>
         </div>
 
+        {/* ❤️ Like + 3-Dots */}
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <div onClick={() => handleLike(reply._id)} style={{ cursor: "pointer" }}>
             {isChildLiked ? (
@@ -324,6 +337,7 @@ export default function AllReviewsPage() {
     </div>
   );
 })}
+
 
               </div>
             </div>
