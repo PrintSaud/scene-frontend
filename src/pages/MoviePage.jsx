@@ -284,7 +284,7 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
       </div>
 
 {/* 👀 Watched by Friends */}
-<div style={{ marginTop: "32px", padding: "0 24px" }}>
+<div style={{ marginTop: "28px", padding: "0 24px" }}>
   <h3 style={{ fontSize: "18px", marginBottom: "12px" }}>Watched by Friends</h3>
 
   {friendLogs.length === 0 ? (
@@ -292,15 +292,20 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
   ) : (
     (() => {
       const seen = new Set();
-      const uniqueLogs = friendLogs.filter((log) => {
-        if (seen.has(log.user._id)) return false;
-        seen.add(log.user._id);
-        return true;
-      });
+      const uniqueLogs = [];
+
+      for (const log of friendLogs) {
+        if (!seen.has(log.user._id)) {
+          uniqueLogs.push(log);
+          seen.add(log.user._id);
+        }
+      }
+
+      console.log("🧪 Unique Friends:", uniqueLogs.length);
+      console.log("🧪 Raw Logs:", friendLogs);
 
       return (
         <>
-          {/* Avatars */}
           <div
             style={{
               display: "flex",
@@ -310,22 +315,27 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
               flexWrap: "wrap",
             }}
           >
-            {uniqueLogs.slice(0, 5).map((log) => {
+            {uniqueLogs.slice(0, 5).map((log, index) => {
               const sameUserLogs = friendLogs.filter(
                 (l) => l.user._id === log.user._id
               );
 
               const reviews = sameUserLogs.filter((l) => l.review);
-
               const displayLog =
                 sameUserLogs.find((l) => l.rating) ||
                 sameUserLogs.find((l) => l.review) ||
                 sameUserLogs.find((l) => l.rewatchCount > 0 || l.rewatch > 0) ||
                 sameUserLogs[0];
 
+              console.log(`🧑‍🎥 ${log.user.username}:`, {
+                rating: displayLog.rating,
+                review: displayLog.review,
+                rewatch: displayLog.rewatchCount ?? displayLog.rewatch,
+              });
+
               return (
                 <div
-                  key={log._id}
+                  key={log._id + index}
                   onClick={() => {
                     if (reviews.length === 1) {
                       navigate(`/review/${reviews[0]._id}`);
@@ -359,7 +369,7 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
                     }}
                   />
 
-                  {/* 👇 Icon logic */}
+                  {/* Render icon */}
                   {displayLog.rating ? (
                     <StarRating rating={displayLog.rating} size={9} />
                   ) : displayLog.review ? (
@@ -374,14 +384,16 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
                       color="#aaa"
                       style={{ marginTop: "2px" }}
                     />
-                  ) : null}
+                  ) : (
+                    <div style={{ height: "9px" }} /> // spacer fallback
+                  )}
                 </div>
               );
             })}
           </div>
 
-          {/* More → */}
-          {uniqueLogs.length > 5 && (
+          {/* ✅ More button logic */}
+          {uniqueLogs.length > 1 && (
             <button
               onClick={() => navigate(`/movie/${movie.id}/friends`)}
               style={{
@@ -404,6 +416,7 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
     })()
   )}
 </div>
+
 
 
       {/* 📝 Popular Reviews */}
