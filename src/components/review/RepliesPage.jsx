@@ -255,16 +255,18 @@ const { parentCommentId, parentUsername } = location.state || {};
             />
             <div style={{ flex: 1 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <strong
-                  style={{ fontSize: 14, color: "#ddd", cursor: "pointer" }}
-                  onClick={() => navigate(`/profile/${parent.userId}`)}
-                >
-                  @{parent.username}
-                </strong>
-                <span style={{ fontSize: 10, color: "#888" }}>{getRelativeTime(parent.createdAt)}</span>
+              <strong
+  style={{ fontSize: 14, color: "#ddd", cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
+  onClick={() => navigate(`/profile/${parent.userId}`)}
+>
+  @{parent.username}
+  {parent.ratingForThisMovie && <StarRating rating={parent.ratingForThisMovie} size={12} />}
+</strong>
+
+                <span style={{ fontSize: 10, color: "#888", fontFamily: "Inter, sans-serif" }}>{getRelativeTime(parent.createdAt)}</span>
               </div>
               <span style={{ fontSize: 14, color: "#ddd", marginTop: 2, display: "block" }}>{parent.text}</span>
-              {parent.rating && (
+              {parent.ratingForThisMovie && (
   <div style={{ marginTop: 4 }}>
     <StarRating rating={parent.rating} size={12} />
   </div>
@@ -323,7 +325,7 @@ const { parentCommentId, parentUsername } = location.state || {};
           const isLikedByMeChild = child.likes?.includes(userId);
           return (
             <div key={child._id} style={{ paddingLeft: 20, fontSize: 13, opacity: 0.9, marginTop: 8 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, fontFamily: "Inter, sans-serif" }}>
                 <img
                   src={child.avatar || "/default-avatar.jpg"}
                   alt="avatar"
@@ -332,16 +334,18 @@ const { parentCommentId, parentUsername } = location.state || {};
                 />
                 <div style={{ flex: 1 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                    <strong
-                      style={{ fontSize: 13, color: "#ddd", cursor: "pointer" }}
-                      onClick={() => navigate(`/profile/${child.userId}`)}
-                    >
-                      @{child.username}
-                    </strong>
-                    <span style={{ fontSize: 10, color: "#888" }}>{getRelativeTime(child.createdAt)}</span>
+                  <strong
+  style={{ fontSize: 14, color: "#ddd", cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
+  onClick={() => navigate(`/profile/${parent.userId}`)}
+>
+  @{child.username}
+  {child.ratingForThisMovie && <StarRating rating={child.ratingForThisMovie} size={12} />}
+</strong>
+
+                    <span style={{ fontSize: 10, color: "#888", fontFamily: "Inter, sans-serif" }}>{getRelativeTime(child.createdAt)}</span>
                   </div>
                   <span style={{ fontSize: 13, color: "#ddd", marginTop: 2, display: "block" }}>{child.text}</span>
-                  {child.rating && (
+                  {child.ratingForThisMovie && (
   <div style={{ marginTop: 4 }}>
     <StarRating rating={child.rating} size={11} />
   </div>
