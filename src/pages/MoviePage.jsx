@@ -617,26 +617,30 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
                 />
               )}
 
-              {/* Reply + Delete */}
+              {/* Reply */}
               <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 6 }}>
-                <button
-                  onClick={() =>
-                    navigate(`/replies/${r._id}`, {
-                      state: { parentCommentId: r._id, parentUsername: r.user.username },
-                    })
-                  }
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "#888",
-                    fontSize: 13,
-                    cursor: "pointer",
-                    padding: 0,
-                  }}
-                >
-                  Reply
-                </button>
-              </div>
+  <button
+    onClick={() =>
+      navigate(`/movie/${id}/reviews`, {
+        state: {
+          parentCommentId: r._id,
+          parentUsername: r.user.username,
+        },
+      })
+    }
+    style={{
+      background: "none",
+      border: "none",
+      color: "#888",
+      fontSize: 13,
+      cursor: "pointer",
+      padding: 0,
+    }}
+  >
+    Reply
+  </button>
+</div>
+
             </div>
 
             {/* Like */}

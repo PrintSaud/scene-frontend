@@ -1,18 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
+import { HiOutlineArrowNarrowLeft, HiOutlineRefresh, HiDotsVertical } from "react-icons/hi";
+import { FaImage } from "react-icons/fa";
+import { BiSolidFileGif } from "react-icons/bi";
+import { FiSend } from "react-icons/fi";
 import api from "../api/api";
-import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
-import { HiOutlineRefresh } from "react-icons/hi";
 import StarRating from "../components/StarRating";
+import GifSearchModal from "../components/GifSearchModal";
 
-
-export default function MoreReviewsPage() {
-  const { id } = useParams(); // movie TMDB id
+export default function AllReviewsPage() {
+  const { id } = useParams();
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const inputRef = useRef();
+
   const [reviews, setReviews] = useState([]);
-  const [replyTo, setReplyTo] = useState(null); // which review we're replying to
-  const [replyText, setReplyText] = useState("");
+  const [userId, setUserId] = useState("");
+  const [input, setInput] = useState("");
+  const [selectedGif, setSelectedGif] = useState("");
+  const [selectedImage, setSelectedImage] = useState("");
+  const [replyingTo, setReplyingTo] = useState(null);
+  const [showGifModal, setShowGifModal] = useState(false);
+  const [menuOpenId, setMenuOpenId] = useState(null);
 
   const getRelativeTime = (date) => {
     const now = Date.now();
@@ -35,209 +44,297 @@ export default function MoreReviewsPage() {
 
   useEffect(() => {
     const stored = localStorage.getItem("user");
-    if (stored) setUser(JSON.parse(stored));
-
-    const fetchReviews = async () => {
-      try {
-        const res = await api.get(`/api/logs/movie/${id}/popular?all=true`);
-        setReviews(res.data);
-      } catch (err) {
-        console.error("❌ Failed to load more reviews", err);
-      }
-    };
-
+    if (stored) {
+      const user = JSON.parse(stored);
+      setUserId(user._id);
+    }
     fetchReviews();
   }, [id]);
+
+  const fetchReviews = async () => {
+    try {
+      const res = await api.get(`/api/logs/movie/${id}/popular?all=true`);
+      setReviews(res.data);
+    } catch (err) {
+      console.error("❌ Failed to load reviews", err);
+    }
+  };
+
+  const handleReply = (reviewId, username) => {
+    setReplyingTo({ id: reviewId, username });
+    setInput(`@${username} `);
+    inputRef.current?.focus();
+  };
+
+  const handleSend = async () => {
+    if (!input.trim() && !selectedGif && !selectedImage) return;
+
+    try {
+      const formData = new FormData();
+      formData.append("text", input);
+      formData.append("parentId", replyingTo.id);
+      if (selectedGif) formData.append("gif", selectedGif);
+      if (selectedImage) formData.append("image", selectedImage);
+
+      await api.post(`/api/replies`, formData); // update this route as needed
+
+      // Clear after send
+      setInput("");
+      setSelectedGif("");
+      setSelectedImage("");
+      setReplyingTo(null);
+      fetchReviews();
+    } catch (err) {
+      console.error("❌ Failed to send reply", err);
+    }
+  };
 
   const handleLike = async (logId) => {
     try {
       await api.post(`/api/logs/${logId}/like`);
-      setReviews((prev) =>
-        prev.map((r) =>
-          r._id === logId
-            ? {
-                ...r,
-                likes: r.likes.includes(user._id)
-                  ? r.likes.filter((u) => u !== user._id)
-                  : [...r.likes, user._id],
-              }
-            : r
-        )
-      );
+      fetchReviews();
     } catch (err) {
-      console.error("❌ Failed to like review:", err);
+      console.error("❌ Failed to like", err);
     }
   };
 
-  const handleReply = async (logId) => {
+  const handleDelete = async (replyId) => {
     try {
-      if (!replyText.trim()) return;
-
-      await api.post(`/api/logs/${logId}/replies`, {
-        text: replyText,
-      });
-
-      setReplyText("");
-      setReplyTo(null);
-      // Optionally: auto-navigate to full RepliesPage
-      navigate(`/replies/${logId}`);
+      await api.delete(`/api/replies/${replyId}`);
+      fetchReviews();
     } catch (err) {
-      console.error("❌ Failed to post reply:", err);
+      console.error("❌ Failed to delete reply", err);
     }
   };
 
   return (
-    <div style={{ padding: "20px 24px" }}>
-      <h2 style={{ fontSize: 20, marginBottom: 16 }}>All Reviews</h2>
+    <div style={{ padding: "16px 12px", paddingBottom: 80 }}>
+      {/* 🔙 Back Button */}
+      <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
+        <HiOutlineArrowNarrowLeft
+          size={24}
+          style={{ cursor: "pointer", color: "#888", marginRight: 12 }}
+          onClick={() => navigate(-1)}
+        />
+        <h2 style={{ fontSize: 18, margin: 0 }}>All Reviews</h2>
+      </div>
 
-      {reviews.length === 0 ? (
-        <p style={{ color: "#888" }}>No reviews yet.</p>
-      ) : (
-        reviews.map((r) => {
-          const isLiked = r.likes.includes(user?._id);
-          const replying = replyTo === r._id;
-
-          return (
-            <div
-              key={r._id}
-              style={{
-                paddingBottom: 16,
-                borderBottom: "1px solid #222",
-                marginBottom: 16,
-              }}
-            >
-              {/* Top Section */}
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <img
-                  src={r.avatar || "/default-avatar.jpg"}
-                  alt="avatar"
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: "50%",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => navigate(`/profile/${r.userId || r.user?._id}`)}
-                />
-
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-                    <strong
-                      style={{ color: "#ddd", fontSize: 14, cursor: "pointer" }}
-                      onClick={() => navigate(`/profile/${r.userId || r.user?._id}`)}
-                    >
-                      @{r.username}
-                    </strong>
-
-                    {r.rating && <StarRating rating={r.rating} size={12} />}
-                    {r.rewatchCount > 0 && (
-                      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                        <HiOutlineRefresh size={12} color="#aaa" />
-                        <span style={{ fontSize: 10, color: "#aaa" }}>
-                          {r.rewatchCount}x
-                        </span>
-                      </div>
-                    )}
-                    <span style={{ fontSize: 10, color: "#888" }}>
-                      {getRelativeTime(r.createdAt)}
+      {/* 🔁 Reviews */}
+      {reviews.map((review) => {
+        const isLiked = review.likes?.includes(userId);
+        return (
+          <div
+            key={review._id}
+            style={{
+              marginBottom: 16,
+              paddingBottom: 12,
+              borderBottom: "1px solid #222",
+              background: replyingTo?.id === review._id ? "#1a1a1a" : "transparent",
+              borderRadius: 8,
+              padding: 10,
+            }}
+          >
+            <div style={{ display: "flex", gap: 10 }}>
+              <img
+                src={review.avatar || "/default-avatar.jpg"}
+                style={{ width: 32, height: 32, borderRadius: "50%", cursor: "pointer" }}
+                onClick={() => navigate(`/profile/${review.user._id}`)}
+              />
+              <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <strong
+                    style={{ fontSize: 14, color: "#ddd", cursor: "pointer" }}
+                    onClick={() => navigate(`/profile/${review.user._id}`)}
+                  >
+                    @{review.user.username}
+                  </strong>
+                  {review.rating && <StarRating rating={review.rating} size={12} />}
+                  {review.rewatchCount > 0 && (
+                    <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                      <HiOutlineRefresh size={12} color="#aaa" />
+                      <span style={{ fontSize: 10, color: "#aaa" }}>{review.rewatchCount}x</span>
+                    </div>
+                  )}
+                  <span style={{ fontSize: 10, color: "#888" }}>{getRelativeTime(review.createdAt)}</span>
+                </div>
+                <div style={{ fontSize: 14, color: "#ddd", marginTop: 2 }}>{review.review}</div>
+                {review.gif && (
+                  <img src={review.gif} style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }} />
+                )}
+                {review.image && (
+                  <img src={review.image} style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }} />
+                )}
+                <div style={{ display: "flex", gap: 12, marginTop: 6 }}>
+                  <button
+                    style={{ background: "none", border: "none", color: "#888", fontSize: 13, cursor: "pointer" }}
+                    onClick={() => handleReply(review._id, review.user.username)}
+                  >
+                    Reply
+                  </button>
+                  <div onClick={() => handleLike(review._id)} style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
+                    {isLiked ? <AiFillHeart size={16} color="#B327F6" /> : <AiOutlineHeart size={16} color="#888" />}
+                    <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>
+                      {review.likes?.length || 0}
                     </span>
                   </div>
                 </div>
 
-                <div
-                  onClick={() => handleLike(r._id)}
-                  style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
-                >
-                  {isLiked ? (
-                    <AiFillHeart size={16} color="#B327F6" />
-                  ) : (
-                    <AiOutlineHeart size={16} color="#888" />
-                  )}
-                  <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>
-                    {r.likes?.length || 0}
-                  </span>
-                </div>
+                {/* 🔁 Nested replies */}
+                {review.replies?.map((reply) => {
+                  const isChildLiked = reply.likes?.includes(userId);
+                  return (
+                    <div key={reply._id} style={{ paddingLeft: 20, marginTop: 8 }}>
+                      <div style={{ display: "flex", gap: 10 }}>
+                        <img
+                          src={reply.avatar || "/default-avatar.jpg"}
+                          style={{ width: 26, height: 26, borderRadius: "50%" }}
+                          onClick={() => navigate(`/profile/${reply.userId}`)}
+                        />
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                            <strong style={{ fontSize: 13, color: "#ddd" }}>@{reply.username}</strong>
+                            <span style={{ fontSize: 10, color: "#888" }}>{getRelativeTime(reply.createdAt)}</span>
+                          </div>
+                          <div style={{ fontSize: 13, color: "#ddd", marginTop: 2 }}>{reply.text}</div>
+                          {reply.gif && <img src={reply.gif} style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }} />}
+                          {reply.image && <img src={reply.image} style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }} />}
+                          <button
+                            onClick={() => handleReply(reply._id, reply.username)}
+                            style={{ background: "none", border: "none", color: "#888", fontSize: 13, cursor: "pointer", marginTop: 4 }}
+                          >
+                            Reply
+                          </button>
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                          <div onClick={() => handleLike(reply._id)} style={{ cursor: "pointer" }}>
+                            {isChildLiked ? <AiFillHeart size={16} color="#B327F6" /> : <AiOutlineHeart size={16} color="#888" />}
+                          </div>
+                          {reply.userId === userId && (
+                            <HiDotsVertical
+                              size={14}
+                              onClick={() => setMenuOpenId(menuOpenId === reply._id ? null : reply._id)}
+                              style={{ cursor: "pointer", color: "#888" }}
+                            />
+                          )}
+                          {menuOpenId === reply._id && (
+                            <div
+                              style={{
+                                position: "absolute",
+                                background: "#222",
+                                borderRadius: 4,
+                                padding: "4px 8px",
+                                fontSize: 12,
+                                color: "#f55",
+                                cursor: "pointer",
+                              }}
+                              onClick={() => handleDelete(reply._id)}
+                            >
+                              Delete
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-
-              {/* Review Text */}
-              <div style={{ marginTop: 6 }}>
-                <p style={{ color: "#ddd", fontSize: 14 }}>{r.review}</p>
-
-                {r.gif && (
-                  <img
-                    src={r.gif}
-                    alt="gif"
-                    style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }}
-                  />
-                )}
-                {r.image && (
-                  <img
-                    src={r.image}
-                    alt="img"
-                    style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }}
-                  />
-                )}
-              </div>
-
-              {/* Reply button */}
-              <div style={{ marginTop: 8 }}>
-                <button
-                  onClick={() =>
-                    setReplyTo(replying ? null : r._id) ||
-                    setReplyText(`@${r.username} `)
-                  }
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "#888",
-                    fontSize: 13,
-                    cursor: "pointer",
-                    padding: 0,
-                  }}
-                >
-                  Reply
-                </button>
-              </div>
-
-              {/* Reply Input */}
-              {replying && (
-                <div style={{ marginTop: 8 }}>
-                  <input
-                    type="text"
-                    value={replyText}
-                    onChange={(e) => setReplyText(e.target.value)}
-                    placeholder="Write a reply..."
-                    style={{
-                      width: "100%",
-                      padding: "8px",
-                      background: "#111",
-                      color: "#fff",
-                      border: "1px solid #333",
-                      borderRadius: 6,
-                      fontSize: 14,
-                      marginBottom: 6,
-                    }}
-                  />
-                  <button
-                    onClick={() => handleReply(r._id)}
-                    style={{
-                      background: "#B327F6",
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: 6,
-                      padding: "6px 12px",
-                      fontSize: 13,
-                      fontWeight: "bold",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Send
-                  </button>
-                </div>
-              )}
             </div>
-          );
-        })
+          </div>
+        );
+      })}
+
+      {/* ✏️ Reply Input */}
+      {replyingTo && (
+        <div style={{ position: "fixed", bottom: 0, width: "100%", background: "#0e0e0e", borderTop: "1px solid #222", padding: "12px 12px", zIndex: 99 }}>
+          {(selectedGif || selectedImage) && (
+            <div style={{ paddingBottom: 8, position: "relative" }}>
+              <img
+                src={selectedGif || selectedImage}
+                alt="preview"
+                style={{ width: "100%", borderRadius: 8, maxHeight: 180, objectFit: "cover" }}
+              />
+              <button
+                onClick={() => {
+                  setSelectedGif("");
+                  setSelectedImage("");
+                }}
+                style={{
+                  position: "absolute",
+                  top: 4,
+                  right: 4,
+                  background: "rgba(0,0,0,0.6)",
+                  border: "none",
+                  borderRadius: "50%",
+                  width: 24,
+                  height: 24,
+                  color: "#fff",
+                  fontSize: 14,
+                  cursor: "pointer",
+                }}
+              >
+                ×
+              </button>
+            </div>
+          )}
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <FaImage size={20} color="#888" style={{ cursor: "pointer", marginRight: 8 }} onClick={() => document.getElementById("imageUpload").click()} />
+            <BiSolidFileGif size={20} color="#888" style={{ cursor: "pointer", marginRight: 8 }} onClick={() => setShowGifModal(true)} />
+            <input
+              ref={inputRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Write a reply..."
+              onKeyDown={(e) => e.key === "Enter" && handleSend()}
+              style={{
+                flex: 1,
+                padding: "12px 16px",
+                borderRadius: 99,
+                border: "1px solid #444",
+                background: "#2a2a2a",
+                color: "#fff",
+                fontSize: "15px",
+                outline: "none",
+              }}
+            />
+            <button
+              onClick={handleSend}
+              style={{
+                marginLeft: 8,
+                background: "transparent",
+                border: "none",
+                color: "#fff",
+                fontSize: 22,
+                cursor: "pointer",
+              }}
+            >
+              <FiSend />
+            </button>
+            <input
+              type="file"
+              accept="image/*"
+              id="imageUpload"
+              style={{ display: "none" }}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onloadend = () => setSelectedImage(reader.result);
+                  reader.readAsDataURL(file);
+                }
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {showGifModal && (
+        <GifSearchModal
+          onSelect={(gif) => {
+            setSelectedGif(gif);
+            setShowGifModal(false);
+          }}
+          onClose={() => setShowGifModal(false)}
+        />
       )}
     </div>
   );
