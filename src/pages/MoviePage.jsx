@@ -11,6 +11,7 @@ import { useSearchParams } from "react-router-dom";
 import StarRating from "../components/StarRating"; // adjust path if needed
 import { FaRegComment } from "react-icons/fa";
 import { HiOutlineRefresh } from "react-icons/hi";
+import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 
 // Components
 import MovieTopBar from "../components/movie/MovieTopBar";
@@ -45,7 +46,7 @@ export default function MoviePage() {
   const [scrollReady, setScrollReady] = useState(false);
   const [showLogModal, setShowLogModal] = useState(false);
 
-  
+
   const getRelativeTime = (date) => {
     const now = Date.now();
     const then = new Date(date).getTime();
