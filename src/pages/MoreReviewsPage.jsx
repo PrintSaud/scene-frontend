@@ -203,7 +203,7 @@ export default function AllReviewsPage() {
     fontSize: 13,
     cursor: "pointer"
   }}
-  onClick={() => handleReply(review._id, review.user.username, log._id)} // 💯
+  onClick={() => handleReply(review._id, review.user.username, review._id)}
 >
   Reply
 </button>
