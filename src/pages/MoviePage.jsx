@@ -11,7 +11,6 @@ import { useSearchParams } from "react-router-dom";
 import StarRating from "../components/StarRating"; // adjust path if needed
 import { FaRegComment } from "react-icons/fa";
 import { HiOutlineRefresh } from "react-icons/hi";
-import getRelativeTime from "../utils/getRelativeTime";
 
 // Components
 import MovieTopBar from "../components/movie/MovieTopBar";
@@ -46,6 +45,25 @@ export default function MoviePage() {
   const [scrollReady, setScrollReady] = useState(false);
   const [showLogModal, setShowLogModal] = useState(false);
 
+  
+  const getRelativeTime = (date) => {
+    const now = Date.now();
+    const then = new Date(date).getTime();
+    const diff = now - then;
+  
+    const min = Math.floor(diff / 60000);
+    const hr = Math.floor(diff / 3600000);
+    const day = Math.floor(diff / 86400000);
+  
+    if (min < 1) return "Just now";
+    if (min < 60) return `${min}min ago`;
+    if (hr < 24) return `${hr}h ago`;
+    if (day <= 7) return `${day}d ago`;
+  
+    const d = new Date(date);
+    return `${d.getDate()} ${d.toLocaleString('default', { month: 'short' })}`;
+  };
+  
 
   
   useEffect(() => {
