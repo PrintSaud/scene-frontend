@@ -285,7 +285,43 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
 
 {/* 👀 Watched by Friends */}
 <div style={{ marginTop: "28px", padding: "0 24px" }}>
-  <h3 style={{ fontSize: "18px", marginBottom: "12px" }}>Watched by Friends</h3>
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: "12px",
+    }}
+  >
+    <h3 style={{ fontSize: "18px" }}>Watched by Friends</h3>
+
+    {friendLogs.length > 0 && (() => {
+      const seen = new Set();
+      const uniqueCount = friendLogs.filter((log) => {
+        if (seen.has(log.user._id)) return false;
+        seen.add(log.user._id);
+        return true;
+      }).length;
+
+      return uniqueCount > 1 ? (
+        <button
+          onClick={() => navigate(`/movie/${movie.id}/friends`)}
+          style={{
+            background: "#111",
+            color: "#fff",
+            border: "1px solid #444",
+            borderRadius: "6px",
+            padding: "4px 10px",
+            fontSize: "13px",
+            fontWeight: "bold",
+            cursor: "pointer",
+          }}
+        >
+          More →
+        </button>
+      ) : null;
+    })()}
+  </div>
 
   {friendLogs.length === 0 ? (
     <p style={{ color: "#888" }}>No friends have logged this film yet.</p>
@@ -301,121 +337,98 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
         }
       }
 
-      console.log("🧪 Unique Friends:", uniqueLogs.length);
-      console.log("🧪 Raw Logs:", friendLogs);
-
       return (
-        <>
-          <div
-            style={{
-              display: "flex",
-              gap: "12px",
-              justifyContent: "flex-start",
-              alignItems: "center",
-              flexWrap: "wrap",
-            }}
-          >
-            {uniqueLogs.slice(0, 5).map((log, index) => {
-              const sameUserLogs = friendLogs.filter(
-                (l) => l.user._id === log.user._id
-              );
+        <div
+          style={{
+            display: "flex",
+            gap: "12px",
+            justifyContent: "flex-start",
+            alignItems: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          {uniqueLogs.slice(0, 5).map((log, index) => {
+            const sameUserLogs = friendLogs.filter(
+              (l) => l.user._id === log.user._id
+            );
 
-              const reviews = sameUserLogs.filter((l) => l.review);
-              const displayLog =
-                sameUserLogs.find((l) => l.rating) ||
-                sameUserLogs.find((l) => l.review) ||
-                sameUserLogs.find((l) => l.rewatchCount > 0 || l.rewatch > 0) ||
-                sameUserLogs[0];
+            const reviews = sameUserLogs.filter((l) => l.review);
 
-              console.log(`🧑‍🎥 ${log.user.username}:`, {
-                rating: displayLog.rating,
-                review: displayLog.review,
-                rewatch: displayLog.rewatchCount ?? displayLog.rewatch,
-              });
+            const displayLog =
+              sameUserLogs.find((l) => l.rating) ||
+              sameUserLogs.find((l) => l.review) ||
+              sameUserLogs.find((l) => l.rewatchCount > 0 || l.rewatch > 0) ||
+              sameUserLogs[0];
 
-              return (
-                <div
-                  key={log._id + index}
-                  onClick={() => {
-                    if (reviews.length === 1) {
-                      navigate(`/review/${reviews[0]._id}`);
-                    } else if (reviews.length > 1) {
-                      navigate(`/movie/${id}/reviews/${log.user._id}`);
-                    } else {
-                      navigate(`/profile/${log.user._id}`);
-                    }
-                  }}
+            const hasRating = typeof displayLog.rating === "number";
+            const hasReview = typeof displayLog.review === "string" && displayLog.review.trim() !== "";
+            const hasRewatch =
+              (typeof displayLog.rewatchCount === "number" && displayLog.rewatchCount > 0) ||
+              (typeof displayLog.rewatch === "number" && displayLog.rewatch > 0);
+
+            return (
+              <div
+                key={log._id + index}
+                onClick={() => {
+                  if (reviews.length === 1) {
+                    navigate(`/review/${reviews[0]._id}`);
+                  } else if (reviews.length > 1) {
+                    navigate(`/movie/${id}/reviews/${log.user._id}`);
+                  } else {
+                    navigate(`/profile/${log.user._id}`);
+                  }
+                }}
+                style={{
+                  cursor: "pointer",
+                  textAlign: "center",
+                  width: "56px",
+                  fontSize: "11px",
+                  color: "#ddd",
+                }}
+              >
+                <img
+                  src={
+                    log.user?.avatar?.startsWith("http")
+                      ? log.user.avatar
+                      : "/default-avatar.png"
+                  }
+                  alt={log.user?.username}
                   style={{
-                    cursor: "pointer",
-                    textAlign: "center",
-                    width: "56px",
-                    fontSize: "11px",
-                    color: "#ddd",
+                    width: "48px",
+                    height: "48px",
+                    objectFit: "cover",
+                    borderRadius: "50%",
+                    marginBottom: "6px",
                   }}
-                >
-                  <img
-                    src={
-                      log.user?.avatar?.startsWith("http")
-                        ? log.user.avatar
-                        : "/default-avatar.png"
-                    }
-                    alt={log.user?.username}
-                    style={{
-                      width: "48px",
-                      height: "48px",
-                      objectFit: "cover",
-                      borderRadius: "50%",
-                      marginBottom: "6px",
-                    }}
+                />
+
+                {/* Render icon */}
+                {hasRating ? (
+                  <StarRating rating={displayLog.rating} size={9} />
+                ) : hasReview ? (
+                  <FaRegComment
+                    size={9}
+                    color="#aaa"
+                    style={{ marginTop: "2px" }}
                   />
-
-                  {/* Render icon */}
-                  {displayLog.rating ? (
-                    <StarRating rating={displayLog.rating} size={9} />
-                  ) : displayLog.review ? (
-                    <FaRegComment
-                      size={9}
-                      color="#aaa"
-                      style={{ marginTop: "2px" }}
-                    />
-                  ) : displayLog.rewatchCount > 0 || displayLog.rewatch > 0 ? (
-                    <HiOutlineRefresh
-                      size={9}
-                      color="#aaa"
-                      style={{ marginTop: "2px" }}
-                    />
-                  ) : (
-                    <div style={{ height: "9px" }} /> // spacer fallback
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* ✅ More button logic */}
-          {uniqueLogs.length > 1 && (
-            <button
-              onClick={() => navigate(`/movie/${movie.id}/friends`)}
-              style={{
-                marginTop: "14px",
-                background: "#111",
-                color: "#fff",
-                border: "1px solid #444",
-                borderRadius: "6px",
-                padding: "8px 12px",
-                fontSize: "13px",
-                fontWeight: "bold",
-                cursor: "pointer",
-              }}
-            >
-              More →
-            </button>
-          )}
-        </>
+                ) : hasRewatch ? (
+                  <HiOutlineRefresh
+                    size={9}
+                    color="#aaa"
+                    style={{ marginTop: "2px" }}
+                  />
+                ) : (
+                  <div style={{ height: "9px" }} /> // Spacer fallback
+                )}
+              </div>
+            );
+          })}
+        </div>
       );
     })()
   )}
 </div>
+
 
 
 
