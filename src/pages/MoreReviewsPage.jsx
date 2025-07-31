@@ -157,7 +157,7 @@ export default function AllReviewsPage() {
         </h2>
       </div>
 
-      {/* 🔁 Reviews */}
+{/* 🔁 Reviews */}
 {reviews.map((review) => {
   const isLiked = review.likes?.includes(userId);
   console.log("📝 Review by:", review.user?.username, "Review ID:", review._id);
@@ -238,6 +238,7 @@ export default function AllReviewsPage() {
             const isChildLiked = reply.likes?.includes(userId);
             const avatar = reply.avatar || "/default-avatar.jpg";
             const username = reply.username?.replace(/^@/, "") || "Unknown";
+            const replyUserId = reply.userId;
 
             return (
               <div key={reply._id} style={{ paddingLeft: 20, marginTop: 8 }}>
@@ -249,14 +250,14 @@ export default function AllReviewsPage() {
                       e.target.src = "/default-avatar.jpg";
                     }}
                     style={{ width: 26, height: 26, borderRadius: "50%", cursor: "pointer" }}
-                    onClick={() => navigate(`/profile/${reply.userId}`)}
+                    onClick={() => navigate(`/profile/${replyUserId}`)}
                   />
 
                   <div style={{ flex: 1 }}>
                     <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
                       <strong
                         style={{ fontSize: 13, color: "#ddd", cursor: "pointer", fontFamily: "Inter, sans-serif" }}
-                        onClick={() => navigate(`/profile/${reply.userId}`)}
+                        onClick={() => navigate(`/profile/${replyUserId}`)}
                       >
                         @{username}
                       </strong>
@@ -315,7 +316,7 @@ export default function AllReviewsPage() {
                       )}
                     </div>
 
-                    {reply.userId === userId && (
+                    {replyUserId === userId && (
                       <div style={{ position: "relative" }}>
                         <HiDotsVertical
                           size={14}
