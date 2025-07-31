@@ -70,26 +70,35 @@ export default function AllReviewsPage() {
 
   const handleSend = async () => {
     if (!input.trim() && !selectedGif && !selectedImage) return;
-
+  
     try {
       const formData = new FormData();
       formData.append("text", input);
-      formData.append("parentId", replyingTo.id);
+      
+      // Include parent comment ID if replying to a comment
+      if (replyingTo?.id) {
+        formData.append("parentComment", replyingTo.id);
+      }
+  
       if (selectedGif) formData.append("gif", selectedGif);
       if (selectedImage) formData.append("image", selectedImage);
-
-      await api.post(`/api/replies`, formData); // update this route as needed
-
-      // Clear after send
+  
+      // ✅ Post to correct route — reply to a review (log)
+      await api.post(`/api/logs/${activeReviewId}/reply`, formData);
+  
+      // Clear inputs
       setInput("");
       setSelectedGif("");
       setSelectedImage("");
       setReplyingTo(null);
+  
+      // Refresh reviews list
       fetchReviews();
     } catch (err) {
       console.error("❌ Failed to send reply", err);
     }
   };
+  
 
   const handleLike = async (logId) => {
     try {
