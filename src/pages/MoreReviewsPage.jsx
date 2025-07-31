@@ -110,6 +110,16 @@ export default function AllReviewsPage() {
     }
   };
 
+  const handleLikeReply = async (logId, replyId) => {
+    try {
+      await api.post(`/api/logs/${logId}/replies/${replyId}/like`);
+      fetchReviews();
+    } catch (err) {
+      console.error("❌ Failed to like reply", err);
+    }
+  };
+  
+
   const handleDelete = async (replyId) => {
     try {
       await api.delete(`/api/replies/${replyId}`);
@@ -218,8 +228,8 @@ export default function AllReviewsPage() {
  
                 {review.replies?.map((reply) => {
   const isChildLiked = reply.likes?.includes(userId);
-  const avatar = reply.avatar || "/default-avatar.jpg";
-  const username = reply.username || "Unknown";
+  const avatar = reply.user?.avatar || "/default-avatar.jpg";
+  const username = reply.user?.username || "Unknown";
   const rating = reply.rating;
 
   return (
@@ -228,13 +238,18 @@ export default function AllReviewsPage() {
         <img
           src={avatar}
           style={{ width: 26, height: 26, borderRadius: "50%", cursor: "pointer" }}
-          onClick={() => navigate(`/profile/${reply.userId}`)}
+          onClick={() => navigate(`/profile/${reply.user?._id}`)}
         />
         <div style={{ flex: 1 }}>
           <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
             <strong
-              style={{ fontSize: 13, color: "#ddd", cursor: "pointer" ,    fontFamily: "Inter, sans-serif", }}
-              onClick={() => navigate(`/profile/${reply.userId}`)}
+              style={{
+                fontSize: 13,
+                color: "#ddd",
+                cursor: "pointer",
+                fontFamily: "Inter, sans-serif",
+              }}
+              onClick={() => navigate(`/profile/${reply.user?._id}`)}
             >
               @{username}
             </strong>
@@ -279,7 +294,7 @@ export default function AllReviewsPage() {
           )}
 
           <button
-            onClick={() => handleReply(null, review.user.username, review._id)}
+            onClick={() => handleReply(null, username, review._id)}
             style={{
               background: "none",
               border: "none",
@@ -296,15 +311,16 @@ export default function AllReviewsPage() {
 
         {/* ❤️ Like + 3-Dots */}
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <div onClick={() => handleLike(reply._id)} style={{ cursor: "pointer" }}>
-            {isChildLiked ? (
-              <AiFillHeart size={16} color="#B327F6" />
-            ) : (
-              <AiOutlineHeart size={16} color="#888" />
-            )}
-          </div>
+        <div onClick={() => handleLikeReply(review._id, reply._id)} style={{ cursor: "pointer" }}>
+  {isChildLiked ? (
+    <AiFillHeart size={16} color="#B327F6" />
+  ) : (
+    <AiOutlineHeart size={16} color="#888" />
+  )}
+</div>
 
-          {reply.userId === userId && (
+
+          {reply.user?._id === userId && (
             <div style={{ position: "relative" }}>
               <HiDotsVertical
                 size={14}
