@@ -60,7 +60,8 @@ useEffect(() => {
     const stored = localStorage.getItem("user");
     return stored ? JSON.parse(stored) : null;
   });  
-  
+
+
   // 🛠 Move this above the useEffect blocks
 const fetchLogs = async () => {
   try {
@@ -283,7 +284,7 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
       </div>
 
 {/* 👀 Watched by Friends */}
-<div style={{ marginTop: "48px", padding: "0 24px" }}>
+<div style={{ marginTop: "32px", padding: "0 24px" }}>
   <h3 style={{ fontSize: "18px", marginBottom: "12px" }}>Watched by Friends</h3>
 
   {friendLogs.length === 0 ? (
@@ -293,61 +294,88 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
       <div
         style={{
           display: "flex",
-          gap: "18px",
+          gap: "12px",
           justifyContent: "flex-start",
           alignItems: "center",
           flexWrap: "wrap",
         }}
       >
-        {friendLogs.slice(0, 5).map((log) => (
-          <div
-            key={log._id}
-            onClick={() =>
-              log.review
-                ? navigate(`/review/${log._id}`)
-                : navigate(`/movie/${id}`)
-            }
-            style={{
-              cursor: "pointer",
-              textAlign: "center",
-              width: "56px",
-              fontSize: "12px",
-              color: "#ddd",
-            }}
-          >
-            {/* Avatar */}
-            <img
-              src={
-                log.user?.avatar?.startsWith("http")
-                  ? log.user.avatar
-                  : "/default-avatar.png"
-              }
-              alt={log.user?.username}
-              style={{
-                width: "48px",
-                height: "48px",
-                objectFit: "cover",
-                borderRadius: "50%",
-                marginBottom: "6px",
-              }}
-            />
+        {(() => {
+          const uniqueLogs = [];
+          const seenUsers = new Set();
 
-            {/* Rating or Icon */}
-            {log.rating ? (
-              <StarRating rating={log.rating} size={11} />
-            ) : log.review ? (
-              <FaRegComment size={16} color="#aaa" style={{ marginTop: "2px" }} />
-            ) : log.rewatchCount > 1 ? (
-              <HiOutlineRefresh size={16} color="#aaa" style={{ marginTop: "2px" }} />
-            ) : null}
-          </div>
-        ))}
+          for (const log of friendLogs) {
+            if (!seenUsers.has(log.user._id)) {
+              uniqueLogs.push(log);
+              seenUsers.add(log.user._id);
+            }
+          }
+
+          return uniqueLogs.slice(0, 5).map((log) => (
+            <div
+              key={log._id}
+              onClick={() => {
+                const sameUserLogs = friendLogs.filter(
+                  (l) => l.user._id === log.user._id
+                );
+                const reviews = sameUserLogs.filter((l) => l.review);
+
+                if (reviews.length === 1) {
+                  navigate(`/review/${reviews[0]._id}`);
+                } else if (reviews.length > 1) {
+                  navigate(`/movie/${id}/reviews/${log.user._id}`);
+                } else {
+                  navigate(`/movie/${id}`);
+                }
+              }}
+              style={{
+                cursor: "pointer",
+                textAlign: "center",
+                width: "56px",
+                fontSize: "11px",
+                color: "#ddd",
+              }}
+            >
+              <img
+                src={
+                  log.user?.avatar?.startsWith("http")
+                    ? log.user.avatar
+                    : "/default-avatar.png"
+                }
+                alt={log.user?.username}
+                style={{
+                  width: "48px",
+                  height: "48px",
+                  objectFit: "cover",
+                  borderRadius: "50%",
+                  marginBottom: "6px",
+                }}
+              />
+
+              {log.rating ? (
+                <StarRating rating={log.rating} size={9} />
+              ) : log.review ? (
+                <FaRegComment size={9} color="#aaa" style={{ marginTop: "2px" }} />
+              ) : log.rewatchCount > 0 ? (
+                <HiOutlineRefresh size={9} color="#aaa" style={{ marginTop: "2px" }} />
+              ) : null}
+            </div>
+          ));
+        })()}
       </div>
 
-      {/* More → Button */}
-      {friendLogs.length > 5 && (
+      {/* More → */}
+      {(() => {
+        const seen = new Set();
+        const uniqueCount = friendLogs.filter((log) => {
+          if (seen.has(log.user._id)) return false;
+          seen.add(log.user._id);
+          return true;
+        }).length;
+        return uniqueCount > 5;
+      })() && (
         <button
-        onClick={() => navigate(`/movie/${movie.id}/friends`)}
+          onClick={() => navigate(`/movie/${movie.id}/friends`)}
           style={{
             marginTop: "14px",
             background: "#111",
@@ -366,8 +394,6 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
     </>
   )}
 </div>
-
-
 
       {/* 📝 Popular Reviews */}
       <div style={{ marginTop: "48px", padding: "0 24px" }}>
