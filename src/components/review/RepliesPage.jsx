@@ -248,18 +248,18 @@ const { parentCommentId, parentUsername } = location.state || {};
         >
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <img
-              src={parent.avatar || "/default-avatar.jpg"}
+              src={parent.user?.avatar || "/default-avatar.jpg"}
               alt="avatar"
               style={{ width: 30, height: 30, borderRadius: "50%", cursor: "pointer" }}
-              onClick={() => navigate(`/profile/${parent.userId}`)}
+              onClick={() => navigate(`/profile/${parent.user?._id}`)}
             />
             <div style={{ flex: 1 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 <strong
                   style={{ fontSize: 14, color: "#ddd", cursor: "pointer" }}
-                  onClick={() => navigate(`/profile/${parent.userId}`)}
+                  onClick={() => navigate(`/profile/${parent.user?._id}`)}
                 >
-                  @{parent.username}
+                  @{parent.user?.username}
                 </strong>
                 <span style={{ fontSize: 10, color: "#888" }}>{getRelativeTime(parent.createdAt)}</span>
               </div>
@@ -273,7 +273,7 @@ const { parentCommentId, parentUsername } = location.state || {};
               {parent.gif && <img src={parent.gif} alt="gif" style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }} />}
               {parent.image && <img src={parent.image} alt="img" style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }} />}
               <button
-                onClick={() => navigate(`/replies/${id}`, { state: { parentCommentId: parent._id, parentUsername: parent.username } })}
+              onClick={() => navigate(`/replies/${id}`, { state: { parentCommentId: parent._id, parentUsername: parent.user?.username } })}
                 style={{ background: "none", border: "none", color: "#888", fontSize: 13, cursor: "pointer", padding: 0, marginTop: 4, textAlign: "left" }}
               >
                 Reply
@@ -287,7 +287,7 @@ const { parentCommentId, parentUsername } = location.state || {};
                 <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>{parent.likes?.length || 0}</span>
               </div>
 
-              {parent.userId === userId && (
+              {parent.user?._id === userId && (
                 <div style={{ position: "relative" }}>
                   <HiDotsVertical
                     size={14}
@@ -325,18 +325,17 @@ const { parentCommentId, parentUsername } = location.state || {};
             <div key={child._id} style={{ paddingLeft: 20, fontSize: 13, opacity: 0.9, marginTop: 8 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <img
-                  src={child.avatar || "/default-avatar.jpg"}
+                  src={child.user?.avatar || "/default-avatar.jpg"}
                   alt="avatar"
                   style={{ width: 26, height: 26, borderRadius: "50%", cursor: "pointer" }}
-                  onClick={() => navigate(`/profile/${child.userId}`)}
+                  onClick={() => navigate(`/profile/${child.user?._id}`)}
                 />
                 <div style={{ flex: 1 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                     <strong
-                      style={{ fontSize: 13, color: "#ddd", cursor: "pointer" }}
-                      onClick={() => navigate(`/profile/${child.userId}`)}
+                      onClick={() => navigate(`/profile/${child.user?._id}`)}
                     >
-                      @{child.username}
+                      @{child.user?.username}
                     </strong>
                     <span style={{ fontSize: 10, color: "#888" }}>{getRelativeTime(child.createdAt)}</span>
                   </div>
@@ -350,7 +349,7 @@ const { parentCommentId, parentUsername } = location.state || {};
                   {child.gif && <img src={child.gif} alt="gif" style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }} />}
                   {child.image && <img src={child.image} alt="img" style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }} />}
                   <button
-                    onClick={() => navigate(`/replies/${id}`, { state: { parentCommentId: child._id, parentUsername: child.username } })}
+                  onClick={() => navigate(`/replies/${id}`, { state: { parentCommentId: child._id, parentUsername: child.user?.username } })}
                     style={{ background: "none", border: "none", color: "#888", fontSize: 13, cursor: "pointer", padding: 0, marginTop: 4, textAlign: "left" }}
                   >
                     Reply
@@ -364,7 +363,7 @@ const { parentCommentId, parentUsername } = location.state || {};
                     <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>{child.likes?.length || 0}</span>
                   </div>
 
-                  {child.userId === userId && (
+                  {child.user?._id === userId && (
                     <div style={{ position: "relative" }}>
                       <HiDotsVertical
                         size={14}

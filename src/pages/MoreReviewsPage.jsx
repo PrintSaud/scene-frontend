@@ -320,7 +320,7 @@ export default function AllReviewsPage() {
 </div>
 
 
-          {reply.user?._id === userId && (
+{reply.user && reply.user._id === userId && (
             <div style={{ position: "relative" }}>
               <HiDotsVertical
                 size={14}
