@@ -228,8 +228,8 @@ export default function AllReviewsPage() {
  
                 {review.replies?.map((reply) => {
   const isChildLiked = reply.likes?.includes(userId);
-  const avatar = reply.user?.avatar || "/default-avatar.jpg";
-  const username = reply.user?.username || "Unknown";
+  const avatar = reply.avatar;
+const username = reply.username;
   const rating = reply.rating;
 
   return (
@@ -320,7 +320,7 @@ export default function AllReviewsPage() {
 </div>
 
 
-{reply.user && reply.user._id === userId && (
+{reply.userId === userId && (
             <div style={{ position: "relative" }}>
               <HiDotsVertical
                 size={14}
