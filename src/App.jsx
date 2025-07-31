@@ -47,6 +47,7 @@ import ShareReviewPage from "./pages/ShareReviewPage";
 import ImportPage from "./pages/ImportPage";
 import LogModal from "./components/modals/LogModal";
 import ShareToFriendPage from "./pages/ShareToFriendPage";
+import MoreReviewsPage from "./pages/MoreReviewsPage"; // adjust path if needed
 
 function App() {
   const location = useLocation();
@@ -147,6 +148,7 @@ function App() {
           <Route path="/import" element={<ImportPage />} />
           <Route path="/log/:logId" element={<LogModal />} />
           <Route path="/share/:type/:id" element={<ShareToFriendPage />} />
+          <Route path="/movie/:id/reviews" element={<MoreReviewsPage />} />
         </Routes>
       </div>
 
