@@ -82,7 +82,7 @@ export default function MoviePage() {
   
   const handleLikeReview = async (reviewId) => {
     try {
-      await api.post(`/api/reviews/${reviewId}/like`);
+      await api.post(`/api/logs/${logId}/like`);
       setPopularReviews((prev) =>
         prev.map((r) =>
           r._id === reviewId
@@ -97,15 +97,6 @@ export default function MoviePage() {
       );
     } catch (err) {
       console.error("Failed to like review:", err);
-    }
-  };
-  
-  const handleDeleteReview = async (reviewId) => {
-    try {
-      await api.delete(`/api/reviews/${reviewId}`);
-      setPopularReviews((prev) => prev.filter((r) => r._id !== reviewId));
-    } catch (err) {
-      console.error("Failed to delete review:", err);
     }
   };
   
