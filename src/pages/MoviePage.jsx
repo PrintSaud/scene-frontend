@@ -284,7 +284,7 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
       </div>
 
 {/* 👀 Watched by Friends */}
-<div style={{ marginTop: "28px", padding: "0 24px" }}>
+<div style={{ marginTop: "32px", padding: "0 24px" }}>
   <h3 style={{ fontSize: "18px", marginBottom: "12px" }}>Watched by Friends</h3>
 
   {friendLogs.length === 0 ? (
@@ -300,6 +300,7 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
 
       return (
         <>
+          {/* Avatars */}
           <div
             style={{
               display: "flex",
@@ -319,6 +320,7 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
               const displayLog =
                 sameUserLogs.find((l) => l.rating) ||
                 sameUserLogs.find((l) => l.review) ||
+                sameUserLogs.find((l) => l.rewatchCount > 0 || l.rewatch > 0) ||
                 sameUserLogs[0];
 
               return (
@@ -357,6 +359,7 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
                     }}
                   />
 
+                  {/* 👇 Icon logic */}
                   {displayLog.rating ? (
                     <StarRating rating={displayLog.rating} size={9} />
                   ) : displayLog.review ? (
@@ -365,7 +368,7 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
                       color="#aaa"
                       style={{ marginTop: "2px" }}
                     />
-                  ) : displayLog.rewatchCount > 0 ? (
+                  ) : displayLog.rewatchCount > 0 || displayLog.rewatch > 0 ? (
                     <HiOutlineRefresh
                       size={9}
                       color="#aaa"
@@ -401,6 +404,7 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
     })()
   )}
 </div>
+
 
       {/* 📝 Popular Reviews */}
       <div style={{ marginTop: "30px", padding: "0 24px" }}>
