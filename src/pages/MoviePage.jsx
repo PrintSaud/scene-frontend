@@ -376,11 +376,10 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
           style={{
             background: "none",
             border: "none",
-            color: "white",
-            fontSize: "13px",
-            fontWeight: "600",
+            color: "#888",
+            fontSize: 14,
             cursor: "pointer",
-            padding: 0,
+            fontWeight: 500,
           }}
         >
           More →
@@ -578,7 +577,7 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
 
                 {r.rating && <StarRating rating={r.rating} size={12} />}
 
-                {r.rewatchCount > 1 && (
+                {r.rewatchCount > 0 && (
                   <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                     <HiOutlineRefresh size={12} color="#aaa" />
                     <span style={{ fontSize: 10, color: "#aaa" }}>
@@ -642,22 +641,6 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
                 >
                   Reply
                 </button>
-
-                {user?._id === r.user._id && (
-                  <button
-                    onClick={() => handleDeleteReview(r._id)}
-                    style={{
-                      background: "none",
-                      border: "none",
-                      color: "#aa4444",
-                      fontSize: 13,
-                      cursor: "pointer",
-                      padding: 0,
-                    }}
-                  >
-                    Delete
-                  </button>
-                )}
               </div>
             </div>
 
