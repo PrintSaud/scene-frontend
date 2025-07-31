@@ -119,7 +119,7 @@ export default function ProfileHeader({
   <div
     style={{
       position: "absolute",
-      top: "48px", // ⬆️ increased from 38px to avoid cut-off
+      top: "68px", // ⬆️ increased from 38px to avoid cut-off
       right: 0,
       background: "#1a1a1a",
       border: "1px solid #333",
