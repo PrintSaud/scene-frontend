@@ -63,12 +63,18 @@ useEffect(() => {
   
 
   useEffect(() => {
-    const fetchFriendsLogs = async () => {
-      const res = await api.get(`/logs/movie/${id}/friends`);
-      setFriendLogs(res.data); // <-- must store here
+    const fetchLogs = async () => {
+      try {
+        const res = await api.get(`/logs/movie/${id}/friends`);
+        setLogs(res.data);
+      } catch (err) {
+        console.error("❌ Failed to fetch movie friends logs", err);
+      }
     };
-    if (user?._id) fetchFriendsLogs();
-  }, [id, user?._id]);
+  
+    fetchLogs(); // ✅ Now this exists
+  }, [id]);
+  
   
   
 
