@@ -50,12 +50,7 @@ export default function AllReviewsPage() {
       setUserId(user._id);
     }
     fetchReviews();
-  }, [id]);
-
-  if (!activeReviewId) {
-    console.error("❌ No activeReviewId — cannot send reply");
-    return;
-  }  
+  }, [id]); 
 
   const fetchReviews = async () => {
     try {
@@ -77,12 +72,15 @@ export default function AllReviewsPage() {
 
   const handleSend = async () => {
     if (!input.trim() && !selectedGif && !selectedImage) return;
+    if (!activeReviewId) {
+      console.error("❌ No activeReviewId — cannot send reply");
+      return;
+    }
   
     try {
       const formData = new FormData();
       formData.append("text", input);
       
-      // Include parent comment ID if replying to a comment
       if (replyingTo?.id) {
         formData.append("parentComment", replyingTo.id);
       }
@@ -90,22 +88,18 @@ export default function AllReviewsPage() {
       if (selectedGif) formData.append("gif", selectedGif);
       if (selectedImage) formData.append("image", selectedImage);
   
-      // ✅ Post to correct route — reply to a review (log)
       await api.post(`/api/logs/${activeReviewId}/reply`, formData);
   
-      // Clear inputs
       setInput("");
       setSelectedGif("");
       setSelectedImage("");
       setReplyingTo(null);
-  
-      // Refresh reviews list
+      setActiveReviewId(null); // reset after sending
       fetchReviews();
     } catch (err) {
       console.error("❌ Failed to send reply", err);
     }
   };
-  
 
   const handleLike = async (logId) => {
     try {
