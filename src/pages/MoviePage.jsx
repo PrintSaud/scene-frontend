@@ -290,113 +290,113 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
   {friendLogs.length === 0 ? (
     <p style={{ color: "#888" }}>No friends have logged this film yet.</p>
   ) : (
-    <>
-      <div
-        style={{
-          display: "flex",
-          gap: "12px",
-          justifyContent: "flex-start",
-          alignItems: "center",
-          flexWrap: "wrap",
-        }}
-      >
-        {(() => {
-          const uniqueLogs = [];
-          const seenUsers = new Set();
+    (() => {
+      const seen = new Set();
+      const uniqueLogs = friendLogs.filter((log) => {
+        if (seen.has(log.user._id)) return false;
+        seen.add(log.user._id);
+        return true;
+      });
 
-          for (const log of friendLogs) {
-            if (!seenUsers.has(log.user._id)) {
-              uniqueLogs.push(log);
-              seenUsers.add(log.user._id);
-            }
-          }
+      return (
+        <>
+          <div
+            style={{
+              display: "flex",
+              gap: "12px",
+              justifyContent: "flex-start",
+              alignItems: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            {uniqueLogs.slice(0, 5).map((log) => (
+              <div
+                key={log._id}
+                onClick={() => {
+                  const sameUserLogs = friendLogs.filter(
+                    (l) => l.user._id === log.user._id
+                  );
+                  const reviews = sameUserLogs.filter((l) => l.review);
+                
+                  if (reviews.length === 1) {
+                    navigate(`/review/${reviews[0]._id}`);
+                  } else if (reviews.length > 1) {
+                    navigate(`/movie/${id}/reviews/${log.user._id}`);
+                  } else {
+                    navigate(`/profile/${log.user._id}`);
+                  }
+                }}                
+                style={{
+                  cursor: "pointer",
+                  textAlign: "center",
+                  width: "56px",
+                  fontSize: "11px",
+                  color: "#ddd",
+                }}
+              >
+                <img
+                  src={
+                    log.user?.avatar?.startsWith("http")
+                      ? log.user.avatar
+                      : "/default-avatar.png"
+                  }
+                  alt={log.user?.username}
+                  style={{
+                    width: "48px",
+                    height: "48px",
+                    objectFit: "cover",
+                    borderRadius: "50%",
+                    marginBottom: "6px",
+                  }}
+                />
 
-          return uniqueLogs.slice(0, 5).map((log) => (
-            <div
-              key={log._id}
-              onClick={() => {
-                const sameUserLogs = friendLogs.filter(
-                  (l) => l.user._id === log.user._id
-                );
-                const reviews = sameUserLogs.filter((l) => l.review);
+                {log.rating ? (
+                  <StarRating rating={log.rating} size={6} />
+                ) : log.review ? (
+                  <FaRegComment
+                    size={9}
+                    color="#aaa"
+                    style={{ marginTop: "2px" }}
+                  />
+                ) : log.rewatchCount > 0 ? (
+                  <HiOutlineRefresh
+                    size={9}
+                    color="#aaa"
+                    style={{ marginTop: "2px" }}
+                  />
+                ) : null}
+              </div>
+            ))}
+          </div>
 
-                if (reviews.length === 1) {
-                  navigate(`/review/${reviews[0]._id}`);
-                } else if (reviews.length > 1) {
-                  navigate(`/movie/${id}/reviews/${log.user._id}`);
-                } else {
-                  navigate(`/movie/${id}`);
-                }
-              }}
+          {/* More → */}
+          {uniqueLogs.length > 5 && (
+            <button
+              onClick={() => navigate(`/movie/${movie.id}/friends`)}
               style={{
+                marginTop: "14px",
+                background: "#111",
+                color: "#fff",
+                border: "1px solid #444",
+                borderRadius: "6px",
+                padding: "8px 12px",
+                fontSize: "13px",
+                fontWeight: "bold",
                 cursor: "pointer",
-                textAlign: "center",
-                width: "56px",
-                fontSize: "11px",
-                color: "#ddd",
               }}
             >
-              <img
-                src={
-                  log.user?.avatar?.startsWith("http")
-                    ? log.user.avatar
-                    : "/default-avatar.png"
-                }
-                alt={log.user?.username}
-                style={{
-                  width: "48px",
-                  height: "48px",
-                  objectFit: "cover",
-                  borderRadius: "50%",
-                  marginBottom: "6px",
-                }}
-              />
-
-              {log.rating ? (
-                <StarRating rating={log.rating} size={9} />
-              ) : log.review ? (
-                <FaRegComment size={9} color="#aaa" style={{ marginTop: "2px" }} />
-              ) : log.rewatchCount > 0 ? (
-                <HiOutlineRefresh size={9} color="#aaa" style={{ marginTop: "2px" }} />
-              ) : null}
-            </div>
-          ));
-        })()}
-      </div>
-
-      {/* More → */}
-      {(() => {
-        const seen = new Set();
-        const uniqueCount = friendLogs.filter((log) => {
-          if (seen.has(log.user._id)) return false;
-          seen.add(log.user._id);
-          return true;
-        }).length;
-        return uniqueCount > 5;
-      })() && (
-        <button
-          onClick={() => navigate(`/movie/${movie.id}/friends`)}
-          style={{
-            marginTop: "14px",
-            background: "#111",
-            color: "#fff",
-            border: "1px solid #444",
-            borderRadius: "6px",
-            padding: "8px 12px",
-            fontSize: "13px",
-            fontWeight: "bold",
-            cursor: "pointer",
-          }}
-        >
-          More →
-        </button>
-      )}
-    </>
+              More →
+            </button>
+          )}
+        </>
+      );
+    })()
   )}
 </div>
 
+
       {/* 📝 Popular Reviews */}
-      <div style={{ marginTop: "48px", padding: "0 24px" }}>
+      <div style={{ marginTop: "36px", padding: "0 24px" }}>
         <h3 style={{ fontSize: "18px", marginBottom: "12px" }}>Popular Reviews</h3>
         {popularReviews.length === 0 ? (
           <p style={{ color: "#888" }}>No reviews yet.</p>
