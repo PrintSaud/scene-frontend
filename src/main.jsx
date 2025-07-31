@@ -5,6 +5,8 @@ import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { NotificationProvider } from './context/NotificationContext'; // ✅ Import it
+import { backend } from "./config";
+console.log("👉 Backend is:", backend);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
