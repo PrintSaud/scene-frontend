@@ -33,6 +33,7 @@ import ListViewPage from "./pages/ListViewPage";
 import EditListPage from "./pages/EditListPage";
 import FollowersFollowingPage from "./pages/FollowersFollowingPage";
 import MoviePage from "./pages/MoviePage";
+import MovieFriendsPage from "./pages/MovieFriendsPage";
 import AddToListPage from "./pages/AddToListPage";
 import DirectorPage from "./pages/DirectorPage";
 import ActorPage from "./pages/ActorPage";
@@ -122,6 +123,7 @@ function App() {
           <Route path="/profile/" element={<ProfilePage />} />
           <Route path="/review/:id" element={<ReviewPage />} />
           <Route path="/film-reviews/:movieId/:userId" element={<FilmReviewsPage />} />
+          <Route path="/movie/:id/friends" element={<MovieFriendsPage />} />
           <Route path="/replies/:id" element={<RepliesPage />} />
           <Route path="/review/:id/change-backdrop" element={<ChangeReviewBackdropPage />} />
           <Route path="/edit-profile" element={<EditProfilePage />} />

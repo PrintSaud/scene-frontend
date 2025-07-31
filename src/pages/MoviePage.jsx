@@ -8,7 +8,9 @@ import { backend } from "../config";
 import { getWatchlistStatus } from "../api/api";
 import ListPickerModal from "../components/lists/ListPickerModal";
 import { useSearchParams } from "react-router-dom";
-
+import StarRating from "../components/StarRating"; // adjust path if needed
+import { FaRegComment } from "react-icons/fa";
+import { HiOutlineRefresh } from "react-icons/hi";
 
 // Components
 import MovieTopBar from "../components/movie/MovieTopBar";
@@ -286,24 +288,92 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
         </div>
       </div>
 
-      {/* 👀 Watched by Friends */}
-      <div style={{ marginTop: "48px", padding: "0 24px" }}>
-        <h3 style={{ fontSize: "18px", marginBottom: "12px" }}>Watched by Friends</h3>
-        {friendLogs.length === 0 ? (
-          <p style={{ color: "#888" }}>No friends have logged this film yet.</p>
-        ) : (
-          <>
-            {friendLogs.slice(0, 3).map((log) => (
-              <p key={log._id} style={{ fontSize: "14px", color: "#ccc", marginBottom: "6px" }}>
-                <strong style={{ color: "#fff" }}>{log.user.username}</strong>: {log.review?.slice(0, 60)}...
-              </p>
-            ))}
-            <button onClick={() => navigate(`/movie/${id}/friends`)} style={{ marginTop: "10px", background: "#111", color: "#fff", border: "1px solid #444", borderRadius: "6px", padding: "8px 12px", fontSize: "13px", fontWeight: "bold", cursor: "pointer" }}>
-              More →
-            </button>
-          </>
-        )}
+{/* 👀 Watched by Friends */}
+<div style={{ marginTop: "48px", padding: "0 24px" }}>
+  <h3 style={{ fontSize: "18px", marginBottom: "12px" }}>Watched by Friends</h3>
+
+  {friendLogs.length === 0 ? (
+    <p style={{ color: "#888" }}>No friends have logged this film yet.</p>
+  ) : (
+    <>
+      <div
+        style={{
+          display: "flex",
+          gap: "18px",
+          justifyContent: "flex-start",
+          alignItems: "center",
+          flexWrap: "wrap",
+        }}
+      >
+        {friendLogs.slice(0, 5).map((log) => (
+          <div
+            key={log._id}
+            onClick={() =>
+              log.review
+                ? navigate(`/review/${log._id}`)
+                : navigate(`/movie/${id}`)
+            }
+            style={{
+              cursor: "pointer",
+              textAlign: "center",
+              width: "56px",
+              fontSize: "12px",
+              color: "#ddd",
+            }}
+          >
+            {/* Avatar */}
+            <img
+              src={
+                log.user?.avatar?.startsWith("http")
+                  ? log.user.avatar
+                  : "/default-avatar.png"
+              }
+              alt={log.user?.username}
+              style={{
+                width: "48px",
+                height: "48px",
+                objectFit: "cover",
+                borderRadius: "50%",
+                marginBottom: "6px",
+              }}
+            />
+
+            {/* Rating or Icon */}
+            {log.rating ? (
+              <StarRating rating={log.rating} size={11} />
+            ) : log.review ? (
+              <FaRegComment size={16} color="#aaa" style={{ marginTop: "2px" }} />
+            ) : log.rewatchCount > 1 ? (
+              <HiOutlineRefresh size={16} color="#aaa" style={{ marginTop: "2px" }} />
+            ) : null}
+          </div>
+        ))}
       </div>
+
+      {/* More → Button */}
+      {friendLogs.length > 5 && (
+        <button
+        onClick={() => navigate(`/movie/${movie.id}/friends`)}
+          style={{
+            marginTop: "14px",
+            background: "#111",
+            color: "#fff",
+            border: "1px solid #444",
+            borderRadius: "6px",
+            padding: "8px 12px",
+            fontSize: "13px",
+            fontWeight: "bold",
+            cursor: "pointer",
+          }}
+        >
+          More →
+        </button>
+      )}
+    </>
+  )}
+</div>
+
+
 
       {/* 📝 Popular Reviews */}
       <div style={{ marginTop: "48px", padding: "0 24px" }}>
