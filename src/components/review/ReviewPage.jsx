@@ -179,7 +179,7 @@ setReview(data);
                       alt="avatar"
                       style={{ width: 30, height: 30, borderRadius: "50%", cursor: "pointer" }}
                       onClick={() => handleProfile(r.userId)}
-                    />
+                      />
                     <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
   {/* Username, stars, time */}
   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>

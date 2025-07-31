@@ -248,7 +248,7 @@ const { parentCommentId, parentUsername } = location.state || {};
         >
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <img
-              src={parent.user?.avatar || "/default-avatar.jpg"}
+              src={r.avatar || "/default-avatar.jpg"}
               alt="avatar"
               style={{ width: 30, height: 30, borderRadius: "50%", cursor: "pointer" }}
               onClick={() => navigate(`/profile/${parent.user?._id}`)}
@@ -259,14 +259,14 @@ const { parentCommentId, parentUsername } = location.state || {};
                   style={{ fontSize: 14, color: "#ddd", cursor: "pointer" }}
                   onClick={() => navigate(`/profile/${parent.user?._id}`)}
                 >
-                  @{parent.user?.username}
+               @{r.username}
                 </strong>
                 <span style={{ fontSize: 10, color: "#888" }}>{getRelativeTime(parent.createdAt)}</span>
               </div>
               <span style={{ fontSize: 14, color: "#ddd", marginTop: 2, display: "block" }}>{parent.text}</span>
-              {parent.rating && (
+              {r.ratingForThisMovie && (
   <div style={{ marginTop: 4 }}>
-    <StarRating rating={parent.rating} size={12} />
+        <StarRating rating={r.ratingForThisMovie} size={12} />
   </div>
 )}
 
