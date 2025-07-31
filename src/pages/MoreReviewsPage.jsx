@@ -157,7 +157,7 @@ export default function AllReviewsPage() {
         </h2>
       </div>
 
-{/* 🔁 Reviews */}
+      {/* 🔁 Reviews */}
 {reviews.map((review) => {
   const isLiked = review.likes?.includes(userId);
   console.log("📝 Review by:", review.user?.username, "Review ID:", review._id);
