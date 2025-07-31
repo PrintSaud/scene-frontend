@@ -45,7 +45,7 @@ export default function MoviePage() {
   const [scrollReady, setScrollReady] = useState(false);
   const [showLogModal, setShowLogModal] = useState(false);
 
-  const userId = user?._id;
+
   
   useEffect(() => {
     const fetchPopularReviews = async () => {
@@ -103,7 +103,10 @@ useEffect(() => {
   const [user, setUser] = useState(() => {
     const stored = localStorage.getItem("user");
     return stored ? JSON.parse(stored) : null;
-  });  
+  });
+  
+  const userId = user?._id; // ✅ Now safe
+  
 
 
   // 🛠 Move this above the useEffect blocks
