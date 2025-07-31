@@ -14,6 +14,10 @@ export default defineConfig({
   },
   preview: {
     port: process.env.PORT || 4000,
-    allowedHosts: ['scene-frontend-production.up.railway.app'], // ✅ fixes the blocked host issue
-  },
+    allowedHosts: [
+      'scene-frontend-production.up.railway.app',
+      'scenesa.com',
+      'www.scenesa.com',
+    ],
+  },  
 });
