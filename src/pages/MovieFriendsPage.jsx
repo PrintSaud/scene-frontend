@@ -14,7 +14,7 @@ export default function MovieFriendsPage() {
     const fetchLogs = async () => {
       try {
         const res = await api.get(`/api/logs/movie/${id}/friends`);
-        setLogs(res.data); // ✅ fixed this line
+        setLogs(res.data);
       } catch (err) {
         console.error("❌ Failed to load friend logs", err);
       }
@@ -22,6 +22,14 @@ export default function MovieFriendsPage() {
 
     fetchLogs();
   }, [id]);
+
+  // ✅ Deduplicate by user
+  const seen = new Set();
+  const uniqueLogs = logs.filter((log) => {
+    if (seen.has(log.user._id)) return false;
+    seen.add(log.user._id);
+    return true;
+  });
 
   return (
     <div
@@ -59,52 +67,90 @@ export default function MovieFriendsPage() {
       </div>
 
       {/* Log List */}
-      {logs.map((log) => (
-        <div
-          key={log._id}
-          onClick={() =>
-            log.review
-              ? navigate(`/review/${log._id}`)
-              : navigate(`/profile/${log.user._id}`)
-          }
-          style={{
-            display: "flex",
-            alignItems: "center",
-            marginBottom: "20px",
-            cursor: "pointer",
-          }}
-        >
-          {/* Avatar */}
-          <img
-            src={log.user.avatar || "/default-avatar.jpg"}
-            alt="avatar"
-            style={{
-              width: "40px",
-              height: "40px",
-              borderRadius: "50%",
-              marginRight: "12px",
-              objectFit: "cover",
-            }}
-          />
+      {uniqueLogs.map((log, index) => {
+        const sameUserLogs = logs.filter(
+          (l) => l.user._id === log.user._id
+        );
 
-          {/* Username + Rating + Icon */}
-          <div>
-            <div style={{ fontWeight: "600", marginBottom: "4px" }}>
-              {log.user.username}
-            </div>
+        const reviews = sameUserLogs.filter((l) => l.review);
+        const hasMultipleReviews = reviews.length > 1;
+        const displayLog =
+          sameUserLogs.find((l) => l.rating) ||
+          sameUserLogs.find((l) => l.review) ||
+          sameUserLogs.find((l) => l.rewatchCount > 0 || l.rewatch > 0) ||
+          sameUserLogs[0];
 
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              {log.rating ? (
-                <StarRating rating={log.rating} />
-              ) : log.review ? (
-                <FaRegComment size={14} />
-              ) : log.rewatchCount > 0 || log.rewatch > 0 ? (
-                <HiOutlineRefresh size={16} />
-              ) : null}
+        const hasRating = typeof displayLog.rating === "number";
+        const hasReview =
+          typeof displayLog.review === "string" &&
+          displayLog.review.trim() !== "";
+        const hasRewatch =
+          (typeof displayLog.rewatchCount === "number" &&
+            displayLog.rewatchCount > 0) ||
+          (typeof displayLog.rewatch === "number" && displayLog.rewatch > 0);
+
+        return (
+          <React.Fragment key={log._id + index}>
+            <div
+              onClick={() => {
+                if (hasMultipleReviews) {
+                  navigate(`/movie/${id}/reviews/${log.user._id}`);
+                } else if (hasReview) {
+                  navigate(`/review/${reviews[0]._id}`);
+                } else {
+                  navigate(`/profile/${log.user._id}`);
+                }
+              }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                paddingBottom: "14px",
+                marginBottom: "14px",
+                cursor: "pointer",
+                borderBottom: "1px solid #333",
+              }}
+            >
+              {/* Avatar */}
+              <img
+                src={
+                  log.user.avatar?.startsWith("http")
+                    ? log.user.avatar
+                    : "/default-avatar.png"
+                }
+                alt="avatar"
+                style={{
+                  width: "42px",
+                  height: "42px",
+                  borderRadius: "50%",
+                  marginRight: "14px",
+                  objectFit: "cover",
+                }}
+              />
+
+              {/* Username + Rating + Icon */}
+              <div>
+                <div style={{ fontWeight: "600", marginBottom: "4px" }}>
+                  {log.user.username}
+                </div>
+
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    fontSize: "13px",
+                    color: "#ccc",
+                  }}
+                >
+                  {hasRating && <StarRating rating={displayLog.rating} />}
+                  {hasReview && <FaRegComment size={14} />}
+                  {hasRewatch && <HiOutlineRefresh size={16} />}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      ))}
+          </React.Fragment>
+        );
+      })}
     </div>
   );
 }

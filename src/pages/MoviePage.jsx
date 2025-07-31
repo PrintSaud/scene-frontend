@@ -307,11 +307,7 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
         <button
           onClick={() => navigate(`/movie/${movie.id}/friends`)}
           style={{
-            color: "#fff",
-            padding: "4px 10px",
-            fontSize: "13px",
-            fontWeight: "bold",
-            cursor: "pointer",
+            float: "right", cursor: "pointer"
           }}
         >
           More →
