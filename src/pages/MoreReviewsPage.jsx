@@ -4,7 +4,7 @@ import api from "../api/api";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { HiOutlineRefresh } from "react-icons/hi";
 import StarRating from "../components/StarRating";
-import getRelativeTime from "../utils/getRelativeTime";
+
 
 export default function MoreReviewsPage() {
   const { id } = useParams(); // movie TMDB id
@@ -13,6 +13,25 @@ export default function MoreReviewsPage() {
   const [reviews, setReviews] = useState([]);
   const [replyTo, setReplyTo] = useState(null); // which review we're replying to
   const [replyText, setReplyText] = useState("");
+
+  const getRelativeTime = (date) => {
+    const now = Date.now();
+    const then = new Date(date).getTime();
+    const diff = now - then;
+  
+    const min = Math.floor(diff / 60000);
+    const hr = Math.floor(diff / 3600000);
+    const day = Math.floor(diff / 86400000);
+  
+    if (min < 1) return "Just now";
+    if (min < 60) return `${min}min ago`;
+    if (hr < 24) return `${hr}h ago`;
+    if (day <= 7) return `${day}d ago`;
+  
+    const d = new Date(date);
+    return `${d.getDate()} ${d.toLocaleString('default', { month: 'short' })}`;
+  };
+  
 
   useEffect(() => {
     const stored = localStorage.getItem("user");
