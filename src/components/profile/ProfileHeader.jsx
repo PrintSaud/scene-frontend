@@ -116,20 +116,21 @@ export default function ProfileHeader({
   </button>
 
   {menuOpen && (
-    <div
-      style={{
-        position: "absolute",
-        top: "38px",  // ⬅️ Pushed further down
-        height: "130px",
-        right: 0,
-        background: "#1a1a1a",
-        border: "1px solid #333",
-        borderRadius: "12px",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
-        padding: "12px 0",
-        width: "180px",
-      }}
-    >
+  <div
+    style={{
+      position: "absolute",
+      top: "48px", // ⬆️ increased from 38px to avoid cut-off
+      right: 0,
+      background: "#1a1a1a",
+      border: "1px solid #333",
+      borderRadius: "12px",
+      boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
+      padding: "12px 0",
+      width: "180px",
+      overflow: "visible", // ✅ allows the full dropdown to show
+      zIndex: 1000,
+    }}
+  >
       {(isOwner
         ? [
             { label: "✏️ Edit Profile", onClick: () => navigate("/edit-profile") },
