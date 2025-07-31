@@ -112,26 +112,29 @@ export default function AllReviewsPage() {
   return (
     <div style={{ padding: "16px 12px", paddingBottom: 80 }}>
       {/* 🔙 Back Button */}
-      <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
-      <button
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          marginBottom: "24px",
+        }}
+      >
+        <button
           onClick={() => navigate(-1)}
           style={{
-            background: "rgba(0,0,0,0.5)",
+            background: "none",
             border: "none",
-            borderRadius: "50%",
-            width: "32px",
-            height: "32px",
-            color: "#fff",
-            fontSize: "18px",
+            color: "white",
+            fontSize: "20px",
+            marginRight: "12px",
             cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
           }}
         >
           ←
         </button>
-        <h2 style={{ fontSize: 18, margin: 0 }}>All Reviews</h2>
+        <h2 style={{ fontWeight: "bold", fontSize: "20px" }}>
+         All Reviews
+        </h2>
       </div>
 
       {/* 🔁 Reviews */}
@@ -150,8 +153,8 @@ export default function AllReviewsPage() {
             }}
           >
             <div style={{ display: "flex", gap: 10 }}>
-              <img
-                src={review.avatar || "/default-avatar.jpg"}
+            <img
+  src={review.user?.avatar || "/default-avatar.jpg"}
                 style={{ width: 32, height: 32, borderRadius: "50%", cursor: "pointer" }}
                 onClick={() => navigate(`/profile/${review.user._id}`)}
               />
@@ -172,7 +175,9 @@ export default function AllReviewsPage() {
                   )}
                   <span style={{ fontSize: 10, color: "#888" }}>{getRelativeTime(review.createdAt)}</span>
                 </div>
-                <div style={{ fontSize: 14, color: "#ddd", marginTop: 2 }}>{review.review}</div>
+                <div style={{ fontSize: 14, color: "#ddd", marginTop: 2, fontFamily: "Inter, sans-serif" }}>
+  {review.review}
+</div>
                 {review.gif && (
                   <img src={review.gif} style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }} />
                 )}
@@ -200,8 +205,8 @@ export default function AllReviewsPage() {
   return (
     <div key={reply._id} style={{ paddingLeft: 20, marginTop: 8 }}>
       <div style={{ display: "flex", gap: 10, position: "relative" }}>
-        <img
-          src={reply.avatar || "/default-avatar.jpg"}
+      <img
+  src={reply.user?.avatar || "/default-avatar.jpg"}
           style={{ width: 26, height: 26, borderRadius: "50%", cursor: "pointer" }}
           onClick={() => navigate(`/profile/${reply.userId}`)}
         />
@@ -218,7 +223,9 @@ export default function AllReviewsPage() {
             </span>
           </div>
 
-          <div style={{ fontSize: 13, color: "#ddd", marginTop: 2 }}>{reply.text}</div>
+          <div style={{ fontSize: 13, color: "#ddd", marginTop: 2, fontFamily: "Inter, sans-serif" }}>
+  {reply.text}
+</div>
           {reply.gif && (
             <img
               src={reply.gif}
