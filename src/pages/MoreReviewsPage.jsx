@@ -13,6 +13,7 @@ export default function AllReviewsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const inputRef = useRef();
+  const [activeReviewId, setActiveReviewId] = useState(null);
 
   const [reviews, setReviews] = useState([]);
   const [userId, setUserId] = useState("");
@@ -62,11 +63,12 @@ export default function AllReviewsPage() {
   };
   
 
-  const handleReply = (reviewId, username) => {
-    setReplyingTo({ id: reviewId, username });
+  const handleReply = (commentId, username, reviewId) => {
+    setReplyingTo({ id: commentId, username });
     setInput(`@${username} `);
-    inputRef.current?.focus();
+    setActiveReviewId(reviewId); // 🔥 this ensures the reply goes to the correct log
   };
+  
 
   const handleSend = async () => {
     if (!input.trim() && !selectedGif && !selectedImage) return;
@@ -259,7 +261,7 @@ export default function AllReviewsPage() {
           )}
 
           <button
-            onClick={() => handleReply(reply._id, reply.username)}
+          onClick={() => handleReply(reply._id, reply.username, review._id)}
             style={{
               background: "none",
               border: "none",
