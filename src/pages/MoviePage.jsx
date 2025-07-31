@@ -57,24 +57,14 @@ useEffect(() => {
   const TMDB_AVATAR = "https://image.tmdb.org/t/p/w185";
   
 
-  const fetchLogs = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-      const headers = { Authorization: `Bearer ${token}` };
+  useEffect(() => {
+    const fetchFriendsLogs = async () => {
+      const res = await api.get(`/logs/movie/${id}/friends`);
+      setFriendLogs(res.data); // <-- must store here
+    };
+    if (user?._id) fetchFriendsLogs();
+  }, [id, user?._id]);
   
-      const [popularRes, friendsRes] = await Promise.all([
-        api.get(`/api/logs/movie/${id}/popular`),
-        api.get(`/api/logs/movie/${id}/friends`),
-      ]);
-      
-  
-      setPopularReviews(popularRes.data || []);
-      setFriendLogs(friendsRes.data || []);
-    } catch (err) {
-      console.error("❌ Failed to fetch logs:", err);
-    }
-  };
   
 
   // Scroll after fetch is complete
@@ -164,9 +154,6 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
   
     fetchPoster();
   }, [movie]);
-  
-  
-
   
 
   useEffect(() => {

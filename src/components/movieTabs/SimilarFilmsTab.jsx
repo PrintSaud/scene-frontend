@@ -35,9 +35,9 @@ export default function SimilarFilmsTab({ movieId, navigate }) {
       fetchSimilar();
     }
   }, [movieId]);
-
+  
   return (
-    <div style={{ padding: "20px 20px 40px" }}>
+    <div style={{ padding: "20px 20px 40px",      minHeight: "100vh", }}>
       {loading ? (
         <p style={{ color: "#888", textAlign: "center" }}>Loading similar films...</p>
       ) : similarMovies.length === 0 ? (
