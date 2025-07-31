@@ -40,7 +40,7 @@ export default function MoviePage() {
   const [showPosterModal, setShowPosterModal] = useState(false);
   const [posterOverride, setPosterOverride] = useState(null);
   const [showAddToListModal, setShowAddToListModal] = useState(false);
-  const [activeTab, setActiveTab] = useState("watch");
+  const [activeTab, setActiveTab] = useState("cast");
   const [friendLogs, setFriendLogs] = useState([]);
   const [popularReviews, setPopularReviews] = useState([]);
   const [scrollReady, setScrollReady] = useState(false);
@@ -82,7 +82,7 @@ export default function MoviePage() {
   
   const handleLikeReview = async (reviewId) => {
     try {
-      await api.post(`/api/logs/${logId}/like`);
+      await api.post(`/api/logs/${reviewId}/like`);
       setPopularReviews((prev) =>
         prev.map((r) =>
           r._id === reviewId
@@ -96,7 +96,7 @@ export default function MoviePage() {
         )
       );
     } catch (err) {
-      console.error("Failed to like review:", err);
+      console.error("❌ Failed to like review:", err);
     }
   };
   
@@ -517,7 +517,11 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
   {popularReviews.length === 0 ? (
     <p style={{ color: "#888" }}>No reviews yet.</p>
   ) : (
-    popularReviews.slice(0, 3).map((r) => {
+    popularReviews
+  .filter((r) => r.review && r.review.trim() !== "")
+  .slice(0, 3)
+  .map((r) => {
+
       const isLikedByMe = r.likes?.includes(user?._id);
       return (
         <div
