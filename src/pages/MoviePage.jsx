@@ -64,7 +64,7 @@ useEffect(() => {
   // 🛠 Move this above the useEffect blocks
 const fetchLogs = async () => {
   try {
-    const res = await api.get(`/logs/movie/${id}/friends`);
+    const res = await api.get(`/api/logs/movie/${id}/friends`);
     setFriendLogs(res.data); // ✅ this was broken — use setFriendLogs not setLogs
   } catch (err) {
     console.error("❌ Failed to fetch movie friends logs", err);

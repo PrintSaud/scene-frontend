@@ -13,7 +13,7 @@ export default function MovieFriendsPage() {
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        const res = await api.get(`/logs/movie/${id}/friends`);
+        const res = await api.get(`/api/logs/movie/${id}/friends`);
         setFriendLogs(res.data); 
       } catch (err) {
         console.error("❌ Failed to load friend logs", err);

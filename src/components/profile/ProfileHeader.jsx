@@ -120,7 +120,7 @@ export default function ProfileHeader({
       style={{
         position: "absolute",
         top: "38px",  // ⬅️ Pushed further down
-        height: "110px",
+        height: "130px",
         right: 0,
         background: "#1a1a1a",
         border: "1px solid #333",
