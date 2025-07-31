@@ -284,7 +284,7 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
       </div>
 
 {/* 👀 Watched by Friends */}
-<div style={{ marginTop: "32px", padding: "0 24px" }}>
+<div style={{ marginTop: "28px", padding: "0 24px" }}>
   <h3 style={{ fontSize: "18px", marginBottom: "12px" }}>Watched by Friends</h3>
 
   {friendLogs.length === 0 ? (
@@ -309,64 +309,72 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
               flexWrap: "wrap",
             }}
           >
-            {uniqueLogs.slice(0, 5).map((log) => (
-              <div
-                key={log._id}
-                onClick={() => {
-                  const sameUserLogs = friendLogs.filter(
-                    (l) => l.user._id === log.user._id
-                  );
-                  const reviews = sameUserLogs.filter((l) => l.review);
-                
-                  if (reviews.length === 1) {
-                    navigate(`/review/${reviews[0]._id}`);
-                  } else if (reviews.length > 1) {
-                    navigate(`/movie/${id}/reviews/${log.user._id}`);
-                  } else {
-                    navigate(`/profile/${log.user._id}`);
-                  }
-                }}                
-                style={{
-                  cursor: "pointer",
-                  textAlign: "center",
-                  width: "56px",
-                  fontSize: "11px",
-                  color: "#ddd",
-                }}
-              >
-                <img
-                  src={
-                    log.user?.avatar?.startsWith("http")
-                      ? log.user.avatar
-                      : "/default-avatar.png"
-                  }
-                  alt={log.user?.username}
-                  style={{
-                    width: "48px",
-                    height: "48px",
-                    objectFit: "cover",
-                    borderRadius: "50%",
-                    marginBottom: "6px",
-                  }}
-                />
+            {uniqueLogs.slice(0, 5).map((log) => {
+              const sameUserLogs = friendLogs.filter(
+                (l) => l.user._id === log.user._id
+              );
 
-                {log.rating ? (
-                  <StarRating rating={log.rating} size={6} />
-                ) : log.review ? (
-                  <FaRegComment
-                    size={9}
-                    color="#aaa"
-                    style={{ marginTop: "2px" }}
+              const reviews = sameUserLogs.filter((l) => l.review);
+
+              const displayLog =
+                sameUserLogs.find((l) => l.rating) ||
+                sameUserLogs.find((l) => l.review) ||
+                sameUserLogs[0];
+
+              return (
+                <div
+                  key={log._id}
+                  onClick={() => {
+                    if (reviews.length === 1) {
+                      navigate(`/review/${reviews[0]._id}`);
+                    } else if (reviews.length > 1) {
+                      navigate(`/movie/${id}/reviews/${log.user._id}`);
+                    } else {
+                      navigate(`/profile/${log.user._id}`);
+                    }
+                  }}
+                  style={{
+                    cursor: "pointer",
+                    textAlign: "center",
+                    width: "56px",
+                    fontSize: "11px",
+                    color: "#ddd",
+                  }}
+                >
+                  <img
+                    src={
+                      log.user?.avatar?.startsWith("http")
+                        ? log.user.avatar
+                        : "/default-avatar.png"
+                    }
+                    alt={log.user?.username}
+                    style={{
+                      width: "48px",
+                      height: "48px",
+                      objectFit: "cover",
+                      borderRadius: "50%",
+                      marginBottom: "6px",
+                    }}
                   />
-                ) : log.rewatchCount > 0 ? (
-                  <HiOutlineRefresh
-                    size={9}
-                    color="#aaa"
-                    style={{ marginTop: "2px" }}
-                  />
-                ) : null}
-              </div>
-            ))}
+
+                  {displayLog.rating ? (
+                    <StarRating rating={displayLog.rating} size={9} />
+                  ) : displayLog.review ? (
+                    <FaRegComment
+                      size={9}
+                      color="#aaa"
+                      style={{ marginTop: "2px" }}
+                    />
+                  ) : displayLog.rewatchCount > 0 ? (
+                    <HiOutlineRefresh
+                      size={9}
+                      color="#aaa"
+                      style={{ marginTop: "2px" }}
+                    />
+                  ) : null}
+                </div>
+              );
+            })}
           </div>
 
           {/* More → */}
@@ -394,9 +402,8 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
   )}
 </div>
 
-
       {/* 📝 Popular Reviews */}
-      <div style={{ marginTop: "36px", padding: "0 24px" }}>
+      <div style={{ marginTop: "30px", padding: "0 24px" }}>
         <h3 style={{ fontSize: "18px", marginBottom: "12px" }}>Popular Reviews</h3>
         {popularReviews.length === 0 ? (
           <p style={{ color: "#888" }}>No reviews yet.</p>
