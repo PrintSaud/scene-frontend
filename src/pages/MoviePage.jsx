@@ -55,6 +55,11 @@ useEffect(() => {
   const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY;
   const TMDB_IMG = "https://image.tmdb.org/t/p/original";
   const TMDB_AVATAR = "https://image.tmdb.org/t/p/w185";
+
+  const [user, setUser] = useState(() => {
+    const stored = localStorage.getItem("user");
+    return stored ? JSON.parse(stored) : null;
+  });  
   
 
   useEffect(() => {
