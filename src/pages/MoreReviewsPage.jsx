@@ -52,6 +52,11 @@ export default function AllReviewsPage() {
     fetchReviews();
   }, [id]);
 
+  if (!activeReviewId) {
+    console.error("❌ No activeReviewId — cannot send reply");
+    return;
+  }  
+
   const fetchReviews = async () => {
     try {
       const res = await api.get(`/api/logs/movie/${id}/popular?all=true`);
@@ -261,7 +266,7 @@ export default function AllReviewsPage() {
           )}
 
           <button
-          onClick={() => handleReply(reply._id, reply.username, review._id)}
+          onClick={() => handleReply(null, review.user.username, review._id)}
             style={{
               background: "none",
               border: "none",
