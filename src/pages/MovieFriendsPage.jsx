@@ -149,7 +149,7 @@ export default function MovieFriendsPage() {
         fontWeight: "normal",
       }}
     >
-      •{" "}
+      {" "}
       {formatDistanceToNowStrict(new Date(displayLog.createdAt), {
         addSuffix: true,
       })}

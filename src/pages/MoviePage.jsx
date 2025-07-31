@@ -45,6 +45,50 @@ export default function MoviePage() {
   const [scrollReady, setScrollReady] = useState(false);
   const [showLogModal, setShowLogModal] = useState(false);
 
+  const userId = user?._id;
+  
+  useEffect(() => {
+    const fetchPopularReviews = async () => {
+      try {
+        const { data } = await api.get(`/api/logs/movie/${id}/popular`);
+        setPopularReviews(data);
+      } catch (err) {
+        console.error("Failed to fetch popular reviews:", err);
+      }
+    };
+  
+    fetchPopularReviews();
+  }, [id]);
+  
+  const handleLikeReview = async (reviewId) => {
+    try {
+      await api.post(`/api/reviews/${reviewId}/like`);
+      setPopularReviews((prev) =>
+        prev.map((r) =>
+          r._id === reviewId
+            ? {
+                ...r,
+                likes: r.likes.includes(userId)
+                  ? r.likes.filter((id) => id !== userId)
+                  : [...r.likes, userId],
+              }
+            : r
+        )
+      );
+    } catch (err) {
+      console.error("Failed to like review:", err);
+    }
+  };
+  
+  const handleDeleteReview = async (reviewId) => {
+    try {
+      await api.delete(`/api/reviews/${reviewId}`);
+      setPopularReviews((prev) => prev.filter((r) => r._id !== reviewId));
+    } catch (err) {
+      console.error("Failed to delete review:", err);
+    }
+  };
+  
 useEffect(() => {
   if (editMode && editLogId) {
     setShowLogModal(true);
@@ -284,7 +328,7 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
       </div>
 
 {/* 👀 Watched by Friends */}
-<div style={{ marginTop: "28px", padding: "0 24px" }}>
+<div style={{ marginTop: "24px", padding: "0 24px" }}>
   <div
     style={{
       display: "flex",
@@ -430,24 +474,191 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
   )}
 </div>
 
-      {/* 📝 Popular Reviews */}
-      <div style={{ marginTop: "30px", padding: "0 24px" }}>
-        <h3 style={{ fontSize: "18px", marginBottom: "12px" }}>Popular Reviews</h3>
-        {popularReviews.length === 0 ? (
-          <p style={{ color: "#888" }}>No reviews yet.</p>
-        ) : (
-          <>
-            {popularReviews.slice(0, 3).map((log) => (
-              <p key={log._id} style={{ fontSize: "14px", color: "#ccc", marginBottom: "6px" }}>
-                <strong style={{ color: "#fff" }}>{log.user.username}</strong>: {log.review?.slice(0, 60)}...
-              </p>
-            ))}
-            <button onClick={() => navigate(`/movie/${id}/reviews`)} style={{ marginTop: "10px", background: "#111", color: "#fff", border: "1px solid #444", borderRadius: "6px", padding: "8px 12px", fontSize: "13px", fontWeight: "bold", cursor: "pointer" }}>
-              More →
-            </button>
-          </>
-        )}
-      </div>
+{/* 📝 Popular Reviews */}
+<div style={{ marginTop: "30px", padding: "0 24px" }}>
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingRight: 6,
+      marginBottom: 12,
+    }}
+  >
+    <h3 style={{ fontSize: 18, margin: 0 }}>Popular Reviews</h3>
+    <button
+      onClick={() => navigate(`/movie/${id}/reviews`)}
+      style={{
+        background: "none",
+        border: "none",
+        color: "#888",
+        fontSize: 14,
+        cursor: "pointer",
+        fontWeight: 500,
+      }}
+    >
+      More →
+    </button>
+  </div>
+
+  {popularReviews.length === 0 ? (
+    <p style={{ color: "#888" }}>No reviews yet.</p>
+  ) : (
+    popularReviews.slice(0, 3).map((r) => {
+      const isLikedByMe = r.likes?.includes(user?._id);
+      return (
+        <div
+          key={r._id}
+          style={{
+            position: "relative",
+            marginBottom: 16,
+            paddingBottom: 12,
+            borderBottom: "1px solid #222",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            {/* Avatar */}
+            <img
+              src={r.user.avatar || "/default-avatar.jpg"}
+              alt="avatar"
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: "50%",
+                cursor: "pointer",
+              }}
+              onClick={() => navigate(`/profile/${r.user._id}`)}
+            />
+
+            <div
+              style={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+              }}
+            >
+              {/* Username, stars, time */}
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <strong
+                  style={{
+                    fontSize: 14,
+                    fontFamily: "Inter, sans-serif",
+                    fontWeight: 400,
+                    color: "#ddd",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => navigate(`/profile/${r.user._id}`)}
+                >
+                  @{r.user.username}
+                </strong>
+
+                {r.rating && <StarRating rating={r.rating} size={12} />}
+
+                {r.rewatchCount > 1 && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                    <HiOutlineRefresh size={12} color="#aaa" />
+                    <span style={{ fontSize: 10, color: "#aaa" }}>
+                      {r.rewatchCount}x
+                    </span>
+                  </div>
+                )}
+
+                <span style={{ fontSize: 10, color: "#888" }}>
+                  {getRelativeTime(r.createdAt)}
+                </span>
+              </div>
+
+              {/* Review text */}
+              {r.review && (
+                <span
+                  style={{
+                    fontSize: 14,
+                    color: "#ddd",
+                    fontFamily: "Inter, sans-serif",
+                    display: "block",
+                    marginTop: 2,
+                  }}
+                >
+                  {r.review}
+                </span>
+              )}
+
+              {/* Optional gif/image */}
+              {r.gif && (
+                <img
+                  src={r.gif}
+                  alt="gif"
+                  style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }}
+                />
+              )}
+              {r.image && (
+                <img
+                  src={r.image}
+                  alt="img"
+                  style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }}
+                />
+              )}
+
+              {/* Reply + Delete */}
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 6 }}>
+                <button
+                  onClick={() =>
+                    navigate(`/replies/${r._id}`, {
+                      state: { parentCommentId: r._id, parentUsername: r.user.username },
+                    })
+                  }
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "#888",
+                    fontSize: 13,
+                    cursor: "pointer",
+                    padding: 0,
+                  }}
+                >
+                  Reply
+                </button>
+
+                {user?._id === r.user._id && (
+                  <button
+                    onClick={() => handleDeleteReview(r._id)}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "#aa4444",
+                      fontSize: 13,
+                      cursor: "pointer",
+                      padding: 0,
+                    }}
+                  >
+                    Delete
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Like */}
+            <div
+              onClick={() => handleLikeReview(r._id)}
+              style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+            >
+              {isLikedByMe ? (
+                <AiFillHeart size={16} color="#B327F6" />
+              ) : (
+                <AiOutlineHeart size={16} color="#888" />
+              )}
+              <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>
+                {r.likes?.length || 0}
+              </span>
+            </div>
+          </div>
+        </div>
+      );
+    })
+  )}
+</div>
+
 
       <MovieTabs
         activeTab={activeTab}
