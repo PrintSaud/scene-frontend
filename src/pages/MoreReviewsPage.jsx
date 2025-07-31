@@ -54,11 +54,13 @@ export default function AllReviewsPage() {
   const fetchReviews = async () => {
     try {
       const res = await api.get(`/api/logs/movie/${id}/popular?all=true`);
-      setReviews(res.data);
+      const filtered = res.data.filter((log) => log.review && log.review.trim() !== "");
+      setReviews(filtered);
     } catch (err) {
       console.error("❌ Failed to load reviews", err);
     }
   };
+  
 
   const handleReply = (reviewId, username) => {
     setReplyingTo({ id: reviewId, username });
@@ -111,11 +113,24 @@ export default function AllReviewsPage() {
     <div style={{ padding: "16px 12px", paddingBottom: 80 }}>
       {/* 🔙 Back Button */}
       <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
-        <HiOutlineArrowNarrowLeft
-          size={24}
-          style={{ cursor: "pointer", color: "#888", marginRight: 12 }}
+      <button
           onClick={() => navigate(-1)}
-        />
+          style={{
+            background: "rgba(0,0,0,0.5)",
+            border: "none",
+            borderRadius: "50%",
+            width: "32px",
+            height: "32px",
+            color: "#fff",
+            fontSize: "18px",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          ←
+        </button>
         <h2 style={{ fontSize: 18, margin: 0 }}>All Reviews</h2>
       </div>
 
@@ -181,62 +196,111 @@ export default function AllReviewsPage() {
 
                 {/* 🔁 Nested replies */}
                 {review.replies?.map((reply) => {
-                  const isChildLiked = reply.likes?.includes(userId);
-                  return (
-                    <div key={reply._id} style={{ paddingLeft: 20, marginTop: 8 }}>
-                      <div style={{ display: "flex", gap: 10 }}>
-                        <img
-                          src={reply.avatar || "/default-avatar.jpg"}
-                          style={{ width: 26, height: 26, borderRadius: "50%" }}
-                          onClick={() => navigate(`/profile/${reply.userId}`)}
-                        />
-                        <div style={{ flex: 1 }}>
-                          <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-                            <strong style={{ fontSize: 13, color: "#ddd" }}>@{reply.username}</strong>
-                            <span style={{ fontSize: 10, color: "#888" }}>{getRelativeTime(reply.createdAt)}</span>
-                          </div>
-                          <div style={{ fontSize: 13, color: "#ddd", marginTop: 2 }}>{reply.text}</div>
-                          {reply.gif && <img src={reply.gif} style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }} />}
-                          {reply.image && <img src={reply.image} style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }} />}
-                          <button
-                            onClick={() => handleReply(reply._id, reply.username)}
-                            style={{ background: "none", border: "none", color: "#888", fontSize: 13, cursor: "pointer", marginTop: 4 }}
-                          >
-                            Reply
-                          </button>
-                        </div>
-                        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                          <div onClick={() => handleLike(reply._id)} style={{ cursor: "pointer" }}>
-                            {isChildLiked ? <AiFillHeart size={16} color="#B327F6" /> : <AiOutlineHeart size={16} color="#888" />}
-                          </div>
-                          {reply.userId === userId && (
-                            <HiDotsVertical
-                              size={14}
-                              onClick={() => setMenuOpenId(menuOpenId === reply._id ? null : reply._id)}
-                              style={{ cursor: "pointer", color: "#888" }}
-                            />
-                          )}
-                          {menuOpenId === reply._id && (
-                            <div
-                              style={{
-                                position: "absolute",
-                                background: "#222",
-                                borderRadius: 4,
-                                padding: "4px 8px",
-                                fontSize: 12,
-                                color: "#f55",
-                                cursor: "pointer",
-                              }}
-                              onClick={() => handleDelete(reply._id)}
-                            >
-                              Delete
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+  const isChildLiked = reply.likes?.includes(userId);
+  return (
+    <div key={reply._id} style={{ paddingLeft: 20, marginTop: 8 }}>
+      <div style={{ display: "flex", gap: 10, position: "relative" }}>
+        <img
+          src={reply.avatar || "/default-avatar.jpg"}
+          style={{ width: 26, height: 26, borderRadius: "50%", cursor: "pointer" }}
+          onClick={() => navigate(`/profile/${reply.userId}`)}
+        />
+        <div style={{ flex: 1 }}>
+          <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+            <strong
+              style={{ fontSize: 13, color: "#ddd", cursor: "pointer" }}
+              onClick={() => navigate(`/profile/${reply.userId}`)}
+            >
+              @{reply.username}
+            </strong>
+            <span style={{ fontSize: 10, color: "#888" }}>
+              {getRelativeTime(reply.createdAt)}
+            </span>
+          </div>
+
+          <div style={{ fontSize: 13, color: "#ddd", marginTop: 2 }}>{reply.text}</div>
+          {reply.gif && (
+            <img
+              src={reply.gif}
+              style={{
+                marginTop: 4,
+                maxWidth: "100%",
+                borderRadius: 8,
+                objectFit: "cover",
+              }}
+            />
+          )}
+          {reply.image && (
+            <img
+              src={reply.image}
+              style={{
+                marginTop: 4,
+                maxWidth: "100%",
+                borderRadius: 8,
+                objectFit: "cover",
+              }}
+            />
+          )}
+
+          <button
+            onClick={() => handleReply(reply._id, reply.username)}
+            style={{
+              background: "none",
+              border: "none",
+              color: "#888",
+              fontSize: 13,
+              cursor: "pointer",
+              marginTop: 4,
+              padding: 0,
+            }}
+          >
+            Reply
+          </button>
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <div onClick={() => handleLike(reply._id)} style={{ cursor: "pointer" }}>
+            {isChildLiked ? (
+              <AiFillHeart size={16} color="#B327F6" />
+            ) : (
+              <AiOutlineHeart size={16} color="#888" />
+            )}
+          </div>
+
+          {reply.userId === userId && (
+            <div style={{ position: "relative" }}>
+              <HiDotsVertical
+                size={14}
+                onClick={() => setMenuOpenId(menuOpenId === reply._id ? null : reply._id)}
+                style={{ cursor: "pointer", color: "#888" }}
+              />
+              {menuOpenId === reply._id && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 20,
+                    right: 0,
+                    background: "#222",
+                    borderRadius: 4,
+                    padding: "4px 8px",
+                    fontSize: 12,
+                    color: "#f55",
+                    cursor: "pointer",
+                    zIndex: 5,
+                  }}
+                  onClick={() => handleDelete(reply._id)}
+                >
+                  Delete
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+})}
+
               </div>
             </div>
           </div>
@@ -245,7 +309,7 @@ export default function AllReviewsPage() {
 
       {/* ✏️ Reply Input */}
       {replyingTo && (
-        <div style={{ position: "fixed", bottom: 0, width: "100%", background: "#0e0e0e", borderTop: "1px solid #222", padding: "12px 12px", zIndex: 99 }}>
+        <div style={{ position: "fixed", bottom: 0, width: "90%", background: "#0e0e0e", borderTop: "1px solid #222", padding: "12px 12px", zIndex: 99 }}>
           {(selectedGif || selectedImage) && (
             <div style={{ paddingBottom: 8, position: "relative" }}>
               <img
