@@ -61,21 +61,21 @@ useEffect(() => {
     return stored ? JSON.parse(stored) : null;
   });  
   
+  // 🛠 Move this above the useEffect blocks
+const fetchLogs = async () => {
+  try {
+    const res = await api.get(`/logs/movie/${id}/friends`);
+    setFriendLogs(res.data); // ✅ this was broken — use setFriendLogs not setLogs
+  } catch (err) {
+    console.error("❌ Failed to fetch movie friends logs", err);
+  }
+};
 
-  useEffect(() => {
-    const fetchLogs = async () => {
-      try {
-        const res = await api.get(`/logs/movie/${id}/friends`);
-        setLogs(res.data);
-      } catch (err) {
-        console.error("❌ Failed to fetch movie friends logs", err);
-      }
-    };
-  
-    fetchLogs(); // ✅ Now this exists
-  }, [id]);
-  
-  
+// ✅ Leave this only ONCE
+useEffect(() => {
+  fetchLogs();
+}, [id]);
+
   
 
   // Scroll after fetch is complete
@@ -113,10 +113,6 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
     };
 
     fetchData();
-  }, [id]);
-
-  useEffect(() => {
-    fetchLogs();
   }, [id]);
   
   useEffect(() => {

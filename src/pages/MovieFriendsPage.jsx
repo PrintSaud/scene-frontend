@@ -14,7 +14,7 @@ export default function MovieFriendsPage() {
     const fetchLogs = async () => {
       try {
         const res = await api.get(`/logs/movie/${id}/friends`);
-        setLogs(res.data);
+        setFriendLogs(res.data); 
       } catch (err) {
         console.error("❌ Failed to load friend logs", err);
       }
