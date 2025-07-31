@@ -11,6 +11,7 @@ import { useSearchParams } from "react-router-dom";
 import StarRating from "../components/StarRating"; // adjust path if needed
 import { FaRegComment } from "react-icons/fa";
 import { HiOutlineRefresh } from "react-icons/hi";
+import getRelativeTime from "../utils/getRelativeTime";
 
 // Components
 import MovieTopBar from "../components/movie/MovieTopBar";
