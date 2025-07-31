@@ -307,7 +307,13 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
         <button
           onClick={() => navigate(`/movie/${movie.id}/friends`)}
           style={{
-            float: "right", cursor: "pointer"
+            background: "none",
+            border: "none",
+            color: "white",
+            fontSize: "13px",
+            fontWeight: "600",
+            cursor: "pointer",
+            padding: 0,
           }}
         >
           More →
@@ -346,6 +352,7 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
             );
 
             const reviews = sameUserLogs.filter((l) => l.review);
+            const hasReview = reviews.length > 0;
 
             const displayLog =
               sameUserLogs.find((l) => l.rating) ||
@@ -354,10 +361,11 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
               sameUserLogs[0];
 
             const hasRating = typeof displayLog.rating === "number";
-            const hasReview = typeof displayLog.review === "string" && displayLog.review.trim() !== "";
             const hasRewatch =
-              (typeof displayLog.rewatchCount === "number" && displayLog.rewatchCount > 0) ||
-              (typeof displayLog.rewatch === "number" && displayLog.rewatch > 0);
+              (typeof displayLog.rewatchCount === "number" &&
+                displayLog.rewatchCount > 0) ||
+              (typeof displayLog.rewatch === "number" &&
+                displayLog.rewatch > 0);
 
             return (
               <div
@@ -395,7 +403,7 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
                   }}
                 />
 
-                {/* Render icon */}
+                {/* Icon Row */}
                 {hasRating ? (
                   <StarRating rating={displayLog.rating} size={9} />
                 ) : hasReview ? (
@@ -421,9 +429,6 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
     })()
   )}
 </div>
-
-
-
 
       {/* 📝 Popular Reviews */}
       <div style={{ marginTop: "30px", padding: "0 24px" }}>

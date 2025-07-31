@@ -4,6 +4,7 @@ import api from "../api/api";
 import StarRating from "../components/StarRating";
 import { HiOutlineRefresh } from "react-icons/hi";
 import { FaRegComment } from "react-icons/fa";
+import { formatDistanceToNowStrict } from "date-fns";
 
 export default function MovieFriendsPage() {
   const { id } = useParams(); // TMDB movie ID
@@ -127,26 +128,49 @@ export default function MovieFriendsPage() {
                 }}
               />
 
-              {/* Username + Rating + Icon */}
-              <div>
-                <div style={{ fontWeight: "600", marginBottom: "4px" }}>
-                  {log.user.username}
-                </div>
+{/* Username + Rating + Icon */}
+<div>
+  <div
+    style={{
+      fontWeight: "600",
+      marginBottom: "2px",
+      display: "flex",
+      alignItems: "center",
+      gap: "8px",
+    }}
+  >
+    {log.user.username}
 
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    fontSize: "13px",
-                    color: "#ccc",
-                  }}
-                >
-                  {hasRating && <StarRating rating={displayLog.rating} />}
-                  {hasReview && <FaRegComment size={14} />}
-                  {hasRewatch && <HiOutlineRefresh size={16} />}
-                </div>
-              </div>
+    {/* 🕒 Timestamp */}
+    <span
+      style={{
+        fontSize: "11px",
+        color: "#999",
+        fontWeight: "normal",
+      }}
+    >
+      •{" "}
+      {formatDistanceToNowStrict(new Date(displayLog.createdAt), {
+        addSuffix: true,
+      })}
+    </span>
+  </div>
+
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "8px",
+      fontSize: "13px",
+      color: "#ccc",
+    }}
+  >
+    {hasRating && <StarRating rating={displayLog.rating} />}
+    {hasReview && <FaRegComment size={14} style={{ position: "relative", top: "-1px" }} />}
+    {hasRewatch && <HiOutlineRefresh size={16} />}
+  </div>
+</div>
+
             </div>
           </React.Fragment>
         );
