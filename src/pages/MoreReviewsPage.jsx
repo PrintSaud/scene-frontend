@@ -174,7 +174,7 @@ export default function AllReviewsPage() {
           >
             <div style={{ display: "flex", gap: 10 }}>
             <img
-  src={r.avatar || "/default-avatar.jpg"}
+              src={review.user?.avatar || "/default-avatar.jpg"}
                 style={{ width: 32, height: 32, borderRadius: "50%", cursor: "pointer" }}
                 onClick={() => navigate(`/profile/${review.user._id}`)}
               />
