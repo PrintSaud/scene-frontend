@@ -14,7 +14,7 @@ export default function MovieFriendsPage() {
     const fetchLogs = async () => {
       try {
         const res = await api.get(`/api/logs/movie/${id}/friends`);
-        setFriendLogs(res.data); 
+        setLogs(res.data); // ✅ fixed this line
       } catch (err) {
         console.error("❌ Failed to load friend logs", err);
       }
@@ -48,6 +48,7 @@ export default function MovieFriendsPage() {
             color: "white",
             fontSize: "20px",
             marginRight: "12px",
+            cursor: "pointer",
           }}
         >
           ←
@@ -93,10 +94,11 @@ export default function MovieFriendsPage() {
             </div>
 
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <StarRating rating={log.rating || 0} />
-              {log.review ? (
+              {log.rating ? (
+                <StarRating rating={log.rating} />
+              ) : log.review ? (
                 <FaRegComment size={14} />
-              ) : log.rewatchCount > 1 ? (
+              ) : log.rewatchCount > 0 || log.rewatch > 0 ? (
                 <HiOutlineRefresh size={16} />
               ) : null}
             </div>
