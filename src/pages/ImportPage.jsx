@@ -18,7 +18,8 @@ export default function ImportPage() {
     ratings: null,
     watchlist: null,
   });
-
+  
+  const [showInstructions, setShowInstructions] = useState(false);
   const [previews, setPreviews] = useState({});
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
