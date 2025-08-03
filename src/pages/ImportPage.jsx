@@ -88,7 +88,7 @@ export default function ImportPage() {
       </div>
   
       {/* Title + Back Button Row */}
-<div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 8 }}>
+<div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
 <button
         onClick={() => navigate(-1)}
         style={{
