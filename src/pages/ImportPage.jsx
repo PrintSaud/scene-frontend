@@ -89,24 +89,24 @@ export default function ImportPage() {
   
       {/* Title + Back Button Row */}
 <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 8 }}>
-  <button
-    onClick={() => navigate(-1)}
-    style={{
-      background: "rgba(0,0,0,0.5)",
-      border: "none",
-      borderRadius: "50%",
-      width: "32px",
-      height: "32px",
-      color: "#fff",
-      fontSize: "18px",
-      cursor: "pointer",
-      display: "flex",
-      alignItems: "left",
-      justifyContent: "left",
-    }}
-  >
-    ←
-  </button>
+<button
+        onClick={() => navigate(-1)}
+        style={{
+          background: "rgba(0,0,0,0.5)",
+          border: "none",
+          borderRadius: "50%",
+          width: "32px",
+          height: "32px",
+          color: "#fff",
+          fontSize: "18px",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        ←
+      </button>
 
   <h2 style={{ fontSize: "14px", textAlign: "center", fontFamily: "Inter, sans-serif" }}>
     Transfer Data from Letterboxd

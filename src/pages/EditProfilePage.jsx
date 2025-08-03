@@ -180,12 +180,24 @@ const [avatarFile, setAvatarFile] = useState(null);
         <div style={{ width: "100%", maxWidth: "620px" }}>
           {/* Top Bar */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-            <button
-              onClick={() => navigate(-1)}
-              style={{ background: "none", color: "#aaa", border: "none", fontSize: "16px", cursor: "pointer" }}
-            >
-              ←
-            </button>
+          <button
+        onClick={() => navigate(-1)}
+        style={{
+          background: "rgba(0,0,0,0.5)",
+          border: "none",
+          borderRadius: "50%",
+          width: "32px",
+          height: "32px",
+          color: "#fff",
+          fontSize: "18px",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        ←
+      </button>
             <button
               onClick={handleSave}
               style={{
