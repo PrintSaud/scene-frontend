@@ -14,6 +14,10 @@ export default function ReviewPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [review, setReview] = useState(null);
+  const hasReview = !!(
+    review?.review?.trim() || review?.gif || review?.image
+  );
+  
   const [replies, setReplies] = useState([]);
   const [moreReviews, setMoreReviews] = useState([]);
   const user = JSON.parse(localStorage.getItem("user")) || {};

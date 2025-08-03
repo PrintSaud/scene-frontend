@@ -194,7 +194,7 @@ export default function ProfileHeader({
         </div>
       </div>
 
-      {/* NAME + USERNAME + FOLLOW BUTTON */}
+      {/* NAME + USERNAME + FOLLOW BUTTON */} 
       <div
         style={{
           marginTop: "8px",

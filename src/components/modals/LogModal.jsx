@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { IoArrowBack } from "react-icons/io5";
 import { FaStar, FaRegStar, FaStarHalfAlt } from "react-icons/fa";
 import { HiOutlineRefresh } from "react-icons/hi";
@@ -25,7 +25,7 @@ export default function LogModal({ movie, onClose, refreshLogs, editLogId }) {
   const [uploadedImageFile, setUploadedImageFile] = useState(null);
   const [showGifModal, setShowGifModal] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
-
+  const navigate = useNavigate();
   const [movieId, setMovieId] = useState(movie?.id || movie?._id);
   const [movieData, setMovieData] = useState(movie || null);
 
@@ -84,9 +84,24 @@ formData.append("rewatchCount", rewatchCount.toString());         // Actual nume
         });
         toast.success("✅ Log updated!");
       } else {
-        await api.post(`${backend}/api/logs/full`, formData, {
+        const { data } = await api.post(`${backend}/api/logs/full`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
+        
+        await api.delete(`/api/watchlist/${user._id}/watchlist/${movieId}`);
+        toast.success("🎬 Log submitted!");
+        
+        const newLog = data?.log;
+        const hasReviewContent = !!(
+          newLog?.review?.trim() || newLog?.gif || newLog?.image
+        );
+        
+        if (hasReviewContent) {
+          navigate(`/review/${newLog._id}`);
+        } else {
+          navigate(`/movie/${movieId}`);
+        }
+        
         await api.delete(`${backend}/api/watchlist/${user._id}/watchlist/${movieId}`);
         toast.success("🎬 Log submitted!");
       }
