@@ -78,7 +78,7 @@ export default function ImportPage() {
           onClick={() => setShowInstructions(true)}
           style={{
             cursor: 'pointer',
-            fontSize: 28,
+            fontSize: 20,
             color: '#aaa',
             transition: 'color 0.2s',
           }}
@@ -218,7 +218,7 @@ export default function ImportPage() {
           }}>
             <h2 style={{ marginBottom: 12 }}>📥 How to Import from Letterboxd</h2>
             <ul style={{ paddingLeft: 20, marginBottom: 16 }}>
-              <li>1. Go to <Letterboxd className="com"></Letterboxd> The Website not the App </li>
+              <li>1. Go to your Letterboxd Account from The Website not the App </li>
               <li>2. Go to Settings → Export your data </li>
               <li>3. Come back to Scene</li>
               <li>4. Upload them here in the correct fields</li>

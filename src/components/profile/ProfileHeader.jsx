@@ -95,7 +95,7 @@ export default function ProfileHeader({
 )}
 
 {/* ⋯ Options */}
-<div style={{ position: "relative", zIndex: 10 }}>
+<div style={{ overflow: "visible", position: "relative", zIndex: 10 }}>
   <button
     onClick={() => setMenuOpen((prev) => !prev)}
     style={{

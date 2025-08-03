@@ -91,16 +91,16 @@ formData.append("rewatchCount", rewatchCount.toString());         // Actual nume
         await api.delete(`/api/watchlist/${user._id}/watchlist/${movieId}`);
         toast.success("🎬 Log submitted!");
         
-        const newLog = data?.log;
         const hasReviewContent = !!(
-          newLog?.review?.trim() || newLog?.gif || newLog?.image
+          review.trim() || gifUrl || uploadedImageFile
         );
         
-        if (hasReviewContent) {
-          navigate(`/review/${newLog._id}`);
+        if (hasReviewContent && data?.log?._id) {
+          navigate(`/review/${data.log._id}`);
         } else {
           navigate(`/movie/${movieId}`);
         }
+        
         
         await api.delete(`${backend}/api/watchlist/${user._id}/watchlist/${movieId}`);
         toast.success("🎬 Log submitted!");
