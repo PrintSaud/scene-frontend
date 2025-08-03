@@ -73,7 +73,7 @@ export default function ImportPage() {
   return (
     <div style={{ position: "relative", padding: "24px", color: "white", maxHeight: "calc(100vh - 60px)", overflowY: "auto", paddingBottom: "160px" }}>
       {/* ❓ Top Right Help Icon */}
-      <div style={{ position: 'absolute', top: 20, right: 20, zIndex: 10 }}>
+      <div style={{ position: 'absolute', top: 30, right: 20, zIndex: 10 }}>
         <AiOutlineQuestionCircle
           onClick={() => setShowInstructions(true)}
           style={{
@@ -101,8 +101,8 @@ export default function ImportPage() {
       fontSize: "18px",
       cursor: "pointer",
       display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
+      alignItems: "left",
+      justifyContent: "left",
     }}
   >
     ←
@@ -212,7 +212,7 @@ export default function ImportPage() {
           <div style={{
             background: '#111',
             padding: 20,
-            borderRadius: 14,
+            borderRadius: 30,
             maxWidth: 350,
             color: '#fff',
             fontSize: 14,

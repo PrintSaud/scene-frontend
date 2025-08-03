@@ -125,7 +125,7 @@ export default function ProfileHeader({
       border: "1px solid #333",
       borderRadius: "12px",
       boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
-      height: "60px",
+      height: "120px",
       padding: "12px 0",
       width: "190px",
     }}
