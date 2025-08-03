@@ -35,7 +35,13 @@ const getRelativeTime = (date) => {
   const userId = JSON.parse(localStorage.getItem("user"))?._id;
 
   const filtered = logs
-    .filter((log) => log.review)
+  .filter(
+    (log) =>
+      log.review &&
+      log.review.trim() !== "" &&
+      log.review.trim().toLowerCase() !== "__media__"
+  )
+
     .sort((a, b) => {
       if (filter === "likes") return (b.likes?.length || 0) - (a.likes?.length || 0);
       return new Date(b.watchedAt) - new Date(a.watchedAt);
