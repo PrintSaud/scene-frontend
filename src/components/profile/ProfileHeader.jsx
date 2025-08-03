@@ -119,7 +119,7 @@ export default function ProfileHeader({
     <div
       style={{
         position: "absolute",
-        top: "40px", // appear below button
+        top: "30px", // appear below button
         right: "0px",
         background: "#1a1a1a",
         border: "1px solid #333",
