@@ -95,7 +95,7 @@ export default function ProfileHeader({
 )}
 
 {/* ⋯ Options */}
-<div style={{ overflow: "visible", position: "relative", zIndex: 10 }}>
+<div style={{ position: "absolute", top: 12, right: 16 }}>
   <button
     onClick={() => setMenuOpen((prev) => !prev)}
     style={{
@@ -118,9 +118,9 @@ export default function ProfileHeader({
   {menuOpen && (
     <div
       style={{
-        position: "fixed", // ✅ changed from absolute to fixed
-        top: "60px",
-        right: "16px",
+        position: "absolute",
+        top: "40px", // appear below button
+        right: "0px",
         background: "#1a1a1a",
         border: "1px solid #333",
         borderRadius: "12px",
@@ -169,6 +169,7 @@ export default function ProfileHeader({
     </div>
   )}
 </div>
+
 
 
         {/* AVATAR */}
