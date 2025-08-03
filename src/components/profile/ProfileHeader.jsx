@@ -119,14 +119,14 @@ export default function ProfileHeader({
     <div
     style={{
       position: "absolute",
-      top: "38px",
+      top: "30px",
       right: "0",
       background: "#1a1a1a",
       border: "1px solid #333",
       borderRadius: "12px",
       boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
       padding: "12px 0",
-      width: "200px",
+      width: "100px",
     }}
   >
       {(isOwner

@@ -221,16 +221,18 @@ export default function ReviewHeader({
           </>
         )}
 
-        {review.review && (
-          <p style={{
-            marginTop: 8,
-            fontFamily: "Inter, sans-serif",
-            fontSize: 14,
-            lineHeight: 1.4
-          }}>
-            {review.review}
-          </p>
-        )}
+{review.review && review.review !== "__media__" && (
+  <p style={{
+    marginTop: 8,
+    fontFamily: "Inter, sans-serif",
+    fontSize: 14,
+    lineHeight: 1.4,
+    whiteSpace: "pre-wrap"
+  }}>
+    {review.review}
+  </p>
+)}
+
 
         {review.image && (
           <img src={review.image} alt="Attached" style={{ width: "100%", borderRadius: 8, marginTop: 8 }} />

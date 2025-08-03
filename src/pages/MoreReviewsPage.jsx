@@ -204,9 +204,18 @@ export default function AllReviewsPage() {
             <span style={{ fontSize: 10, color: "#888" }}>{getRelativeTime(review.createdAt)}</span>
           </div>
 
-          <div style={{ fontSize: 14, color: "#ddd", marginTop: 2, fontFamily: "Inter, sans-serif" }}>
-            {review.review}
-          </div>
+          {review.review && review.review !== "__media__" && (
+  <div style={{
+    fontSize: 14,
+    color: "#ddd",
+    marginTop: 2,
+    fontFamily: "Inter, sans-serif",
+    whiteSpace: "pre-wrap"
+  }}>
+    {review.review}
+  </div>
+)}
+
 
           {review.gif && (
             <img src={review.gif} style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }} />
