@@ -114,23 +114,21 @@ export default function ProfileHeader({
   >
     ⋯
   </button>
-
+ 
   {menuOpen && (
     <div
-      style={{
-        position: "absolute",
-        top: "30px", // appear below button
-        right: "0px",
-        background: "#1a1a1a",
-        border: "1px solid #333",
-        borderRadius: "12px",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
-        padding: "12px 0",
-        width: "180px",
-        overflow: "visible",
-        zIndex: 1000,
-      }}
-    >
+    style={{
+      position: "absolute",
+      top: "38px",
+      right: "0",
+      background: "#1a1a1a",
+      border: "1px solid #333",
+      borderRadius: "12px",
+      boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
+      padding: "12px 0",
+      width: "200px",
+    }}
+  >
       {(isOwner
         ? [
             { label: "✏️ Edit Profile", onClick: () => navigate("/edit-profile") },
