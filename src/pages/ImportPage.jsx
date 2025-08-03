@@ -87,31 +87,32 @@ export default function ImportPage() {
         />
       </div>
   
-      {/* Title */}
-      <h2 style={{ fontSize: "14px", marginBottom: "8px", textAlign: "center" }}>
-        Transfer Data from Letterboxd
-      </h2>
-  
-      {/* Back Button */}
-      <button
-        onClick={() => navigate(-1)}
-        style={{
-          background: "rgba(0,0,0,0.5)",
-          border: "none",
-          borderRadius: "50%",
-          width: "32px",
-          height: "32px",
-          color: "#fff",
-          fontSize: "18px",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          marginBottom: "6px",
-        }}
-      >
-        ←
-      </button>
+      {/* Title + Back Button Row */}
+<div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 8 }}>
+  <button
+    onClick={() => navigate(-1)}
+    style={{
+      background: "rgba(0,0,0,0.5)",
+      border: "none",
+      borderRadius: "50%",
+      width: "32px",
+      height: "32px",
+      color: "#fff",
+      fontSize: "18px",
+      cursor: "pointer",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    }}
+  >
+    ←
+  </button>
+
+  <h2 style={{ fontSize: "14px", textAlign: "center", fontFamily: "Inter, sans-serif" }}>
+    Transfer Data from Letterboxd
+  </h2>
+</div>
+
   
       {/* Instructions */}
       <p style={{ fontSize: "14px", color: "#aaa", marginBottom: "16px", fontFamily: "Inter, sans-serif" }}>
@@ -211,8 +212,8 @@ export default function ImportPage() {
           <div style={{
             background: '#111',
             padding: 20,
-            borderRadius: 8,
-            maxWidth: 400,
+            borderRadius: 14,
+            maxWidth: 350,
             color: '#fff',
             fontSize: 14,
           }}>
