@@ -33,14 +33,16 @@ const getRelativeTime = (date) => {
   }) {
   
   const userId = JSON.parse(localStorage.getItem("user"))?._id;
-
-  const filtered = logs
-  .filter(
-    (log) =>
-      log.review &&
-      log.review.trim() !== "" &&
-      log.review.trim().toLowerCase() !== "__media__"
-  )
+  
+  const filtered = logs.filter((log) => {
+    const hasText = log.review && log.review.trim() !== "" && log.review.trim().toLowerCase() !== "__media__";
+    const hasGif = !!log.gif;
+    const hasImage = !!log.image;
+  
+    return hasText || hasGif || hasImage;
+  })
+  
+  
 
     .sort((a, b) => {
       if (filter === "likes") return (b.likes?.length || 0) - (a.likes?.length || 0);
@@ -167,18 +169,20 @@ const getRelativeTime = (date) => {
                 </div>
 
                 {/* 📝 Review text */}
-                {log.review && !["[GIF ONLY]", "[IMAGE ONLY]"].includes(log.review.trim()) && (
-  <p
-    style={{
-      color: "#ccc",
-      fontSize: "13px",
-      fontFamily: "Inter, sans-serif",
-      marginTop: "8px",
-    }}
-  >
-    {log.review}
-  </p>
+                {log.review &&
+  !["[GIF ONLY]", "[IMAGE ONLY]", "__media__"].includes(log.review.trim()) && (
+    <p
+      style={{
+        color: "#ccc",
+        fontSize: "13px",
+        fontFamily: "Inter, sans-serif",
+        marginTop: "8px",
+      }}
+    >
+      {log.review}
+    </p>
 )}
+
 
               </div>
             </div>
