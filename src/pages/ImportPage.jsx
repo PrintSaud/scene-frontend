@@ -18,7 +18,7 @@ export default function ImportPage() {
     ratings: null,
     watchlist: null,
   });
-  
+
   const [showInstructions, setShowInstructions] = useState(false);
   const [previews, setPreviews] = useState({});
   const [message, setMessage] = useState("");
@@ -218,9 +218,9 @@ export default function ImportPage() {
           }}>
             <h2 style={{ marginBottom: 12 }}>📥 How to Import from Letterboxd</h2>
             <ul style={{ paddingLeft: 20, marginBottom: 16 }}>
-              <li>1. Go to your Letterboxd account</li>
-              <li>2. Visit Settings → Import & Export</li>
-              <li>3. Export Diary / Ratings / Watchlist as CSV</li>
+              <li>1. Go to <Letterboxd className="com"></Letterboxd> The Website not the App </li>
+              <li>2. Go to Settings → Export your data </li>
+              <li>3. Come back to Scene</li>
               <li>4. Upload them here in the correct fields</li>
               <li>5. Click Save — we'll handle the rest! 🚀</li>
             </ul>
