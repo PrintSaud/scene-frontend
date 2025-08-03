@@ -136,7 +136,7 @@ export default function ProfileTabProfile({
 
     <div style={{
       display: "grid",
-      gridTemplateColumns: "repeat(auto-fit, minmax(90px, 1fr))",
+      gridTemplateColumns: "repeat(3, 1fr)", // 👈 LOCK to 3 columns
       gap: "10px",
       marginTop: "12px",
     }}>

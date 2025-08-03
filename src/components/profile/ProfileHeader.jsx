@@ -95,10 +95,13 @@ export default function ProfileHeader({
 )}
 
 {/* ⋯ Options */}
-<div style={{ position: "absolute", top: "16px", right: "16px", zIndex: 10 }}>
+<div style={{ position: "relative", zIndex: 10 }}>
   <button
     onClick={() => setMenuOpen((prev) => !prev)}
     style={{
+      position: "absolute",
+      top: "16px",
+      right: "16px",
       background: "rgba(0,0,0,0.5)",
       border: "none",
       borderRadius: "50%",
@@ -110,27 +113,28 @@ export default function ProfileHeader({
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
+      zIndex: 11,
     }}
   >
     ⋯
   </button>
 
   {menuOpen && (
-  <div
-    style={{
-      position: "absolute",
-      top: "16px", // ⬆️ increased from 38px to avoid cut-off
-      right: 0,
-      background: "#1a1a1a",
-      border: "1px solid #333",
-      borderRadius: "12px",
-      boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
-      padding: "12px 0",
-      width: "180px",
-      overflow: "visible", // ✅ allows the full dropdown to show
-      zIndex: 1000,
-    }}
-  >
+    <div
+      style={{
+        position: "absolute",
+        top: "60px", // 👈 appear BELOW the 3-dots
+        right: "16px",
+        background: "#1a1a1a",
+        border: "1px solid #333",
+        borderRadius: "12px",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
+        padding: "12px 0",
+        width: "180px",
+        overflow: "visible",
+        zIndex: 1000,
+      }}
+    >
       {(isOwner
         ? [
             { label: "✏️ Edit Profile", onClick: () => navigate("/edit-profile") },

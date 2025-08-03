@@ -36,31 +36,29 @@ export default function GifSearchModal({ onSelect, onClose }) {
   }, [activeTab]);
 
   const fetchGIFs = async (query) => {
+
     if (query === "recent" && userId) {
       try {
-        await api.post(`/api/user/gif/recent`, {
-          userId,
-          gifUrl,
-        });        
+        const res = await api.get(`/api/users/gif/recent/${userId}`); // ✅ call GET route
         const gifsArray = res.data?.recentGifs || [];
-  
+    
         setGifs(
-            gifsArray.map((url, idx) => ({
-              id: idx,
-              url, // 👈 Add this
-              images: {
-                original: { url },
-                fixed_width: { webp: url },
-              },
-            }))
-          );
-          
+          gifsArray.map((url, idx) => ({
+            id: idx,
+            url,
+            images: {
+              original: { url },
+              fixed_width: { webp: url },
+            },
+          }))
+        );
       } catch (err) {
         console.error("Failed to fetch recent gifs:", err);
-        setGifs([]); // Optional: clear grid on error
+        setGifs([]);
       }
       return;
     }
+    
   
     const endpoint =
       query === "trending"

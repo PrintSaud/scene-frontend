@@ -61,7 +61,7 @@ export default function TrendingPage() {
           fontWeight: "600",
         }}
       >
-        🔥 Trending Films This Week
+         Trending Movies This Week 🔥
       </h1>
 
       {/* 🎬 Movie Grid */}

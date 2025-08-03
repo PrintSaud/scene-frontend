@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "../api/api";
 import { useNavigate } from "react-router-dom";
+import { AiOutlineQuestionCircle } from "react-icons/ai";
 
 const importEndpoints = {
     diary: "/api/letterboxd/logs",
@@ -69,11 +70,28 @@ export default function ImportPage() {
   };
 
   return (
-    <div style={{ padding: "24px", color: "white" }}>
-      <h2 style={{ fontSize: "16px", marginBottom: "8px", textAlign: "center" }}>
-        📦 Transfer Data from Letterboxd
+    <div style={{ position: "relative", padding: "24px", color: "white", maxHeight: "calc(100vh - 60px)", overflowY: "auto", paddingBottom: "160px" }}>
+      {/* ❓ Top Right Help Icon */}
+      <div style={{ position: 'absolute', top: 20, right: 20, zIndex: 10 }}>
+        <AiOutlineQuestionCircle
+          onClick={() => setShowInstructions(true)}
+          style={{
+            cursor: 'pointer',
+            fontSize: 28,
+            color: '#aaa',
+            transition: 'color 0.2s',
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = '#fff')}
+          onMouseLeave={(e) => (e.currentTarget.style.color = '#aaa')}
+        />
+      </div>
+  
+      {/* Title */}
+      <h2 style={{ fontSize: "12px", marginBottom: "8px", textAlign: "center" }}>
+        Transfer Data from Letterboxd
       </h2>
-
+  
+      {/* Back Button */}
       <button
         onClick={() => navigate(-1)}
         style={{
@@ -93,12 +111,14 @@ export default function ImportPage() {
       >
         ←
       </button>
-
+  
+      {/* Instructions */}
       <p style={{ fontSize: "14px", color: "#aaa", marginBottom: "16px", fontFamily: "Inter, sans-serif" }}>
         Upload your exported files one by one from the Letterboxd data folder (watchlist.csv, ratings.csv, etc.).
       </p>
-
-      {["diary", "ratings","watchlist"].map((type) => (
+  
+      {/* Upload Inputs */}
+      {["diary", "ratings", "watchlist"].map((type) => (
         <div key={type} style={{ marginBottom: "16px" }}>
           <label style={{ fontWeight: "bold", fontSize: "13px", display: "block", marginBottom: "4px" }}>
             {type.charAt(0).toUpperCase() + type.slice(1)}.csv
@@ -117,10 +137,10 @@ export default function ImportPage() {
           )}
         </div>
       ))}
-
+  
       {loading && <p style={{ color: "#fff" }}>⏳ Uploading files...</p>}
       {message && <p style={{ marginTop: "12px" }}>{message}</p>}
-
+  
       {!uploadComplete && (
         <button
           onClick={handleUpload}
@@ -139,7 +159,7 @@ export default function ImportPage() {
           🚀 Upload All Files
         </button>
       )}
-
+  
       {uploadComplete && (
         <button
           onClick={() => navigate("/profile")}
@@ -158,8 +178,8 @@ export default function ImportPage() {
           ✅ Continue to Profile
         </button>
       )}
-
-      {(previews.diary || previews.ratings || previews.watchlist ) && (
+  
+      {(previews.diary || previews.ratings || previews.watchlist) && (
         <button
           onClick={undoImport}
           style={{
@@ -177,6 +197,49 @@ export default function ImportPage() {
           🗑️ Undo Last Import
         </button>
       )}
+  
+      {/* 📋 Instructions Modal */}
+      {showInstructions && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.8)',
+          display: 'flex', justifyContent: 'center', alignItems: 'center',
+          zIndex: 9999
+        }}>
+          <div style={{
+            background: '#111',
+            padding: 20,
+            borderRadius: 8,
+            maxWidth: 400,
+            color: '#fff',
+            fontSize: 14,
+          }}>
+            <h2 style={{ marginBottom: 12 }}>📥 How to Import from Letterboxd</h2>
+            <ul style={{ paddingLeft: 20, marginBottom: 16 }}>
+              <li>1. Go to your Letterboxd account</li>
+              <li>2. Visit Settings → Import & Export</li>
+              <li>3. Export Diary / Ratings / Watchlist as CSV</li>
+              <li>4. Upload them here in the correct fields</li>
+              <li>5. Click Save — we'll handle the rest! 🚀</li>
+            </ul>
+            <button
+              onClick={() => setShowInstructions(false)}
+              style={{
+                background: '#444',
+                color: '#fff',
+                padding: '8px 12px',
+                border: 'none',
+                borderRadius: 4,
+                cursor: 'pointer',
+                marginTop: 8,
+              }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
-  );
+  );  
 }
