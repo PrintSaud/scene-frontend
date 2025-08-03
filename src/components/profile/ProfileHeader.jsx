@@ -98,27 +98,28 @@ export default function ProfileHeader({
 <div style={{ overflow: "visible", position: "relative", zIndex: 10 }}>
   <button
     onClick={() => setMenuOpen((prev) => !prev)}
-  style={{
-    position: "fixed", // ⬅️ KEY CHANGE from absolute
-    top: "60px",
-    right: "16px",
-    background: "#1a1a1a",
-    border: "1px solid #333",
-    borderRadius: "12px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
-    padding: "12px 0",
-    width: "180px",
-    zIndex: 1000,
-  }}
->
+    style={{
+      background: "rgba(0,0,0,0.5)",
+      border: "none",
+      borderRadius: "50%",
+      width: "32px",
+      height: "32px",
+      color: "#fff",
+      fontSize: "22px",
+      cursor: "pointer",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    }}
+  >
     ⋯
   </button>
 
   {menuOpen && (
     <div
       style={{
-        position: "absolute",
-        top: "60px", // 👈 appear BELOW the 3-dots
+        position: "fixed", // ✅ changed from absolute to fixed
+        top: "60px",
         right: "16px",
         background: "#1a1a1a",
         border: "1px solid #333",
