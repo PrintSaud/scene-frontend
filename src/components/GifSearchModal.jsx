@@ -39,7 +39,7 @@ export default function GifSearchModal({ onSelect, onClose }) {
 
     if (query === "recent" && userId) {
       try {
-        const res = await api.get(`/api/users/gif/recent/${userId}`); // ✅ call GET route
+        const res = await api.get(`/api/users/${userId}/recent-gifs`);
         const gifsArray = res.data?.recentGifs || [];
     
         setGifs(

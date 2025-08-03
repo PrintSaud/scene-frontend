@@ -161,16 +161,19 @@ const getRelativeTime = (date) => {
                 </div>
 
                 {/* 📝 Review text */}
-                <p
-                  style={{
-                    color: "#ccc",
-                    fontSize: "13px",
-                    fontFamily: "Inter, sans-serif",
-                    marginTop: "8px",
-                  }}
-                >
-                  {log.review}
-                </p>
+                {log.review && !["[GIF ONLY]", "[IMAGE ONLY]"].includes(log.review.trim()) && (
+  <p
+    style={{
+      color: "#ccc",
+      fontSize: "13px",
+      fontFamily: "Inter, sans-serif",
+      marginTop: "8px",
+    }}
+  >
+    {log.review}
+  </p>
+)}
+
               </div>
             </div>
 
