@@ -268,18 +268,22 @@ export default function AllReviewsPage() {
 
 {/* 🧵 Replies */}
 {review.replies?.map(reply => {
-    console.log("🧪 Individual Reply:", reply);
   const isChildLiked = reply.likes?.includes(userId);
+
+  // 🛡️ Fallback-safe reply.user handling
+  const replyUserId = typeof reply.user === "string" ? reply.user : reply.user?._id;
+  const replyUsername = typeof reply.user === "object" ? reply.user.username : reply.username;
+  const replyAvatar = typeof reply.user === "object" ? reply.user.avatar : reply.avatar || "/default-avatar.jpg";
 
   return (
     <div key={reply._id} style={{ paddingLeft: 20, marginTop: 8 }}>
       <div style={{ display: "flex", gap: 10, position: "relative" }}>
         {/* Avatar */}
         <img
-          src={reply.avatar || "/default-avatar.jpg"}
+          src={replyAvatar}
           onError={e => (e.target.src = "/default-avatar.jpg")}
           style={{ width: 26, height: 26, borderRadius: "50%", cursor: "pointer" }}
-          onClick={() => navigate(`/profile/${reply.userId}`)}
+          onClick={() => navigate(`/profile/${replyUserId}`)}
         />
 
         <div style={{ flex: 1 }}>
@@ -292,23 +296,16 @@ export default function AllReviewsPage() {
                 cursor: "pointer",
                 fontFamily: "Inter, sans-serif"
               }}
-              onClick={() => navigate(`/profile/${reply.userId}`)}
+              onClick={() => navigate(`/profile/${replyUserId}`)}
             >
-              @{reply.username || "DeletedUser"}
+              @{replyUsername || "DeletedUser"}
             </strong>
             <span style={{ fontSize: 10, color: "#888" }}>
               {getRelativeTime(reply.createdAt)}
             </span>
           </div>
 
-          <div
-            style={{
-              fontSize: 13,
-              color: "#ddd",
-              marginTop: 2,
-              fontFamily: "Inter, sans-serif"
-            }}
-          >
+          <div style={{ fontSize: 13, color: "#ddd", marginTop: 2, fontFamily: "Inter, sans-serif" }}>
             {reply.text}
           </div>
 
@@ -336,7 +333,7 @@ export default function AllReviewsPage() {
           )}
 
           <button
-            onClick={() => handleReply(reply._id, reply.username, review._id)}
+            onClick={() => handleReply(reply._id, replyUsername, review._id)}
             style={{
               background: "none",
               border: "none",
@@ -350,14 +347,20 @@ export default function AllReviewsPage() {
             Reply
           </button>
 
-          {/* Nested Replies */}
+          {/* 🧵 Nested Replies */}
           {reply.children?.map(child => {
             const isGrandChildLiked = child.likes?.includes(userId);
+
+            // 🛡️ Nested safety
+            const childUserId = typeof child.user === "string" ? child.user : child.user?._id;
+            const childUsername = typeof child.user === "object" ? child.user.username : child.username;
+            const childAvatar = typeof child.user === "object" ? child.user.avatar : child.avatar || "/default-avatar.jpg";
+
             return (
               <div key={child._id} style={{ paddingLeft: 20, marginTop: 8 }}>
                 <div style={{ display: "flex", gap: 10, position: "relative" }}>
                   <img
-                    src={child.avatar || "/default-avatar.jpg"}
+                    src={childAvatar}
                     onError={e => (e.target.src = "/default-avatar.jpg")}
                     style={{
                       width: 26,
@@ -365,7 +368,7 @@ export default function AllReviewsPage() {
                       borderRadius: "50%",
                       cursor: "pointer"
                     }}
-                    onClick={() => navigate(`/profile/${child.userId}`)}
+                    onClick={() => navigate(`/profile/${childUserId}`)}
                   />
                   <div style={{ flex: 1 }}>
                     <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
@@ -376,22 +379,15 @@ export default function AllReviewsPage() {
                           cursor: "pointer",
                           fontFamily: "Inter, sans-serif"
                         }}
-                        onClick={() => navigate(`/profile/${child.userId}`)}
+                        onClick={() => navigate(`/profile/${childUserId}`)}
                       >
-                        @{child.username || "DeletedUser"}
+                        @{childUsername || "DeletedUser"}
                       </strong>
                       <span style={{ fontSize: 10, color: "#888" }}>
                         {getRelativeTime(child.createdAt)}
                       </span>
                     </div>
-                    <div
-                      style={{
-                        fontSize: 13,
-                        color: "#ddd",
-                        marginTop: 2,
-                        fontFamily: "Inter, sans-serif"
-                      }}
-                    >
+                    <div style={{ fontSize: 13, color: "#ddd", marginTop: 2, fontFamily: "Inter, sans-serif" }}>
                       {child.text}
                     </div>
                   </div>
@@ -406,7 +402,7 @@ export default function AllReviewsPage() {
                         <AiOutlineHeart size={16} color="#888" />
                       )}
                     </div>
-                    {child.userId === userId && (
+                    {childUserId === userId && (
                       <div style={{ position: "relative" }}>
                         <HiDotsVertical
                           size={14}
@@ -443,7 +439,7 @@ export default function AllReviewsPage() {
           })}
         </div>
 
-        {/* Like + 3-dot */}
+        {/* ❤️ Like + 3-dot */}
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <div
             onClick={() => handleLikeReply(review._id, reply._id)}
@@ -455,7 +451,7 @@ export default function AllReviewsPage() {
               <AiOutlineHeart size={16} color="#888" />
             )}
           </div>
-          {reply.userId === userId && (
+          {replyUserId === userId && (
             <div style={{ position: "relative" }}>
               <HiDotsVertical
                 size={14}
