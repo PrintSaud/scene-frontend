@@ -255,9 +255,9 @@ const user = stored ? JSON.parse(stored) : null;
 
           {/* 🧵 Replies */}
 {review.replies?.map(function renderReply(reply) {
-    const avatar = reply.user?.avatar || "/default-avatar.jpg";
-    const username = reply.user?.username || "DeletedUser";    
-    const replyUserId = reply.user?._id || null;
+    const avatar = reply.avatar || "/default-avatar.jpg";
+    const username = reply.username || "DeletedUser";
+    const replyUserId = reply.userId || null;        
     const isChildLiked = reply.likes?.includes(userId);
 
   return (
@@ -286,7 +286,7 @@ const user = stored ? JSON.parse(stored) : null;
             </span>
           </div>
 
-          <div style={{ fontSize: 13, color: "#ddd", marginTop: 2 }}>
+          <div style={{ fontSize: 13, color: "#ddd", marginTop: 2, fontFamily: "Inter, sans-serif" }}>
             {reply.text}
           </div>
 
