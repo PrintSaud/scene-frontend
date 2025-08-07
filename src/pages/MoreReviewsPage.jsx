@@ -178,7 +178,6 @@ export default function AllReviewsPage() {
         <img
           src={review.user?.avatar || "/default-avatar.jpg"}
           onError={(e) => {
-            console.warn("⚠️ Broken avatar for review by", review.user?.username);
             e.target.src = "/default-avatar.jpg";
           }}
           style={{ width: 32, height: 32, borderRadius: "50%", cursor: "pointer" }}
@@ -253,7 +252,6 @@ export default function AllReviewsPage() {
         <img
           src={avatar}
           onError={(e) => {
-            console.warn("⚠️ Broken avatar in reply by", username);
             e.target.src = "/default-avatar.jpg";
           }}
           style={{ width: 26, height: 26, borderRadius: "50%", cursor: "pointer" }}

@@ -349,7 +349,7 @@ const { parentCommentId, parentUsername } = location.state || {};
                       >
                         @{child.username || "Unknown"}
                       </strong>
-                      <span style={{ fontSize: 10, color: "#888" }}>{getRelativeTime(child.createdAt)}</span>
+                       <span style={{ fontSize: 10, color: "#888" }}>{getRelativeTime(child.createdAt)}</span>
                     </div>
                     <span style={{ fontSize: 13, color: "#ddd", marginTop: 2, display: "block" }}>{child.text}</span>
                     {child.rating && (
