@@ -53,11 +53,6 @@ export default function SceneBotComponent() {
     }
   
     const question = rawInput.trim();
-  
-    // 🧪 Log input and types
-    console.log("🟢 Raw Input =", rawInput, "Type:", typeof rawInput);
-    console.log("🟢 Final Question =", question, "Type:", typeof question);
-  
     if (!question) return;
   
     // 🌍 Language Triggers
@@ -78,56 +73,53 @@ export default function SceneBotComponent() {
       text: typeof question === "string" ? question : JSON.stringify(question),
     };
   
-    console.log("👤 Saved userMsg =", userMsg, "Type of text:", typeof userMsg.text);
-  
     const newMessages = [...messages, userMsg];
     setMessages(newMessages);
     saveToStorage(newMessages);
     setLoading(true);
     setInput("");
   
-    // 🚀 Call the bot
+    // 🚀 Call SceneBot
     const lang = forcedLang || localStorage.getItem("sceneLang") || "english";
     console.log("🧠 CONFIRMATION — calling callSceneBot with:", question);
-console.trace();
+    console.trace();
+  
     const result = await callSceneBot(question, lang);
-    console.log("🔔 Raw API result =", result);
-    console.log("📦 typeof result =", typeof result);
-  
-    const replyText = typeof result === "string" ? result : JSON.stringify(result);
-    console.log("🎬 Final replyText =", replyText);
-  
     setLoading(false);
   
-    if (result) {
-      setTypingText("");
-      const botMsg = {
-        sender: "bot",
-        text: typeof replyText === "string" ? replyText : JSON.stringify(replyText),
-      };
-      const updated = [...newMessages, botMsg];
-      setMessages(updated);
+    const replyText = typeof result === "string" ? result : JSON.stringify(result);
+    if (!replyText) return;
   
-      // ✍️ Typewriter Effect
-      let i = 0;
-      const typeChar = () => {
-        if (i < replyText.length) {
-          const newTyping = [...updated];
-newTyping[newTyping.length - 1] = {
-  ...newTyping[newTyping.length - 1],
-  text: newTyping[newTyping.length - 1].text + replyText[i],
-};
-setMessages(newTyping);
-          i++;
-          setTimeout(typeChar, 15);
-        } else {
-          saveToStorage(newTyping);
-        }
-      };
+    setTypingText("");
   
-      typeChar();
-    }
+    const botMsg = {
+      sender: "bot",
+      text: "", // start empty, we'll type it
+    };
+  
+    let fullMessages = [...newMessages, botMsg];
+    setMessages(fullMessages);
+  
+    // ✍️ Typewriter Effect
+    let i = 0;
+    const typeChar = () => {
+      if (i < replyText.length) {
+        fullMessages = [...fullMessages];
+        fullMessages[fullMessages.length - 1] = {
+          ...fullMessages[fullMessages.length - 1],
+          text: fullMessages[fullMessages.length - 1].text + replyText[i],
+        };
+        setMessages(fullMessages);
+        i++;
+        setTimeout(typeChar, 15); // or use requestAnimationFrame for buttery smoothness
+      } else {
+        saveToStorage(fullMessages);
+      }
+    };
+  
+    typeChar();
   };
+  
   
   useEffect(() => {
     if (location.state?.autoAsk) {
