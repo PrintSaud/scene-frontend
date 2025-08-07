@@ -268,35 +268,37 @@ export default function AllReviewsPage() {
 
 {/* 🧵 Replies */}
 {review.replies?.map(reply => {
+  console.log("🧪 MAIN REPLY OBJECT:", reply);
+
   const isChildLiked = reply.likes?.includes(userId);
 
-  // 🛡️ Fallback-safe reply.user handling
   const replyUserId = typeof reply.user === "string" ? reply.user : reply.user?._id;
   const replyUsername = typeof reply.user === "object" ? reply.user.username : reply.username;
   const replyAvatar = typeof reply.user === "object" ? reply.user.avatar : reply.avatar || "/default-avatar.jpg";
 
+  console.log("🧪 REPLY USER FIELDS:", { replyUserId, replyUsername, replyAvatar });
+
   return (
     <div key={reply._id} style={{ paddingLeft: 20, marginTop: 8 }}>
       <div style={{ display: "flex", gap: 10, position: "relative" }}>
-        {/* Avatar */}
         <img
           src={replyAvatar}
           onError={e => (e.target.src = "/default-avatar.jpg")}
           style={{ width: 26, height: 26, borderRadius: "50%", cursor: "pointer" }}
-          onClick={() => navigate(`/profile/${replyUserId}`)}
+          onClick={() => {
+            console.log("👤 Navigating to reply user profile:", replyUserId);
+            navigate(`/profile/${replyUserId}`);
+          }}
         />
 
         <div style={{ flex: 1 }}>
           <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-            {/* Username */}
             <strong
-              style={{
-                fontSize: 13,
-                color: "#ddd",
-                cursor: "pointer",
-                fontFamily: "Inter, sans-serif"
+              style={{ fontSize: 13, color: "#ddd", cursor: "pointer", fontFamily: "Inter, sans-serif" }}
+              onClick={() => {
+                console.log("👤 Username clicked:", replyUsername, "→", replyUserId);
+                navigate(`/profile/${replyUserId}`);
               }}
-              onClick={() => navigate(`/profile/${replyUserId}`)}
             >
               @{replyUsername || "DeletedUser"}
             </strong>
@@ -309,31 +311,14 @@ export default function AllReviewsPage() {
             {reply.text}
           </div>
 
-          {reply.gif && (
-            <img
-              src={reply.gif}
-              style={{
-                marginTop: 4,
-                maxWidth: "100%",
-                borderRadius: 8,
-                objectFit: "cover"
-              }}
-            />
-          )}
-          {reply.image && (
-            <img
-              src={reply.image}
-              style={{
-                marginTop: 4,
-                maxWidth: "100%",
-                borderRadius: 8,
-                objectFit: "cover"
-              }}
-            />
-          )}
+          {reply.gif && <img src={reply.gif} style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8, objectFit: "cover" }} />}
+          {reply.image && <img src={reply.image} style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8, objectFit: "cover" }} />}
 
           <button
-            onClick={() => handleReply(reply._id, replyUsername, review._id)}
+            onClick={() => {
+              console.log("🗨️ Replying to:", replyUsername);
+              handleReply(reply._id, replyUsername, review._id);
+            }}
             style={{
               background: "none",
               border: "none",
@@ -349,12 +334,14 @@ export default function AllReviewsPage() {
 
           {/* 🧵 Nested Replies */}
           {reply.children?.map(child => {
-            const isGrandChildLiked = child.likes?.includes(userId);
+            console.log("🧪 NESTED REPLY OBJECT:", child);
 
-            // 🛡️ Nested safety
+            const isGrandChildLiked = child.likes?.includes(userId);
             const childUserId = typeof child.user === "string" ? child.user : child.user?._id;
             const childUsername = typeof child.user === "object" ? child.user.username : child.username;
             const childAvatar = typeof child.user === "object" ? child.user.avatar : child.avatar || "/default-avatar.jpg";
+
+            console.log("🧪 CHILD USER FIELDS:", { childUserId, childUsername, childAvatar });
 
             return (
               <div key={child._id} style={{ paddingLeft: 20, marginTop: 8 }}>
@@ -362,24 +349,20 @@ export default function AllReviewsPage() {
                   <img
                     src={childAvatar}
                     onError={e => (e.target.src = "/default-avatar.jpg")}
-                    style={{
-                      width: 26,
-                      height: 26,
-                      borderRadius: "50%",
-                      cursor: "pointer"
+                    style={{ width: 26, height: 26, borderRadius: "50%", cursor: "pointer" }}
+                    onClick={() => {
+                      console.log("👶 Navigating to child user profile:", childUserId);
+                      navigate(`/profile/${childUserId}`);
                     }}
-                    onClick={() => navigate(`/profile/${childUserId}`)}
                   />
                   <div style={{ flex: 1 }}>
                     <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
                       <strong
-                        style={{
-                          fontSize: 13,
-                          color: "#ddd",
-                          cursor: "pointer",
-                          fontFamily: "Inter, sans-serif"
+                        style={{ fontSize: 13, color: "#ddd", cursor: "pointer", fontFamily: "Inter, sans-serif" }}
+                        onClick={() => {
+                          console.log("👶 Username clicked:", childUsername, "→", childUserId);
+                          navigate(`/profile/${childUserId}`);
                         }}
-                        onClick={() => navigate(`/profile/${childUserId}`)}
                       >
                         @{childUsername || "DeletedUser"}
                       </strong>
@@ -391,9 +374,13 @@ export default function AllReviewsPage() {
                       {child.text}
                     </div>
                   </div>
+
                   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                     <div
-                      onClick={() => handleLikeReply(review._id, child._id)}
+                      onClick={() => {
+                        console.log("💗 Like CHILD:", child._id);
+                        handleLikeReply(review._id, child._id);
+                      }}
                       style={{ cursor: "pointer" }}
                     >
                       {isGrandChildLiked ? (
@@ -406,9 +393,7 @@ export default function AllReviewsPage() {
                       <div style={{ position: "relative" }}>
                         <HiDotsVertical
                           size={14}
-                          onClick={() =>
-                            setMenuOpenId(menuOpenId === child._id ? null : child._id)
-                          }
+                          onClick={() => setMenuOpenId(menuOpenId === child._id ? null : child._id)}
                           style={{ cursor: "pointer", color: "#888" }}
                         />
                         {menuOpenId === child._id && (
@@ -425,7 +410,10 @@ export default function AllReviewsPage() {
                               cursor: "pointer",
                               zIndex: 5
                             }}
-                            onClick={() => handleDelete(child._id)}
+                            onClick={() => {
+                              console.log("❌ Delete CHILD:", child._id);
+                              handleDelete(child._id);
+                            }}
                           >
                             Delete
                           </div>
@@ -442,7 +430,10 @@ export default function AllReviewsPage() {
         {/* ❤️ Like + 3-dot */}
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <div
-            onClick={() => handleLikeReply(review._id, reply._id)}
+            onClick={() => {
+              console.log("💗 Like MAIN REPLY:", reply._id);
+              handleLikeReply(review._id, reply._id);
+            }}
             style={{ cursor: "pointer" }}
           >
             {isChildLiked ? (
@@ -455,9 +446,7 @@ export default function AllReviewsPage() {
             <div style={{ position: "relative" }}>
               <HiDotsVertical
                 size={14}
-                onClick={() =>
-                  setMenuOpenId(menuOpenId === reply._id ? null : reply._id)
-                }
+                onClick={() => setMenuOpenId(menuOpenId === reply._id ? null : reply._id)}
                 style={{ cursor: "pointer", color: "#888" }}
               />
               {menuOpenId === reply._id && (
@@ -474,7 +463,10 @@ export default function AllReviewsPage() {
                     cursor: "pointer",
                     zIndex: 5
                   }}
-                  onClick={() => handleDelete(reply._id)}
+                  onClick={() => {
+                    console.log("❌ Delete MAIN REPLY:", reply._id);
+                    handleDelete(reply._id);
+                  }}
                 >
                   Delete
                 </div>
