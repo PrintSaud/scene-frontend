@@ -1,7 +1,7 @@
-console.log("✅ callSceneBot.js LOADED"); // Confirms correct file is being used
+
 
 export const callSceneBot = async (message, lang) => {
-  console.log("📤 callSceneBot called with:", message, "Type:", typeof message);
+
 
   if (typeof message !== "string") {
     console.error("🛑 BLOCKED — callSceneBot received non-string message:", message);
@@ -14,15 +14,12 @@ export const callSceneBot = async (message, lang) => {
     const token = user?.token;
     const preferredLang = lang || localStorage.getItem("sceneLang") || "english";
 
-    console.log("🌍 Preferred language:", preferredLang);
-    console.log("🔐 Sending token:", token ? "✅ Present" : "❌ Missing");
-
     const payload = {
       message,
       lang: preferredLang,
     };
 
-    console.log("📦 Payload to backend:", payload);
+   
 
     const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/scenebot`, {
       method: "POST",
@@ -34,7 +31,7 @@ export const callSceneBot = async (message, lang) => {
     });
 
     const data = await res.json();
-    console.log("📬 Response from backend:", data);
+
 
     return typeof data.reply === "string"
       ? data.reply

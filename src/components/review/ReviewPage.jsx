@@ -35,7 +35,6 @@ export default function ReviewPage() {
   }
 
   const handleReply = () => {
-    console.log("💬 Reply clicked");
   };
   
 
@@ -64,7 +63,6 @@ export default function ReviewPage() {
   const fetchData = async () => {
     try {
       const { data } = await api.get(`/api/logs/${id}`);
-console.log("🐛 Fetched review:", data);
 setReview(data);
 
       setReplies(data.replies || []);

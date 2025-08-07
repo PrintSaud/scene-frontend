@@ -95,7 +95,6 @@ export default function ProfilePage() {
       }
   
       try {
-        console.log("📤 Fetching custom posters for:", { userId, movieIds });
         const data = await getCustomPostersBatch(userId, movieIds);
         setCustomPosters(data);
       } catch (err) {

@@ -29,11 +29,7 @@ export default function ReviewHeader({
     const TMDB_BACKDROP = "https://image.tmdb.org/t/p/original";
     const DEFAULT_BACKDROP = "/default-backdrop.jpg";
 
-    console.log("🧠 REVIEW BACKDROP CHECK:", {
-      customBackdrop: review?.customBackdrop,
-      reviewBackdrop: review?.backdrop,
-      movieBackdrop: review?.movie?.backdropPath,
-    });
+
 
     const backdropUrl =
   review?.customBackdrop ||

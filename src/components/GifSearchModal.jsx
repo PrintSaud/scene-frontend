@@ -89,7 +89,7 @@ export default function GifSearchModal({ onSelect, onClose }) {
   const handleSelectGif = async (gif) => {
     const gifUrl = gif?.images?.original?.url || gif?.url; // prefer actual image
   
-    console.log("👉 Final GIF URL:", gifUrl);
+
   
     onSelect(gifUrl);
     onClose();
