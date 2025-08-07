@@ -14,6 +14,9 @@ export default function AllReviewsPage() {
   const navigate = useNavigate();
   const inputRef = useRef();
   const [activeReviewId, setActiveReviewId] = useState(null);
+  const stored = localStorage.getItem("user");
+const user = stored ? JSON.parse(stored) : null;
+
 
   const [reviews, setReviews] = useState([]);
   const [userId, setUserId] = useState("");
@@ -80,7 +83,11 @@ export default function AllReviewsPage() {
     try {
       const formData = new FormData();
       formData.append("text", input);
-      if (!user?._id) return res.status(401).json({ message: "Missing user" });
+      if (!user?._id) {
+        console.error("Missing user");
+        return;
+      }
+      
 
       
       if (replyingTo?.id) {
