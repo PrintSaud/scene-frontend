@@ -271,12 +271,19 @@ export default function AllReviewsPage() {
   console.log("🧪 MAIN REPLY OBJECT:", reply);
 
   const isChildLiked = reply.likes?.includes(userId);
+  
 
   const replyUserId = typeof reply.user === "string" ? reply.user : reply.user?._id;
   const replyUsername = typeof reply.user === "object" ? reply.user.username : reply.username;
   const replyAvatar = typeof reply.user === "object" ? reply.user.avatar : reply.avatar || "/default-avatar.jpg";
 
-  console.log("🧪 REPLY USER FIELDS:", { replyUserId, replyUsername, replyAvatar });
+
+  console.log("🧪 REPLY USER FIELDS:", {
+    replyUserId: reply.user?._id,
+    replyUsername: reply.user?.username,
+    replyAvatar: reply.user?.avatar
+  });
+  
 
   return (
     <div key={reply._id} style={{ paddingLeft: 20, marginTop: 8 }}>
