@@ -88,7 +88,12 @@ export default function AllReviewsPage() {
       if (selectedGif) formData.append("gif", selectedGif);
       if (selectedImage) formData.append("image", selectedImage);
   
-      await api.post(`/api/logs/${activeReviewId}/reply`, formData);
+      await api.post(`/api/logs/${activeReviewId}/reply`, formData, {
+        headers: {
+          Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))?.token}`,
+        },
+      });
+      
   
       setInput("");
       setSelectedGif("");

@@ -22,13 +22,6 @@ api.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
-  console.log(
-    "👉 API REQUEST:",
-    config.method,
-    config.url,
-    config.headers.Authorization ? "✅ token" : "No token"
-  );
-
   return config;
 });
 
