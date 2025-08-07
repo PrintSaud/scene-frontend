@@ -268,6 +268,7 @@ export default function AllReviewsPage() {
 
 {/* 🧵 Replies */}
 {review.replies?.map(reply => {
+    console.log("🧪 Individual Reply:", reply);
   const isChildLiked = reply.likes?.includes(userId);
 
   return (
