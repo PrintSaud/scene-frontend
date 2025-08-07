@@ -245,9 +245,10 @@ export default function AllReviewsPage() {
             console.log("↪️ Reply:", reply.text, "| by:", reply.username, "| ID:", reply._id);
 
             const isChildLiked = reply.likes?.includes(userId);
-            const avatar = reply.avatar || "/default-avatar.jpg";
-            const username = reply.username?.replace(/^@/, "") || "Unknown";
-            const replyUserId = reply.userId;
+            const avatar = reply.user?.avatar || "/default-avatar.jpg";
+const username = reply.user?.username || "Unknown";
+const replyUserId = reply.user?._id;
+
 
             return (
               <div key={reply._id} style={{ paddingLeft: 20, marginTop: 8 }}>
