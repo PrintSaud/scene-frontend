@@ -52,7 +52,7 @@ export default function LoginPage() {
       <p className="welcome-text">Welcome back! We missed you 🎬</p>
 
       {error && (
-        <p style={{ color: "#ff4d4d", fontSize: "0.65rem", marginBottom: "10px", textAlign: "centre", }}>
+        <p style={{ color: "#ff4d4d", fontSize: "0.65rem", marginBottom: "10px", textAlign: "center", }}>
           {error}
         </p>
       )}

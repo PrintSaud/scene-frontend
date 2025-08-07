@@ -93,33 +93,43 @@ export default function SignupPage() {
     e.preventDefault();
     setError("");
     setIsLoading(true);
-
+  
     if (!avatar) return showError("Please upload an avatar.");
     if (!isValidUsername(username)) return showError("Invalid username format.");
     if (usernameTaken) return showError("Username already taken.");
     if (!validateEmail(email)) return showError("Invalid email.");
     if (emailTaken) return showError("Email already in use.");
     if (password.length < 4) return showError("Password too short.");
-
+  
     try {
-      const avatarUrl = await uploadToCloudinary(avatar);
-
+      // Step 1: Register user (no avatar yet)
       const res = await api.post(`/api/auth/register`, {
         username,
         email,
         password,
-        avatar: avatarUrl,
       });
-
+  
       const mergedUser = {
         ...res.data.user,
         _id: res.data.user._id,
         token: res.data.token,
       };
-
+  
       localStorage.setItem("user", JSON.stringify(mergedUser));
       localStorage.setItem("token", res.data.token);
+  
+      // Step 2: Upload avatar to backend using token
+      const formData = new FormData();
+formData.append("avatar", avatar); // must match 'avatar' field in multer
 
+await api.post(`/api/upload/avatar/${mergedUser._id}`, formData, {
+  headers: {
+    "Content-Type": "multipart/form-data",
+    Authorization: `Bearer ${res.data.token}`,
+  },
+});
+
+  
       toast.success("Signed up successfully!");
       window.location.href = "/verify-email";
     } catch (err) {
@@ -129,6 +139,7 @@ export default function SignupPage() {
       setIsLoading(false);
     }
   };
+  
 
   const showError = (msg) => {
     setError(msg);

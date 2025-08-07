@@ -112,12 +112,16 @@ console.trace();
       let i = 0;
       const typeChar = () => {
         if (i < replyText.length) {
-          updated[updated.length - 1].text += replyText[i];
-          setMessages([...updated]);
+          const newTyping = [...updated];
+newTyping[newTyping.length - 1] = {
+  ...newTyping[newTyping.length - 1],
+  text: newTyping[newTyping.length - 1].text + replyText[i],
+};
+setMessages(newTyping);
           i++;
           setTimeout(typeChar, 15);
         } else {
-          saveToStorage(updated);
+          saveToStorage(newTyping);
         }
       };
   
@@ -172,52 +176,56 @@ console.trace();
 
   return (
     <div
+  style={{
+    display: "flex",
+    flexDirection: "column",
+    height: "100vh",
+    background: "#0e0e0e",
+    color: "#fff",
+    fontFamily: "Inter, sans-serif",
+    position: "relative",
+  }}
+>
+  {/* 🧠 Sticky Header with ❓ Icon */}
+  <div
+    style={{
+      position: "sticky",
+      top: 0,
+      background: "#0e0e0e",
+      zIndex: 100,
+      padding: "20px 16px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      borderBottom: "1px solid #222",
+    }}
+  >
+    {/* Centered Title */}
+    <div style={{ fontSize: "20px", fontWeight: "600", flex: 1, textAlign: "center" }}>
+      SceneBot 🎬
+    </div>
+
+    {/* ❓ Icon — now truly top right */}
+    <div
+      onClick={() =>
+        alert(
+          `🌍 To change language, just type:\n\nreply in "arabic"\nreply in "french"\nreply in "english"\n\nTo reset, type: reset language`
+        )
+      }
       style={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100vh",
-        background: "#0e0e0e",
-        color: "#fff",
-        fontFamily: "Inter, sans-serif",
-        position: "relative",
+        position: "absolute",
+        top: 20,
+        right: 16,
+        fontSize: "20px",
+        cursor: "pointer",
+        color: "#ccc",
       }}
+      title="Language Info"
     >
-      {/* 🧠 Sticky Header with ❓ Icon */}
-      <div
-        style={{
-          position: "sticky",
-          top: 0,
-          background: "#0e0e0e",
-          zIndex: 100,
-          padding: "20px 16px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          borderBottom: "1px solid #222",
-        }}
-      >
-        <div style={{ fontSize: "20px", fontWeight: "600", flex: 1, textAlign: "center" }}>
-          SceneBot 🎬
-        </div>
-  
-        <div
-          onClick={() =>
-            alert(
-              `🌍 To change language, just type:\n\nreply in "arabic"\nreply in "french"\nreply in "english"\n\nTo reset, type: reset language`
-            )
-          }
-          style={{
-            position: "absolute",
-            right: "18px",
-            fontSize: "20px",
-            cursor: "pointer",
-            color: "#ccc",
-          }}
-          title="Language Info"
-        >
-          ❓
-        </div>
-      </div>
+      🌍
+    </div>
+  </div>
+
   
       {/* 🗨️ Messages */}
       <div
