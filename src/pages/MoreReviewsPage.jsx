@@ -275,7 +275,7 @@ export default function AllReviewsPage() {
               <div style={{ display: "flex", gap: 10, position: "relative" }}>
                 {/* Avatar */}
                 <img
-                  src={reply.user?.avatar || "/default-avatar.jpg"}
+                src={reply.avatar || "/default-avatar.jpg"}
                   onError={e => (e.target.src = "/default-avatar.jpg")}
                   style={{ width: 26, height: 26, borderRadius: "50%", cursor: "pointer" }}
                   onClick={() => navigate(`/profile/${reply.user?._id}`)}
@@ -293,7 +293,7 @@ export default function AllReviewsPage() {
                       }}
                       onClick={() => navigate(`/profile/${reply.user?._id}`)}
                     >
-                      @{reply.user?.username || "DeletedUser"}
+                        @{reply.username || "DeletedUser"}
                     </strong>
 
                     <span style={{ fontSize: 10, color: "#888" }}>
