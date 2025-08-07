@@ -255,16 +255,10 @@ const user = stored ? JSON.parse(stored) : null;
 
           {/* 🧵 Replies */}
 {review.replies?.map(function renderReply(reply) {
-    const avatar = reply.user?.avatar && reply.user.username !== "Unknown"
-    ? reply.user.avatar
-    : "/default-avatar.jpg";
-  
-  const username = reply.user?.username && reply.user.username !== "Unknown"
-  ? reply.user.username
-  : "DeletedUser";
-
-  const replyUserId = reply.user?._id || null;
-  const isChildLiked = reply.likes?.includes(userId);
+    const avatar = reply.user?.avatar || "/default-avatar.jpg";
+    const username = reply.user?.username || "DeletedUser";    
+    const replyUserId = reply.user?._id || null;
+    const isChildLiked = reply.likes?.includes(userId);
 
   return (
     <div key={reply._id} style={{ paddingLeft: 20, marginTop: 8 }}>
