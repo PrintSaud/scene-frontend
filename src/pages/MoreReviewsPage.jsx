@@ -240,125 +240,120 @@ export default function AllReviewsPage() {
             </div>
           </div>
 
-          {/* 🧵 Replies */}
-          {review.replies?.map((reply) => {
-            console.log("↪️ Reply:", reply.text, "| by:", reply.username, "| ID:", reply._id);
+{/* 🧵 Replies */}
+{review.replies?.map(function renderReply(reply) {
+  const avatar = reply.user?.avatar || "/default-avatar.jpg";
+  const username = reply.user?.username || "Unknown";
+  const replyUserId = reply.user?._id;
+  const isChildLiked = reply.likes?.includes(userId);
 
-            const isChildLiked = reply.likes?.includes(userId);
-            const avatar = reply.user?.avatar || "/default-avatar.jpg";
-const username = reply.user?.username || "Unknown";
-const replyUserId = reply.user?._id;
+  return (
+    <div key={reply._id} style={{ paddingLeft: 20, marginTop: 8 }}>
+      <div style={{ display: "flex", gap: 10, position: "relative" }}>
+        <img
+          src={avatar}
+          onError={(e) => {
+            console.warn("⚠️ Broken avatar in reply by", username);
+            e.target.src = "/default-avatar.jpg";
+          }}
+          style={{ width: 26, height: 26, borderRadius: "50%", cursor: "pointer" }}
+          onClick={() => navigate(`/profile/${replyUserId}`)}
+        />
 
+        <div style={{ flex: 1 }}>
+          <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+            <strong
+              style={{ fontSize: 13, color: "#ddd", cursor: "pointer", fontFamily: "Inter, sans-serif" }}
+              onClick={() => navigate(`/profile/${replyUserId}`)}
+            >
+              @{username}
+            </strong>
 
-            return (
-              <div key={reply._id} style={{ paddingLeft: 20, marginTop: 8 }}>
-                <div style={{ display: "flex", gap: 10, position: "relative" }}>
-                  <img
-                    src={avatar}
-                    onError={(e) => {
-                      console.warn("⚠️ Broken avatar in reply by", username);
-                      e.target.src = "/default-avatar.jpg";
-                    }}
-                    style={{ width: 26, height: 26, borderRadius: "50%", cursor: "pointer" }}
-                    onClick={() => navigate(`/profile/${replyUserId}`)}
-                  />
+            <span style={{ fontSize: 10, color: "#888" }}>
+              {getRelativeTime(reply.createdAt)}
+            </span>
+          </div>
 
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-                      <strong
-                        style={{ fontSize: 13, color: "#ddd", cursor: "pointer", fontFamily: "Inter, sans-serif" }}
-                        onClick={() => navigate(`/profile/${replyUserId}`)}
-                      >
-                        @{username}
-                      </strong>
+          <div style={{ fontSize: 13, color: "#ddd", marginTop: 2 }}>
+            {reply.text}
+          </div>
 
-                      {reply.rating && (
-                        <div style={{ marginTop: -1 }}>
-                          <StarRating rating={reply.rating} size={12} />
-                        </div>
-                      )}
+          {reply.gif && (
+            <img
+              src={reply.gif}
+              style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8, objectFit: "cover" }}
+            />
+          )}
+          {reply.image && (
+            <img
+              src={reply.image}
+              style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8, objectFit: "cover" }}
+            />
+          )}
 
-                      <span style={{ fontSize: 10, color: "#888" }}>
-                        {getRelativeTime(reply.createdAt)}
-                      </span>
-                    </div>
+          <button
+            onClick={() => handleReply(reply._id, username, review._id)}
+            style={{
+              background: "none",
+              border: "none",
+              color: "#888",
+              fontSize: 13,
+              cursor: "pointer",
+              marginTop: 4,
+              padding: 0,
+            }}
+          >
+            Reply
+          </button>
 
-                    <div style={{ fontSize: 13, color: "#ddd", marginTop: 2 }}>
-                      {reply.text}
-                    </div>
+          {/* 🧵 Nested Replies */}
+          {reply.children?.map(renderReply)}
+        </div>
 
-                    {reply.gif && (
-                      <img
-                        src={reply.gif}
-                        style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8, objectFit: "cover" }}
-                      />
-                    )}
-                    {reply.image && (
-                      <img
-                        src={reply.image}
-                        style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8, objectFit: "cover" }}
-                      />
-                    )}
+        {/* ❤️ Like + ⋯ */}
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <div onClick={() => handleLikeReply(review._id, reply._id)} style={{ cursor: "pointer" }}>
+            {isChildLiked ? (
+              <AiFillHeart size={16} color="#B327F6" />
+            ) : (
+              <AiOutlineHeart size={16} color="#888" />
+            )}
+          </div>
 
-                    <button
-                      onClick={() => handleReply(null, username, review._id)}
-                      style={{
-                        background: "none",
-                        border: "none",
-                        color: "#888",
-                        fontSize: 13,
-                        cursor: "pointer",
-                        marginTop: 4,
-                        padding: 0,
-                      }}
-                    >
-                      Reply
-                    </button>
-                  </div>
-
-                  {/* ❤️ Like + ⋯ */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                    <div onClick={() => handleLikeReply(review._id, reply._id)} style={{ cursor: "pointer" }}>
-                      {isChildLiked ? (
-                        <AiFillHeart size={16} color="#B327F6" />
-                      ) : (
-                        <AiOutlineHeart size={16} color="#888" />
-                      )}
-                    </div>
-
-                    {replyUserId === userId && (
-                      <div style={{ position: "relative" }}>
-                        <HiDotsVertical
-                          size={14}
-                          onClick={() => setMenuOpenId(menuOpenId === reply._id ? null : reply._id)}
-                          style={{ cursor: "pointer", color: "#888" }}
-                        />
-                        {menuOpenId === reply._id && (
-                          <div
-                            style={{
-                              position: "absolute",
-                              top: 20,
-                              right: 0,
-                              background: "#222",
-                              borderRadius: 4,
-                              padding: "4px 8px",
-                              fontSize: 12,
-                              color: "#f55",
-                              cursor: "pointer",
-                              zIndex: 5,
-                            }}
-                            onClick={() => handleDelete(reply._id)}
-                          >
-                            Delete
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
+          {replyUserId === userId && (
+            <div style={{ position: "relative" }}>
+              <HiDotsVertical
+                size={14}
+                onClick={() => setMenuOpenId(menuOpenId === reply._id ? null : reply._id)}
+                style={{ cursor: "pointer", color: "#888" }}
+              />
+              {menuOpenId === reply._id && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 20,
+                    right: 0,
+                    background: "#222",
+                    borderRadius: 4,
+                    padding: "4px 8px",
+                    fontSize: 12,
+                    color: "#f55",
+                    cursor: "pointer",
+                    zIndex: 5,
+                  }}
+                  onClick={() => handleDelete(reply._id)}
+                >
+                  Delete
                 </div>
-              </div>
-            );
-          })}
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+})}
+
         </div>
       </div>
     </div>
