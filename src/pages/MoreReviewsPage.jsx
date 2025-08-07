@@ -242,8 +242,8 @@ export default function AllReviewsPage() {
 
 {/* 🧵 Replies */}
 {review.replies?.map(function renderReply(reply) {
-  const avatar = reply.user?.avatar || "/default-avatar.jpg";
-  const username = reply.user?.username || "Unknown";
+  const avatar = reply.avatar|| "/default-avatar.jpg";
+  const username = reply.username || "Unknown";
   const replyUserId = reply.user?._id;
   const isChildLiked = reply.likes?.includes(userId);
 
