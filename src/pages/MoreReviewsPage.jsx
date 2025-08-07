@@ -80,6 +80,8 @@ export default function AllReviewsPage() {
     try {
       const formData = new FormData();
       formData.append("text", input);
+      if (!user?._id) return res.status(401).json({ message: "Missing user" });
+
       
       if (replyingTo?.id) {
         formData.append("parentComment", replyingTo.id);
