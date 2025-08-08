@@ -8,7 +8,7 @@ import { FiSend } from "react-icons/fi";
 import api from "../api/api";
 import StarRating from "../components/StarRating";
 import GifSearchModal from "../components/GifSearchModal";
-
+import toast from "react-hot-toast"; // ✅ Add at top if not already
 export default function AllReviewsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -96,13 +96,18 @@ export default function AllReviewsPage() {
       setReplyingTo(null);
       setActiveReviewId(null);
   
-      // ✅ Trigger reload when landing on ReviewPage
+      // ✅ Trigger reload
       navigate(`/review/${activeReviewId}`, { state: { refreshAfterReply: true } });
   
+      // ✅ Toast!
+      toast.success("Reply sent 🎉");
+      
     } catch (err) {
       console.error("❌ Failed to send reply", err);
+      toast.error("Failed to send reply ❌");
     }
   };
+  
   
 
   const handleLike = async (logId) => {
@@ -124,22 +129,25 @@ export default function AllReviewsPage() {
   };
 
   const handleDelete = async (replyId, logId) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this reply?");
+    if (!confirmDelete) return;
+  
     try {
       await api.delete(`/api/logs/${logId}/replies/${replyId}`, {
         headers: {
           Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))?.token}`,
         },
       });
-      await fetchReviews(); // 🔁 refresh to show updated replies
+  
+      await fetchReviews(); // 🔁 refresh list
+      toast.success("Reply deleted 🗑️");
+      
     } catch (err) {
       console.error("❌ Failed to delete reply:", err);
+      toast.error("Failed to delete reply ❌");
     }
   };
   
-  
-  
-
-
   return (
     <div style={{ padding: "16px 12px", paddingBottom: 80 }}>
   {/* 🔙 Back Button */}
@@ -515,7 +523,7 @@ export default function AllReviewsPage() {
 
     
       {/* ✏️ Reply Input */}
-      {replyingTo && (
+      {replyingTo?.id && (
         <div style={{ position: "fixed", bottom: 0, width: "90%", background: "#0e0e0e", borderTop: "1px solid #222", padding: "12px 12px", zIndex: 99 }}>
           {(selectedGif || selectedImage) && (
             <div style={{ paddingBottom: 8, position: "relative" }}>
