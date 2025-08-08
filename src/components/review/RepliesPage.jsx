@@ -50,7 +50,8 @@ const { parentCommentId, parentUsername } = location.state || {};
 
   const fetchReplies = async () => {
     try {
-      const data = await getRepliesForLog(id);
+      const res = await api.get(`/api/logs/${id}`);
+const data = res.data.replies || [];
       const sorted = (data || []).sort(
         (a, b) => (b.likes?.length || 0) - (a.likes?.length || 0)
       );

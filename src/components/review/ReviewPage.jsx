@@ -9,6 +9,7 @@ import MoreReviewsList from "./MoreReviewsList";
 import StarRating from "../StarRating";
 import api from "../../api/api";
 import { HiOutlineRefresh } from "react-icons/hi"
+import { useLocation } from "react-router-dom";
 
 export default function ReviewPage() {
   const { id } = useParams();
@@ -22,6 +23,8 @@ export default function ReviewPage() {
   const [moreReviews, setMoreReviews] = useState([]);
   const user = JSON.parse(localStorage.getItem("user")) || {};
   const userId = user._id;
+  const location = useLocation();
+
 
   function getRelativeTime(date) {
     const now = new Date();
@@ -81,9 +84,11 @@ setReview(data);
 
   useEffect(() => {
     fetchData();
-  }, [id]);
-
-  
+    if (location.state?.refreshAfterReply) {
+      // 🚿 Clean the navigation state to prevent re-fetching forever
+      navigate(location.pathname, { replace: true });
+    }
+  }, [id, location.state?.refreshAfterReply]);
 
   const handleLike = async () => {
     if (!userId) return toast.error("You must be logged in to like.");

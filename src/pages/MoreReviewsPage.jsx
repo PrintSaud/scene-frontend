@@ -55,6 +55,7 @@ export default function AllReviewsPage() {
 
   const fetchReviews = async () => {
     try {
+        console.log("🐛 GETTING REVIEWS")
       const res = await api.get(`/api/logs/movie/${id}/popular?all=true`);
       const filtered = res.data.filter((log) => log.review && log.review.trim() !== "");
       setReviews(filtered);
@@ -72,32 +73,37 @@ export default function AllReviewsPage() {
   const handleSend = async () => {
     if (!input.trim() && !selectedGif && !selectedImage) return;
     if (!activeReviewId) return console.error("❌ No activeReviewId — cannot send reply");
-
+  
     try {
       const formData = new FormData();
       formData.append("text", input);
       if (!user?._id) return console.error("Missing user");
-
+  
       if (replyingTo?.id) formData.append("parentComment", replyingTo.id);
       if (selectedGif) formData.append("gif", selectedGif);
       if (selectedImage) formData.append("image", selectedImage);
-
+  
       await api.post(`/api/logs/${activeReviewId}/reply`, formData, {
         headers: {
           Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))?.token}`,
         },
       });
-
+  
+      // ✅ Reset state
       setInput("");
       setSelectedGif("");
       setSelectedImage("");
       setReplyingTo(null);
       setActiveReviewId(null);
-      fetchReviews();
+  
+      // ✅ Trigger reload when landing on ReviewPage
+      navigate(`/review/${activeReviewId}`, { state: { refreshAfterReply: true } });
+  
     } catch (err) {
       console.error("❌ Failed to send reply", err);
     }
   };
+  
 
   const handleLike = async (logId) => {
     try {
@@ -119,12 +125,14 @@ export default function AllReviewsPage() {
 
   const handleDelete = async (replyId) => {
     try {
-      await api.delete(`/api/replies/${replyId}`);
-      fetchReviews();
+      await api.delete(`/api/logs/replies/${replyId}`);
+      await fetchReviews(); // 🔥 re-fetch instead of mutating state
     } catch (err) {
-      console.error("❌ Failed to delete reply", err);
+      console.error("❌ Failed to delete reply:", err);
     }
   };
+  
+  
 
 
   return (
@@ -435,53 +443,60 @@ export default function AllReviewsPage() {
           })}
         </div>
 
-        {/* ❤️ Like + 3-dot */}
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <div
-            onClick={() => {
-              console.log("💗 Like MAIN REPLY:", reply._id);
-              handleLikeReply(review._id, reply._id);
-            }}
-            style={{ cursor: "pointer" }}
-          >
-            {isChildLiked ? (
-              <AiFillHeart size={16} color="#B327F6" />
-            ) : (
-              <AiOutlineHeart size={16} color="#888" />
-            )}
-          </div>
-          {replyUserId === userId && (
-            <div style={{ position: "relative" }}>
-              <HiDotsVertical
-                size={14}
-                onClick={() => setMenuOpenId(menuOpenId === reply._id ? null : reply._id)}
-                style={{ cursor: "pointer", color: "#888" }}
-              />
-              {menuOpenId === reply._id && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: 20,
-                    right: 0,
-                    background: "#222",
-                    borderRadius: 4,
-                    padding: "4px 8px",
-                    fontSize: 12,
-                    color: "#f55",
-                    cursor: "pointer",
-                    zIndex: 5
-                  }}
-                  onClick={() => {
-                    console.log("❌ Delete MAIN REPLY:", reply._id);
-                    handleDelete(reply._id);
-                  }}
-                >
-                  Delete
-                </div>
-              )}
-            </div>
-          )}
+{/* ❤️ Like + 3-dot */}
+<div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+  <div
+    onClick={() => {
+      console.log("💗 Like MAIN REPLY:", reply._id);
+      handleLikeReply(review._id, reply._id);
+    }}
+    style={{ cursor: "pointer" }}
+  >
+    {isChildLiked ? (
+      <AiFillHeart size={16} color="#B327F6" />
+    ) : (
+      <AiOutlineHeart size={16} color="#888" />
+    )}
+  </div>
+
+  {/* ✅ Add this right after the icon */}
+  <span style={{ fontSize: 13, color: "#aaa" }}>
+    {reply.likes?.length || 0}
+  </span>
+
+  {replyUserId === userId && (
+    <div style={{ position: "relative" }}>
+      <HiDotsVertical
+        size={14}
+        onClick={() => setMenuOpenId(menuOpenId === reply._id ? null : reply._id)}
+        style={{ cursor: "pointer", color: "#888" }}
+      />
+      {menuOpenId === reply._id && (
+        <div
+          style={{
+            position: "absolute",
+            top: 20,
+            right: 0,
+            background: "#222",
+            borderRadius: 4,
+            padding: "4px 8px",
+            fontSize: 12,
+            color: "#f55",
+            cursor: "pointer",
+            zIndex: 5
+          }}
+          onClick={() => {
+            console.log("❌ Delete MAIN REPLY:", reply._id);
+            handleDelete(reply._id);
+          }}
+        >
+          Delete
         </div>
+      )}
+    </div>
+  )}
+</div>
+
       </div>
     </div>
   );
