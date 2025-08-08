@@ -74,6 +74,7 @@ export default function SearchPage() {
     const apiKey = import.meta.env.VITE_TMDB_API_KEY;
   
     try {
+      // 🎬 Films Tab
       if (activeTab === "films") {
         const res = await fetch(`https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(q)}&api_key=${apiKey}`);
         const data = await res.json();
@@ -92,50 +93,51 @@ export default function SearchPage() {
           }));
           setPosterOverrides(overrides);
         }
-
-        if (activeTab === "users") {
-          const res = await fetch(`${backend}/api/users?query=${q}`);
-          setResults(await res.json());
-        
-        } else if (activeTab === "lists") {
-          console.log("📨 Searching Lists tab with query:", q);
-        
-          const user = JSON.parse(localStorage.getItem("user"));
-          const token = user?.token;
-        
-          if (!token) {
-            console.warn("⚠️ No token found in localStorage — user not logged in?");
-            return;
-          }
-        
-          try {
-            const url = `${backend}/api/lists/search?q=${encodeURIComponent(q)}`;
-            console.log("🌍 Sending fetch to:", url);
-        
-            const res = await fetch(url, {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
-        
-            const data = await res.json();
-            console.log("📦 List Search Result:", data);
-        
-            if (Array.isArray(data)) {
-              setResults(data);
-            } else {
-              console.error("❌ Unexpected list search response format:", data);
-              setResults([]);
-            }
-          } catch (error) {
-            console.error("🚨 Fetch failed for list search:", error);
+      }
+  
+      // 👤 Users Tab
+      else if (activeTab === "users") {
+        const res = await fetch(`${backend}/api/users?query=${q}`);
+        const users = await res.json();
+        console.log("👥 Users result:", users);
+        setResults(users);
+      }
+  
+      // 📝 Lists Tab
+      else if (activeTab === "lists") {
+        const user = JSON.parse(localStorage.getItem("user"));
+        const token = user?.token;
+  
+        if (!token) {
+          console.warn("⚠️ No token found in localStorage — user not logged in?");
+          return;
+        }
+  
+        try {
+          const url = `${backend}/api/lists/search?q=${encodeURIComponent(q)}`;
+          const res = await fetch(url, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+  
+          const data = await res.json();
+          console.log("📦 List Search Result:", data);
+  
+          if (Array.isArray(data)) {
+            setResults(data);
+          } else {
+            console.error("❌ Unexpected list search response format:", data);
             setResults([]);
           }
+        } catch (error) {
+          console.error("🚨 Fetch failed for list search:", error);
+          setResults([]);
         }
-        
+      }
   
-
-      } else if (activeTab === "actors" || activeTab === "directors") {
+      // 🎭 Actors or Directors Tab
+      else if (activeTab === "actors" || activeTab === "directors") {
         const res = await fetch(`https://api.themoviedb.org/3/search/person?query=${encodeURIComponent(q)}&api_key=${apiKey}`);
         const data = await res.json();
         const filtered = (data.results || []).filter((p) =>
@@ -145,11 +147,13 @@ export default function SearchPage() {
         );
         setResults(filtered);
       }
+  
     } catch (err) {
       console.error("Search error:", err);
       setResults([]);
     }
   };
+  
   
 
   useEffect(() => {

@@ -12,7 +12,7 @@ export default function SearchTabUsers({ results, onSearch, saveToRecentSearches
           key={user._id}
           onClick={() => {
             saveToRecentSearches(user.username, "users");
-            navigate(`/user/${user._id}`);
+            navigate(`/profile/${user._id}`);
           }}          
           style={{
             display: "flex",
