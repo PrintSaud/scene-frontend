@@ -53,6 +53,11 @@ function App() {
   const location = useLocation();
   const [hasUnreadCount, setHasUnreadCount] = useState(0);
 
+    // ✅ Kill frontend rendering for OG routes
+    if (location.pathname.startsWith("/og/")) {
+      return null;
+    }
+
   let user = null;
   try {
     const stored = localStorage.getItem('user');
