@@ -34,21 +34,18 @@ export default function CropListImageModal({ file, onClose, onCropComplete }) {
         zIndex: 9999,
       }}
     >
-      {/* Cropper */}
-      <div style={{ flex: 1, position: "relative" }}>
-        <Cropper
-          image={imageURL}
-          crop={crop}
-          zoom={zoom}
-          aspect={16 / 9} // ✅ RECTANGULAR CROP
-          onCropChange={setCrop}
-          onZoomChange={setZoom}
-          onCropComplete={handleCropComplete}
-        />
-      </div>
-
-      {/* Buttons */}
-      <div style={{ display: "flex", justifyContent: "space-between", padding: "16px" }}>
+      {/* Sticky Button Bar */}
+      <div
+        style={{
+          padding: "16px",
+          display: "flex",
+          justifyContent: "space-between",
+          backgroundColor: "#000", // match background
+          position: "sticky",
+          top: 0,
+          zIndex: 10,
+        }}
+      >
         <button
           onClick={onClose}
           style={{
@@ -63,7 +60,7 @@ export default function CropListImageModal({ file, onClose, onCropComplete }) {
         >
           Cancel
         </button>
-
+  
         <button
           onClick={handleDone}
           style={{
@@ -79,6 +76,19 @@ export default function CropListImageModal({ file, onClose, onCropComplete }) {
           Done
         </button>
       </div>
+  
+      {/* Cropper */}
+      <div style={{ flex: 1, position: "relative" }}>
+        <Cropper
+          image={imageURL}
+          crop={crop}
+          zoom={zoom}
+          aspect={16 / 9}
+          onCropChange={setCrop}
+          onZoomChange={setZoom}
+          onCropComplete={handleCropComplete}
+        />
+      </div>
     </div>
-  );
+  );  
 }
