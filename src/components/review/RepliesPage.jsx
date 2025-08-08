@@ -55,15 +55,11 @@ const { parentCommentId, parentUsername } = location.state || {};
 
   const fetchReplies = async () => {
     try {
-      const res = await api.get(`/api/logs/movie/${tmdbId}/popular?all=true`);
-      const allLogs = res.data;
-  
-      const currentLog = allLogs.find((log) => log._id === id);
-  
-      if (!currentLog) {
-        console.warn("🛑 Could not find log in popular reviews");
-        return;
-      }
+      const res = await api.get(`/api/logs/${id}`);
+setReplies((res.data.replies || []).sort(
+  (a, b) => (b.likes?.length || 0) - (a.likes?.length || 0)
+));
+
   
       const sorted = (currentLog.replies || []).sort(
         (a, b) => (b.likes?.length || 0) - (a.likes?.length || 0)
