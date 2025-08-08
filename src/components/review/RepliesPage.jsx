@@ -33,10 +33,14 @@ const getRelativeTime = (date) => {
 
 export default function RepliesPage() {
   const location = useLocation();
-const { parentCommentId, parentUsername } = location.state || {};
+  const { parentCommentId, parentUsername } = location.state || {};
   const { id } = useParams();  // ✅ keep only `id`
   const navigate = useNavigate();
   const [replies, setReplies] = useState([]);
+
+const topLevelReplies = replies.filter(r => !r.parentComment);
+const rootReplies = topLevelReplies.length > 0 ? topLevelReplies : replies;
+
   const [tmdbId, setTmdbId] = useState(null);
   const [input, setInput] = useState("");
   const [selectedGif, setSelectedGif] = useState("");
@@ -278,9 +282,7 @@ console.log("🧪 Top-level replies:", replies.filter(r => !r.parentComment));
 )}
 
 
-  {replies
-    .filter(r => !r.parentComment)
-    .map(parent => {
+{rootReplies.map(parent => {
       const isLikedByMeParent = parent.likes?.includes(userId);
       const childReplies = replies.filter(c => c.parentComment === parent._id);
 
