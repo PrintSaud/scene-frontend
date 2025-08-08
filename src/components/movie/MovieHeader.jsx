@@ -54,7 +54,7 @@ export default function MovieHeader({
             {movie.tagline && (
               <p
                 style={{
-                  fontSize: "13px",
+                  fontSize: "11px",
                   fontStyle: "italic",
                   color: "#aaa",
                   marginBottom: "4px",
