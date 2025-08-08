@@ -48,6 +48,7 @@ import ImportPage from "./pages/ImportPage";
 import LogModal from "./components/modals/LogModal";
 import ShareToFriendPage from "./pages/ShareToFriendPage";
 import MoreReviewsPage from "./pages/MoreReviewsPage"; // adjust path if needed
+import OgReviewPage from "./pages/OgReviewPage";
 
 function App() {
   const location = useLocation();
@@ -148,6 +149,7 @@ function App() {
           <Route path="/actor/:id" element={<ActorPage />} />
           <Route path="/person/:id" element={<PersonPage />} />
           <Route path="/upload-avatar" element={<UploadAvatarPage />} />
+          <Route path="/og/review/:id" element={<OgReviewPage />} />
           <Route path="/share-review/:id" element={<ShareReviewPage />} />
           <Route path="/review/:id/replies" element={<RepliesPage />} />
           <Route path="/import" element={<ImportPage />} />
