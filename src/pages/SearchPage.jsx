@@ -97,7 +97,7 @@ export default function SearchPage() {
   
       // 👤 Users Tab
       else if (activeTab === "users") {
-        const res = await fetch(`${backend}/api/users?query=${q}`);
+        const res = await fetch(`${backend}/api/users/search?query=${q}`);
         const users = await res.json();
         console.log("👥 Users result:", users);
         setResults(users);
