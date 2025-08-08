@@ -20,7 +20,7 @@ export default function ReviewHeader({
     const [showOptions, setShowOptions] = useState(false);
   
     const handleCopyLink = () => {
-      const ogLink = `${window.location.origin}/og/review/${review._id}`;
+      const ogLink = `${window.location.origin}/review/${review._id}`;
       navigator.clipboard.writeText(ogLink);
       toast.success("🔗 Link copied with preview!");
       setShowOptions(false);

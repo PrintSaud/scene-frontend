@@ -116,7 +116,7 @@ export default function ProfileHeader({
   </button>
  
   {menuOpen && (
-    <div
+  <div
     style={{
       position: "absolute",
       top: "30px",
@@ -125,48 +125,49 @@ export default function ProfileHeader({
       border: "1px solid #333",
       borderRadius: "12px",
       boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
-      height: "140px",
       padding: "12px 0",
       width: "190px",
+      zIndex: 9999,
     }}
   >
-      {(isOwner
-        ? [
-            { label: "✏️ Edit Profile", onClick: () => navigate("/edit-profile") },
-            { label: "📤 Share", onClick: handleShare },
-            { label: "🚪 Log Out", onClick: handleLogout },
-          ]
-        : [
-            { label: "📤 Share", onClick: handleShare },
-            ...(currentUser.followers?.includes(user._id)
-              ? [{ label: "❌ Remove Follower", onClick: handleRemoveFollower }]
-              : []),
-          ]
-      ).map((item, i) => (
-        <div
-          key={i}
-          onClick={() => {
-            item.onClick();
-            setMenuOpen(false);
-          }}
-          style={{
-            padding: "10px 16px",
-            cursor: "pointer",
-            fontSize: "14.5px",
-            fontWeight: "500",
-            color: "#fff",
-            fontFamily: "Inter",
-            transition: "0.2s",
-            whiteSpace: "nowrap",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.background = "#2a2a2a")}
-          onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-        >
-          {item.label}
-        </div>
-      ))}
-    </div>
-  )}
+    {(isOwner
+      ? [
+          { label: "✏️ Edit Profile", onClick: () => navigate("/edit-profile") },
+          { label: "📤 Share", onClick: handleShare },
+          { label: "🚪 Log Out", onClick: handleLogout },
+        ]
+      : [
+          { label: "📤 Share", onClick: handleShare },
+          ...(user.followers?.includes(currentUser._id)
+            ? [{ label: "❌ Remove Follower", onClick: handleRemoveFollower }]
+            : []),
+        ]
+    ).map((item, i) => (
+      <div
+        key={i}
+        onClick={() => {
+          item.onClick();
+          setMenuOpen(false);
+        }}
+        style={{
+          padding: "10px 16px",
+          cursor: "pointer",
+          fontSize: "14.5px",
+          fontWeight: "500",
+          color: "#fff",
+          fontFamily: "Inter",
+          transition: "0.2s",
+          whiteSpace: "nowrap",
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.background = "#2a2a2a")}
+        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+      >
+        {item.label}
+      </div>
+    ))}
+  </div>
+)}
+
 </div>
 
 
