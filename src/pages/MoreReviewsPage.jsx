@@ -495,9 +495,9 @@ export default function AllReviewsPage() {
             zIndex: 5
           }}
           onClick={() => {
-            console.log("❌ Delete MAIN REPLY:", reply._id);
-            handleDelete(child._id, review._id); 
-          }}
+            console.log("❌ Delete MAIN REPLY:", reply._id); // ✅
+            handleDelete(reply._id, review._id);             // ✅ use 'reply', not 'child'
+          }}          
         >
           Delete
         </div>
