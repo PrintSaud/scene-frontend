@@ -279,10 +279,11 @@ export default function AllReviewsPage() {
 
 
   console.log("🧪 REPLY USER FIELDS:", {
-    replyUserId: reply.user?._id,
-    replyUsername: reply.user?.username,
-    replyAvatar: reply.user?.avatar
+    replyUserId,
+    replyUsername,
+    replyAvatar
   });
+  
   
 
   return (
