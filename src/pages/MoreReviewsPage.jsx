@@ -95,9 +95,7 @@ export default function AllReviewsPage() {
       setSelectedImage("");
       setReplyingTo(null);
       setActiveReviewId(null);
-  
-      // ✅ Trigger reload
-      navigate(`/review/${activeReviewId}`, { state: { refreshAfterReply: true } });
+
   
       // ✅ Toast!
       toast.success("Reply sent 🎉");

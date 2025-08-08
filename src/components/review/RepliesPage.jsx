@@ -50,6 +50,8 @@ const { parentCommentId, parentUsername } = location.state || {};
   const inputRef = useRef(null);
   const [menuOpenId, setMenuOpenId] = useState(null);
   const [parentComment, setParentComment] = useState(null);
+  const [log, setLog] = useState(null); // ✅ Save full log object
+
 
   const fetchReplies = async () => {
     try {
@@ -77,7 +79,9 @@ const { parentCommentId, parentUsername } = location.state || {};
     const fetchLog = async () => {
       try {
         const res = await api.get(`/api/logs/${id}`);
-        setTmdbId(res.data.tmdbId); // ✅ Set the tmdbId
+        const fullLog = res.data;
+        setTmdbId(fullLog.tmdbId); // ✅ Save TMDB ID
+        setLog(fullLog);            // ✅ Save log object
       } catch (err) {
         console.error("❌ Failed to fetch log", err);
       }
@@ -85,6 +89,7 @@ const { parentCommentId, parentUsername } = location.state || {};
   
     fetchLog();
   }, [id]);
+  
   
   
 
