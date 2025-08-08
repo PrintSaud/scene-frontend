@@ -9,6 +9,7 @@ import { addLogReply, likeReply, getRepliesForLog, deleteReply } from "../../api
 import GifSearchModal from "../GifSearchModal";
 import { HiDotsVertical } from "react-icons/hi";
 import { useLocation } from "react-router-dom";
+import api from "../../api/api"; // ✅ fix relative path
 
 
 

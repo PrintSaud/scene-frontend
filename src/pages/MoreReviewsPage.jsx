@@ -123,14 +123,19 @@ export default function AllReviewsPage() {
     }
   };
 
-  const handleDelete = async (replyId) => {
+  const handleDelete = async (replyId, logId) => {
     try {
-      await api.delete(`/api/logs/replies/${replyId}`);
-      await fetchReviews(); // 🔥 re-fetch instead of mutating state
+      await api.delete(`/api/logs/${logId}/replies/${replyId}`, {
+        headers: {
+          Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))?.token}`,
+        },
+      });
+      await fetchReviews(); // 🔁 refresh to show updated replies
     } catch (err) {
       console.error("❌ Failed to delete reply:", err);
     }
   };
+  
   
   
 
