@@ -39,6 +39,7 @@ const { parentCommentId, parentUsername } = location.state || {};
   const { id } = useParams();  // ✅ keep only `id`
   const navigate = useNavigate();
   const [replies, setReplies] = useState([]);
+  const [tmdbId, setTmdbId] = useState(null);
   const [input, setInput] = useState("");
   const [selectedGif, setSelectedGif] = useState("");
   const [showGifModal, setShowGifModal] = useState(false); // ✅ 2️⃣ Manage modal visibility
@@ -52,16 +53,39 @@ const { parentCommentId, parentUsername } = location.state || {};
 
   const fetchReplies = async () => {
     try {
-      const res = await api.get(`/api/logs/${id}`);
-      const data = res.data; // full log object
-      const sorted = (data.replies || []).sort(
+      const res = await api.get(`/api/logs/movie/${tmdbId}/popular?all=true`);
+      const allLogs = res.data;
+  
+      const currentLog = allLogs.find((log) => log._id === id);
+  
+      if (!currentLog) {
+        console.warn("🛑 Could not find log in popular reviews");
+        return;
+      }
+  
+      const sorted = (currentLog.replies || []).sort(
         (a, b) => (b.likes?.length || 0) - (a.likes?.length || 0)
       );
+  
       setReplies(sorted);
     } catch (err) {
-      console.error("Failed to load replies", err);
+      console.error("❌ Failed to load replies", err);
     }
   };
+
+  useEffect(() => {
+    const fetchLog = async () => {
+      try {
+        const res = await api.get(`/api/logs/${id}`);
+        setTmdbId(res.data.tmdbId); // ✅ Set the tmdbId
+      } catch (err) {
+        console.error("❌ Failed to fetch log", err);
+      }
+    };
+  
+    fetchLog();
+  }, [id]);
+  
   
 
   const handleReplyLike = async (replyId) => {
@@ -166,8 +190,11 @@ const { parentCommentId, parentUsername } = location.state || {};
   
   
   useEffect(() => {
-    fetchReplies();
-  }, [id]);
+    if (tmdbId) {
+      fetchReplies();
+    }
+  }, [tmdbId]);
+  ;
 
   return (
     <div
