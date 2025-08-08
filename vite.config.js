@@ -19,5 +19,12 @@ export default defineConfig({
       'scenesa.com',
       'www.scenesa.com',
     ],
-  },  
+  },
+  build: {
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
+      },
+    },
+  },
 });
