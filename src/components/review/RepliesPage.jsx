@@ -194,7 +194,6 @@ const { parentCommentId, parentUsername } = location.state || {};
       fetchReplies();
     }
   }, [tmdbId]);
-  ;
 
   return (
     <div
