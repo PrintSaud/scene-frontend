@@ -12,7 +12,8 @@ import { useLocation } from "react-router-dom";
 import api from "../../api/api"; // ✅ fix relative path
 import toast from "react-hot-toast";
 
-
+console.log("🧪 All replies:", replies);
+console.log("🧪 Top-level replies:", replies.filter(r => !r.parentComment));
 
 const getRelativeTime = (date) => {
   const now = Date.now();
@@ -55,15 +56,22 @@ const { parentCommentId, parentUsername } = location.state || {};
 
   const fetchReplies = async () => {
     try {
+      console.log("🧪 Fetching log for replies…", id);
       const res = await api.get(`/api/logs/${id}`);
-      const repliesSorted = (res.data.replies || []).sort(
+      console.log("📦 Full log response:", res.data);
+  
+      const replies = res.data.replies || [];
+      console.log("💬 Replies found:", replies);
+  
+      const sorted = replies.sort(
         (a, b) => (b.likes?.length || 0) - (a.likes?.length || 0)
       );
-      setReplies(repliesSorted);
+      setReplies(sorted);
     } catch (err) {
       console.error("❌ Failed to load replies", err);
     }
   };
+  
   
 
   useEffect(() => {
@@ -189,6 +197,7 @@ const { parentCommentId, parentUsername } = location.state || {};
     fetchReplies();
   }, [id]);
   
+  
 
   return (
     <div
@@ -257,15 +266,18 @@ const { parentCommentId, parentUsername } = location.state || {};
           backgroundColor: "#333",
           opacity: 0.6,
         }}
-      ></div>
+      ></div>     
+
+
 
 {/* Replies list */}
 <div ref={listRef} style={{ padding: "72px 16px 0 16px", fontFamily: "Inter, sans-serif" }}>
-  {replies.length === 0 && (
-    <div style={{ textAlign: "center", marginTop: 40, color: "#888", fontSize: 14 }}>
-      No comments yet. Be the first to reply!
-    </div>
-  )}
+{replies.filter(r => !r.parentComment).length === 0 && (
+  <div style={{ textAlign: "center", marginTop: 40, color: "#888", fontSize: 14 }}>
+    No comments yet. Be the first to reply!
+  </div>
+)}
+
 
   {replies
     .filter(r => !r.parentComment)
