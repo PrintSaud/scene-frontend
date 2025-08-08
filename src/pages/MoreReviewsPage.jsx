@@ -129,24 +129,20 @@ export default function AllReviewsPage() {
   };
 
   const handleDelete = async (replyId, logId) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this reply?");
-    if (!confirmDelete) return;
-  
     try {
       await api.delete(`/api/logs/${logId}/replies/${replyId}`, {
         headers: {
           Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))?.token}`,
         },
       });
-  
-      await fetchReviews(); // 🔁 refresh list
-      toast.success("Reply deleted 🗑️");
-      
+      await fetchReviews(); // 🔁 refresh
+      toast.success("Reply deleted");
     } catch (err) {
       console.error("❌ Failed to delete reply:", err);
-      toast.error("Failed to delete reply ❌");
+      toast.error("Failed to delete reply");
     }
   };
+  
   
   return (
     <div style={{ padding: "16px 12px", paddingBottom: 80 }}>
@@ -441,7 +437,7 @@ export default function AllReviewsPage() {
                             }}
                             onClick={() => {
                               console.log("❌ Delete CHILD:", child._id);
-                              handleDelete(child._id);
+                              handleDelete(child._id, review._id); 
                             }}
                           >
                             Delete
