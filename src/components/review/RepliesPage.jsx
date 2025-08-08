@@ -275,71 +275,94 @@ console.log("🧪 Top-level replies:", replies.filter(r => !r.parentComment));
 
 {/* Replies list */}
 <div ref={listRef} style={{ padding: "72px 16px 0 16px", fontFamily: "Inter, sans-serif" }}>
-{replies.filter(r => !r.parentComment).length === 0 && (
-  <div style={{ textAlign: "center", marginTop: 40, color: "#888", fontSize: 14 }}>
-    No comments yet. Be the first to reply!
-  </div>
-)}
+  {rootReplies.length === 0 && (
+    <div style={{ textAlign: "center", marginTop: 40, color: "#888", fontSize: 14 }}>
+      No comments yet. Be the first to reply!
+    </div>
+  )}
 
+  {rootReplies.map(parent => {
+    const isLikedByMeParent = parent.likes?.includes(userId);
+    const childReplies = replies.filter(c => c.parentComment === parent._id);
 
-{rootReplies.map(parent => {
-      const isLikedByMeParent = parent.likes?.includes(userId);
-      const childReplies = replies.filter(c => c.parentComment === parent._id);
-
-      return (
-        <div key={parent._id} style={{ marginBottom: 16 }}>
-          {/* Parent comment */}
-          <div
-            style={{
-              backgroundColor: parent._id === parentCommentId ? "#1e1e1e" : "transparent",
-              borderRadius: 8,
-              padding: "8px 12px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <img
-                src={parent.avatar || "/default-avatar.jpg"}
-                alt="avatar"
-                style={{ width: 30, height: 30, borderRadius: "50%", cursor: "pointer" }}
-                onClick={() => navigate(`/profile/${parent.userId}`)}
-              />
-              <div style={{ flex: 1 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <strong
-                    style={{ fontSize: 14, color: "#ddd", cursor: "pointer" }}
-                    onClick={() => navigate(`/profile/${parent.userId}`)}
-                  >
-                    @{parent.username || "Unknown"}
-                  </strong>
-                  <span style={{ fontSize: 10, color: "#888" }}>{getRelativeTime(parent.createdAt)}</span>
-                </div>
-                <span style={{ fontSize: 14, color: "#ddd", marginTop: 2, display: "block" }}>{parent.text}</span>
-                {parent.ratingForThisMovie && (
-                  <div style={{ marginTop: 4 }}>
-                    <StarRating rating={parent.ratingForThisMovie} size={12} />
-                  </div>
-                )}
-                {parent.gif && <img src={parent.gif} alt="gif" style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }} />}
-                {parent.image && <img src={parent.image} alt="img" style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }} />}
-
-                <button
-                  onClick={() => navigate(`/replies/${id}`, {
-                    state: { parentCommentId: parent._id, parentUsername: parent.username }
-                  })}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "#888",
-                    fontSize: 13,
-                    cursor: "pointer",
-                    padding: 0,
-                    marginTop: 4,
-                    textAlign: "left",
-                  }}
+    return (
+      <div key={parent._id} style={{ marginBottom: 16 }}>
+        {/* Parent comment */}
+        <div
+          style={{
+            backgroundColor: parent._id === parentCommentId ? "#1e1e1e" : "transparent",
+            borderRadius: 8,
+            padding: "8px 12px",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <img
+              src={parent.avatar || "/default-avatar.jpg"}
+              alt="avatar"
+              style={{ width: 30, height: 30, borderRadius: "50%", cursor: "pointer" }}
+              onClick={() => navigate(`/profile/${parent.userId}`)}
+            />
+            <div style={{ flex: 1 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                <strong
+                  style={{ fontSize: 14, color: "#ddd", cursor: "pointer" }}
+                  onClick={() => navigate(`/profile/${parent.userId}`)}
                 >
-                  Reply
-                </button>
+                  @{parent.username || "Unknown"}
+                </strong>
+
+                {/* ⭐ Star rating right next to username */}
+                {parent.ratingForThisMovie && (
+                  <StarRating rating={parent.ratingForThisMovie} size={14} />
+                )}
+
+                <span style={{ fontSize: 10, color: "#888" }}>
+                  {getRelativeTime(parent.createdAt)}
+                </span>
               </div>
+
+              {/* 💬 Comment text */}
+              <span style={{ fontSize: 14, color: "#ddd", marginTop: 2, display: "block" }}>
+                {parent.text}
+              </span>
+
+              {/* 🎞️ Media attachments */}
+              {parent.gif && (
+                <img
+                  src={parent.gif}
+                  alt="gif"
+                  style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }}
+                />
+              )}
+              {parent.image && (
+                <img
+                  src={parent.image}
+                  alt="img"
+                  style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }}
+                />
+              )}
+
+              {/* 🗨️ Reply button */}
+              <button
+                onClick={() =>
+                  navigate(`/replies/${id}`, {
+                    state: { parentCommentId: parent._id, parentUsername: parent.username },
+                  })
+                }
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "#888",
+                  fontSize: 13,
+                  cursor: "pointer",
+                  padding: 0,
+                  marginTop: 4,
+                  textAlign: "left",
+                }}
+              >
+                Reply
+              </button>
+            </div>
 
               {/* Like + 3-dots for parent */}
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
