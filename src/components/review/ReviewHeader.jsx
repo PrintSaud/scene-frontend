@@ -30,11 +30,12 @@ export default function ReviewHeader({
     const TMDB_IMG = "https://image.tmdb.org/t/p/original";
     const fallbackImage = "https://scenesa.com/scene-og-review-fallback.png";
     
-    const backdrop =
-      review.customBackdrop ||
-      (review.reviewBackdrop ? `${TMDB_IMG}${review.reviewBackdrop}` : "") ||
-      (review.movie?.backdrop_path ? `${TMDB_IMG}${review.movie.backdrop_path}` : "") ||
-      fallbackImage;
+    const backdropUrl =
+    review.customBackdrop ||
+    (review.reviewBackdrop ? `${TMDB_IMG}${review.reviewBackdrop}` : "") ||
+    (review.movie?.backdrop_path ? `${TMDB_IMG}${review.movie.backdrop_path}` : "") ||
+    fallbackImage;
+  
     
     
 
