@@ -56,20 +56,15 @@ const { parentCommentId, parentUsername } = location.state || {};
   const fetchReplies = async () => {
     try {
       const res = await api.get(`/api/logs/${id}`);
-setReplies((res.data.replies || []).sort(
-  (a, b) => (b.likes?.length || 0) - (a.likes?.length || 0)
-));
-
-  
-      const sorted = (currentLog.replies || []).sort(
+      const repliesSorted = (res.data.replies || []).sort(
         (a, b) => (b.likes?.length || 0) - (a.likes?.length || 0)
       );
-  
-      setReplies(sorted);
+      setReplies(repliesSorted);
     } catch (err) {
       console.error("❌ Failed to load replies", err);
     }
   };
+  
 
   useEffect(() => {
     const fetchLog = async () => {
@@ -191,10 +186,9 @@ setReplies((res.data.replies || []).sort(
   
   
   useEffect(() => {
-    if (tmdbId) {
-      fetchReplies();
-    }
-  }, [tmdbId]);
+    fetchReplies();
+  }, [id]);
+  
 
   return (
     <div
