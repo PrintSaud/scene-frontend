@@ -12,9 +12,6 @@ import { useLocation } from "react-router-dom";
 import api from "../../api/api"; // ✅ fix relative path
 import toast from "react-hot-toast";
 
-console.log("🧪 All replies:", replies);
-console.log("🧪 Top-level replies:", replies.filter(r => !r.parentComment));
-
 const getRelativeTime = (date) => {
   const now = Date.now();
   const then = new Date(date).getTime();
@@ -197,7 +194,9 @@ const { parentCommentId, parentUsername } = location.state || {};
     fetchReplies();
   }, [id]);
   
-  
+  console.log("🧪 All replies:", replies);
+console.log("🧪 Top-level replies:", replies.filter(r => !r.parentComment));
+
 
   return (
     <div
