@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL || "https://scene-backend-production.up.railway.app",
+  baseURL: import.meta.env.VITE_BACKEND_URL || "https://backend.scenesa.com",
   
   withCredentials: true,
 });
