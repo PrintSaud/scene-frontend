@@ -10,6 +10,7 @@ import GifSearchModal from "../GifSearchModal";
 import { HiDotsVertical } from "react-icons/hi";
 import { useLocation } from "react-router-dom";
 import api from "../../api/api"; // ✅ fix relative path
+import toast from "react-hot-toast";
 
 
 
@@ -95,10 +96,10 @@ const { parentCommentId, parentUsername } = location.state || {};
     if (!input.trim() && !selectedGif && !selectedImage) return;
   
     const formData = new FormData();
-    formData.append('text', input || '');
-    if (selectedGif) formData.append('gif', selectedGif);
-    if (selectedImage) formData.append('externalImage', selectedImage);
-    if (parentCommentId) formData.append('parentComment', parentCommentId);
+    formData.append("text", input || "");
+    if (selectedGif) formData.append("gif", selectedGif);
+    if (selectedImage) formData.append("externalImage", selectedImage);
+    if (parentCommentId) formData.append("parentComment", parentCommentId);
   
     try {
       await addLogReply(id, formData);
@@ -107,24 +108,36 @@ const { parentCommentId, parentUsername } = location.state || {};
       setSelectedImage("");
       fetchReplies();
       inputRef.current?.focus();
+  
       setTimeout(() => {
-        listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
+        listRef.current?.scrollTo({
+          top: listRef.current.scrollHeight,
+          behavior: "smooth",
+        });
       }, 100);
+  
+      toast.success("Reply sent");
     } catch (err) {
       console.error("❌ Failed to send reply", err);
+      toast.error("Failed to send reply");
     }
   };
+  
 
   const handleDelete = async (replyId) => {
     const confirmDelete = window.confirm("Delete this reply?");
     if (!confirmDelete) return;
+  
     try {
-      await deleteReply(id, replyId);
-      fetchReplies(); // Refresh after deletion
+      await deleteReply(id, replyId); // `id` = logId
+      fetchReplies(); // 🔄 Refresh the replies
+      toast.success("Reply deleted");
     } catch (err) {
       console.error("Failed to delete reply", err);
+      toast.error("Failed to delete reply");
     }
   };
+  
   
 
   const handlePickImage = () => {

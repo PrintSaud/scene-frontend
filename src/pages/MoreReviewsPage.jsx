@@ -496,7 +496,7 @@ export default function AllReviewsPage() {
           }}
           onClick={() => {
             console.log("❌ Delete MAIN REPLY:", reply._id);
-            handleDelete(reply._id);
+            handleDelete(child._id, review._id); 
           }}
         >
           Delete
@@ -505,7 +505,6 @@ export default function AllReviewsPage() {
     </div>
   )}
 </div>
-
       </div>
     </div>
   );
