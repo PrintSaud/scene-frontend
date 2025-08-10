@@ -77,20 +77,36 @@ export default function ProfilePage() {
 
 
   useEffect(() => {
-    if (!logs.length || !user) return;
+    if (!Array.isArray(logs) || !user) return;
   
     const fetchCustomPosters = async () => {
-      const userId = user._id; // ✅ Use the profile owner's ID
+      const userId = user._id;
   
-      const logIds = logs.map((log) => Number(log.tmdbId)).filter(Boolean);
-      const favIds = (user.favoriteFilms || []).map(
-        (m) => Number(m.tmdbId || m.id || m._id)
-      ).filter(Boolean);
+      // helper: robust tmdb id extraction
+      const getId = (obj) => {
+        if (!obj) return null;
+        // if it's a number already
+        if (typeof obj === "number") return obj;
+        // if it's a string number
+        if (typeof obj === "string" && /^\d+$/.test(obj)) return Number(obj);
+        // object fields (use optional chaining)
+        return Number(obj?.tmdbId ?? obj?.id ?? obj?._id) || null;
+      };
+  
+      const logIds = (logs || [])
+        .filter(Boolean)
+        .map((log) => getId(log?.tmdbId ?? log))
+        .filter((v) => Number.isFinite(v));
+  
+      const favIds = (user?.favoriteFilms || [])
+        .filter(Boolean) // <-- avoids nulls
+        .map((m) => getId(m))
+        .filter((v) => Number.isFinite(v));
   
       const movieIds = [...new Set([...logIds, ...favIds])];
   
-      if (!movieIds.length || !userId) {
-        console.warn("⚠️ Missing userId or valid movieIds for custom posters");
+      if (!userId || movieIds.length === 0) {
+        console.warn("⚠️ Missing userId or valid movieIds for custom posters", { userId, movieIds });
         return;
       }
   
@@ -103,7 +119,8 @@ export default function ProfilePage() {
     };
   
     fetchCustomPosters();
-  }, [logs, user]); // ✅ Removed `id` dependency to avoid confusion
+  }, [logs, user]); // keep as you had it
+  
   
   useEffect(() => {
     if (!logs.length || !user) return;
@@ -239,7 +256,7 @@ export default function ProfilePage() {
   <ProfileTabProfile
     user={user}
     logs={logs}
-    favoriteMovies={user.favoriteFilms || []}
+    favoriteMovies={user?.favoriteFilms} 
     profileUserId={user._id}
     customPosters={customPosters}
   />
@@ -282,9 +299,9 @@ export default function ProfilePage() {
 {activeTab === "Films" && (
   <ProfileTabFilms
   logs={logs}
-  favorites={user.favoriteFilms || []}
-  profileUserId={id}
-  posters={resolvedPosters} // ✅ pass this instead of raw customPosters
+  favorites={user?.favorites}
+  profileUserId={user?._id}
+  customPosters={customPosters}
 />
 )}
 
