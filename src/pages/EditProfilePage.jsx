@@ -65,6 +65,9 @@ export default function EditProfilePage() {
 const [showCropper, setShowCropper] = useState(false);
 const [avatarFile, setAvatarFile] = useState(null);
 
+const [isDeleting, setIsDeleting] = useState(false);
+
+
 
   useEffect(() => {
     if (user) {
@@ -389,36 +392,44 @@ const [avatarFile, setAvatarFile] = useState(null);
             </details>
           </div>
 
-          {/* Delete My Account */}
-          <div style={{ marginTop: "40px", textAlign: "center" }}>
-            <button
-              style={{
-                background: "transparent",
-                border: "1px solid red",
-                color: "red",
-                padding: "10px 20px",
-                borderRadius: "8px",
-                fontSize: "14px",
-                cursor: "pointer",
-              }}
-              onClick={async () => {
-                if (!window.confirm("⚠️ Are you sure you want to delete your account? This cannot be undone.")) return;
+{/* Delete My Account */}
+<div style={{ marginTop: "40px", textAlign: "center" }}>
+  <button
+    style={{
+      background: "transparent",
+      border: "1px solid red",
+      color: "red",
+      padding: "10px 20px",
+      borderRadius: "8px",
+      fontSize: "14px",
+      cursor: isDeleting ? "not-allowed" : "pointer",
+      opacity: isDeleting ? 0.6 : 1,
+    }}
+    disabled={isDeleting}
+    onClick={async () => {
+      if (!window.confirm("⚠️ Are you sure you want to delete your account? This cannot be undone.")) return;
 
-                try {
-                  await axios.delete(`/api/users/${user._id}`);
+      try {
+        setIsDeleting(true);
+        await axios.delete(`/api/auth/account`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-                  localStorage.clear();
-                  toast.success("🗑️ Account deleted.");
-                  navigate("/login");
-                } catch (err) {
-                  toast.error("Failed to delete account.");
-                  console.error(err);
-                }
-              }}
-            >
-              Delete My Account
-            </button>
-          </div>
+        localStorage.clear();
+        toast.success("🗑️ Account deleted.");
+        navigate("/signup");
+      } catch (err) {
+        toast.error(err?.response?.data?.error || "Failed to delete account.");
+        console.error("delete account error:", err);
+      } finally {
+        setIsDeleting(false);
+      }
+    }}
+  >
+    {isDeleting ? "Deleting…" : "Delete My Account"}
+  </button>
+</div>
+
         </div>
       </div>
 
