@@ -93,14 +93,14 @@ export default function LoginPage() {
         </button>
       </form>
 
-      <div className="or-separator">or</div>
 
-      <div className="signup-row">
-        <span>Don’t have an account?</span>
-        <a href="/signup" className="signup-link">
-          Sign up
-        </a>
-      </div>
+      <div className="signup-row" style={{ marginTop: "15px" }}>
+  <span>Don’t have an account?</span>
+  <a href="/signup" className="signup-link">
+    Sign up
+  </a>
+</div>
+
     </div>
   );
 }
