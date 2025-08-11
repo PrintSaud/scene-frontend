@@ -49,10 +49,10 @@ export default function LoginPage() {
       <h1 className="scene-logo">
         Scene <span className="popcorn">🎭</span>
       </h1>
-      <p className="welcome-text">Welcome back! We missed you 🎬</p>
+      <p className="welcome-text">Welcome back! We missed you!</p>
 
       {error && (
-        <p style={{ color: "#ff4d4d", fontSize: "0.65rem", marginBottom: "10px", textAlign: "center", }}>
+        <p style={{ color: "#ff4d4d", fontSize: "0.15rem", marginBottom: "10px", textAlign: "center", }}>
           {error}
         </p>
       )}
