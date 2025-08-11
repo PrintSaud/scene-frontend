@@ -95,45 +95,6 @@ export default function LoginPage() {
 
       <div className="or-separator">or</div>
 
-      <div className="google-login">
-        <GoogleLogin
-          onSuccess={async (credentialResponse) => {
-            try {
-              const { data } = await axios.post(`/api/auth/google`, {
-                credential: credentialResponse.credential,
-              });
-              
-              console.log("✅ Google login response:", data);
-
-              if (!data.token || !data.user) {
-                console.error("❌ Missing token or user in response");
-                toast.error("Google login failed. Please try again.");
-                return;
-              }
-
-              const mergedUser = {
-                ...data.user,
-                _id: data.user._id,
-                token: data.token,
-              };
-
-              localStorage.setItem("user", JSON.stringify(mergedUser));
-              localStorage.setItem("token", data.token);
-              toast.success("Logged in with Google!");
-              window.location.href = "/home";
-            } catch (err) {
-              console.error("❌ Google login error:", err);
-              toast.error("Something went wrong with Google login.");
-            }
-          }}
-          onError={() => {
-            console.log("Google login failed");
-            toast.error("Google sign-in failed.");
-          }}
-          width="280"
-        />
-      </div>
-
       <div className="signup-row">
         <span>Don’t have an account?</span>
         <a href="/signup" className="signup-link">
