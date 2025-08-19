@@ -373,7 +373,7 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
                   >
                     <StarRating rating={log.rating} size={12} />
                      {hasReview && <FaRegComment size={9} style={{ position: "relative", top: "-1.5px" }} />}
-                    {log.rewatchCount > 0 && <HiOutlineRefresh size={11} style={{ position: "relative", top: "-0.5px" }} />}
+                    {log.rewatchCount > 0 && <HiOutlineRefresh size={11} style={{ position: "relative", top: "-1.5px" }} />}
                   </div>
                 </div>
               );

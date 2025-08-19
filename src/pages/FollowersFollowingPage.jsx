@@ -48,7 +48,15 @@ export default function FollowersFollowingPage() {
   };
 
   return (
-    <div style={{ background: "#000", minHeight: "100vh", padding: "24px", color: "#fff" }}>
+    <div
+  style={{
+    background: "#000",
+    minHeight: "100vh",
+    padding: "24px",
+    paddingBottom: "120px", // 👈 extra breathing room at bottom
+    color: "#fff",
+  }}
+>
       {/* Back + title */}
       <div style={{ position: "relative", marginBottom: "20px", height: "24px" }}>
         <button

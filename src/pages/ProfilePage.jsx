@@ -246,6 +246,7 @@ export default function ProfilePage() {
   isOwner={isOwner}
   isFollowing={isFollowing}
   handleFollow={handleFollow}
+  handleRemoveFollower={handleRemoveFollower}  // ✅ now wired
 />
 
 
