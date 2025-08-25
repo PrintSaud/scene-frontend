@@ -202,7 +202,7 @@ export default function ProfileTabProfile({
     <div
       style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))", // ✅ responsive like Home
+        gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))", // ✅ responsive like Home
         gap: "16px",
         justifyItems: "center", // ✅ center each card
         marginTop: "12px",

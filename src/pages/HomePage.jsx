@@ -287,7 +287,7 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
                   className="scroll-section"
                   style={{
                     display: "grid",
-                    gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))", // ✅ responsive grid
+                    gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))", // ✅ responsive grid
                     gap: "16px", // ✅ spacing
                     justifyItems: "center", // ✅ center cards
                   }}
