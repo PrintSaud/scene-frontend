@@ -19,23 +19,25 @@ export function isQueryBanned(query) {
 }
 
 export default function filterMovies(movies) {
-  return movies.filter((movie) => {
-    const isBlocked = blockedIds.includes(Number(movie.id));  // ✅ FIXED HERE
-    const isLowRatedJapanese = movie.original_language === "ja" && movie.vote_count < 2500;
-    const indianLangs = ["hi", "ta", "te", "ml", "kn", "bn", "pa", "ur"];
-    const isIndian = indianLangs.includes(movie.original_language);
-    const otherLangs = ["zh", "fr", "de", "ru", "ko"];
-    const isArabic = movie.original_language === "ar";
-    const isForeignLowRated = !isArabic && otherLangs.includes(movie.original_language) && movie.vote_count < 5000;
+  const indianLangs = ["hi", "ta", "te", "ml", "kn", "bn", "pa", "ur"];
+  const otherLangs = ["zh", "fr", "de", "ru", "ko"];
 
-    return (
-      movie.vote_count > 10 &&
-      movie.poster_path &&
-      !movie.adult &&
-      !isBlocked &&
-      !isLowRatedJapanese &&
-      !isIndian &&
-      !isForeignLowRated
-    );
+  return movies.filter((movie) => {
+    const isBlocked = blockedIds.includes(Number(movie.id));
+    const isArabic = movie.original_language === "ar";
+    const isSaudi = movie.origin_country?.includes("SA");
+    const isIndian = indianLangs.includes(movie.original_language);
+    const isForeignLowRated = otherLangs.includes(movie.original_language) && movie.vote_count < 2000;
+
+    // ✅ Always allow Saudi/Arabic films
+    if (isArabic || isSaudi) return !isBlocked && movie.poster_path;
+
+    // ✅ Rules for others
+    if (isBlocked || !movie.poster_path || movie.adult) return false;
+    if (isIndian && movie.vote_count < 50000) return false;
+    if (isForeignLowRated) return false;
+    if (movie.vote_count <= 10) return false;
+
+    return true;
   });
 }
