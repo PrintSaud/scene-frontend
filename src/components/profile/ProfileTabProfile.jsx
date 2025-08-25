@@ -178,119 +178,134 @@ export default function ProfileTabProfile({
         <p style={{ color: "#888", marginTop: "20px" }}>No favorite movies yet.</p>
       )}
 
-      {/* 🕒 Recent Activity */}
-      {(recentlyWatched?.length || 0) > 0 ? (
-        <div style={{ marginTop: "12px" }}>
+{/* 🕒 Recent Activity */}
+{(recentlyWatched?.length || 0) > 0 ? (
+  <div style={{ marginTop: "12px" }}>
+    <div
+      style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
+    >
+      <h3 style={{ fontSize: "12px", fontWeight: "600" }}>Recent Activities</h3>
+      <button
+        onClick={() => window.dispatchEvent(new CustomEvent("navigateToFilms"))}
+        style={{
+          background: "none",
+          border: "none",
+          color: "#ccc",
+          fontSize: "13px",
+          cursor: "pointer",
+        }}
+      >
+        More →
+      </button>
+    </div>
+
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))", // ✅ responsive like Home
+        gap: "16px",
+        justifyItems: "center", // ✅ center each card
+        marginTop: "12px",
+      }}
+    >
+      {recentlyWatched.map((log) => {
+        const id = toTmdbId(log?.tmdbId ?? log?.movie ?? log?.movieId ?? log?.movie?.id);
+        if (!id) return null;
+
+        const posterUrl = resolvePoster({
+          id,
+          tmdbPosters,
+          customPosters,
+          raw: log?.movie,
+        });
+
+        const hasReview = !!(log?.review && log.review.trim().length > 0);
+
+        const logDate = new Date(log?.createdAt || log?.watchedAt || Date.now());
+        const sevenDaysAgo = subDays(new Date(), 7);
+        const timestamp = isBefore(logDate, sevenDaysAgo)
+          ? logDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+          : formatDistanceToNowStrict(logDate, { addSuffix: true });
+
+        return (
           <div
-            style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
+            key={log._id}
+            onClick={() => handleLogClick(log)}
+            style={{ position: "relative", cursor: "pointer", width: "100%", maxWidth: "130px" }}
           >
-            <h3 style={{ fontSize: "12px", fontWeight: "600" }}>Recent Activities</h3>
-            <button
-              onClick={() => window.dispatchEvent(new CustomEvent("navigateToFilms"))}
+            {/* Poster */}
+            <img
+              src={posterUrl}
+              alt={log?.title || "Poster"}
               style={{
-                background: "none",
-                border: "none",
-                color: "#ccc",
-                fontSize: "13px",
-                cursor: "pointer",
+                width: "100%",
+                height: "170px",
+                objectFit: "cover",
+                borderRadius: "6px",
+              }}
+              onError={(e) => (e.currentTarget.src = FALLBACK_POSTER)}
+            />
+
+            {/* Timestamp */}
+            <div
+              style={{
+                position: "absolute",
+                top: "6px",
+                right: "6px",
+                fontSize: "11px",
+                background: "rgba(0,0,0,0.7)",
+                padding: "2px 6px",
+                borderRadius: "6px",
+                color: "#fff",
               }}
             >
-              More →
-            </button>
-          </div>
+              {timestamp}
+            </div>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap: "10px",
-              marginTop: "12px",
-            }}
-          >
-            {recentlyWatched.map((log) => {
-              const id = toTmdbId(log?.tmdbId ?? log?.movie ?? log?.movieId ?? log?.movie?.id);
-              if (!id) return null;
-
-              const posterUrl = resolvePoster({
-                id,
-                tmdbPosters,
-                customPosters,
-                raw: log?.movie,
-              });
-
-              const hasReview = !!(log?.review && log.review.trim().length > 0);
-
-              const logDate = new Date(log?.createdAt || log?.watchedAt || Date.now());
-              const sevenDaysAgo = subDays(new Date(), 7);
-              const timestamp = isBefore(logDate, sevenDaysAgo)
-                ? logDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })
-                : formatDistanceToNowStrict(logDate, { addSuffix: true });
-
-              return (
-                <div
-                  key={log._id}
-                  onClick={() => handleLogClick(log)}
-                  style={{ position: "relative", cursor: "pointer" }}
-                >
-                  <img
-                    src={posterUrl}
-                    alt={log?.title || "Poster"}
-                    style={{
-                      width: "100%",
-                      aspectRatio: "2/3",
-                      objectFit: "cover",
-                      borderRadius: "6px",
-                    }}
-                    onError={(e) => (e.currentTarget.src = FALLBACK_POSTER)}
+            {/* Rating + Icons */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+                marginTop: "4px",
+                fontSize: "10px",
+                color: "#aaa",
+              }}
+            >
+              <StarRating rating={log?.rating} size={12} />
+              {hasReview && (
+                <FaRegComment size={9} style={{ position: "relative", top: "-1.5px" }} />
+              )}
+              {log?.rewatchCount > 0 && (
+                <div style={{ display: "flex", alignItems: "center", gap: "2px" }}>
+                  <HiOutlineRefresh
+                    size={11}
+                    color="#aaa"
+                    style={{ position: "relative", top: "-1.5px" }}
                   />
-
-                  <div
+                  <span
                     style={{
-                      position: "absolute",
-                      top: "6px",
-                      right: "6px",
-                      fontSize: "11px",
-                      background: "rgba(0,0,0,0.7)",
-                      padding: "2px 6px",
-                      borderRadius: "6px",
-                      color: "#fff",
-                    }}
-                  >
-                    {timestamp}
-                  </div>
-
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "flex-start",
-                      gap: "4px",
-                      padding: "2px 4px 0 4px",
                       fontSize: "10px",
                       color: "#aaa",
-                      fontFamily: "Inter",
+                      position: "relative",
+                      top: "-1.5px", // ✅ match Home Page alignment
                     }}
                   >
-                    <StarRating rating={log?.rating} size={12} />
-                    {hasReview && (
-                      <FaRegComment size={9} style={{ position: "relative", top: "-1.5px" }} />
-                    )}
-                    {log?.rewatchCount > 0 && (
-                      <HiOutlineRefresh
-                        size={11}
-                        color="#aaa"
-                        style={{ position: "relative", top: "-1.2px" }}
-                      />
-                    )}
-                  </div>
+                    {log.rewatchCount}x
+                  </span>
                 </div>
-              );
-            })}
+              )}
+            </div>
           </div>
-        </div>
-      ) : (
-        <p style={{ color: "#888", marginTop: "20px" }}>No recent logs yet.</p>
-      )}
+        );
+      })}
+    </div>
+  </div>
+) : (
+  <p style={{ color: "#888", marginTop: "20px" }}>No recent logs yet.</p>
+)}
+
 
       {/* 🔗 Connections */}
       {Object.values(user?.socials || {}).some(Boolean) && (

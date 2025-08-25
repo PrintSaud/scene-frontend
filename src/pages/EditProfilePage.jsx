@@ -107,10 +107,11 @@ const [isDeleting, setIsDeleting] = useState(false);
       const updatedUser = {
         bio,
         avatar,
-        backdrop,
+        profileBackdrop: backdrop,  // 👈 change this
         favoriteFilms,
-        socials, // ✅ NESTED correctly
+        socials,
       };
+      
       
   
       const res = await axios.patch(`/api/users/${user._id}`, updatedUser);

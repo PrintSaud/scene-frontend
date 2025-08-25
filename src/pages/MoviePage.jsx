@@ -46,7 +46,6 @@ export default function MoviePage() {
   const [scrollReady, setScrollReady] = useState(false);
   const [showLogModal, setShowLogModal] = useState(false);
 
-
   const getRelativeTime = (date) => {
     const now = Date.now();
     const then = new Date(date).getTime();
@@ -341,7 +340,7 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
         </div>
       </div>
 
-{/* 👀 Watched by Friends */}
+      {/* 👀 Watched by Friends */}
 <div style={{ marginTop: "24px", padding: "0 24px" }}>
   <div
     style={{
@@ -355,11 +354,16 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
 
     {friendLogs.length > 0 && (() => {
       const seen = new Set();
-      const uniqueCount = friendLogs.filter((log) => {
-        if (seen.has(log.user._id)) return false;
-        seen.add(log.user._id);
-        return true;
-      }).length;
+      const myLog = friendLogs.find((l) => l.user._id === userId);
+      if (myLog) seen.add(userId);
+
+      const uniqueCount =
+        (myLog ? 1 : 0) +
+        friendLogs.filter((log) => {
+          if (seen.has(log.user._id)) return false;
+          seen.add(log.user._id);
+          return true;
+        }).length;
 
       return uniqueCount > 1 ? (
         <button
@@ -382,108 +386,114 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
   {friendLogs.length === 0 ? (
     <p style={{ color: "#888" }}>No friends have logged this film yet.</p>
   ) : (
-    (() => {
-      const seen = new Set();
-      const uniqueLogs = [];
+    <div
+      style={{
+        display: "flex",
+        gap: "12px",
+        justifyContent: "flex-start",
+        alignItems: "center",
+        flexWrap: "wrap",
+      }}
+    >
+      {(() => {
+        const seen = new Set();
+        const uniqueLogs = [];
 
-      for (const log of friendLogs) {
-        if (!seen.has(log.user._id)) {
-          uniqueLogs.push(log);
-          seen.add(log.user._id);
+        // ✅ Add your own log first
+        const myLog = friendLogs.find((l) => l.user._id === userId);
+        if (myLog) {
+          uniqueLogs.push(myLog);
+          seen.add(userId);
         }
-      }
 
-      return (
-        <div
-          style={{
-            display: "flex",
-            gap: "12px",
-            justifyContent: "flex-start",
-            alignItems: "center",
-            flexWrap: "wrap",
-          }}
-        >
-          {uniqueLogs.slice(0, 5).map((log, index) => {
-            const sameUserLogs = friendLogs.filter(
-              (l) => l.user._id === log.user._id
-            );
+        // ✅ Then add friends
+        for (const log of friendLogs) {
+          if (!seen.has(log.user._id)) {
+            uniqueLogs.push(log);
+            seen.add(log.user._id);
+          }
+        }
 
-            const reviews = sameUserLogs.filter((l) => l.review);
-            const hasReview = reviews.length > 0;
+        return uniqueLogs.slice(0, 5).map((log, index) => {
+          const sameUserLogs = friendLogs.filter(
+            (l) => l.user._id === log.user._id
+          );
 
-            const displayLog =
-              sameUserLogs.find((l) => l.rating) ||
-              sameUserLogs.find((l) => l.review) ||
-              sameUserLogs.find((l) => l.rewatchCount > 0 || l.rewatch > 0) ||
-              sameUserLogs[0];
+          const reviews = sameUserLogs.filter((l) => l.review);
+          const hasReview = reviews.length > 0;
 
-            const hasRating = typeof displayLog.rating === "number";
-            const hasRewatch =
-              (typeof displayLog.rewatchCount === "number" &&
-                displayLog.rewatchCount > 0) ||
-              (typeof displayLog.rewatch === "number" &&
-                displayLog.rewatch > 0);
+          const displayLog =
+            sameUserLogs.find((l) => l.rating) ||
+            sameUserLogs.find((l) => l.review) ||
+            sameUserLogs.find((l) => l.rewatchCount > 0 || l.rewatch > 0) ||
+            sameUserLogs[0];
 
-            return (
-              <div
-                key={log._id + index}
-                onClick={() => {
-                  if (reviews.length === 1) {
-                    navigate(`/review/${reviews[0]._id}`);
-                  } else if (reviews.length > 1) {
-                    navigate(`/movie/${id}/reviews/${log.user._id}`);
-                  } else {
-                    navigate(`/profile/${log.user._id}`);
-                  }
-                }}
+          const hasRating = typeof displayLog.rating === "number";
+          const hasRewatch =
+            (typeof displayLog.rewatchCount === "number" &&
+              displayLog.rewatchCount > 0) ||
+            (typeof displayLog.rewatch === "number" &&
+              displayLog.rewatch > 0);
+
+          return (
+            <div
+              key={log._id + index}
+              onClick={() => {
+                if (reviews.length === 1) {
+                  navigate(`/review/${reviews[0]._id}`);
+                } else if (reviews.length > 1) {
+                  navigate(`/movie/${id}/reviews/${log.user._id}`);
+                } else {
+                  navigate(`/profile/${log.user._id}`);
+                }
+              }}
+              style={{
+                cursor: "pointer",
+                textAlign: "center",
+                width: "56px",
+                fontSize: "11px",
+                color: "#ddd",
+              }}
+            >
+              <img
+                src={
+                  log.user?.avatar?.startsWith("http")
+                    ? log.user.avatar
+                    : "/default-avatar.png"
+                }
+                alt={log.user?.username}
                 style={{
-                  cursor: "pointer",
-                  textAlign: "center",
-                  width: "56px",
-                  fontSize: "11px",
-                  color: "#ddd",
+                  width: "48px",
+                  height: "48px",
+                  objectFit: "cover",
+                  borderRadius: "50%",
+                  marginBottom: "6px",
                 }}
-              >
-                <img
-                  src={
-                    log.user?.avatar?.startsWith("http")
-                      ? log.user.avatar
-                      : "/default-avatar.png"
-                  }
-                  alt={log.user?.username}
-                  style={{
-                    width: "48px",
-                    height: "48px",
-                    objectFit: "cover",
-                    borderRadius: "50%",
-                    marginBottom: "6px",
-                  }}
-                />
+              />
 
-                {/* Icon Row */}
-                {hasRating ? (
-                  <StarRating rating={displayLog.rating} size={9} />
-                ) : hasReview ? (
-                  <FaRegComment
-                    size={9}
-                    color="#aaa"
-                    style={{ marginTop: "2px" }}
-                  />
-                ) : hasRewatch ? (
-                  <HiOutlineRefresh
-                    size={9}
-                    color="#aaa"
-                    style={{ marginTop: "2px" }}
-                  />
-                ) : (
-                  <div style={{ height: "9px" }} /> // Spacer fallback
-                )}
-              </div>
-            );
-          })}
-        </div>
-      );
-    })()
+              {/* Icon Row */}
+              {hasRating ? (
+                <StarRating rating={displayLog.rating} size={9} />
+              ) : hasReview ? (
+                <FaRegComment
+                  size={9}
+                  color="#aaa"
+                  style={{ marginTop: "2px" }}
+                />
+              ) : hasRewatch ? (
+                <HiOutlineRefresh
+                  size={9}
+                  color="#aaa"
+                  style={{ marginTop: "2px" }}
+                />
+              ) : (
+                <div style={{ height: "9px" }} /> // Spacer fallback
+              )}
+            </div>
+          );
+        });
+      })()}
+    </div>
   )}
 </div>
 
@@ -518,151 +528,184 @@ const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
     <p style={{ color: "#888" }}>No reviews yet.</p>
   ) : (
     popularReviews
-  .filter((r) => r.review && r.review.trim() !== "")
-  .slice(0, 3)
-  .map((r) => {
+      .slice(0, 3) // ✅ no filter that hides gifs/images
+      .map((r) => {
+        const isLikedByMe = r.likes?.includes(user?._id);
 
-      const isLikedByMe = r.likes?.includes(user?._id);
-      return (
-        <div
-          key={r._id}
-          style={{
-            position: "relative",
-            marginBottom: 16,
-            paddingBottom: 12,
-            borderBottom: "1px solid #222",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            {/* Avatar */}
-            <img
-              src={r.user.avatar || "/default-avatar.jpg"}
-              alt="avatar"
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: "50%",
-                cursor: "pointer",
-              }}
-              onClick={() => navigate(`/profile/${r.user._id}`)}
-            />
+        // check review text validity
+        const reviewText =
+          r.review &&
+          !["__media__", "[GIF ONLY]", "[IMAGE ONLY]"].includes(r.review.trim())
+            ? r.review
+            : "";
 
-            <div
-              style={{
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-              }}
-            >
-              {/* Username, stars, time */}
-              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <strong
-                  style={{
-                    fontSize: 14,
-                    fontFamily: "Inter, sans-serif",
-                    fontWeight: 400,
-                    color: "#ddd",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => navigate(`/profile/${r.user._id}`)}
-                >
-                  @{r.user.username}
-                </strong>
+        const words = reviewText ? reviewText.split(" ") : [];
+        const isLong = words.length > 30;
+        const shortText = words.slice(0, 30).join(" ");
 
-                {r.rating && <StarRating rating={r.rating} size={12} />}
+        return (
+          <div
+            key={r._id}
+            style={{
+              borderBottom: "1px solid #222",
+              marginBottom: 16,
+              paddingBottom: 12,
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <img
+                src={r.user.avatar || "/default-avatar.jpg"}
+                alt="avatar"
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: "50%",
+                  cursor: "pointer",
+                }}
+                onClick={() => navigate(`/profile/${r.user._id}`)}
+              />
 
-                {r.rewatchCount > 0 && (
-                  <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                    <HiOutlineRefresh size={12} color="#aaa" />
-                    <span style={{ fontSize: 10, color: "#aaa" }}>
-                      {r.rewatchCount}x
-                    </span>
-                  </div>
+              <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+                {/* Username, stars, time */}
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <strong
+                    style={{
+                      fontSize: 14,
+                      fontFamily: "Inter, sans-serif", // ✅ Inter font
+                      fontWeight: 500,
+                      color: "#ddd",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => navigate(`/profile/${r.user._id}`)}
+                  >
+                    @{r.user.username}
+                  </strong>
+
+                  {r.rating && <StarRating rating={r.rating} size={12} />}
+
+                  {r.rewatchCount > 0 && (
+                    <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                      <HiOutlineRefresh size={12} color="#aaa" />
+                      <span style={{ fontSize: 10, color: "#aaa" }}>
+                        {r.rewatchCount}x
+                      </span>
+                    </div>
+                  )}
+
+                  <span style={{ fontSize: 10, color: "#888" }}>
+                    {getRelativeTime(r.createdAt)}
+                  </span>
+                </div>
+
+                {/* ✅ Only show review text if not placeholder */}
+                {reviewText && (
+                  <span
+                    style={{
+                      fontSize: 14,
+                      fontFamily: "Inter, sans-serif",
+                      color: "#ddd",
+                      display: "block",
+                      marginTop: 2,
+                    }}
+                  >
+                    {isLong ? shortText + "…" : reviewText}
+                    {isLong && (
+                      <button
+                        onClick={() => navigate(`/review/${r._id}`)}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          color: "#B327F6",
+                          fontSize: 13,
+                          cursor: "pointer",
+                          marginLeft: 4,
+                        }}
+                      >
+                        Read more
+                      </button>
+                    )}
+                  </span>
                 )}
 
-                <span style={{ fontSize: 10, color: "#888" }}>
-                  {getRelativeTime(r.createdAt)}
-                </span>
+                {/* ✅ Media still shows */}
+                {r.gif && (
+                  <img
+                    src={r.gif}
+                    alt="gif"
+                    style={{
+                      marginTop: 4,
+                      maxWidth: "100%",
+                      borderRadius: 8,
+                    }}
+                  />
+                )}
+                {r.image && (
+                  <img
+                    src={r.image}
+                    alt="img"
+                    style={{
+                      marginTop: 4,
+                      maxWidth: "100%",
+                      borderRadius: 8,
+                    }}
+                  />
+                )}
+
+                <div style={{ marginTop: 6 }}>
+                  <button
+                    onClick={() =>
+                      navigate(`/movie/${id}/reviews`, {
+                        state: {
+                          parentCommentId: r._id,
+                          parentUsername: r.user.username,
+                        },
+                      })
+                    }
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "#888",
+                      fontSize: 13,
+                      cursor: "pointer",
+                    }}
+                  >
+                    Reply
+                  </button>
+                </div>
               </div>
 
-              {/* Review text */}
-              {r.review && (
+              <div
+                onClick={() => handleLikeReview(r._id)}
+                style={{
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                {isLikedByMe ? (
+                  <AiFillHeart size={16} color="#B327F6" />
+                ) : (
+                  <AiOutlineHeart size={16} color="#888" />
+                )}
                 <span
                   style={{
-                    fontSize: 14,
-                    color: "#ddd",
-                    fontFamily: "Inter, sans-serif",
-                    display: "block",
-                    marginTop: 2,
+                    fontSize: 12,
+                    color: "#888",
+                    marginLeft: 4,
                   }}
                 >
-                  {r.review}
+                  {r.likes?.length || 0}
                 </span>
-              )}
-
-              {/* Optional gif/image */}
-              {r.gif && (
-                <img
-                  src={r.gif}
-                  alt="gif"
-                  style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }}
-                />
-              )}
-              {r.image && (
-                <img
-                  src={r.image}
-                  alt="img"
-                  style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }}
-                />
-              )}
-
-              {/* Reply */}
-              <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 6 }}>
-  <button
-    onClick={() =>
-      navigate(`/movie/${id}/reviews`, {
-        state: {
-          parentCommentId: r._id,
-          parentUsername: r.user.username,
-        },
-      })
-    }
-    style={{
-      background: "none",
-      border: "none",
-      color: "#888",
-      fontSize: 13,
-      cursor: "pointer",
-      padding: 0,
-    }}
-  >
-    Reply
-  </button>
-</div>
-
-            </div>
-
-            {/* Like */}
-            <div
-              onClick={() => handleLikeReview(r._id)}
-              style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
-            >
-              {isLikedByMe ? (
-                <AiFillHeart size={16} color="#B327F6" />
-              ) : (
-                <AiOutlineHeart size={16} color="#888" />
-              )}
-              <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>
-                {r.likes?.length || 0}
-              </span>
+              </div>
             </div>
           </div>
-        </div>
-      );
-    })
+        );
+      })
   )}
 </div>
+
+
+
 
 
       <MovieTabs

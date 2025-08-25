@@ -284,111 +284,114 @@ export default function ProfileTabFilms({
           <option value="asc">⬆ Ascending</option>
         </select>
       </div>
-
       {sortedLogs.length === 0 ? (
-        <div
-          style={{
-            textAlign: "center",
-            color: "#888",
-            marginTop: "30px",
-            fontSize: "14px",
-          }}
-        >
-          {sortType === "favorites"
-            ? "You haven’t marked any favorite films yet."
-            : "No films found for this filter."}
+  <div
+    style={{
+      textAlign: "center",
+      color: "#888",
+      marginTop: "30px",
+      fontSize: "14px",
+    }}
+  >
+    {sortType === "favorites"
+      ? "You haven’t marked any favorite films yet."
+      : "No films found for this filter."}
+  </div>
+) : (
+  <div
+    style={{
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))", // ✅ responsive grid
+      gap: "12px", // ✅ spacing
+      justifyItems: "center", // ✅ center posters in grid cell
+    }}
+  >
+    {sortedLogs.map((lg) => {
+      const movieId = toTmdbIdAny(lg);
+      const posterUrl =
+        customPostersState[String(movieId)] ||
+        customPosters[String(movieId)] ||
+        (lg.movie?.poster_path ? `${TMDB_IMG}${lg.movie.poster_path}` : null) ||
+        tmdbFallbacks[String(movieId)] ||
+        FALLBACK_POSTER;
+
+      const favorite = isFav(movieId);
+      const hasReview = !!(lg.review && lg.review.trim().length > 0);
+
+      const handleClick = async () => {
+        const stored = JSON.parse(localStorage.getItem("user"));
+        const token = stored?.token;
+        const ownerId = lg.user?._id || lg.user;
+        if (!movieId) return;
+
+        if (!token || !ownerId) return navigate(`/movie/${movieId}`);
+
+        try {
+          const { data: logsForThisMovie } = await axios.get(
+            `/api/logs/user/${ownerId}/movie/${movieId}`
+          );
+          const reviewedLog = logsForThisMovie.find((x) => x.review?.trim());
+          if (reviewedLog) navigate(`/review/${reviewedLog._id}`);
+          else navigate(`/movie/${movieId}`);
+        } catch (err) {
+          console.error("Failed to fetch logs for this movie", err);
+          navigate(`/movie/${movieId}`);
+        }
+      };
+
+      return (
+        <div key={lg._id} onClick={handleClick} style={{ position: "relative", cursor: "pointer" }}>
+          <img
+            src={posterUrl}
+            loading="lazy"
+            decoding="async"
+            fetchpriority="low"
+            alt={lg.title || "Poster"}
+            style={{
+              width: "100%",
+              height: "170px",   // ✅ consistent height
+              objectFit: "cover",
+              borderRadius: "6px",
+              background: "#0f0f0f",
+              maxWidth: "110px", // ✅ cap width
+              margin: "0 auto",  // ✅ center
+            }}
+            onError={(e) => (e.currentTarget.src = FALLBACK_POSTER)}
+          />
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              gap: "4px",
+              padding: "2px 4px 0 4px",
+              fontSize: "10px",
+              color: "#aaa",
+              fontFamily: "Inter",
+            }}
+          >
+            <StarRating rating={lg.rating} size={12} />
+            {hasReview && (
+              <FaRegComment
+                size={9}
+                style={{ position: "relative", top: "-1.5px" }}
+              />
+            )}
+            {favorite && (
+              <AiFillHeart
+                size={11}
+                color="#B327F6"
+                style={{ position: "relative", top: "-1.5px" }}
+              />
+            )}
+          </div>
         </div>
-      ) : (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "4px",
-          }}
-        >
-          {sortedLogs.map((lg) => {
-            const movieId = toTmdbIdAny(lg);
-            const posterUrl =
-              customPostersState[String(movieId)] ||
-              customPosters[String(movieId)] ||
-              (lg.movie?.poster_path ? `${TMDB_IMG}${lg.movie.poster_path}` : null) ||
-              tmdbFallbacks[String(movieId)] ||
-              FALLBACK_POSTER;
+      );
+    })}
+  </div>
+)}
 
-            const favorite = isFav(movieId);
-            const hasReview = !!(lg.review && lg.review.trim().length > 0);
-
-            const handleClick = async () => {
-              const stored = JSON.parse(localStorage.getItem("user"));
-              const token = stored?.token;
-              const ownerId = lg.user?._id || lg.user;
-              if (!movieId) return;
-
-              if (!token || !ownerId) return navigate(`/movie/${movieId}`);
-
-              try {
-                const { data: logsForThisMovie } = await axios.get(
-                  `/api/logs/user/${ownerId}/movie/${movieId}`
-                );
-                const reviewedLog = logsForThisMovie.find((x) => x.review?.trim());
-                if (reviewedLog) navigate(`/review/${reviewedLog._id}`);
-                else navigate(`/movie/${movieId}`);
-              } catch (err) {
-                console.error("Failed to fetch logs for this movie", err);
-                navigate(`/movie/${movieId}`);
-              }
-            };
-
-            return (
-              <div key={lg._id} onClick={handleClick} style={{ position: "relative", cursor: "pointer" }}>
-                <img
-                  src={posterUrl}
-                  loading="lazy"
-                  decoding="async"
-                  fetchpriority="low"
-                  alt={lg.title || "Poster"}
-                  style={{
-                    width: "100%",
-                    aspectRatio: "2/3",
-                    objectFit: "cover",
-                    borderRadius: "6px",
-                    background: "#0f0f0f",
-                  }}
-                  onError={(e) => (e.currentTarget.src = FALLBACK_POSTER)}
-                />
-
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "flex-start",
-                    gap: "4px",
-                    padding: "2px 4px 0 4px",
-                    fontSize: "10px",
-                    color: "#aaa",
-                    fontFamily: "Inter",
-                  }}
-                >
-                  <StarRating rating={lg.rating} size={12} />
-                  {hasReview && (
-                    <FaRegComment
-                      size={9}
-                      style={{ position: "relative", top: "-1.5px" }}
-                    />
-                  )}
-                  {favorite && (
-                    <AiFillHeart
-                      size={11}
-                      color="#B327F6"
-                      style={{ position: "relative", top: "-1.5px" }}
-                    />
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
     </>
   );
 }

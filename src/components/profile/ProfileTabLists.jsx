@@ -126,9 +126,10 @@ export default function ProfileTabLists({ user, profileUserId, refreshTrigger })
 <div
   style={{
     display: "grid",
-    gridTemplateColumns: "1fr",
-    gap: "16px",
+    gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", // ✅ responsive
+    gap: "20px",
     padding: "0 16px 16px",
+    justifyItems: "center", // ✅ center cards in each cell
   }}
 >
   {displayedLists.map((list) => (
@@ -142,6 +143,8 @@ export default function ProfileTabLists({ user, profileUserId, refreshTrigger })
         cursor: "pointer",
         boxShadow: "0 4px 10px rgba(0,0,0,0.4)",
         transition: "transform 0.2s ease",
+        width: "100%",
+        maxWidth: "400px", // ✅ cap card width for desktops
       }}
       onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
       onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
@@ -151,11 +154,15 @@ export default function ProfileTabLists({ user, profileUserId, refreshTrigger })
         <img
           src={list.coverImage}
           alt={list.title}
-          style={{ width: "100%", height: "150px", objectFit: "cover" }}
+          style={{
+            width: "100%",
+            height: "160px",   // ✅ slightly taller for balance
+            objectFit: "cover",
+          }}
         />
       )}
 
-      <div style={{ padding: "10px" }}>
+      <div style={{ padding: "12px" }}>
         <div
           style={{
             fontSize: "14px",
@@ -176,7 +183,7 @@ export default function ProfileTabLists({ user, profileUserId, refreshTrigger })
             display: "flex",
             alignItems: "center",
             gap: "4px",
-            marginTop: "4px",
+            marginTop: "6px",
           }}
         >
           {list.likes?.includes(user?._id) ? (
@@ -184,12 +191,15 @@ export default function ProfileTabLists({ user, profileUserId, refreshTrigger })
           ) : (
             <AiOutlineHeart style={{ fontSize: "14px", color: "#999" }} />
           )}
-          <span style={{ fontSize: "12px", color: "#bbb" }}>{list.likes?.length || 0}</span>
+          <span style={{ fontSize: "12px", color: "#bbb" }}>
+            {list.likes?.length || 0}
+          </span>
         </div>
       </div>
     </div>
   ))}
 </div>
+
 
     </>
   );

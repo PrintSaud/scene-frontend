@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
-import { HiOutlineArrowNarrowLeft, HiOutlineRefresh, HiDotsVertical } from "react-icons/hi";
+import { HiOutlineRefresh, HiDotsVertical } from "react-icons/hi";
 import { FaImage } from "react-icons/fa";
 import { BiSolidFileGif } from "react-icons/bi";
 import { FiSend } from "react-icons/fi";
 import api from "../api/api";
 import StarRating from "../components/StarRating";
 import GifSearchModal from "../components/GifSearchModal";
-import toast from "react-hot-toast"; // ✅ Add at top if not already
+import toast from "react-hot-toast";
+
 export default function AllReviewsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ export default function AllReviewsPage() {
   const [replyingTo, setReplyingTo] = useState(null);
   const [showGifModal, setShowGifModal] = useState(false);
   const [menuOpenId, setMenuOpenId] = useState(null);
+  const [filter, setFilter] = useState("all"); // "all" | "friends"
 
   const getRelativeTime = (date) => {
     const now = Date.now();
@@ -51,13 +53,29 @@ export default function AllReviewsPage() {
       setUserId(user._id);
     }
     fetchReviews();
-  }, [id]);
+  }, [id, filter]);
 
   const fetchReviews = async () => {
     try {
-        console.log("🐛 GETTING REVIEWS")
-      const res = await api.get(`/api/logs/movie/${id}/popular?all=true`);
-      const filtered = res.data.filter((log) => log.review && log.review.trim() !== "");
+      const endpoint =
+        filter === "friends"
+          ? `/api/logs/movie/${id}/friends` // ✅ fetch only friends logs
+          : `/api/logs/movie/${id}/popular?all=true`;
+
+      const res = await api.get(endpoint);
+
+      // ✅ Only keep top-level reviews (not replies)
+      const filtered = res.data.filter(
+        (log) =>
+          (log.review &&
+            log.review.trim() !== "" &&
+            !["__media__", "[GIF ONLY]", "[IMAGE ONLY]"].includes(
+              log.review.trim()
+            )) ||
+          log.gif ||
+          log.image
+      );
+
       setReviews(filtered);
     } catch (err) {
       console.error("❌ Failed to load reviews", err);
@@ -72,120 +90,115 @@ export default function AllReviewsPage() {
 
   const handleSend = async () => {
     if (!input.trim() && !selectedGif && !selectedImage) return;
-    if (!activeReviewId) return console.error("❌ No activeReviewId — cannot send reply");
-  
+    if (!activeReviewId)
+      return console.error("❌ No activeReviewId — cannot send reply");
+
     try {
       const formData = new FormData();
       formData.append("text", input);
       if (!user?._id) return console.error("Missing user");
-  
+
       if (replyingTo?.id) formData.append("parentComment", replyingTo.id);
       if (selectedGif) formData.append("gif", selectedGif);
       if (selectedImage) formData.append("image", selectedImage);
-  
+
       await api.post(`/api/logs/${activeReviewId}/reply`, formData, {
         headers: {
-          Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))?.token}`,
+          Authorization: `Bearer ${
+            JSON.parse(localStorage.getItem("user"))?.token
+          }`,
         },
       });
-  
-      // ✅ Reset state
+
       setInput("");
       setSelectedGif("");
       setSelectedImage("");
       setReplyingTo(null);
       setActiveReviewId(null);
-
-  
-      // ✅ Toast!
       toast.success("Reply sent 🎉");
-      
     } catch (err) {
       console.error("❌ Failed to send reply", err);
       toast.error("Failed to send reply ❌");
     }
   };
-  
-  
 
-  const handleLike = async (logId) => {
-    try {
-      await api.post(`/api/logs/${logId}/like`);
-      fetchReviews();
-    } catch (err) {
-      console.error("❌ Failed to like", err);
-    }
-  };
-
-  const handleLikeReply = async (logId, replyId) => {
-    try {
-      await api.post(`/api/logs/${logId}/replies/${replyId}/like`);
-      fetchReviews();
-    } catch (err) {
-      console.error("❌ Failed to like reply", err);
-    }
-  };
-
-  const handleDelete = async (replyId, logId) => {
-    try {
-      await api.delete(`/api/logs/${logId}/replies/${replyId}`, {
-        headers: {
-          Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))?.token}`,
-        },
-      });
-      await fetchReviews(); // 🔁 refresh
-      toast.success("Reply deleted");
-    } catch (err) {
-      console.error("❌ Failed to delete reply:", err);
-      toast.error("Failed to delete reply");
-    }
-  };
-  
-  
   return (
     <div style={{ padding: "16px 12px", paddingBottom: 80 }}>
-  {/* 🔙 Back Button */}
-  <div
-    style={{
-      display: "flex",
-      alignItems: "center",
-      marginBottom: "24px",
-    }}
-  >
-    <button
-      onClick={() => navigate(-1)}
-      style={{
-        background: "none",
-        border: "none",
-        color: "white",
-        fontSize: "20px",
-        marginRight: "12px",
-        cursor: "pointer",
-      }}
-    >
-      ←
-    </button>
-    <h2 style={{ fontWeight: "bold", fontSize: "20px" }}>
-      All Reviews
-    </h2>
-  </div>
-
-  {/* 🔁 Reviews */}
-  {reviews.map(review => {
-    const isLiked = review.likes?.includes(userId);
-
-    return (
+      {/* 🔙 Back + Toggle */}
       <div
-        key={review._id}
         style={{
-          marginBottom: 16,
-          paddingBottom: 12,
-          borderBottom: "1px solid #222",
-          background: replyingTo?.id === review._id ? "#1a1a1a" : "transparent",
-          borderRadius: 8,
-          padding: 10,
+          display: "flex",
+          alignItems: "center",
+          marginBottom: "24px",
+          justifyContent: "space-between",
         }}
       >
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <button
+            onClick={() => navigate(-1)}
+            style={{
+              background: "none",
+              border: "none",
+              color: "white",
+              fontSize: "20px",
+              marginRight: "12px",
+              cursor: "pointer",
+            }}
+          >
+            ←
+          </button>
+          <h2 style={{ fontWeight: "bold", fontSize: "20px" }}>
+          {filter === "friends" ? "Friends Reviews" : "All Reviews"}
+          </h2>
+        </div>
+
+        {/* Toggle (All first, Friends second) */}
+        <div style={{ display: "flex", gap: "8px" }}>
+          <button
+            onClick={() => setFilter("all")}
+            style={{
+              background: filter === "all" ? "#B327F6" : "transparent",
+              border: "1px solid #333",
+              borderRadius: "8px",
+              padding: "4px 10px",
+              fontSize: "13px",
+              color: "#fff",
+              cursor: "pointer",
+            }}
+          >
+            All
+          </button>
+          <button
+            onClick={() => setFilter("friends")}
+            style={{
+              background: filter === "friends" ? "#B327F6" : "transparent",
+              border: "1px solid #333",
+              borderRadius: "8px",
+              padding: "4px 10px",
+              fontSize: "13px",
+              color: "#fff",
+              cursor: "pointer",
+            }}
+          >
+            Friends
+          </button>
+        </div>
+      </div>
+
+      {/* 🔁 Reviews */}
+      {reviews.map((review) => {
+        const isLiked = review.likes?.includes(userId);
+        return (
+          <div
+            key={review._id}
+            style={{
+              marginBottom: 16,
+              paddingBottom: 12,
+              borderBottom: "1px solid #222",
+              borderRadius: 8,
+              padding: 10,
+            }}
+          >
         <div style={{ display: "flex", gap: 10 }}>
           <img
             src={review.user?.avatar || "/default-avatar.jpg"}
