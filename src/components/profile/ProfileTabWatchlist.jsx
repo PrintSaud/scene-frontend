@@ -22,20 +22,20 @@ export default function ProfileTabWatchlist({
   const isOwner = user?._id === profileUserId;
   const [isLoading, setIsLoading] = useState(true);
 
-
   useEffect(() => {
     const fetchWatchlist = async () => {
       try {
-        setIsLoading(true); // ✅ Only set loading here once
+        setIsLoading(true);
         const res = await api.get(
           `/api/users/${profileUserId}/watchlist?sort=${sortType}&order=${order}&genre=${selectedGenre}`
         );
-        const visibleWatchlist = isOwner ? res.data : res.data.filter((movie) => !movie.isPrivate);
+        const visibleWatchlist = isOwner
+          ? res.data
+          : res.data.filter((movie) => !movie.isPrivate);
         setWatchList(visibleWatchlist);
-  
-        // Optional: Smooth fade for large watchlists
+
         if (visibleWatchlist.length > 100) {
-          setTimeout(() => setIsLoading(false), 800); // Smooth delay
+          setTimeout(() => setIsLoading(false), 800);
         } else {
           setIsLoading(false);
         }
@@ -44,27 +44,26 @@ export default function ProfileTabWatchlist({
         setIsLoading(false);
       }
     };
-  
+
     if (profileUserId) fetchWatchlist();
   }, [profileUserId, sortType, order, selectedGenre]);
-  
-  
 
   if (isLoading) {
     return (
-      <div style={{
-        minHeight: "300px",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        fontSize: "18px",
-        color: "#888",
-      }}>
+      <div
+        style={{
+          minHeight: "300px",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          fontSize: "18px",
+          color: "#888",
+        }}
+      >
         🎞️ Loading your Scenes...
       </div>
     );
   }
-  
 
   return (
     <div style={{ padding: "0" }}>
@@ -97,7 +96,7 @@ export default function ProfileTabWatchlist({
             <option value="rating">Rating</option>
             <option value="runtime">Runtime</option>
           </select>
-  
+
           <select
             value={order}
             onChange={(e) => setOrder(e.target.value)}
@@ -114,7 +113,7 @@ export default function ProfileTabWatchlist({
             <option value="desc">⬇</option>
             <option value="asc">⬆</option>
           </select>
-  
+
           <select
             value={selectedGenre}
             onChange={(e) => setSelectedGenre(e.target.value)}
@@ -140,20 +139,23 @@ export default function ProfileTabWatchlist({
           </select>
         </div>
       )}
-  
 
       {watchList?.length > 0 ? (
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "4px",
+            gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))",
+            gap: "6px",
             padding: "0",
           }}
         >
           {watchList.map((movie) => {
-            const image = getPosterUrl(movie.tmdbId || movie.id, movie.poster_path, movie.posterOverride);
- 
+            const image = getPosterUrl(
+              movie.tmdbId || movie.id,
+              movie.poster_path,
+              movie.posterOverride
+            );
+
             return (
               <img
                 key={movie.id || movie.tmdbId || movie._id}
@@ -190,6 +192,17 @@ export default function ProfileTabWatchlist({
           This watchlist is empty.
         </p>
       )}
+
+      {/* ✅ Responsive inline media query to force 3 cols on phones */}
+      <style>
+        {`
+          @media (max-width: 480px) {
+            .watchlist-grid {
+              grid-template-columns: repeat(3, 1fr) !important;
+            }
+          }
+        `}
+      </style>
     </div>
   );
 }

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import filterMovies from "../../utils/filterMovies";
 import { backend } from "../../config";
 
-
 export default function SimilarFilmsTab({ movieId, navigate }) {
   const [similarMovies, setSimilarMovies] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -35,21 +34,24 @@ export default function SimilarFilmsTab({ movieId, navigate }) {
       fetchSimilar();
     }
   }, [movieId]);
-  
+
   return (
-    <div style={{ padding: "20px 20px 40px",      minHeight: "100vh", }}>
+    <div style={{ padding: "20px 20px 40px", minHeight: "100vh" }}>
       {loading ? (
-        <p style={{ color: "#888", textAlign: "center" }}>Loading similar films...</p>
+        <p style={{ color: "#888", textAlign: "center" }}>
+          Loading similar films...
+        </p>
       ) : similarMovies.length === 0 ? (
-        <p style={{ color: "#888", textAlign: "center" }}>No similar films found.</p>
+        <p style={{ color: "#888", textAlign: "center" }}>
+          No similar films found.
+        </p>
       ) : (
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(2, 1fr)", // 🔥 now exactly 2 per row
+            gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", // ✅ responsive grid
             gap: "16px",
             justifyItems: "center",
-            height: "200px"
           }}
         >
           {similarMovies.map((movie) => (
@@ -61,9 +63,8 @@ export default function SimilarFilmsTab({ movieId, navigate }) {
               }}
               style={{
                 cursor: "pointer",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
+                textAlign: "center",
+                maxWidth: "180px", // ✅ keeps cards uniform
               }}
             >
               <img
@@ -75,8 +76,7 @@ export default function SimilarFilmsTab({ movieId, navigate }) {
                 alt={movie.title}
                 style={{
                   width: "100%",
-                  maxWidth: "180px",
-                  aspectRatio: "2 / 3",
+                  aspectRatio: "2 / 3", // ✅ consistent ratio
                   objectFit: "cover",
                   borderRadius: "10px",
                   boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
@@ -89,7 +89,9 @@ export default function SimilarFilmsTab({ movieId, navigate }) {
                   fontFamily: "Inter",
                   color: "#fff",
                   fontWeight: "500",
-                  textAlign: "center",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
                 }}
               >
                 {movie.title}

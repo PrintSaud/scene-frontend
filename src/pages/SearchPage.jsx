@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import filterMovies, { isQueryBanned } from "../utils/filterMovies";
 import { backend } from "../config";
 import StarRating from "../components/StarRating";
-
 import SearchTabUsers from "./searchTabs/SearchTabUsers";
 import SearchTabLists from "./searchTabs/SearchTabLists";
 import SearchTabActors from "./searchTabs/SearchTabActors";
 import SearchTabDirectors from "./searchTabs/SearchTabDirectors";
 import SearchTabRecent from "./searchTabs/SearchTabRecent";
+import filterMovies, { isQueryBanned, whitelistIds } from "../utils/filterMovies";
 
 export default function SearchPage() {
   const [query, setQuery] = useState("");
@@ -75,25 +74,66 @@ export default function SearchPage() {
   
     try {
       // 🎬 Films Tab
-      if (activeTab === "films") {
-        const res = await fetch(`https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(q)}&api_key=${apiKey}`);
-        const data = await res.json();
-        const filtered = filterMovies(data.results || []);
-        setResults(filtered);
-  
-        const userId = JSON.parse(localStorage.getItem("user"))?._id;
-        if (userId) {
-          const overrides = {};
-          await Promise.all(filtered.map(async (movie) => {
-            try {
-              const res = await fetch(`${backend}/api/posters/${movie.id}?userId=${userId}`);
-              const data = await res.json();
-              if (data.posterOverride) overrides[movie.id] = data.posterOverride;
-            } catch {}
-          }));
-          setPosterOverrides(overrides);
+if (activeTab === "films") {
+  // fetch page 1 and 2 (20 results each)
+  const [res1, res2] = await Promise.all([
+    fetch(`https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(q)}&api_key=${apiKey}&page=1`),
+    fetch(`https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(q)}&api_key=${apiKey}&page=2`)
+  ]);
+
+  const [data1, data2] = await Promise.all([res1.json(), res2.json()]);
+  let allResults = [...(data1.results || []), ...(data2.results || [])];
+
+  // apply filter
+  let filtered = filterMovies(allResults);
+
+  // 🚀 Ensure whitelisted movies show up if they match the query
+  const normalizedQuery = q.toLowerCase();
+  const missingWhitelisted = whitelistIds.filter(
+    (id) => !filtered.some((m) => Number(m.id) === id)
+  );
+
+  for (const id of missingWhitelisted) {
+    try {
+      const res = await fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${apiKey}`);
+      if (res.ok) {
+        const movieData = await res.json();
+
+        // ✅ Only inject if query matches title or original_title
+        const titleMatch =
+          movieData.title?.toLowerCase().includes(normalizedQuery) ||
+          movieData.original_title?.toLowerCase().includes(normalizedQuery);
+
+        if (titleMatch) {
+          filtered.push(movieData);
+          console.log("✨ Injected whitelisted movie:", movieData.title, id);
         }
       }
+    } catch (err) {
+      console.warn("⚠️ Could not fetch whitelisted movie:", id, err);
+    }
+  }
+
+  setResults(filtered);
+
+  // 🎨 Load poster overrides
+  const userId = JSON.parse(localStorage.getItem("user"))?._id;
+  if (userId) {
+    const overrides = {};
+    await Promise.all(
+      filtered.map(async (movie) => {
+        try {
+          const res = await fetch(`${backend}/api/posters/${movie.id}?userId=${userId}`);
+          const data = await res.json();
+          if (data.posterOverride) overrides[movie.id] = data.posterOverride;
+        } catch {}
+      })
+    );
+    setPosterOverrides(overrides);
+  }
+}
+
+      
   
       // 👤 Users Tab
       else if (activeTab === "users") {
