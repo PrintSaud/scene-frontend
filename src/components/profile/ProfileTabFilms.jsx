@@ -1,3 +1,4 @@
+// src/components/profile/ProfileTabFilms.jsx
 import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import StarRating from "../StarRating";
@@ -5,7 +6,7 @@ import { AiFillHeart } from "react-icons/ai";
 import { FaRegComment } from "react-icons/fa";
 import axios from "../../api/api";
 
-const TMDB_IMG = "https://image.tmdb.org/t/p/w342"; // smaller/faster for grid
+const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const FALLBACK_POSTER = "/default-poster.jpg";
 
 function toTmdbIdAny(x) {
@@ -16,29 +17,21 @@ function toTmdbIdAny(x) {
     x?.movieId ??
     x?.id ??
     (typeof x === "number" || (typeof x === "string" && /^\d+$/.test(x)) ? x : null);
+
   const n = Number(id);
   return Number.isFinite(n) ? n : null;
 }
 
-// simple chunk helper
-const chunk = (arr, size) => {
-  const out = [];
-  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
-  return out;
-};
-
 export default function ProfileTabFilms({
   logs = [],
-  favorites = [],          // numeric TMDB ids
+  favorites = [], // numeric TMDB ids
   profileUserId,
-  customPosters = {},      // { [tmdbId]: url }
+  customPosters = {},
 }) {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [sortType, setSortType] = useState("added");
   const [order, setOrder] = useState("desc");
-
-  // maps: { [tmdbId]: url }
   const [tmdbFallbacks, setTmdbFallbacks] = useState({});
   const [customPostersState, setCustomPostersState] = useState({});
   const [lsFavorites, setLsFavorites] = useState([]);
@@ -62,93 +55,60 @@ export default function ProfileTabFilms({
 
   const isFav = useCallback((tmdbId) => favIds.includes(Number(tmdbId)), [favIds]);
 
-  // Lightweight loading — don’t block long
   useEffect(() => {
     if ((logs?.length || 0) > 100) {
       setIsLoading(true);
-      const t = setTimeout(() => setIsLoading(false), 200); // snappy
+      const t = setTimeout(() => setIsLoading(false), 1000);
       return () => clearTimeout(t);
     }
     setIsLoading(false);
   }, [logs]);
 
-  // 🔥 Optimized fallback poster fetcher
   useEffect(() => {
-    const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY;
-    if (!TMDB_KEY) return;
+    const fetchFallbackPosters = async () => {
+      try {
+        const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY;
+        if (!TMDB_KEY) return;
 
-    // collect ids we actually need (no override, no state, and log lacks poster_path)
-    const idsNeeded = [];
-    for (const log of logs) {
-      const id = toTmdbIdAny(log);
-      if (!id) continue;
+        const idsToFetch = [];
+        for (const log of logs) {
+          const id = toTmdbIdAny(log);
+          if (!id) continue;
+          if (customPosters[String(id)]) continue;
+          if (customPostersState[String(id)]) continue;
+          if (tmdbFallbacks[String(id)]) continue;
+          idsToFetch.push(id);
+        }
 
-      // skip if we already have a custom poster (prop or state)
-      if (customPostersState[String(id)] || customPosters[String(id)]) continue;
+        const uniqueIds = [...new Set(idsToFetch)];
+        if (uniqueIds.length === 0) return;
 
-      // skip if we already resolved via TMDB before
-      if (tmdbFallbacks[String(id)]) continue;
-
-      // skip hitting TMDB if the log already includes poster_path
-      if (log.movie?.poster_path) continue;
-
-      idsNeeded.push(id);
-    }
-
-    const unique = [...new Set(idsNeeded)];
-    if (unique.length === 0) return;
-
-    let cancelled = false;
-    const CONCURRENCY = 12; // safe & fast
-
-    const run = async () => {
-      const batches = chunk(unique, CONCURRENCY);
-      for (const batch of batches) {
-        // parallel within the chunk
-        const results = await Promise.allSettled(
-          batch.map(async (id) => {
-            try {
-              const res = await fetch(
-                `https://api.themoviedb.org/3/movie/${id}?api_key=${TMDB_KEY}`
-              );
-              const data = await res.json();
-              return {
-                id,
-                url: data?.poster_path ? `${TMDB_IMG}${data.poster_path}` : FALLBACK_POSTER,
-              };
-            } catch {
-              return { id, url: FALLBACK_POSTER };
-            }
-          })
-        );
-
-        if (cancelled) return;
-
-        const map = {};
-        for (const r of results) {
-          if (r.status === "fulfilled" && r.value) {
-            map[r.value.id] = r.value.url;
-          } else if (r.status === "rejected") {
-            // in case of hard fail, keep fallback
-            // no-op; we just won't set anything for that id
+        const posterMap = {};
+        for (const id of uniqueIds) {
+          try {
+            const res = await fetch(
+              `https://api.themoviedb.org/3/movie/${id}?api_key=${TMDB_KEY}`
+            );
+            const data = await res.json();
+            posterMap[id] = data?.poster_path
+              ? `${TMDB_IMG}${data.poster_path}`
+              : FALLBACK_POSTER;
+          } catch {
+            posterMap[id] = FALLBACK_POSTER;
           }
         }
 
-        if (Object.keys(map).length) {
-          setTmdbFallbacks((prev) => ({ ...prev, ...map }));
+        if (Object.keys(posterMap).length) {
+          setTmdbFallbacks((prev) => ({ ...prev, ...posterMap }));
         }
+      } catch {
+        // ignore
       }
     };
 
-    run();
-    return () => {
-      cancelled = true;
-    };
-    // ⚠️ intentionally NOT depending on tmdbFallbacks/customPostersState to avoid loops
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [logs, customPosters, profileUserId]);
+    fetchFallbackPosters();
+  }, [logs, customPosters, customPostersState, tmdbFallbacks]);
 
-  // Batch load the profile owner's custom posters once (fast path)
   useEffect(() => {
     const fetchCustomPosters = async () => {
       try {
@@ -161,21 +121,19 @@ export default function ProfileTabFilms({
 
         const { data } = await axios.post(
           "/api/posters/batch",
-          { userId: profileUserId, movieIds: uniqueIds.slice(0, 60) }, // first-screen priority
-          token ? { headers: { Authorization: `Bearer ${token}` } } : undefined
+          { userId: profileUserId, movieIds: uniqueIds },
+          { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        // Expect shape: { [tmdbId]: url } or { map: { ... } }
-        const map = data?.map || data || {};
-        if (map && typeof map === "object") {
-          setCustomPostersState(map);
+        if (data && typeof data === "object") {
+          setCustomPostersState(data);
         }
       } catch (err) {
         console.error("❌ Failed to load custom posters", err);
       }
     };
 
-    if (profileUserId && logs.length) fetchCustomPosters();
+    if (profileUserId) fetchCustomPosters();
   }, [logs, profileUserId]);
 
   const sortedLogs = useMemo(() => {
@@ -236,7 +194,7 @@ export default function ProfileTabFilms({
     <>
       <div style={{ height: "6px" }} />
 
-      {/* Controls */}
+      {/* Sorting Controls */}
       <div
         style={{
           display: "flex",
@@ -284,114 +242,111 @@ export default function ProfileTabFilms({
           <option value="asc">⬆ Ascending</option>
         </select>
       </div>
+
+      {/* Logs Grid */}
       {sortedLogs.length === 0 ? (
-  <div
-    style={{
-      textAlign: "center",
-      color: "#888",
-      marginTop: "30px",
-      fontSize: "14px",
-    }}
-  >
-    {sortType === "favorites"
-      ? "You haven’t marked any favorite films yet."
-      : "No films found for this filter."}
-  </div>
-) : (
-  <div
-    style={{
-      display: "grid",
-      gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))", // ✅ responsive grid
-      gap: "12px", // ✅ spacing
-      justifyItems: "center", // ✅ center posters in grid cell
-    }}
-  >
-    {sortedLogs.map((lg) => {
-      const movieId = toTmdbIdAny(lg);
-      const posterUrl =
-        customPostersState[String(movieId)] ||
-        customPosters[String(movieId)] ||
-        (lg.movie?.poster_path ? `${TMDB_IMG}${lg.movie.poster_path}` : null) ||
-        tmdbFallbacks[String(movieId)] ||
-        FALLBACK_POSTER;
-
-      const favorite = isFav(movieId);
-      const hasReview = !!(lg.review && lg.review.trim().length > 0);
-
-      const handleClick = async () => {
-        const stored = JSON.parse(localStorage.getItem("user"));
-        const token = stored?.token;
-        const ownerId = lg.user?._id || lg.user;
-        if (!movieId) return;
-
-        if (!token || !ownerId) return navigate(`/movie/${movieId}`);
-
-        try {
-          const { data: logsForThisMovie } = await axios.get(
-            `/api/logs/user/${ownerId}/movie/${movieId}`
-          );
-          const reviewedLog = logsForThisMovie.find((x) => x.review?.trim());
-          if (reviewedLog) navigate(`/review/${reviewedLog._id}`);
-          else navigate(`/movie/${movieId}`);
-        } catch (err) {
-          console.error("Failed to fetch logs for this movie", err);
-          navigate(`/movie/${movieId}`);
-        }
-      };
-
-      return (
-        <div key={lg._id} onClick={handleClick} style={{ position: "relative", cursor: "pointer" }}>
-          <img
-            src={posterUrl}
-            loading="lazy"
-            decoding="async"
-            fetchpriority="low"
-            alt={lg.title || "Poster"}
-            style={{
-              width: "100%",
-              height: "170px",   // ✅ consistent height
-              objectFit: "cover",
-              borderRadius: "6px",
-              background: "#0f0f0f",
-              maxWidth: "110px", // ✅ cap width
-              margin: "0 auto",  // ✅ center
-            }}
-            onError={(e) => (e.currentTarget.src = FALLBACK_POSTER)}
-          />
-
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "flex-start",
-              gap: "4px",
-              padding: "2px 4px 0 4px",
-              fontSize: "10px",
-              color: "#aaa",
-              fontFamily: "Inter",
-            }}
-          >
-            <StarRating rating={lg.rating} size={12} />
-            {hasReview && (
-              <FaRegComment
-                size={9}
-                style={{ position: "relative", top: "-1.5px" }}
-              />
-            )}
-            {favorite && (
-              <AiFillHeart
-                size={11}
-                color="#B327F6"
-                style={{ position: "relative", top: "-1.5px" }}
-              />
-            )}
-          </div>
+        <div
+          style={{
+            textAlign: "center",
+            color: "#888",
+            marginTop: "30px",
+            fontSize: "14px",
+          }}
+        >
+          {sortType === "favorites"
+            ? "You haven’t marked any favorite films yet."
+            : "No films found for this filter."}
         </div>
-      );
-    })}
-  </div>
-)}
+      ) : (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns:
+              "repeat(auto-fit, minmax(110px, 1fr))", // ✅ responsive grid
+            gap: "8px",
+          }}
+        >
+          {sortedLogs.map((lg) => {
+            const movieId = toTmdbIdAny(lg);
+            const posterUrl =
+              customPostersState[String(movieId)] ||
+              customPosters[String(movieId)] ||
+              tmdbFallbacks[String(movieId)] ||
+              (lg.movie?.poster_path ? `${TMDB_IMG}${lg.movie.poster_path}` : FALLBACK_POSTER);
 
+            const favorite = isFav(movieId);
+            const hasReview = !!(lg.review && lg.review.trim().length > 0);
+
+            const handleClick = async () => {
+              const stored = JSON.parse(localStorage.getItem("user"));
+              const token = stored?.token;
+              const ownerId = lg.user?._id || lg.user;
+              if (!movieId) return;
+
+              if (!token || !ownerId) return navigate(`/movie/${movieId}`);
+
+              try {
+                const { data: logsForThisMovie } = await axios.get(
+                  `/api/logs/user/${ownerId}/movie/${movieId}`,
+                  { headers: { Authorization: `Bearer ${token}` } }
+                );
+                const reviewedLog = logsForThisMovie.find((x) => x.review?.trim());
+                if (reviewedLog) navigate(`/review/${reviewedLog._id}`);
+                else navigate(`/movie/${movieId}`);
+              } catch (err) {
+                console.error("Failed to fetch logs for this movie", err);
+                navigate(`/movie/${movieId}`);
+              }
+            };
+
+            return (
+              <div key={lg._id} onClick={handleClick} style={{ position: "relative", cursor: "pointer" }}>
+                <img
+                  src={posterUrl}
+                  loading="lazy"
+                  alt={lg.title || "Poster"}
+                  style={{
+                    width: "100%",
+                    aspectRatio: "2/3",
+                    objectFit: "cover",
+                    borderRadius: "6px",
+                  }}
+                  onError={(e) => (e.currentTarget.src = FALLBACK_POSTER)}
+                />
+
+                {/* Rating + Review/Fav Icons */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "flex-start",
+                    gap: "4px",
+                    padding: "2px 4px 0 4px",
+                    fontSize: "10px",
+                    color: "#aaa",
+                    fontFamily: "Inter",
+                  }}
+                >
+                  <StarRating rating={lg.rating} size={12} />
+                  {hasReview && (
+                    <FaRegComment
+                      size={9}
+                      style={{ position: "relative", top: "-1.5px" }}
+                    />
+                  )}
+                  {favorite && (
+                    <AiFillHeart
+                      size={11}
+                      color="#B327F6"
+                      style={{ position: "relative", top: "-1.5px" }}
+                    />
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </>
   );
 }
