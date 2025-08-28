@@ -7,6 +7,9 @@ import PrivateRoute from './components/PrivateRoute';
 import PublicRoute from './components/PublicRoute';
 import { getNotifications } from "./api/api";
 import { NotificationProvider } from "./context/NotificationContext";
+import { LanguageProvider } from "./context/LanguageContext.jsx";
+
+
 
 // Pages
 import HomePage from './pages/HomePage';
@@ -49,6 +52,7 @@ import LogModal from "./components/modals/LogModal";
 import ShareToFriendPage from "./pages/ShareToFriendPage";
 import MoreReviewsPage from "./pages/MoreReviewsPage"; // adjust path if needed
 import OgReviewPage from "./pages/OgReviewPage";
+import SettingsPage from "./pages/SettingsPage"; // ✅ new
 
 function App() {
   const location = useLocation();
@@ -110,58 +114,62 @@ function App() {
   ) && user;
 
   return (
-    <div style={{ overflowX: "hidden", width: "100%", maxWidth: "100vw" }}>
-      <Toaster position="top-right" />
-      <div className="min-h-screen pb-16 bg-[#0e0e0e]">
-        <Routes>
-          <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
-          <Route path="/signup" element={<PublicRoute><SignupPage /></PublicRoute>} />
-          <Route path="/verify-email" element={<VerifyEmailPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/verify-reset-code" element={<VerifyResetCode />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
-          <Route path="/" element={<PrivateRoute><HomePage /></PrivateRoute>} />
-          <Route path="/home" element={<PrivateRoute><HomePage /></PrivateRoute>} />
-          <Route path="/choose-avatar" element={<UploadAvatar />} />
-          <Route path="/friends-activity" element={<FriendsActivityPage />} />
-          <Route path="/trending" element={<TrendingPage />} />
-          <Route path="/search" element={<SearchPage />} />
-          <Route path="/profile/:id" element={<ProfilePage />} />
-          <Route path="/profile/" element={<ProfilePage />} />
-          <Route path="/review/:id" element={<ReviewPage />} />
-          <Route path="/film-reviews/:movieId/:userId" element={<FilmReviewsPage />} />
-          <Route path="/movie/:id/friends" element={<MovieFriendsPage />} />
-          <Route path="/replies/:id" element={<RepliesPage />} />
-          <Route path="/review/:id/change-backdrop" element={<ChangeReviewBackdropPage />} />
-          <Route path="/edit-profile" element={<EditProfilePage />} />
-          <Route path="/choose-backdrop" element={<BackdropSearchPage />} />
-          <Route path="/avatar-upload-test" element={<AvatarUploadTestPage />} />
-          <Route path="/scenebot" element={<SceneBotPage />} />
-          <Route path="/notifications" element={<NotificationsPage setHasUnread={setHasUnreadCount} />} />
-          <Route path="/create-list" element={<CreateListPage />} />
-          <Route path="/list/:id" element={<ListViewPage />} />
-          <Route path="/list/:id/edit" element={<EditListPage />} />
-          <Route path="/profile/:id/followers" element={<FollowersFollowingPage />} />
-          <Route path="/profile/:id/following" element={<FollowersFollowingPage />} />
-          <Route path="/movie/:id" element={<MoviePage />} />
-          <Route path="/add-to-list/:movieId" element={<AddToListPage />} />
-          <Route path="/director/:id" element={<DirectorPage />} />
-          <Route path="/actor/:id" element={<ActorPage />} />
-          <Route path="/person/:id" element={<PersonPage />} />
-          <Route path="/upload-avatar" element={<UploadAvatarPage />} />
-          <Route path="/og/review/:id" element={<OgReviewPage />} />
-          <Route path="/share-review/:id" element={<ShareReviewPage />} />
-          <Route path="/review/:id/replies" element={<RepliesPage />} />
-          <Route path="/import" element={<ImportPage />} />
-          <Route path="/log/:logId" element={<LogModal />} />
-          <Route path="/share/:type/:id" element={<ShareToFriendPage />} />
-          <Route path="/movie/:id/reviews" element={<MoreReviewsPage />} />
-        </Routes>
+    <LanguageProvider>
+      <div style={{ overflowX: "hidden", width: "100%", maxWidth: "100vw" }}>
+        <Toaster position="top-right" />
+        <div className="min-h-screen pb-16 bg-[#0e0e0e]">
+          <Routes>
+            <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+            <Route path="/signup" element={<PublicRoute><SignupPage /></PublicRoute>} />
+            <Route path="/verify-email" element={<VerifyEmailPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/verify-reset-code" element={<VerifyResetCode />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/" element={<PrivateRoute><HomePage /></PrivateRoute>} />
+            <Route path="/home" element={<PrivateRoute><HomePage /></PrivateRoute>} />
+            <Route path="/choose-avatar" element={<UploadAvatar />} />
+            <Route path="/friends-activity" element={<FriendsActivityPage />} />
+            <Route path="/trending" element={<TrendingPage />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/profile/:id" element={<ProfilePage />} />
+            <Route path="/profile/" element={<ProfilePage />} />
+            <Route path="/review/:id" element={<ReviewPage />} />
+            <Route path="/film-reviews/:movieId/:userId" element={<FilmReviewsPage />} />
+            <Route path="/movie/:id/friends" element={<MovieFriendsPage />} />
+            <Route path="/replies/:id" element={<RepliesPage />} />
+            <Route path="/review/:id/change-backdrop" element={<ChangeReviewBackdropPage />} />
+            <Route path="/edit-profile" element={<EditProfilePage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/choose-backdrop" element={<BackdropSearchPage />} />
+            <Route path="/avatar-upload-test" element={<AvatarUploadTestPage />} />
+            <Route path="/scenebot" element={<SceneBotPage />} />
+            <Route path="/notifications" element={<NotificationsPage setHasUnread={setHasUnreadCount} />} />
+            <Route path="/create-list" element={<CreateListPage />} />
+            <Route path="/list/:id" element={<ListViewPage />} />
+            <Route path="/list/:id/edit" element={<EditListPage />} />
+            <Route path="/profile/:id/followers" element={<FollowersFollowingPage />} />
+            <Route path="/profile/:id/following" element={<FollowersFollowingPage />} />
+            <Route path="/movie/:id" element={<MoviePage />} />
+            <Route path="/add-to-list/:movieId" element={<AddToListPage />} />
+            <Route path="/director/:id" element={<DirectorPage />} />
+            <Route path="/actor/:id" element={<ActorPage />} />
+            <Route path="/person/:id" element={<PersonPage />} />
+            <Route path="/upload-avatar" element={<UploadAvatarPage />} />
+            <Route path="/og/review/:id" element={<OgReviewPage />} />
+            <Route path="/share-review/:id" element={<ShareReviewPage />} />
+            <Route path="/review/:id/replies" element={<RepliesPage />} />
+            <Route path="/import" element={<ImportPage />} />
+            <Route path="/log/:logId" element={<LogModal />} />
+            <Route path="/share/:type/:id" element={<ShareToFriendPage />} />
+            <Route path="/movie/:id/reviews" element={<MoreReviewsPage />} />
+          </Routes>
+        </div>
+  
+        {shouldShowNav && <BottomNav hasUnread={hasUnreadCount} />}
       </div>
-
-      {shouldShowNav && <BottomNav hasUnread={hasUnreadCount} />}
-    </div>
+    </LanguageProvider>
   );
+  
 }
 
 export default App;

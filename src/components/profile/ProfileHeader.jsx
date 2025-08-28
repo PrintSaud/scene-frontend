@@ -1,16 +1,10 @@
+// src/components/ProfileHeader.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import useTranslate from "../../utils/useTranslate";
 
-const menuItemStyle = {
-  fontSize: "13px",
-  padding: "6px 10px",
-  background: "#1c1c1c",
-  borderRadius: "5px",
-  cursor: "pointer",
-  color: "white",
-  transition: "0.2s",
-};
+
 
 export default function ProfileHeader({
   user,
@@ -19,10 +13,11 @@ export default function ProfileHeader({
   isOwner,
   isFollowing,
   handleFollow,
-  handleRemoveFollower, // ← parent wires this; we guard it
+  handleRemoveFollower,
 }) {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const t = useTranslate(); // ✅ translation hook
 
   const isMobile = typeof window !== "undefined" ? window.innerWidth <= 768 : false;
   const backdropHeight = isMobile ? 180 : 300;
@@ -36,50 +31,53 @@ export default function ProfileHeader({
     }
   })();
 
-  // ---- Helpers ----
-  const onLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    toast.success("Logged out!");
-    window.location.href = "/login";
-  };
-
   const onShare = () => {
     try {
       navigator.clipboard.writeText(`${window.location.origin}/profile/${user._id}`);
-      toast.success("🔗 Profile link copied!");
+      toast.success(t("🔗 Profile link copied!"));
     } catch {
-      toast.error("Couldn’t copy link");
+      toast.error(t("Couldn’t copy link"));
     }
     setMenuOpen(false);
   };
 
-  // A user can remove someone as a follower if THAT person follows ME
+  // ✅ new: they follow me if their `following` contains my id
+  const idEq = (a, b) => String(a) === String(b);
+  const canRemoveFollower = (user.following || []).some((id) => idEq(id, me?._id));
 
-// ✅ new: they follow me if their `following` contains my id
-const idEq = (a, b) => String(a) === String(b);
-const canRemoveFollower = (user.following || []).some((id) => idEq(id, me?._id));
+  const onRemoveFollower = () => {
+    if (!handleRemoveFollower) {
+      toast.error(t("Remove follower isn’t wired yet"));
+      return;
+    }
+    handleRemoveFollower(user._id);
+    setMenuOpen(false);
+  };
 
-const onRemoveFollower = () => {
-  if (!handleRemoveFollower) {
-    toast.error("Remove follower isn’t wired yet");
-    return;
-  }
-  handleRemoveFollower(user._id); // pass their id (the follower to remove)
-  setMenuOpen(false);
-};
-
-
-  // Build menu items with guaranteed onClick (or guarded)
+  // Menu items
   const items = isOwner
     ? [
-        { label: "✏️ Edit Profile", onClick: () => { setMenuOpen(false); navigate("/edit-profile"); } },
-        { label: "📤 Share", onClick: onShare },
-        { label: "🚪 Log Out", onClick: onLogout },
+        {
+          label: `✏️ ${t("Edit Profile")}`,
+          onClick: () => {
+            setMenuOpen(false);
+            navigate("/edit-profile");
+          },
+        },
+        { label: `📤 ${t("Share")}`, onClick: onShare },
+        {
+          label: `⚙️ ${t("Settings")}`,
+          onClick: () => {
+            setMenuOpen(false);
+            navigate("/settings");
+          },
+        },
       ]
     : [
-        { label: "📤 Share", onClick: onShare },
-        ...(canRemoveFollower ? [{ label: "❌ Remove Follower", onClick: onRemoveFollower }] : []),
+        { label: `📤 ${t("Share")}`, onClick: onShare },
+        ...(canRemoveFollower
+          ? [{ label: `❌ ${t("Remove Follower")}`, onClick: onRemoveFollower }]
+          : []),
       ];
 
   return (
@@ -96,7 +94,6 @@ const onRemoveFollower = () => {
           overflow: "hidden",
         }}
       >
-        {/* Hidden img for ColorThief */}
         <img
           ref={imgRef}
           src={user.profileBackdrop || "/default-backdrop.jpg"}
@@ -107,7 +104,7 @@ const onRemoveFollower = () => {
           }}
         />
 
-        {/* 🔙 Back Button for non-owners (like MoviePage style) */}
+        {/* 🔙 Back Button for non-owners */}
         {!isOwner && (
           <button
             onClick={() => navigate(-1)}
@@ -180,7 +177,7 @@ const onRemoveFollower = () => {
                   tabIndex={0}
                   onClick={(e) => {
                     e.stopPropagation();
-                    item.onClick?.(); // ✅ guard against undefined
+                    item.onClick?.();
                   }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
@@ -252,23 +249,25 @@ const onRemoveFollower = () => {
 
         {/* FOLLOW BUTTON */}
         {!isOwner && (
-          <button
-            onClick={handleFollow}
-            style={{
-              background: isFollowing ? "#333" : "#1a1a1a",
-              color: "white",
-              border: "1px solid #555",
-              borderRadius: "6px",
-              padding: "4px 12px",
-              fontSize: "12px",
-              cursor: "pointer",
-              height: "28px",
-              marginTop: "-8px",
-            }}
-          >
-            {isFollowing ? "Following" : "Follow"}
-          </button>
-        )}
+  <button
+    onClick={() => handleFollow(user._id)}
+    style={{
+      background: isFollowing ? "#333" : "#1a1a1a",
+      color: "white",
+      border: "1px solid #555",
+      borderRadius: "6px",
+      padding: "4px 12px",
+      fontSize: "12px",
+      cursor: "pointer",
+      height: "28px",
+      marginTop: "-8px",
+    }}
+  >
+    {isFollowing ? t("Following") : t("Follow")}
+  </button>
+)}
+
+
       </div>
 
       {/* BIO */}
@@ -306,12 +305,12 @@ const onRemoveFollower = () => {
       >
         <div onClick={() => navigate(`/profile/${user._id}/following`)} style={{ cursor: "pointer" }}>
           <strong>{user.following?.length || 0}</strong>
-          <div>Following</div>
+          <div>{t("Following")}</div>
         </div>
 
         <div onClick={() => navigate(`/profile/${user._id}/followers`)} style={{ cursor: "pointer" }}>
           <strong>{user.followers?.length || 0}</strong>
-          <div>Followers</div>
+          <div>{t("Followers")}</div>
         </div>
 
         <div
@@ -322,7 +321,7 @@ const onRemoveFollower = () => {
           style={{ cursor: "pointer" }}
         >
           <strong>{logs.length || 0}</strong>
-          <div>Films</div>
+          <div>{t("Films")}</div>
         </div>
       </div>
     </>

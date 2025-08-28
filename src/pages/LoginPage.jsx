@@ -1,3 +1,4 @@
+// src/pages/LoginPage.jsx
 import { useEffect, useState } from "react";
 import axios from "../api/api";
 import "../styles/LoginPage.css";
@@ -5,6 +6,7 @@ import { GoogleLogin } from "@react-oauth/google";
 import toast from "react-hot-toast";
 import { FaSpinner } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "../context/LanguageContext"; // ⬅️ add this
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -12,8 +14,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-
-  
+  const { setLanguage } = useLanguage(); // ⬅️ add this
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -21,10 +22,7 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const res = await axios.post(`/api/auth/login`, {
-        email,
-        password,
-      });
+      const res = await axios.post(`/api/auth/login`, { email, password });
 
       const mergedUser = {
         ...res.data.user,
@@ -32,10 +30,13 @@ export default function LoginPage() {
         token: res.data.token,
       };
 
+      // Store user
       localStorage.setItem("user", JSON.stringify(mergedUser));
+      // ⬅️ Flip UI language immediately (per-user)
+      setLanguage(res.data.user?.language || "en");
 
       toast.success("Logged in successfully!");
-      window.location.href = "/home";
+      navigate("/home"); // use SPA navigation so context change applies instantly
     } catch (err) {
       setError("Login failed. Please check your credentials.");
       toast.error("Login failed.");
@@ -52,7 +53,7 @@ export default function LoginPage() {
       <p className="welcome-text">Welcome back! We missed you!</p>
 
       {error && (
-        <p style={{ color: "#ff4d4d", fontSize: "0.15rem", marginBottom: "10px", textAlign: "center", }}>
+        <p style={{ color: "#ff4d4d", fontSize: "0.15rem", marginBottom: "10px", textAlign: "center" }}>
           {error}
         </p>
       )}
@@ -74,33 +75,26 @@ export default function LoginPage() {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-<div style={{ textAlign: "right", marginTop: "-10px", marginBottom: "10px" }}>
-  <span
-    onClick={() => navigate("/forgot-password")}
-    style={{ color: "#aaa", fontSize: "0.85rem", cursor: "pointer", textDecoration: "underline" }}
-  >
-    Forgot password?
-  </span>
-</div>
-
+        <div style={{ textAlign: "right", marginTop: "-10px", marginBottom: "10px" }}>
+          <span
+            onClick={() => navigate("/forgot-password")}
+            style={{ color: "#aaa", fontSize: "0.85rem", cursor: "pointer", textDecoration: "underline" }}
+          >
+            Forgot password?
+          </span>
+        </div>
 
         <button type="submit" className="login-button" disabled={isLoading}>
-          {isLoading ? (
-            <FaSpinner className="spin" style={{ fontSize: "18px" }} />
-          ) : (
-            "Login"
-          )}
+          {isLoading ? <FaSpinner className="spin" style={{ fontSize: "18px" }} /> : "Login"}
         </button>
       </form>
 
-
       <div className="signup-row" style={{ marginTop: "15px" }}>
-  <span>Don’t have an account?</span>
-  <a href="/signup" className="signup-link">
-    Sign up
-  </a>
-</div>
-
+        <span>Don’t have an account?</span>
+        <a href="/signup" className="signup-link">
+          Sign up
+        </a>
+      </div>
     </div>
   );
 }

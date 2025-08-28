@@ -3,11 +3,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "../api/api";
 import AddMovieModal from "../components/lists/AddMovieModal";
 import MovieListSortable from "../components/lists/MovieListSortable";
-import { backend } from "../config";
-import CropperModal from "../components/CropperModal";
-import CropListImageModal from "../components/CropListImageModal"; // ✅ NEW
+import CropListImageModal from "../components/CropListImageModal";
+import useTranslate from "../utils/useTranslate";
+import toast from "react-hot-toast";
 
 export default function EditListPage() {
+  const t = useTranslate();
   const { id } = useParams();
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
@@ -21,23 +22,23 @@ export default function EditListPage() {
   const [showModal, setShowModal] = useState(false);
   const [rawCoverFile, setRawCoverFile] = useState(null);
   const [showCropper, setShowCropper] = useState(false);
-  
+
   useEffect(() => {
     const fetchList = async () => {
       try {
-        const { data } = await axios.get(`/api/lists/${id}`); // ✅ ADDED /api
-        if (data.user._id !== user._id) return navigate("/");
-        setTitle(data.title);
+        const { data } = await axios.get(`/api/lists/${id}`);
+        if (data?.user?._id && data.user._id !== user?._id) return navigate("/");
+        setTitle(data.title || "");
         setDescription(data.description || "");
         setCoverImage(data.coverImage || "");
-        setIsPrivate(data.isPrivate);
-        setIsRanked(data.isRanked);
-        setMovies(data.movies || []);
+        setIsPrivate(!!data.isPrivate);
+        setIsRanked(!!data.isRanked);
+        setMovies(Array.isArray(data.movies) ? data.movies : []);
       } catch (err) {
         console.error("❌ Failed to load list", err);
+        toast.error(t("Failed to load list."));
       }
     };
-    
     fetchList();
   }, [id]);
 
@@ -53,66 +54,64 @@ export default function EditListPage() {
         isRanked,
         movies,
       };
-  
-      await axios.patch(`/api/lists/${id}`, payload); // ✅ updated path
-  
+      await axios.patch(`/api/lists/${id}`, payload);
+      toast.success("✅ " + t("List updated!"));
       navigate(`/list/${id}`);
     } catch (err) {
       console.error("❌ Failed to update list", err);
-      alert("Failed to update list.");
+      toast.error(t("Failed to update list."));
     }
   };
-  
 
   const handleDelete = async () => {
-    const confirm = window.confirm("Are you sure you want to delete this list?");
-    if (!confirm) return;
+    const ok = window.confirm("⚠️ " + t("Are you sure you want to delete this list?"));
+    if (!ok) return;
     try {
-      await axios.delete(`/api/lists/${id}`); // ✅ correct path
+      await axios.delete(`/api/lists/${id}`);
+      toast.success(t("List deleted."));
       navigate("/profile");
     } catch (err) {
       console.error("❌ Failed to delete list", err);
-      alert("Failed to delete list.");
+      toast.error(t("Failed to delete list."));
     }
   };
-  
+
   const handleCoverUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     setRawCoverFile(file);
     setShowCropper(true);
   };
-  
+
   const handleCroppedCover = async (croppedBlob) => {
     const formData = new FormData();
     formData.append("image", croppedBlob);
-  
     try {
       const { data } = await axios.post("/api/upload/list-cover", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-  
       setCoverImage(data.url);
+      toast.success(t("Cover uploaded!"));
     } catch (err) {
       console.error("❌ Upload failed", err);
-      alert("Upload failed.");
+      toast.error(t("Upload failed."));
     }
   };
-  
 
   return (
     <div style={{ background: "#0e0e0e", color: "white", minHeight: "100vh", paddingBottom: "80px" }}>
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", padding: "16px" }}>
-        <button onClick={() => navigate(-1)} style={btnStyle}>← Back</button>
+        <button onClick={() => navigate(-1)} style={btnStyle}>← {t("Back")}</button>
         <div style={{ display: "flex", gap: "10px" }}>
           <button
             onClick={handleSave}
             style={{ ...btnStyle, opacity: canSave ? 1 : 0.5 }}
             disabled={!canSave}
           >
-            ✅ Save
+            ✅ {t("Save")}
           </button>
+          <button onClick={handleDelete} style={deleteBtn}>🗑️ {t("Delete")}</button>
         </div>
       </div>
 
@@ -120,70 +119,80 @@ export default function EditListPage() {
       <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: "12px" }}>
         <input
           type="text"
-          placeholder="List title"
+          placeholder={t("List title")}
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           style={inputStyle}
+          aria-label={t("List title")}
         />
 
         <textarea
-          placeholder="Description (optional)"
+          placeholder={t("Description (optional)")}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           style={{ ...inputStyle, height: "80px" }}
+          aria-label={t("Description (optional)")}
         />
 
         {/* Cover */}
         {!coverImage ? (
           <div>
-            <label htmlFor="cover-upload" style={uploadLabel}>⬆️ Upload a cover image</label>
-            <input type="file" id="cover-upload" accept="image/*" style={{ display: "none" }} onChange={handleCoverUpload} />
+            <label htmlFor="cover-upload" style={uploadLabel}>⬆️ {t("Upload a cover image")}</label>
+            <input
+              type="file"
+              id="cover-upload"
+              accept="image/*"
+              style={{ display: "none" }}
+              onChange={handleCoverUpload}
+            />
           </div>
         ) : (
           <div>
             <img
-  src={coverImage}
-  alt="Cover"
-  style={{
-    width: "100%",
-    aspectRatio: "16 / 9",  // ✅ Ensures consistent rectangle
-    borderRadius: "10px",
-    objectFit: "cover",
-    backgroundColor: "#222", // ✅ prevents visual pop while loading
-  }}
-/>
-
-            <button onClick={() => setCoverImage("")} style={removeBtn}>❌ Remove</button>
+              src={coverImage}
+              alt={t("Cover")}
+              style={{
+                width: "100%",
+                aspectRatio: "16 / 9",
+                borderRadius: "10px",
+                objectFit: "cover",
+                backgroundColor: "#222",
+              }}
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = "/default-poster.jpg";
+              }}
+            />
+            <button onClick={() => setCoverImage("")} style={removeBtn}>❌ {t("Remove")}</button>
           </div>
         )}
 
         {/* Toggles */}
         <label style={toggleStyle}>
           <input type="checkbox" checked={isPrivate} onChange={() => setIsPrivate(!isPrivate)} />
-          <span style={{ marginLeft: "8px",            fontFamily: "Inter, sans-serif", }}>Private</span>
+          <span style={{ marginLeft: 8, fontFamily: "Inter, sans-serif" }}>{t("Private")}</span>
         </label>
 
         <label style={toggleStyle}>
           <input type="checkbox" checked={isRanked} onChange={() => setIsRanked(!isRanked)} />
-          <span style={{ marginLeft: "8px",             fontFamily: "Inter, sans-serif", }}>Ranked</span>
+          <span style={{ marginLeft: 8, fontFamily: "Inter, sans-serif" }}>{t("Ranked")}</span>
         </label>
 
-{/* Movies */}
-<div>
-  <h4 style={{ marginTop: "20px" }}>🎬 Movies in this list:</h4>
-  {movies.length === 0 ? (
-    <p style={{ color: "#888" }}>No movies yet.</p>
-  ) : (
-    <MovieListSortable
-      movies={movies}
-      setMovies={setMovies}
-      hideNumbers={!isRanked}  // 🔥 Always sortable; hide numbers if unranked
-    />
-  )}
-</div>
+        {/* Movies */}
+        <div>
+          <h4 style={{ marginTop: "20px" }}>🎬 {t("Movies in this list:")}</h4>
+          {movies.length === 0 ? (
+            <p style={{ color: "#888" }}>{t("No movies yet.")}</p>
+          ) : (
+            <MovieListSortable
+              movies={movies}
+              setMovies={setMovies}
+              hideNumbers={!isRanked}
+            />
+          )}
+        </div>
 
-
-        <button onClick={() => setShowModal(true)} style={btnStyle}>➕ Add Movie</button>
+        <button onClick={() => setShowModal(true)} style={btnStyle}>➕ {t("Add Movie")}</button>
       </div>
 
       {/* Modal */}
@@ -198,14 +207,14 @@ export default function EditListPage() {
           existing={movies}
         />
       )}
-      {showCropper && rawCoverFile && (
-  <CropListImageModal
-    file={rawCoverFile}
-    onClose={() => setShowCropper(false)}
-    onCropComplete={handleCroppedCover}
-  />
-)}
 
+      {showCropper && rawCoverFile && (
+        <CropListImageModal
+          file={rawCoverFile}
+          onClose={() => setShowCropper(false)}
+          onCropComplete={handleCroppedCover}
+        />
+      )}
     </div>
   );
 }

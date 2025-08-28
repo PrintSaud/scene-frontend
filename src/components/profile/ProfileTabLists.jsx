@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   getMyLists,
   getUserLists,
@@ -7,18 +7,33 @@ import {
   getFriendsLists,
 } from "../../api/api";
 import { useNavigate } from "react-router-dom";
-import { backend } from "../../config";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
+import useTranslate from "../../utils/useTranslate";
 
 export default function ProfileTabLists({ user, profileUserId, refreshTrigger }) {
+  const t = useTranslate();
+  const navigate = useNavigate();
+
   const [myLists, setMyLists] = useState([]);
   const [savedLists, setSavedLists] = useState([]);
   const [popularLists, setPopularLists] = useState([]);
   const [friendsLists, setFriendsLists] = useState([]);
-  const [activeSubTab, setActiveSubTab] = useState("My lists");
-  const navigate = useNavigate();
 
+  // 🔤 keep an internal ID (not a label) so translation doesn’t break logic
   const isOwner = user?._id === profileUserId;
+  const availableTabs = isOwner ? ["my", "saved", "popular", "friends"] : ["my", "saved", "popular"];
+  const [activeSubTab, setActiveSubTab] = useState(availableTabs[0]);
+
+  // labels map (recomputed when language changes)
+  const TAB_LABELS = useMemo(
+    () => ({
+      my: t("My lists"),
+      saved: t("Saved"),
+      popular: t("Popular"),
+      friends: t("Friends"),
+    }),
+    [t]
+  );
 
   useEffect(() => {
     const fetchLists = async () => {
@@ -46,27 +61,20 @@ export default function ProfileTabLists({ user, profileUserId, refreshTrigger })
     fetchLists();
   }, [profileUserId, isOwner, refreshTrigger]);
 
-  const getDisplayedLists = () => {
+  const displayedLists = useMemo(() => {
     switch (activeSubTab) {
-      case "My lists":
+      case "my":
         return myLists;
-      case "Saved":
+      case "saved":
         return savedLists;
-      case "Popular":
+      case "popular":
         return popularLists;
-      case "Friends":
+      case "friends":
         return friendsLists;
       default:
         return [];
     }
-  };
-
-  const displayedLists = getDisplayedLists();
-
-  // 🔔 Define tabs conditionally
-  const subTabs = isOwner
-    ? ["My lists", "Saved", "Popular", "Friends"]
-    : ["My lists", "Saved", "Popular"];
+  }, [activeSubTab, myLists, savedLists, popularLists, friendsLists]);
 
   return (
     <>
@@ -81,28 +89,32 @@ export default function ProfileTabLists({ user, profileUserId, refreshTrigger })
           marginBottom: "20px",
         }}
       >
-        {subTabs.map((label) => (
-          <button
-            key={label}
-            onClick={() => setActiveSubTab(label)}
-            style={{
-              background: activeSubTab === label ? "#222" : "transparent",
-              border: "1px solid #444",
-              borderRadius: "20px",
-              padding: "6px 14px",
-              color: "#eee",
-              fontWeight: activeSubTab === label ? "bold" : "normal",
-              cursor: "pointer",
-              fontSize: "13px",
-            }}
-          >
-            {label}
-          </button>
-        ))}
+        {availableTabs.map((tabId) => {
+          const isActive = activeSubTab === tabId;
+          return (
+            <button
+              key={tabId}
+              onClick={() => setActiveSubTab(tabId)}
+              style={{
+                background: isActive ? "#222" : "transparent",
+                border: "1px solid #444",
+                borderRadius: "20px",
+                padding: "6px 14px",
+                color: "#eee",
+                fontWeight: isActive ? "bold" : "normal",
+                cursor: "pointer",
+                fontSize: "13px",
+              }}
+              aria-pressed={isActive}
+            >
+              {TAB_LABELS[tabId]}
+            </button>
+          );
+        })}
       </div>
 
       {/* Add Button */}
-      {activeSubTab === "My lists" && isOwner && (
+      {activeSubTab === "my" && isOwner && (
         <div style={{ display: "flex", justifyContent: "flex-end", padding: "0 16px" }}>
           <button
             onClick={() => navigate("/create-list")}
@@ -117,90 +129,99 @@ export default function ProfileTabLists({ user, profileUserId, refreshTrigger })
               cursor: "pointer",
             }}
           >
-            ➕ Add List
+            ➕ {t("Add List")}
           </button>
         </div>
       )}
 
-{/* Grid Display */}
-<div
-  style={{
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", // ✅ responsive
-    gap: "20px",
-    padding: "0 16px 16px",
-    justifyItems: "center", // ✅ center cards in each cell
-  }}
->
-  {displayedLists.map((list) => (
-    <div
-      key={list._id}
-      onClick={() => navigate(`/list/${list._id}`)}
-      style={{
-        background: "#1a1a1a",
-        borderRadius: "14px",
-        overflow: "hidden",
-        cursor: "pointer",
-        boxShadow: "0 4px 10px rgba(0,0,0,0.4)",
-        transition: "transform 0.2s ease",
-        width: "100%",
-        maxWidth: "400px", // ✅ cap card width for desktops
-      }}
-      onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
-      onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-    >
-      {/* 🔥 Only render <img> if coverImage exists */}
-      {list.coverImage && (
-        <img
-          src={list.coverImage}
-          alt={list.title}
-          style={{
-            width: "100%",
-            height: "160px",   // ✅ slightly taller for balance
-            objectFit: "cover",
-          }}
-        />
-      )}
+      {/* Grid Display */}
+      <div
+        className="lists-grid"
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+          gap: "20px",
+          padding: "0 16px 16px",
+          justifyItems: "center",
+        }}
+      >
+        {displayedLists.map((list) => (
+          <div
+            key={list._id}
+            onClick={() => navigate(`/list/${list._id}`)}
+            style={{
+              background: "#1a1a1a",
+              borderRadius: "14px",
+              overflow: "hidden",
+              cursor: "pointer",
+              boxShadow: "0 4px 10px rgba(0,0,0,0.4)",
+              transition: "transform 0.2s ease",
+              width: "100%",
+              maxWidth: "400px",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+          >
+            {list.coverImage && (
+              <img
+                src={list.coverImage}
+                alt={list.title}
+                style={{
+                  width: "100%",
+                  height: "160px",
+                  objectFit: "cover",
+                }}
+              />
+            )}
 
-      <div style={{ padding: "12px" }}>
-        <div
-          style={{
-            fontSize: "14px",
-            fontWeight: "bold",
-            color: "#fff",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {list.title}
-        </div>
-        <div style={{ color: "#aaa", fontSize: "12px", marginTop: "4px" }}>
-          @{list.user?.username || "unknown"}
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "4px",
-            marginTop: "6px",
-          }}
-        >
-          {list.likes?.includes(user?._id) ? (
-            <AiFillHeart style={{ fontSize: "14px", color: "#B327F6" }} />
-          ) : (
-            <AiOutlineHeart style={{ fontSize: "14px", color: "#999" }} />
-          )}
-          <span style={{ fontSize: "12px", color: "#bbb" }}>
-            {list.likes?.length || 0}
-          </span>
-        </div>
+            <div style={{ padding: "12px" }}>
+              <div
+                style={{
+                  fontSize: "14px",
+                  fontWeight: "bold",
+                  color: "#fff",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {list.title}
+              </div>
+              <div style={{ color: "#aaa", fontSize: "12px", marginTop: "4px" }}>
+                @{list.user?.username || t("unknown")}
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px",
+                  marginTop: "6px",
+                }}
+              >
+                {list.likes?.includes(user?._id) ? (
+                  <AiFillHeart style={{ fontSize: "14px", color: "#B327F6" }} />
+                ) : (
+                  <AiOutlineHeart style={{ fontSize: "14px", color: "#999" }} />
+                )}
+                <span style={{ fontSize: "12px", color: "#bbb" }}>
+                  {list.likes?.length || 0}
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
-    </div>
-  ))}
-</div>
 
-
+      {/* (Optional) Phone-specific layout tweaks */}
+      <style>
+        {`
+          @media (max-width: 480px) {
+            .lists-grid {
+              grid-template-columns: repeat(1, 1fr);
+            }
+          }
+        `}
+      </style>
     </>
   );
 }

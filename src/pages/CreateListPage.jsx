@@ -3,12 +3,12 @@ import { useNavigate } from "react-router-dom";
 import axios from "../api/api";
 import AddMovieModal from "../components/lists/AddMovieModal";
 import MovieListSortable from "../components/lists/MovieListSortable";
-import { backend } from "../config";
 import toast from "react-hot-toast";
-import CropperModal from "../components/CropperModal";
-import CropListImageModal from "../components/CropListImageModal"; // ✅ NEW
+import CropListImageModal from "../components/CropListImageModal";
+import useTranslate from "../utils/useTranslate";
 
 export default function CreateListPage() {
+  const t = useTranslate();
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
 
@@ -20,43 +20,39 @@ export default function CreateListPage() {
   const [movies, setMovies] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [rawCoverFile, setRawCoverFile] = useState(null);
-const [showCropper, setShowCropper] = useState(false);
+  const [showCropper, setShowCropper] = useState(false);
 
+  const handleCoverUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setRawCoverFile(file);
+    setShowCropper(true);
+  };
 
-const handleCoverUpload = (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  setRawCoverFile(file);
-  setShowCropper(true);
-};
+  const handleCroppedCover = async (croppedBlob) => {
+    const formData = new FormData();
+    formData.append("image", croppedBlob);
 
-const handleCroppedCover = async (croppedBlob) => {
-  const formData = new FormData();
-  formData.append("image", croppedBlob);
-
-  try {
-    const { data } = await axios.post("/api/upload/list-cover", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-
-    setCoverImage(data.url);
-  } catch (err) {
-    console.error("❌ Upload failed", err);
-    toast.error("Upload failed.");
-  }
-};
-
-
+    try {
+      const { data } = await axios.post("/api/upload/list-cover", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setCoverImage(data.url);
+      toast.success(t("Cover uploaded!"));
+    } catch (err) {
+      console.error("❌ Upload failed", err);
+      toast.error(t("Upload failed."));
+    }
+  };
 
   const canSave = title.trim().length > 0 && movies.length > 0;
-
 
   const handleSave = async () => {
     try {
       const payload = {
         title,
         description,
-        coverImage,  // Will be empty string if no image selected
+        coverImage, // empty string if none
         isPrivate,
         isRanked,
         movies: movies.map((m) => ({
@@ -70,27 +66,28 @@ const handleCroppedCover = async (croppedBlob) => {
               : "",
         })),
       };
-  
-      await axios.post("/api/lists", payload);
 
-  
+      await axios.post("/api/lists", payload);
       window.dispatchEvent(new Event("refreshMyLists"));
-      toast.success("✅ List created!");
+      toast.success("✅ " + t("List created!"));
       navigate(-1);
     } catch (err) {
       console.error("❌ Failed to create list", err);
-      toast.error("Failed to create list.");
+      toast.error(t("Failed to create list."));
     }
   };
-  
 
   return (
     <div style={{ background: "#0e0e0e", color: "white", minHeight: "100vh", paddingBottom: "80px" }}>
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", padding: "16px" }}>
-        <button onClick={() => navigate(-1)} style={btnStyle}>← Back</button>
-        <button onClick={handleSave} style={{ ...btnStyle, opacity: canSave ? 1 : 0.5 }} disabled={!canSave}>
-          ✅ Save
+        <button onClick={() => navigate(-1)} style={btnStyle}>← {t("Back")}</button>
+        <button
+          onClick={handleSave}
+          style={{ ...btnStyle, opacity: canSave ? 1 : 0.5 }}
+          disabled={!canSave}
+        >
+          ✅ {t("Save")}
         </button>
       </div>
 
@@ -98,72 +95,82 @@ const handleCroppedCover = async (croppedBlob) => {
       <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: "12px" }}>
         <input
           type="text"
-          placeholder="List title"
+          placeholder={t("List title")}
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           style={inputStyle}
+          aria-label={t("List title")}
         />
 
         <textarea
-          placeholder="Description (optional)"
+          placeholder={t("Description (optional)")}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           style={{ ...inputStyle, height: "80px" }}
+          aria-label={t("Description (optional)")}
         />
 
         {/* Cover Image Upload */}
         {!coverImage ? (
           <div style={{ marginTop: "12px" }}>
             <label htmlFor="cover-upload" style={uploadLabel}>
-  ⬆️ Upload a cover image (optional)
-</label>
-            <input type="file" id="cover-upload" accept="image/*" style={{ display: "none" }} onChange={handleCoverUpload} />
+              ⬆️ {t("Upload a cover image (optional)")}
+            </label>
+            <input
+              type="file"
+              id="cover-upload"
+              accept="image/*"
+              style={{ display: "none" }}
+              onChange={handleCoverUpload}
+            />
           </div>
         ) : (
           <div style={{ marginTop: "12px" }}>
             <img
-  src={coverImage}
-  alt="Cover"
-  style={{
-    width: "100%",
-    aspectRatio: "16 / 9",  // ✅ Ensures consistent rectangle
-    borderRadius: "10px",
-    objectFit: "cover",
-    backgroundColor: "#222", // ✅ prevents visual pop while loading
-  }}
-/>
-
-            <button onClick={() => setCoverImage("")} style={removeBtn}>❌ Remove</button>
+              src={coverImage}
+              alt={t("Cover")}
+              style={{
+                width: "100%",
+                aspectRatio: "16 / 9",
+                borderRadius: "10px",
+                objectFit: "cover",
+                backgroundColor: "#222",
+              }}
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = "/default-poster.jpg";
+              }}
+            />
+            <button onClick={() => setCoverImage("")} style={removeBtn}>❌ {t("Remove")}</button>
           </div>
         )}
 
         {/* Toggles */}
         <label style={toggleStyle}>
           <input type="checkbox" checked={isPrivate} onChange={() => setIsPrivate(!isPrivate)} />
-          <span style={{ marginLeft: "8px",             fontFamily: "Inter, sans-serif", }}>Private</span>
+          <span style={{ marginLeft: 8, fontFamily: "Inter, sans-serif" }}>{t("Private")}</span>
         </label>
 
         <label style={toggleStyle}>
           <input type="checkbox" checked={isRanked} onChange={() => setIsRanked(!isRanked)} />
-          <span style={{ marginLeft: "8px",             fontFamily: "Inter, sans-serif", }}>Ranked</span>
+          <span style={{ marginLeft: 8, fontFamily: "Inter, sans-serif" }}>{t("Ranked")}</span>
         </label>
 
-{/* Movie List */}
-<div>
-  <h4 style={{ marginTop: "20px" }}>🎬 Movies in this list:</h4>
-  {movies.length === 0 ? (
-    <p style={{ color: "#888" }}>No movies added yet.</p>
-  ) : (
-    <MovieListSortable
-      movies={movies}
-      setMovies={setMovies}
-      hideNumbers={!isRanked}  // 🔥 Always use sortable; hide numbers for unranked
-    />
-  )}
-</div>
+        {/* Movie List */}
+        <div>
+          <h4 style={{ marginTop: "20px" }}>🎬 {t("Movies in this list:")}</h4>
+          {movies.length === 0 ? (
+            <p style={{ color: "#888" }}>{t("No movies added yet.")}</p>
+          ) : (
+            <MovieListSortable
+              movies={movies}
+              setMovies={setMovies}
+              hideNumbers={!isRanked} // keep sortable; hide numbers if unranked
+            />
+          )}
+        </div>
 
-
-        <button onClick={() => setShowModal(true)} style={btnStyle}>➕ Add Movie</button>
+        <button onClick={() => setShowModal(true)} style={btnStyle}>➕ {t("Add Movie")}</button>
       </div>
 
       {/* Modal */}
@@ -174,14 +181,14 @@ const handleCroppedCover = async (croppedBlob) => {
           existing={movies}
         />
       )}
-      {showCropper && rawCoverFile && (
-  <CropListImageModal
-    file={rawCoverFile}
-    onClose={() => setShowCropper(false)}
-    onCropComplete={handleCroppedCover}
-  />
-)}
 
+      {showCropper && rawCoverFile && (
+        <CropListImageModal
+          file={rawCoverFile}
+          onClose={() => setShowCropper(false)}
+          onCropComplete={handleCroppedCover}
+        />
+      )}
     </div>
   );
 }

@@ -146,14 +146,35 @@ export default function ProfilePage() {
 
 
 
-  const handleFollow = async () => {
-    try {
-      await followUser(stored._id, user._id);
-      setIsFollowing(!isFollowing);
-    } catch (err) {
-      console.error("❌ Failed to follow/unfollow:", err);
+// example handleFollow
+
+
+async function handleFollow(targetId) {
+  try {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const token = user?.token;
+
+    const res = await api.post(
+      `/api/users/${user._id}/follow/${targetId}`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    // If server blocked with 403, this won't run (it’ll throw)
+    setIsFollowing(res.data.following);
+    toast.success(res.data.message);
+  } catch (err) {
+    console.error("❌ Follow toggle failed:", err);
+
+    if (err.response?.status === 403) {
+      // 🚫 Blocked
+      toast.error("لا حقتي");
+      setIsFollowing(false); // make sure button stays "Follow"
+    } else {
+      toast.error("Failed to update follow status");
     }
-  };
+  }
+}
   
 
   const handleCopyLink = () => {

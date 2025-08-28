@@ -11,7 +11,9 @@ import { HiDotsVertical } from "react-icons/hi";
 import { useLocation } from "react-router-dom";
 import api from "../../api/api"; // ✅ fix relative path
 import toast from "react-hot-toast";
+import useTranslate from "../../utils/useTranslate"; // ✅ NEW
 
+// ⏱️ Leave timestamps EXACTLY as-is (per your request)
 const getRelativeTime = (date) => {
   const now = Date.now();
   const then = new Date(date).getTime();
@@ -30,21 +32,21 @@ const getRelativeTime = (date) => {
   return `${d.getDate()} ${d.toLocaleString('default', { month: 'short' })}`;
 };
 
-
 export default function RepliesPage() {
+  const t = useTranslate(); // ✅ NEW
   const location = useLocation();
   const { parentCommentId, parentUsername } = location.state || {};
   const { id } = useParams();  // ✅ keep only `id`
   const navigate = useNavigate();
   const [replies, setReplies] = useState([]);
 
-const topLevelReplies = replies.filter(r => !r.parentComment);
-const rootReplies = topLevelReplies.length > 0 ? topLevelReplies : replies;
+  const topLevelReplies = replies.filter(r => !r.parentComment);
+  const rootReplies = topLevelReplies.length > 0 ? topLevelReplies : replies;
 
   const [tmdbId, setTmdbId] = useState(null);
   const [input, setInput] = useState("");
   const [selectedGif, setSelectedGif] = useState("");
-  const [showGifModal, setShowGifModal] = useState(false); // ✅ 2️⃣ Manage modal visibility
+  const [showGifModal, setShowGifModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState("");
   const user = JSON.parse(localStorage.getItem("user")) || {};
   const userId = user._id;
@@ -52,46 +54,32 @@ const rootReplies = topLevelReplies.length > 0 ? topLevelReplies : replies;
   const inputRef = useRef(null);
   const [menuOpenId, setMenuOpenId] = useState(null);
   const [parentComment, setParentComment] = useState(null);
-  const [log, setLog] = useState(null); // ✅ Save full log object
-
+  const [log, setLog] = useState(null);
 
   const fetchReplies = async () => {
     try {
-      console.log("🧪 Fetching log for replies…", id);
       const res = await api.get(`/api/logs/${id}`);
-      console.log("📦 Full log response:", res.data);
-  
       const replies = res.data.replies || [];
-      console.log("💬 Replies found:", replies);
-  
-      const sorted = replies.sort(
-        (a, b) => (b.likes?.length || 0) - (a.likes?.length || 0)
-      );
+      const sorted = replies.sort((a, b) => (b.likes?.length || 0) - (a.likes?.length || 0));
       setReplies(sorted);
     } catch (err) {
       console.error("❌ Failed to load replies", err);
     }
   };
-  
-  
 
   useEffect(() => {
     const fetchLog = async () => {
       try {
         const res = await api.get(`/api/logs/${id}`);
         const fullLog = res.data;
-        setTmdbId(fullLog.tmdbId); // ✅ Save TMDB ID
-        setLog(fullLog);            // ✅ Save log object
+        setTmdbId(fullLog.tmdbId);
+        setLog(fullLog);
       } catch (err) {
         console.error("❌ Failed to fetch log", err);
       }
     };
-  
     fetchLog();
   }, [id]);
-  
-  
-  
 
   const handleReplyLike = async (replyId) => {
     try {
@@ -120,16 +108,15 @@ const rootReplies = topLevelReplies.length > 0 ? topLevelReplies : replies;
     }
   }, [parentUsername]);
 
-
   const handleSend = async () => {
     if (!input.trim() && !selectedGif && !selectedImage) return;
-  
+
     const formData = new FormData();
     formData.append("text", input || "");
     if (selectedGif) formData.append("gif", selectedGif);
     if (selectedImage) formData.append("externalImage", selectedImage);
     if (parentCommentId) formData.append("parentComment", parentCommentId);
-  
+
     try {
       await addLogReply(id, formData);
       setInput("");
@@ -137,37 +124,34 @@ const rootReplies = topLevelReplies.length > 0 ? topLevelReplies : replies;
       setSelectedImage("");
       fetchReplies();
       inputRef.current?.focus();
-  
+
       setTimeout(() => {
         listRef.current?.scrollTo({
           top: listRef.current.scrollHeight,
           behavior: "smooth",
         });
       }, 100);
-  
-      toast.success("Reply sent");
+
+      toast.success(t("Reply sent"));
     } catch (err) {
       console.error("❌ Failed to send reply", err);
-      toast.error("Failed to send reply");
+      toast.error(t("Failed to send reply"));
     }
   };
-  
 
   const handleDelete = async (replyId) => {
-    const confirmDelete = window.confirm("Delete this reply?");
+    const confirmDelete = window.confirm(t("Delete this reply?"));
     if (!confirmDelete) return;
-  
+
     try {
       await deleteReply(id, replyId); // `id` = logId
-      fetchReplies(); // 🔄 Refresh the replies
-      toast.success("Reply deleted");
+      fetchReplies();
+      toast.success(t("Reply deleted"));
     } catch (err) {
       console.error("Failed to delete reply", err);
-      toast.error("Failed to delete reply");
+      toast.error(t("Failed to delete reply"));
     }
   };
-  
-  
 
   const handlePickImage = () => {
     const input = document.createElement("input");
@@ -184,23 +168,15 @@ const rootReplies = topLevelReplies.length > 0 ? topLevelReplies : replies;
     input.click();
   };
 
-  const handlePickGif = () => {
-    setShowGifModal(true); // ✅ 3️⃣ Open your real modal
-  };
-
+  const handlePickGif = () => setShowGifModal(true);
   const handleGifSelect = (gifUrl) => {
     setSelectedGif(gifUrl);
     setShowGifModal(false);
   };
-  
-  
+
   useEffect(() => {
     fetchReplies();
   }, [id]);
-  
-  console.log("🧪 All replies:", replies);
-console.log("🧪 Top-level replies:", replies.filter(r => !r.parentComment));
-
 
   return (
     <div
@@ -228,6 +204,8 @@ console.log("🧪 Top-level replies:", replies.filter(r => !r.parentComment));
       >
         <button
           onClick={() => navigate(-1)}
+          aria-label={t("Back")}
+          title={t("Back")}
           style={{
             position: "absolute",
             left: 12,
@@ -254,7 +232,7 @@ console.log("🧪 Top-level replies:", replies.filter(r => !r.parentComment));
             margin: 0,
           }}
         >
-          Comments
+          {t("Comments")}
         </h3>
       </div>
 
@@ -269,173 +247,86 @@ console.log("🧪 Top-level replies:", replies.filter(r => !r.parentComment));
           backgroundColor: "#333",
           opacity: 0.6,
         }}
-      ></div>     
+      ></div>
 
+      {/* Replies list */}
+      <div ref={listRef} style={{ padding: "72px 16px 0 16px", fontFamily: "Inter, sans-serif" }}>
+        {rootReplies.length === 0 && (
+          <div style={{ textAlign: "center", marginTop: 40, color: "#888", fontSize: 14 }}>
+            {t("No comments yet. Be the first to reply!")}
+          </div>
+        )}
 
+        {rootReplies.map((parent) => {
+          const isLikedByMeParent = parent.likes?.includes(userId);
+          const childReplies = replies.filter((c) => c.parentComment === parent._id);
 
-{/* Replies list */}
-<div ref={listRef} style={{ padding: "72px 16px 0 16px", fontFamily: "Inter, sans-serif" }}>
-  {rootReplies.length === 0 && (
-    <div style={{ textAlign: "center", marginTop: 40, color: "#888", fontSize: 14 }}>
-      No comments yet. Be the first to reply!
-    </div>
-  )}
-
-  {rootReplies.map(parent => {
-    const isLikedByMeParent = parent.likes?.includes(userId);
-    const childReplies = replies.filter(c => c.parentComment === parent._id);
-
-    return (
-      <div key={parent._id} style={{ marginBottom: 16 }}>
-        {/* Parent comment */}
-        <div
-          style={{
-            backgroundColor: parent._id === parentCommentId ? "#1e1e1e" : "transparent",
-            borderRadius: 8,
-            padding: "8px 12px",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <img
-              src={parent.avatar || "/default-avatar.jpg"}
-              alt="avatar"
-              style={{ width: 30, height: 30, borderRadius: "50%", cursor: "pointer" }}
-              onClick={() => navigate(`/profile/${parent.userId}`)}
-            />
-            <div style={{ flex: 1 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                <strong
-                  style={{ fontSize: 14, color: "#ddd", cursor: "pointer" }}
-                  onClick={() => navigate(`/profile/${parent.userId}`)}
-                >
-                  @{parent.username || "Unknown"}
-                </strong>
-
-                {/* ⭐ Star rating right next to username */}
-                {parent.ratingForThisMovie && (
-                  <StarRating rating={parent.ratingForThisMovie} size={14} />
-                )}
-
-                <span style={{ fontSize: 10, color: "#888" }}>
-                  {getRelativeTime(parent.createdAt)}
-                </span>
-              </div>
-
-              {/* 💬 Comment text */}
-              <span style={{ fontSize: 14, color: "#ddd", marginTop: 2, display: "block" }}>
-                {parent.text}
-              </span>
-
-              {/* 🎞️ Media attachments */}
-              {parent.gif && (
-                <img
-                  src={parent.gif}
-                  alt="gif"
-                  style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }}
-                />
-              )}
-              {parent.image && (
-                <img
-                  src={parent.image}
-                  alt="img"
-                  style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }}
-                />
-              )}
-
-              {/* 🗨️ Reply button */}
-              <button
-                onClick={() =>
-                  navigate(`/replies/${id}`, {
-                    state: { parentCommentId: parent._id, parentUsername: parent.username },
-                  })
-                }
+          return (
+            <div key={parent._id} style={{ marginBottom: 16 }}>
+              {/* Parent comment */}
+              <div
                 style={{
-                  background: "none",
-                  border: "none",
-                  color: "#888",
-                  fontSize: 13,
-                  cursor: "pointer",
-                  padding: 0,
-                  marginTop: 4,
-                  textAlign: "left",
+                  backgroundColor: parent._id === parentCommentId ? "#1e1e1e" : "transparent",
+                  borderRadius: 8,
+                  padding: "8px 12px",
                 }}
               >
-                Reply
-              </button>
-            </div>
-
-              {/* Like + 3-dots for parent */}
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <div style={{ cursor: "pointer", display: "flex", alignItems: "center" }} onClick={() => handleReplyLike(parent._id)}>
-                  {isLikedByMeParent ? <AiFillHeart size={16} color="#B327F6" /> : <AiOutlineHeart size={16} color="#888" />}
-                  <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>{parent.likes?.length || 0}</span>
-                </div>
-
-                {parent.userId === userId && (
-                  <div style={{ position: "relative" }}>
-                    <HiDotsVertical
-                      size={14}
-                      style={{ cursor: "pointer", color: "#888" }}
-                      onClick={() => setMenuOpenId(menuOpenId === parent._id ? null : parent._id)}
-                    />
-                    {menuOpenId === parent._id && (
-                      <div
-                        style={{
-                          position: "absolute",
-                          top: 18,
-                          right: 0,
-                          background: "#222",
-                          borderRadius: 4,
-                          padding: "4px 8px",
-                          fontSize: 12,
-                          color: "#f55",
-                          cursor: "pointer",
-                        }}
-                        onClick={() => handleDelete(parent._id)}
-                      >
-                        Delete
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Child replies */}
-          {childReplies.map(child => {
-            const isLikedByMeChild = child.likes?.includes(userId);
-            return (
-              <div key={child._id} style={{ paddingLeft: 20, fontSize: 13, opacity: 0.9, marginTop: 8 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   <img
-                    src={child.avatar || "/default-avatar.jpg"}
-                    alt="avatar"
-                    style={{ width: 26, height: 26, borderRadius: "50%", cursor: "pointer" }}
-                    onClick={() => navigate(`/profile/${child.userId}`)}
+                    src={parent.avatar || "/default-avatar.jpg"}
+                    alt={t("Avatar")}
+                    style={{ width: 30, height: 30, borderRadius: "50%", cursor: "pointer" }}
+                    onClick={() => navigate(`/profile/${parent.userId}`)}
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = "/default-avatar.jpg";
+                    }}
                   />
                   <div style={{ flex: 1 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
                       <strong
-                        onClick={() => navigate(`/profile/${child.userId}`)}
-                        style={{ fontSize: 13, color: "#ddd", cursor: "pointer" }}
+                        style={{ fontSize: 14, color: "#ddd", cursor: "pointer" }}
+                        onClick={() => navigate(`/profile/${parent.userId}`)}
                       >
-                        @{child.username || "Unknown"}
+                        @{parent.username || t("Unknown")}
                       </strong>
-                       <span style={{ fontSize: 10, color: "#888" }}>{getRelativeTime(child.createdAt)}</span>
+
+                      {/* ⭐ Star rating right next to username */}
+                      {parent.ratingForThisMovie && <StarRating rating={parent.ratingForThisMovie} size={14} />}
+
+                      <span style={{ fontSize: 10, color: "#888" }}>
+                        {getRelativeTime(parent.createdAt)}
+                      </span>
                     </div>
-                    <span style={{ fontSize: 13, color: "#ddd", marginTop: 2, display: "block" }}>{child.text}</span>
-                    {child.rating && (
-                      <div style={{ marginTop: 4 }}>
-                        <StarRating rating={child.rating} size={10} />
-                      </div>
+
+                    {/* 💬 Comment text */}
+                    <span style={{ fontSize: 14, color: "#ddd", marginTop: 2, display: "block" }}>
+                      {parent.text}
+                    </span>
+
+                    {/* 🎞️ Media attachments */}
+                    {parent.gif && (
+                      <img
+                        src={parent.gif}
+                        alt={t("GIF")}
+                        style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }}
+                      />
                     )}
-                    {child.gif && <img src={child.gif} alt="gif" style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }} />}
-                    {child.image && <img src={child.image} alt="img" style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }} />}
+                    {parent.image && (
+                      <img
+                        src={parent.image}
+                        alt={t("Image")}
+                        style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }}
+                      />
+                    )}
+
+                    {/* 🗨️ Reply button */}
                     <button
-                      onClick={() => navigate(`/replies/${id}`, {
-                        state: { parentCommentId: child._id, parentUsername: child.username }
-                      })}
+                      onClick={() =>
+                        navigate(`/replies/${id}`, {
+                          state: { parentCommentId: parent._id, parentUsername: parent.username },
+                        })
+                      }
                       style={{
                         background: "none",
                         border: "none",
@@ -447,25 +338,36 @@ console.log("🧪 Top-level replies:", replies.filter(r => !r.parentComment));
                         textAlign: "left",
                       }}
                     >
-                      Reply
+                      {t("Reply")}
                     </button>
                   </div>
 
-                  {/* Like + 3-dots for child */}
+                  {/* Like + 3-dots for parent */}
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <div style={{ cursor: "pointer", display: "flex", alignItems: "center" }} onClick={() => handleReplyLike(child._id)}>
-                      {isLikedByMeChild ? <AiFillHeart size={16} color="#B327F6" /> : <AiOutlineHeart size={16} color="#888" />}
-                      <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>{child.likes?.length || 0}</span>
+                    <div
+                      style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+                      onClick={() => handleReplyLike(parent._id)}
+                    >
+                      {isLikedByMeParent ? (
+                        <AiFillHeart size={16} color="#B327F6" />
+                      ) : (
+                        <AiOutlineHeart size={16} color="#888" />
+                      )}
+                      <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>
+                        {parent.likes?.length || 0}
+                      </span>
                     </div>
 
-                    {child.userId === userId && (
+                    {parent.userId === userId && (
                       <div style={{ position: "relative" }}>
                         <HiDotsVertical
                           size={14}
                           style={{ cursor: "pointer", color: "#888" }}
-                          onClick={() => setMenuOpenId(menuOpenId === child._id ? null : child._id)}
+                          onClick={() => setMenuOpenId(menuOpenId === parent._id ? null : parent._id)}
+                          aria-label={t("Options")}
+                          title={t("Options")}
                         />
-                        {menuOpenId === child._id && (
+                        {menuOpenId === parent._id && (
                           <div
                             style={{
                               position: "absolute",
@@ -478,9 +380,9 @@ console.log("🧪 Top-level replies:", replies.filter(r => !r.parentComment));
                               color: "#f55",
                               cursor: "pointer",
                             }}
-                            onClick={() => handleDelete(child._id)}
+                            onClick={() => handleDelete(parent._id)}
                           >
-                            Delete
+                            {t("Delete")}
                           </div>
                         )}
                       </div>
@@ -488,150 +390,244 @@ console.log("🧪 Top-level replies:", replies.filter(r => !r.parentComment));
                   </div>
                 </div>
               </div>
-            );
-          })}
-        </div>
-      );
-    })}
-</div>
 
+              {/* Child replies */}
+              {childReplies.map((child) => {
+                const isLikedByMeChild = child.likes?.includes(userId);
+                return (
+                  <div key={child._id} style={{ paddingLeft: 20, fontSize: 13, opacity: 0.9, marginTop: 8 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <img
+                        src={child.avatar || "/default-avatar.jpg"}
+                        alt={t("Avatar")}
+                        style={{ width: 26, height: 26, borderRadius: "50%", cursor: "pointer" }}
+                        onClick={() => navigate(`/profile/${child.userId}`)}
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = "/default-avatar.jpg";
+                        }}
+                      />
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                          <strong
+                            onClick={() => navigate(`/profile/${child.userId}`)}
+                            style={{ fontSize: 13, color: "#ddd", cursor: "pointer" }}
+                          >
+                            @{child.username || t("Unknown")}
+                          </strong>
+                          <span style={{ fontSize: 10, color: "#888" }}>
+                            {getRelativeTime(child.createdAt)}
+                          </span>
+                        </div>
+                        <span style={{ fontSize: 13, color: "#ddd", marginTop: 2, display: "block" }}>
+                          {child.text}
+                        </span>
+                        {child.rating && (
+                          <div style={{ marginTop: 4 }}>
+                            <StarRating rating={child.rating} size={10} />
+                          </div>
+                        )}
+                        {child.gif && (
+                          <img
+                            src={child.gif}
+                            alt={t("GIF")}
+                            style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }}
+                          />
+                        )}
+                        {child.image && (
+                          <img
+                            src={child.image}
+                            alt={t("Image")}
+                            style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }}
+                          />
+                        )}
+                        <button
+                          onClick={() =>
+                            navigate(`/replies/${id}`, {
+                              state: { parentCommentId: child._id, parentUsername: child.username },
+                            })
+                          }
+                          style={{
+                            background: "none",
+                            border: "none",
+                            color: "#888",
+                            fontSize: 13,
+                            cursor: "pointer",
+                            padding: 0,
+                            marginTop: 4,
+                            textAlign: "left",
+                          }}
+                        >
+                          {t("Reply")}
+                        </button>
+                      </div>
 
-<div
-  style={{
-    position: "fixed",
-    bottom: 0,
-    left: 0,
-    width: "100%",
-    padding: "12px 12px",
-    background: "#0e0e0e",
-    borderTop: "1px solid #222",
-    display: "flex",
-    alignItems: "flex-end", // Align at bottom
-    gap: 8,
-    zIndex: 99,
-  }}
->
-  {/* Icons */}
-  <FaImage
-    size={20}
-    style={{ cursor: "pointer", color: "#888" }}
-    onClick={handlePickImage}
-  />
-  <BiSolidFileGif
-    size={20}
-    style={{ cursor: "pointer", color: "#888" }}
-    onClick={handlePickGif}
-  />
+                      {/* Like + 3-dots for child */}
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <div
+                          style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+                          onClick={() => handleReplyLike(child._id)}
+                        >
+                          {isLikedByMeChild ? (
+                            <AiFillHeart size={16} color="#B327F6" />
+                          ) : (
+                            <AiOutlineHeart size={16} color="#888" />
+                          )}
+                          <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>
+                            {child.likes?.length || 0}
+                          </span>
+                        </div>
 
-{/* Input footer */}
-<div
-  style={{
-    position: "fixed",
-    bottom: 0,
-    left: 0,
-    width: "100%",
-    background: "#0e0e0e",
-    borderTop: "1px solid #222",
-    zIndex: 99,
-  }}
->
-  {/* Preview container inside fixed footer */}
-  {(selectedGif || selectedImage) && (
-    <div style={{ padding: "8px 12px", position: "relative" }}>
-      <img
-        src={selectedGif || selectedImage}
-        alt="preview"
+                        {child.userId === userId && (
+                          <div style={{ position: "relative" }}>
+                            <HiDotsVertical
+                              size={14}
+                              style={{ cursor: "pointer", color: "#888" }}
+                              onClick={() => setMenuOpenId(menuOpenId === child._id ? null : child._id)}
+                              aria-label={t("Options")}
+                              title={t("Options")}
+                            />
+                            {menuOpenId === child._id && (
+                              <div
+                                style={{
+                                  position: "absolute",
+                                  top: 18,
+                                  right: 0,
+                                  background: "#222",
+                                  borderRadius: 4,
+                                  padding: "4px 8px",
+                                  fontSize: 12,
+                                  color: "#f55",
+                                  cursor: "pointer",
+                                }}
+                                onClick={() => handleDelete(child._id)}
+                              >
+                                {t("Delete")}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Footer composer */}
+      <div
         style={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
           width: "100%",
-          borderRadius: 8,
-          objectFit: "cover",
-          maxHeight: 180,
-        }}
-      />
-      <button
-        onClick={() => {
-          setSelectedGif("");
-          setSelectedImage("");
-        }}
-        style={{
-          position: "absolute",
-          top: 4,
-          right: 4,
-          background: "rgba(0,0,0,0.6)",
-          border: "none",
-          borderRadius: "50%",
-          width: 24,
-          height: 24,
-          color: "#fff",
-          fontSize: 14,
-          cursor: "pointer",
+          background: "#0e0e0e",
+          borderTop: "1px solid #222",
+          zIndex: 99,
         }}
       >
-        ×
-      </button>
+        {/* Preview (gif/image) */}
+        {(selectedGif || selectedImage) && (
+          <div style={{ padding: "8px 12px", position: "relative" }}>
+            <img
+              src={selectedGif || selectedImage}
+              alt={t("Preview")}
+              style={{
+                width: "100%",
+                borderRadius: 8,
+                objectFit: "cover",
+                maxHeight: 180,
+              }}
+            />
+            <button
+              onClick={() => {
+                setSelectedGif("");
+                setSelectedImage("");
+              }}
+              aria-label={t("Remove attachment")}
+              title={t("Remove attachment")}
+              style={{
+                position: "absolute",
+                top: 4,
+                right: 4,
+                background: "rgba(0,0,0,0.6)",
+                border: "none",
+                borderRadius: "50%",
+                width: 24,
+                height: 24,
+                color: "#fff",
+                fontSize: 14,
+                cursor: "pointer",
+              }}
+            >
+              ×
+            </button>
+          </div>
+        )}
+
+        {/* Input row */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            padding: "12px 12px",
+          }}
+        >
+          <FaImage
+            size={20}
+            style={{ cursor: "pointer", color: "#888", marginRight: 8 }}
+            onClick={handlePickImage}
+            title={t("Add image")}
+            aria-label={t("Add image")}
+          />
+          <BiSolidFileGif
+            size={20}
+            style={{ cursor: "pointer", color: "#888", marginRight: 8 }}
+            onClick={handlePickGif}
+            title={t("Add GIF")}
+            aria-label={t("Add GIF")}
+          />
+          <input
+            ref={inputRef}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            placeholder={t("Write a comment...")}
+            style={{
+              flex: "0 0 60%",
+              padding: "12px 16px",
+              borderRadius: "999px",
+              border: "1px solid #444",
+              background: "#2a2a2a",
+              color: "#fff",
+              fontSize: "15px",
+              fontFamily: "Inter, sans-serif",
+              outline: "none",
+            }}
+          />
+          <button
+            onClick={handleSend}
+            aria-label={t("Send")}
+            title={t("Send")}
+            style={{
+              marginLeft: "8px",
+              background: "transparent",
+              border: "none",
+              color: "#fff",
+              fontSize: "22px",
+              cursor: "pointer",
+            }}
+          >
+            <FiSend />
+          </button>
+        </div>
+      </div>
+
+      {/* GIF Modal */}
+      {showGifModal && <GifSearchModal onSelect={handleGifSelect} onClose={() => setShowGifModal(false)} />}
     </div>
-  )}
-
-  {/* Input row */}
-  <div
-    style={{
-      display: "flex",
-      alignItems: "center",
-      padding: "12px 12px",
-    }}
-  >
-    <FaImage
-      size={20}
-      style={{ cursor: "pointer", color: "#888", marginRight: 8 }}
-      onClick={handlePickImage}
-    />
-    <BiSolidFileGif
-      size={20}
-      style={{ cursor: "pointer", color: "#888", marginRight: 8 }}
-      onClick={handlePickGif}
-    />
-    <input
-      ref={inputRef}
-      value={input}
-      onChange={(e) => setInput(e.target.value)}
-      onKeyDown={(e) => e.key === "Enter" && handleSend()}
-      placeholder="Write a comment..."
-      style={{
-        flex: "0 0 60%",
-        padding: "12px 16px",
-        borderRadius: "999px",
-        border: "1px solid #444",
-        background: "#2a2a2a",
-        color: "#fff",
-        fontSize: "15px",
-        fontFamily: "Inter, sans-serif",
-        outline: "none",
-      }}
-    />
-    <button
-      onClick={handleSend}
-      style={{
-        marginLeft: "8px",
-        background: "transparent",
-        border: "none",
-        color: "#fff",
-        fontSize: "22px",
-        cursor: "pointer",
-      }}
-    >
-      <FiSend />
-    </button>
-  </div>
-</div>
-</div>
-
-       {/* 4️⃣ GifSearchModal integrated */}
-       {showGifModal && (
-        <GifSearchModal
-          onSelect={handleGifSelect}
-          onClose={() => setShowGifModal(false)}
-        />
-      )}
-       </div>
   );
 }

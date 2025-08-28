@@ -3,6 +3,7 @@ import api from "../../api/api";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import getPosterUrl from "../../utils/getPosterUrl";
+import useTranslate from "../../utils/useTranslate";
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const FALLBACK_POSTER = "/default-poster.jpg";
@@ -19,8 +20,10 @@ export default function ProfileTabWatchlist({
 }) {
   const navigate = useNavigate();
   const [selectedGenre, setSelectedGenre] = useState("");
-  const isOwner = user?._id === profileUserId;
   const [isLoading, setIsLoading] = useState(true);
+  const t = useTranslate();
+
+  const isOwner = user?._id === profileUserId;
 
   useEffect(() => {
     const fetchWatchlist = async () => {
@@ -60,7 +63,7 @@ export default function ProfileTabWatchlist({
           color: "#888",
         }}
       >
-        🎞️ Loading your Scenes...
+        🎞️ {t("Loading your Scenes...")}
       </div>
     );
   }
@@ -91,10 +94,10 @@ export default function ProfileTabWatchlist({
               minWidth: "130px",
             }}
           >
-            <option value="added">Recently Added</option>
-            <option value="release">Release Date</option>
-            <option value="rating">Rating</option>
-            <option value="runtime">Runtime</option>
+            <option value="added">{t("Recently Added")}</option>
+            <option value="release">{t("Release Date")}</option>
+            <option value="rating">{t("Rating")}</option>
+            <option value="runtime">{t("Runtime")}</option>
           </select>
 
           <select
@@ -127,21 +130,22 @@ export default function ProfileTabWatchlist({
               minWidth: "130px",
             }}
           >
-            <option value="">All Genres</option>
-            <option value="28">Action</option>
-            <option value="35">Comedy</option>
-            <option value="18">Drama</option>
-            <option value="27">Horror</option>
-            <option value="10749">Romance</option>
-            <option value="16">Animation</option>
-            <option value="80">Crime</option>
-            <option value="53">Thriller</option>
+            <option value="">{t("All Genres")}</option>
+            <option value="28">{t("Action")}</option>
+            <option value="35">{t("Comedy")}</option>
+            <option value="18">{t("Drama")}</option>
+            <option value="27">{t("Horror")}</option>
+            <option value="10749">{t("Romance")}</option>
+            <option value="16">{t("Animation")}</option>
+            <option value="80">{t("Crime")}</option>
+            <option value="53">{t("Thriller")}</option>
           </select>
         </div>
       )}
 
       {watchList?.length > 0 ? (
         <div
+          className="watchlist-grid" // ✅ match the media query below
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))",
@@ -174,14 +178,14 @@ export default function ProfileTabWatchlist({
                   const tmdbId = Number(cleanedId);
                   if (!tmdbId || isNaN(tmdbId)) {
                     console.warn("❌ Invalid TMDB ID:", movie);
-                    toast.error("This movie has no valid TMDB ID.");
+                    toast.error(t("This movie has no valid TMDB ID."));
                     return;
                   }
                   navigate(`/movie/${tmdbId}`);
                 }}
                 onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = FALLBACK_POSTER;
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = FALLBACK_POSTER;
                 }}
               />
             );
@@ -189,7 +193,7 @@ export default function ProfileTabWatchlist({
         </div>
       ) : (
         <p style={{ textAlign: "center", marginTop: "40px", color: "#aaa" }}>
-          This watchlist is empty.
+          {t("This watchlist is empty.")}
         </p>
       )}
 

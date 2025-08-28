@@ -1,11 +1,14 @@
-import React from "react";
+// src/components/profile/ProfileTabs.jsx
+import React, { useRef } from "react";
 import { useDrag } from "@use-gesture/react";
-import { useRef } from "react";
-
+import useTranslate from "../../utils/useTranslate";
 
 export default function ProfileTabs({ activeTab, setActiveTab }) {
+  const t = useTranslate();
+
+  // ✅ List of tabs (keys we’ll pass through translator)
   const tabs = ["Profile", "Reviews", "Watchlist", "Lists", "Films"];
-  const index = tabs.findIndex((t) => t === activeTab);
+  const index = tabs.findIndex((tname) => tname === activeTab);
   const containerRef = useRef();
 
   const bind = useDrag(
@@ -53,7 +56,7 @@ export default function ProfileTabs({ activeTab, setActiveTab }) {
             cursor: "pointer",
           }}
         >
-          {tab}
+          {t(tab)} {/* ✅ translate instantly */}
         </button>
       ))}
     </div>

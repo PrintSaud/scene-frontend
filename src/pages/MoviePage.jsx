@@ -20,6 +20,16 @@ import MovieTabs from "../components/movie/MovieTabs";
 import MovieTrailer from "../components/movie/MovieTrailer";
 import ChangePosterModal from "../components/movie/ChangePosterModal";
 import AddMovieModal from "../components/lists/AddMovieModal";
+import useTranslate from "../utils/useTranslate";
+
+function HeaderLabel({ text }) {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const lang = user?.language || "en";
+
+  const translated = useTranslate(text, lang);
+
+  return <h2>{translated}</h2>;
+}
 
 export default function MoviePage() {
 

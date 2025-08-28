@@ -399,7 +399,7 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
                           {hasReview && (
                             <FaRegComment
                               size={9}
-                              style={{ position: "relative", top: "-1.5px" }}
+                              style={{ position: "relative", top: "-1.0px" }}
                             />
                           )}
                           {log.rewatchCount > 0 && (
@@ -408,6 +408,7 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
                                 display: "flex",
                                 alignItems: "center",
                                 gap: "2px",
+                            
                               }}
                             >
                               <HiOutlineRefresh
@@ -418,7 +419,10 @@ New Day. New Amazing Film. It’s a Scene Thing. 🎥
                                 }}
                               />
                               <span
-                                style={{ fontSize: "10px", color: "#aaa" }}
+                                style={{                       fontSize: "10px",
+                                  color: "#aaa",
+                                  position: "relative",
+                                  top: "-1.5px", }}
                               >
                                 {log.rewatchCount}x
                               </span>

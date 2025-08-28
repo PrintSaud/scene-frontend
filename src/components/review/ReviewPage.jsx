@@ -1,75 +1,96 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useMemo } from "react";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
 import { likeLog, likeReply } from "../../api/api";
-import { backend } from "../../config";
-import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import ReviewHeader from "./ReviewHeader";
 import MoreReviewsList from "./MoreReviewsList";
 import StarRating from "../StarRating";
 import api from "../../api/api";
-import { HiOutlineRefresh } from "react-icons/hi"
-import { useLocation } from "react-router-dom";
+import { HiOutlineRefresh } from "react-icons/hi";
+import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
+import useTranslate from "../../utils/useTranslate";
 
 export default function ReviewPage() {
+  const t = useTranslate();
   const { id } = useParams();
   const navigate = useNavigate();
-  const [review, setReview] = useState(null);
-  const hasReview = !!(
-    review?.review?.trim() || review?.gif || review?.image
-  );
-  
-  const [replies, setReplies] = useState([]);
-  const [moreReviews, setMoreReviews] = useState([]);
-  const user = JSON.parse(localStorage.getItem("user")) || {};
-  const userId = user._id;
   const location = useLocation();
 
+  const [review, setReview] = useState(null);
+  const [replies, setReplies] = useState([]);
+  const [moreReviews, setMoreReviews] = useState([]);
 
-  function getRelativeTime(date) {
-    const now = new Date();
-    const then = new Date(date);
-    const diff = (now - then) / 1000;
-    if (diff < 60) return "just now";
-    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-    if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
-    return then.toLocaleDateString();
+  const user = JSON.parse(localStorage.getItem("user")) || {};
+  const userId = user._id;
+
+  // ---------- English fallback date helpers (same idea as ReviewHeader) ----------
+  const MONTHS_EN = useMemo(
+    () => [
+          "Jan","Feb","Mar","Apr","May","Jun",
+    "Jul","Aug","Sep","Oct","Nov","Dec"
+    ],
+    []
+  );
+  const englishOrdinal = (n) => {
+    const v = n % 100;
+    if (v >= 11 && v <= 13) return `${n}`;
+    switch (n % 10) {
+      case 1: return `${n}`;
+      case 2: return `${n}`;
+      case 3: return `${n}`;
+      default: return `${n}`;
+    }
+  };
+
+  // localized relative time (short), with EN fallback date (e.g., "31st December")
+  function formatRelative(iso) {
+    if (!iso) return "";
+    const now = Date.now();
+    const then = new Date(iso).getTime();
+    const diffMs = now - then;
+
+    const minute = 60 * 1000;
+    const hour   = 60 * minute;
+    const day    = 24 * hour;
+
+    if (diffMs < minute) return t("Just now");
+    if (diffMs < hour)   return t("{{n}}m ago", { n: Math.floor(diffMs / minute) });
+    if (diffMs < day)    return t("{{n}}h ago", { n: Math.floor(diffMs / hour) });
+    if (diffMs <= 7 * day) return t("{{n}}d ago", { n: Math.floor(diffMs / day) });
+
+    const d = new Date(iso);
+    const dayNum = d.getDate();
+    const monthName = MONTHS_EN[d.getMonth()];
+    return `${englishOrdinal(dayNum)} ${monthName}`;
   }
 
   const handleReply = () => {
+    // no-op here (you navigate to replies below); hook if you add inline composer
   };
-  
 
   const handleDelete = async () => {
-    const confirmDelete = window.confirm("Delete this review?");
+    const confirmDelete = window.confirm(t("Delete this review?"));
     if (!confirmDelete) return;
     try {
       await api.delete(`/api/logs/${review._id}`);
-      toast.success("🗑️ Review deleted!");
+      toast.success("🗑️ " + t("Review deleted!"));
       navigate("/profile");
     } catch (err) {
       console.error("Delete failed", err);
-      toast.error("Failed to delete review.");
+      toast.error(t("Failed to delete review."));
     }
   };
-  
-  
+
   const handleEdit = () => {
     navigate(`/movie/${review.movie?.id || review.movie}?edit=1&logId=${review._id}`);
   };
-  
-
-
-  
 
   const fetchData = async () => {
     try {
       const { data } = await api.get(`/api/logs/${id}`);
-setReview(data);
-
+      setReview(data);
       setReplies(data.replies || []);
-  
+
       if (data.user?._id) {
         const res = await api.get(`/api/logs/user/${data.user._id}`);
         const filtered = res.data.filter((r) => r._id !== id);
@@ -77,21 +98,19 @@ setReview(data);
       }
     } catch (err) {
       console.error("❌ Failed to fetch review:", err);
-      toast.error("Failed to load review.");
+      toast.error(t("Failed to load review."));
     }
   };
-  
 
   useEffect(() => {
     fetchData();
     if (location.state?.refreshAfterReply) {
-      // 🚿 Clean the navigation state to prevent re-fetching forever
       navigate(location.pathname, { replace: true });
     }
   }, [id, location.state?.refreshAfterReply]);
 
   const handleLike = async () => {
-    if (!userId) return toast.error("You must be logged in to like.");
+    if (!userId) return toast.error(t("You must be logged in to like."));
     try {
       await likeLog(id);
       setReview((prev) => ({
@@ -101,12 +120,12 @@ setReview(data);
           : [...(prev.likes || []), userId],
       }));
     } catch {
-      toast.error("Failed to like.");
+      toast.error(t("Failed to like."));
     }
   };
 
   const handleReplyLike = async (replyId) => {
-    if (!userId) return toast.error("You must be logged in to like.");
+    if (!userId) return toast.error(t("You must be logged in to like."));
     try {
       await likeReply(id, replyId);
       setReplies((prev) =>
@@ -122,7 +141,7 @@ setReview(data);
         )
       );
     } catch {
-      toast.error("Failed to like reply.");
+      toast.error(t("Failed to like reply."));
     }
   };
 
@@ -132,44 +151,57 @@ setReview(data);
   if (!review) return null;
 
   return (
-    <div style={{
-      backgroundColor: "#0e0e0e",
-      color: "#fff",
-      minHeight: "100vh",
-      overflowY: "auto",
-      paddingBottom: "80px"  // ⭐️ Add this line (adjust if needed)
-    }}>
-    
-    <ReviewHeader
-  review={review}
-  userId={userId}
-  rewatchCount={review.rewatchCount}
-  onLike={handleLike}
-  onReply={handleReply} // ✅ this line was missing!
-  onProfile={handleProfile}
-  onChangeBackdrop={() => navigate(`/review/${review._id}/change-backdrop`)}
-  onEdit={handleEdit}
-  onDelete={handleDelete}
-/>
-
-
-
+    <div
+      style={{
+        backgroundColor: "#0e0e0e",
+        color: "#fff",
+        minHeight: "100vh",
+        overflowY: "auto",
+        paddingBottom: "80px",
+      }}
+    >
+      <ReviewHeader
+        review={review}
+        userId={userId}
+        rewatchCount={review.rewatchCount}
+        onLike={handleLike}
+        onReply={handleReply}
+        onProfile={handleProfile}
+        onChangeBackdrop={() => navigate(`/review/${review._id}/change-backdrop`)}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
 
       {/* 💬 Comments section */}
       <div style={{ marginTop: 24 }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px", marginBottom: replies.length === 0 ? 4 : 12 }}>
-          <h3 style={{ fontSize: 18, margin: 0, marginLeft: -6 }}>Comments</h3>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "0 24px",
+            marginBottom: replies.length === 0 ? 4 : 12,
+          }}
+        >
+          <h3 style={{ fontSize: 18, margin: 0, marginLeft: -6 }}>{t("Comments")}</h3>
           <button
             onClick={() => navigate(`/review/${id}/replies`)}
-            style={{ background: "none", border: "none", color: "#888", fontSize: 14, cursor: "pointer", marginRight: -12 }}
+            style={{
+              background: "none",
+              border: "none",
+              color: "#888",
+              fontSize: 14,
+              cursor: "pointer",
+              marginRight: -12,
+            }}
           >
-            More →
+            {t("More →")}
           </button>
         </div>
 
         {replies.length === 0 ? (
           <div style={{ paddingLeft: 24 }}>
-            <p style={{ color: "#888", fontSize: 14, marginLeft: -6 }}>No comments yet.</p>
+            <p style={{ color: "#888", fontSize: 14, marginLeft: -6 }}>{t("No comments yet.")}</p>
           </div>
         ) : (
           [...replies]
@@ -183,66 +215,95 @@ setReview(data);
                     {/* Avatar */}
                     <img
                       src={r.avatar || "/default-avatar.jpg"}
-                      alt="avatar"
+                      alt={t("Avatar")}
                       style={{ width: 30, height: 30, borderRadius: "50%", cursor: "pointer" }}
                       onClick={() => handleProfile(r.userId)}
-                      />
-                    <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-  {/* Username, stars, time */}
-  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-    <strong
-      style={{
-        fontSize: 14,
-        fontFamily: "Inter, sans-serif",
-        fontWeight: 400,
-        color: "#ddd",
-        cursor: "pointer",
-      }}
-      onClick={() => handleProfile(r.userId)}
-    >
-      @{r.username}
-    </strong>
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = "/default-avatar.jpg";
+                      }}
+                    />
 
-    {r.ratingForThisMovie && (
-      <StarRating rating={r.ratingForThisMovie} size={12} />
-    )}
+                    <div
+                      style={{
+                        flex: 1,
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                      }}
+                    >
+                      {/* Username, stars, time */}
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <strong
+                          style={{
+                            fontSize: 14,
+                            fontFamily: "Inter, sans-serif",
+                            fontWeight: 400,
+                            color: "#ddd",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => handleProfile(r.userId)}
+                        >
+                          @{r.username}
+                        </strong>
 
-    {/* ✅ Rewatch icon + count if r.rewatch > 0 */}
-    {review.rewatchCount > 1 && (
-  <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-    <HiOutlineRefresh size={12} color="#aaa" />
-    <span style={{ fontSize: 10, color: "#aaa" }}>
-      {review.rewatchCount}x
-    </span>
-  </div>
-)}
+                        {r.ratingForThisMovie && (
+                          <StarRating rating={r.ratingForThisMovie} size={12} />
+                        )}
 
+                        {/* Rewatch icon for the review (kept as in original) */}
+                        {review.rewatchCount > 1 && (
+                          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                            <HiOutlineRefresh size={12} color="#aaa" />
+                            <span style={{ fontSize: 10, color: "#aaa" }}>
+                              {review.rewatchCount}x
+                            </span>
+                          </div>
+                        )}
 
+                        <span style={{ fontSize: 10, color: "#888" }}>
+                          {formatRelative(r.createdAt)}
+                        </span>
+                      </div>
 
-    <span style={{ fontSize: 10, color: "#888" }}>
-      {getRelativeTime(r.createdAt)}
-    </span>
-  </div>
                       {/* Text comment */}
                       {r.text && (
-                        <span style={{ fontSize: 14, color: "#ddd", fontFamily: "Inter, sans-serif", display: "block", marginTop: 2 }}>
+                        <span
+                          style={{
+                            fontSize: 14,
+                            color: "#ddd",
+                            fontFamily: "Inter, sans-serif",
+                            display: "block",
+                            marginTop: 2,
+                          }}
+                        >
                           {r.text}
                         </span>
                       )}
 
                       {/* Optional gif/image */}
                       {r.gif && (
-                        <img src={r.gif} alt="gif" style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }} />
+                        <img
+                          src={r.gif}
+                          alt={t("GIF")}
+                          style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }}
+                        />
                       )}
                       {r.image && (
-                        <img src={r.image} alt="img" style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }} />
+                        <img
+                          src={r.image}
+                          alt={t("Image")}
+                          style={{ marginTop: 4, maxWidth: "100%", borderRadius: 8 }}
+                        />
                       )}
 
                       {/* Reply button */}
                       <button
-                        onClick={() => navigate(`/replies/${id}`, {
-                          state: { parentCommentId: r._id, parentUsername: r.username }
-                        })}
+                        onClick={() =>
+                          navigate(`/replies/${id}`, {
+                            state: { parentCommentId: r._id, parentUsername: r.username },
+                          })
+                        }
                         style={{
                           background: "none",
                           border: "none",
@@ -254,14 +315,25 @@ setReview(data);
                           textAlign: "left",
                         }}
                       >
-                        Reply
+                        {t("Reply")}
                       </button>
                     </div>
 
                     {/* Like button */}
-                    <div style={{ cursor: "pointer", display: "flex", alignItems: "center" }} onClick={() => handleReplyLike(r._id)}>
-                      {isLikedByMe ? <AiFillHeart size={16} color="#B327F6" /> : <AiOutlineHeart size={16} color="#888" />}
-                      <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>{r.likes?.length || 0}</span>
+                    <div
+                      style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+                      onClick={() => handleReplyLike(r._id)}
+                      aria-label={t("Like")}
+                      title={t("Like")}
+                    >
+                      {isLikedByMe ? (
+                        <AiFillHeart size={16} color="#B327F6" />
+                      ) : (
+                        <AiOutlineHeart size={16} color="#888" />
+                      )}
+                      <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>
+                        {r.likes?.length || 0}
+                      </span>
                     </div>
                   </div>
                 </div>

@@ -4,12 +4,11 @@ import axios from "../api/api";
 import toast from "react-hot-toast";
 import { getPlatformIcon } from "../utils/getPlatformIcon.jsx";
 import MovieListSortable from "../components/lists/MovieListSortable";
-import AddMovieModal       from "../components/lists/AddMovieModal";
+import AddMovieModal from "../components/lists/AddMovieModal";
 import CropperModal from "../components/CropperModal";
-
 import ReactModal from "react-modal";
-import { BLOCKED_MOVIE_IDS } from "../utils/blockedMovies";
 import BackdropSearchModalV2 from "../components/BackdropSearchModalV2";
+import useTranslate from "../utils/useTranslate";
 
 ReactModal.setAppElement("#root");
 
@@ -34,6 +33,7 @@ const btnStyle = {
 };
 
 export default function EditProfilePage() {
+  const t = useTranslate();
   const stored = localStorage.getItem("user");
   const rawUser = stored ? JSON.parse(stored) : null;
   const user = { ...rawUser, _id: rawUser?._id || rawUser?.id || "" };
@@ -62,12 +62,9 @@ export default function EditProfilePage() {
   const [selectedBackdrop, setSelectedBackdrop] = useState("");
   const [showAddMovieModal, setShowAddMovieModal] = useState(false);
   const [rawAvatarFile, setRawAvatarFile] = useState(null);
-const [showCropper, setShowCropper] = useState(false);
-const [avatarFile, setAvatarFile] = useState(null);
-
-const [isDeleting, setIsDeleting] = useState(false);
-
-
+  const [showCropper, setShowCropper] = useState(false);
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -87,7 +84,7 @@ const [isDeleting, setIsDeleting] = useState(false);
         imdb: user.socials?.imdb || "",
         tmdb: user.socials?.tmdb || "",
         website: user.socials?.website || "",
-      });      
+      });
     }
   }, []);
 
@@ -99,65 +96,53 @@ const [isDeleting, setIsDeleting] = useState(false);
       JSON.stringify(favoriteFilms) === JSON.stringify(user.favoriteFilms) &&
       JSON.stringify(socials) === JSON.stringify(user.socials || {})
     ) {
-      toast("No changes to save.");
+      toast(t("No changes to save."));
       return;
     }
-  
+
     try {
       const updatedUser = {
         bio,
         avatar,
-        profileBackdrop: backdrop,  // 👈 change this
+        profileBackdrop: backdrop,
         favoriteFilms,
         socials,
       };
-      
-      
-  
+
       const res = await axios.patch(`/api/users/${user._id}`, updatedUser);
 
-  
-      // 🔥 Save updated user (includes favoriteMovies)
       localStorage.setItem("user", JSON.stringify({ ...user, ...res.data.user }));
-  
 
-      toast.success("✅ Profile updated!");
+      toast.success("✅ " + t("Profile updated!"));
       navigate(`/profile/${user._id}`);
     } catch (err) {
       console.error("❌ Failed to update profile", err);
-      toast.error("❌ Failed to update profile.");
+      toast.error("❌ " + t("Failed to update profile."));
     }
   };
-  
+
   const handleAvatarUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     setRawAvatarFile(file);
     setShowCropper(true);
   };
-  
+
   const handleCroppedAvatar = async (croppedBlob) => {
     const formData = new FormData();
     formData.append("avatar", croppedBlob);
-  
+
     try {
-      const res = await axios.post(
-        `/api/upload/avatar/${user._id}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const res = await axios.post(`/api/upload/avatar/${user._id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       setAvatar(res.data.avatar);
-      toast.success("✅ Avatar uploaded!");
+      toast.success("✅ " + t("Avatar uploaded!"));
     } catch (err) {
       console.error("Avatar upload failed", err);
-      toast.error("❌ Avatar upload failed.");
+      toast.error("❌ " + t("Avatar upload failed."));
     }
   };
-  
 
   const onDragEnd = (result) => {
     if (!result.destination) return;
@@ -175,33 +160,43 @@ const [isDeleting, setIsDeleting] = useState(false);
           color: "#fff",
           padding: "24px",
           minHeight: "100vh",
-          paddingBottom: "100px", // ✅ adds scroll space for delete button
-          overflowY: "auto",       // ✅ enables scrolling if needed
+          paddingBottom: "100px",
+          overflowY: "auto",
           display: "flex",
           justifyContent: "center",
         }}
       >
         <div style={{ width: "100%", maxWidth: "620px" }}>
           {/* Top Bar */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-          <button
-        onClick={() => navigate(-1)}
-        style={{
-          background: "rgba(0,0,0,0.5)",
-          border: "none",
-          borderRadius: "50%",
-          width: "32px",
-          height: "32px",
-          color: "#fff",
-          fontSize: "18px",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        ←
-      </button>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "20px",
+            }}
+          >
+            <button
+              onClick={() => navigate(-1)}
+              aria-label={t("Back")}
+              title={t("Back")}
+              style={{
+                background: "rgba(0,0,0,0.5)",
+                border: "none",
+                borderRadius: "50%",
+                width: "32px",
+                height: "32px",
+                color: "#fff",
+                fontSize: "18px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              ←
+            </button>
+
             <button
               onClick={handleSave}
               style={{
@@ -214,7 +209,7 @@ const [isDeleting, setIsDeleting] = useState(false);
                 cursor: "pointer",
               }}
             >
-              Save
+              {t("Save")}
             </button>
           </div>
 
@@ -222,7 +217,7 @@ const [isDeleting, setIsDeleting] = useState(false);
           {backdrop && (
             <img
               src={backdrop}
-              alt="backdrop"
+              alt={t("Backdrop")}
               style={{
                 width: "100%",
                 height: "140px",
@@ -235,26 +230,25 @@ const [isDeleting, setIsDeleting] = useState(false);
 
           {/* Avatar Upload */}
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          <img
-  src={
-    avatar && avatar !== "null" && avatar !== "undefined"
-      ? avatar
-      : "/default-avatar.jpg"
-  }
-  alt="Avatar"
-  style={{
-    width: "80px",
-    height: "80px",
-    borderRadius: "50%",
-    objectFit: "cover",
-    border: "2px solid white",
-  }}
-  onError={(e) => {
-    e.currentTarget.onerror = null; // prevent infinite loop
-    e.currentTarget.src = "/default-avatar.jpg";
-  }}
-/>
-
+            <img
+              src={
+                avatar && avatar !== "null" && avatar !== "undefined"
+                  ? avatar
+                  : "/default-avatar.jpg"
+              }
+              alt={t("Avatar")}
+              style={{
+                width: "80px",
+                height: "80px",
+                borderRadius: "50%",
+                objectFit: "cover",
+                border: "2px solid white",
+              }}
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = "/default-avatar.jpg";
+              }}
+            />
 
             <div>
               <input
@@ -265,7 +259,7 @@ const [isDeleting, setIsDeleting] = useState(false);
                 onChange={handleAvatarUpload}
               />
               <label htmlFor="avatarInput" style={btnStyle}>
-                Change Photo
+                {t("Change Photo")}
               </label>
             </div>
           </div>
@@ -273,74 +267,75 @@ const [isDeleting, setIsDeleting] = useState(false);
           {/* Backdrop button */}
           <div style={{ marginTop: "16px", width: "60%", display: "flex", alignItems: "center" }}>
             <button style={btnStyle} onClick={() => navigate("/choose-backdrop")}>
-              Change backdrop
+              {t("Change backdrop")}
             </button>
           </div>
 
           {/* Bio */}
           <div style={{ marginTop: "14px", width: "90%" }}>
-            <label>Bio</label>
+            <label htmlFor="bio-input">{t("Bio")}</label>
             <textarea
+              id="bio-input"
               value={bio}
               onChange={(e) => setBio(e.target.value.slice(0, 180))}
               maxLength={180}
+              placeholder={t("Write a short bio (max 180 chars)")}
               style={{ ...inputStyle, height: "80px" }}
             />
           </div>
 
-{/* Favorite Films */}
-<div style={{ marginTop: "24px" }}>
-  <h4>Favorite Films</h4>
+          {/* Favorite Films */}
+          <div style={{ marginTop: "24px" }}>
+            <h4>{t("Favorite Films")}</h4>
 
-  {favoriteFilms.length === 0 ? (
-    <p style={{ color: "#888" }}>No favorite movies yet.</p>
-  ) : (
-    <MovieListSortable movies={favoriteFilms} setMovies={setFavoriteFilms} />
-  )}
+            {favoriteFilms.length === 0 ? (
+              <p style={{ color: "#888" }}>{t("No favorite movies yet.")}</p>
+            ) : (
+              <MovieListSortable movies={favoriteFilms} setMovies={setFavoriteFilms} onDragEnd={onDragEnd} />
+            )}
 
-  {/* only show add button if fewer than 4 movies */}
-  {favoriteFilms.length < 4 && (
-    <button
-      onClick={() => setShowAddMovieModal(true)}
-      style={{
-        marginTop: "12px",
-        padding: "8px 16px",
-        fontSize: "14px",
-        cursor: "pointer",
-        backgroundColor: "#1a1a1a",
-        border: "1px solid #333",
-        borderRadius: "6px",
-        color: "white",
-      }}
-    >
-      ➕ Add Movie
-    </button>
-  )}
+            {favoriteFilms.length < 4 && (
+              <button
+                onClick={() => setShowAddMovieModal(true)}
+                style={{
+                  marginTop: "12px",
+                  padding: "8px 16px",
+                  fontSize: "14px",
+                  cursor: "pointer",
+                  backgroundColor: "#1a1a1a",
+                  border: "1px solid #333",
+                  borderRadius: "6px",
+                  color: "white",
+                }}
+              >
+                ➕ {t("Add Movie")}
+              </button>
+            )}
 
-  {/* likewise, only allow modal to open if under 4 */}
-  {showAddMovieModal && favoriteFilms.length < 4 && (
-    <AddMovieModal
-      onClose={() => setShowAddMovieModal(false)}
-      onSelect={(movie) => {
-        if (!favoriteFilms.some((m) => m.id === movie.id)) {
-          setFavoriteFilms([...favoriteFilms, movie]);
-        }
-        setShowAddMovieModal(false);
-      }}
-      existing={favoriteFilms}
-    />
-  )}
-</div>
-
+            {showAddMovieModal && favoriteFilms.length < 4 && (
+              <AddMovieModal
+                onClose={() => setShowAddMovieModal(false)}
+                onSelect={(movie) => {
+                  if (!favoriteFilms.some((m) => m.id === movie.id)) {
+                    setFavoriteFilms([...favoriteFilms, movie]);
+                  }
+                  setShowAddMovieModal(false);
+                }}
+                existing={favoriteFilms}
+              />
+            )}
+          </div>
 
           {/* Connections */}
           <div style={{ marginTop: "36px" }}>
-            <h4>Connections</h4>
+            <h4>{t("Connections")}</h4>
             <p style={{ fontSize: "13px", color: "#888", marginBottom: "6px" }}>
-              Add your social links (X, YouTube, etc.)
+              {t("Add your social links (X, YouTube, etc.)")}
             </p>
             <details style={{ marginBottom: "20px" }}>
-              <summary style={{ cursor: "pointer", color: "#ddd" }}>Add / Edit Connections</summary>
+              <summary style={{ cursor: "pointer", color: "#ddd" }}>
+                {t("Add / Edit Connections")}
+              </summary>
               <div style={{ marginTop: "12px", display: "flex", flexDirection: "column", gap: "12px" }}>
                 {["X", "youtube", "instagram", "tiktok", "imdb", "tmdb", "website"].map((platform) => (
                   <div key={platform} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -348,7 +343,7 @@ const [isDeleting, setIsDeleting] = useState(false);
                       {getPlatformIcon(platform)}
                     </div>
                     <input
-                      placeholder={`Enter your ${platform} link or username`}
+                      placeholder={t("Enter your {{platform}} link or username", { platform })}
                       value={socials[platform]}
                       onChange={(e) =>
                         setSocials((prev) => ({ ...prev, [platform]: e.target.value }))
@@ -361,76 +356,24 @@ const [isDeleting, setIsDeleting] = useState(false);
             </details>
           </div>
 
+          {/* Import */}
           <div style={{ marginTop: "24px" }}>
-  <button
-    onClick={() => navigate("/import")}
-    style={{
-      padding: "10px 16px",
-      background: "#1e1e1e",
-      color: "#fff",
-      border: "1px solid #444",
-      borderRadius: "8px",
-      fontSize: "14px",
-      fontWeight: "600",
-      cursor: "pointer",
-    }}
-  >
-    📦 Transfer Data from Letterboxd
-  </button>
-</div>
-
-
-          {/* Contact Us */}
-          <div style={{ marginTop: "32px" }}>
-            <h4>Contact Us</h4>
-            <details>
-              <summary style={{ cursor: "pointer", color: "#ddd" }}>Show contact info</summary>
-              <div style={{ marginTop: "12px", color: "#aaa",fontFamily: "Inter, sans-serif", }}>
-                <p>Email: scenewebapp@gmail.com</p>
-                <p>X: @joinsceneapp</p>
-                <p>instagram: @joinscene</p>
-              </div>
-            </details>
+            <button
+              onClick={() => navigate("/import")}
+              style={{
+                padding: "10px 16px",
+                background: "#1e1e1e",
+                color: "#fff",
+                border: "1px solid #444",
+                borderRadius: "8px",
+                fontSize: "14px",
+                fontWeight: "600",
+                cursor: "pointer",
+              }}
+            >
+              📦 {t("Transfer Data from Letterboxd")}
+            </button>
           </div>
-
-{/* Delete My Account */}
-<div style={{ marginTop: "40px", textAlign: "center" }}>
-  <button
-    style={{
-      background: "transparent",
-      border: "1px solid red",
-      color: "red",
-      padding: "10px 20px",
-      borderRadius: "8px",
-      fontSize: "14px",
-      cursor: isDeleting ? "not-allowed" : "pointer",
-      opacity: isDeleting ? 0.6 : 1,
-    }}
-    disabled={isDeleting}
-    onClick={async () => {
-      if (!window.confirm("⚠️ Are you sure you want to delete your account? This cannot be undone.")) return;
-
-      try {
-        setIsDeleting(true);
-        await axios.delete(`/api/auth/account`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        localStorage.clear();
-        toast.success("🗑️ Account deleted.");
-        navigate("/signup");
-      } catch (err) {
-        toast.error(err?.response?.data?.error || "Failed to delete account.");
-        console.error("delete account error:", err);
-      } finally {
-        setIsDeleting(false);
-      }
-    }}
-  >
-    {isDeleting ? "Deleting…" : "Delete My Account"}
-  </button>
-</div>
-
         </div>
       </div>
 
@@ -448,16 +391,16 @@ const [isDeleting, setIsDeleting] = useState(false);
           onClose={() => setShowBackdropModal(false)}
         />
       )}
-      {showCropper && rawAvatarFile && (
-  <CropperModal
-    file={rawAvatarFile}                      // ✅ fix here
-    onClose={() => setShowCropper(false)}     // ✅ typo fix here
-    onCropComplete={(blob) => handleCroppedAvatar(blob)}
-    shape="circle"
-    aspectRatio={1}
-  />
-)}
 
+      {showCropper && rawAvatarFile && (
+        <CropperModal
+          file={rawAvatarFile}
+          onClose={() => setShowCropper(false)}
+          onCropComplete={(blob) => handleCroppedAvatar(blob)}
+          shape="circle"
+          aspectRatio={1}
+        />
+      )}
     </>
   );
 }

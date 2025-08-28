@@ -1,59 +1,71 @@
+// src/components/profile/ProfileTabReviews.jsx
 import React from "react";
 import { FaStar, FaRegStar, FaStarHalfAlt } from "react-icons/fa";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
+import useTranslate from "../../utils/useTranslate";
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w300";
 
 const getRelativeTime = (date) => {
-    const now = Date.now();
-    const then = new Date(date).getTime();
-    const diff = now - then;
-  
-    const min = Math.floor(diff / 60000);
-    const hr = Math.floor(diff / 3600000);
-    const day = Math.floor(diff / 86400000);
-  
-    if (min < 1) return "Just now";
-    if (min < 60) return `${min}min ago`;
-    if (hr < 24) return `${hr}h ago`;
-    if (day <= 7) return `${day}d ago`;
-  
-    const d = new Date(date);
-    return `${d.getDate()} ${d.toLocaleString('default', { month: 'short' })}`;
-  };
-  
+  const now = Date.now();
+  const then = new Date(date).getTime();
+  const diff = now - then;
 
-  export default function ProfileTabReviews({
-    logs,
-    filter,
-    setFilter,
-    navigate,
-    handleLike,
-    customPosters = {},
-  }) {
-  
+  const min = Math.floor(diff / 60000);
+  const hr = Math.floor(diff / 3600000);
+  const day = Math.floor(diff / 86400000);
+
+  if (min < 1) return "Just now";
+  if (min < 60) return `${min}min ago`;
+  if (hr < 24) return `${hr}h ago`;
+  if (day <= 7) return `${day}d ago`;
+
+  const d = new Date(date);
+  return `${d.getDate()} ${d.toLocaleString("default", { month: "short" })}`;
+};
+
+export default function ProfileTabReviews({
+  logs,
+  filter,
+  setFilter,
+  navigate,
+  handleLike,
+  customPosters = {},
+}) {
+  const t = useTranslate();
   const userId = JSON.parse(localStorage.getItem("user"))?._id;
-  
-  const filtered = logs.filter((log) => {
-    const hasText = log.review && log.review.trim() !== "" && log.review.trim().toLowerCase() !== "__media__";
-    const hasGif = !!log.gif;
-    const hasImage = !!log.image;
-  
-    return hasText || hasGif || hasImage;
-  })
-  
-  
 
+  // Only keep reviews that actually have content (text/gif/image)
+  const filtered = logs
+    .filter((log) => {
+      const hasText =
+        log.review &&
+        log.review.trim() !== "" &&
+        log.review.trim().toLowerCase() !== "__media__";
+      const hasGif = !!log.gif;
+      const hasImage = !!log.image;
+
+      return hasText || hasGif || hasImage;
+    })
     .sort((a, b) => {
-      if (filter === "likes") return (b.likes?.length || 0) - (a.likes?.length || 0);
+      if (filter === "likes")
+        return (b.likes?.length || 0) - (a.likes?.length || 0);
       return new Date(b.watchedAt) - new Date(a.watchedAt);
     });
-    
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "24px" }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "16px",
+        marginTop: "24px",
+      }}
+    >
       {/* ⬇️ Dropdown Filter */}
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "12px" }}>
+      <div
+        style={{ display: "flex", justifyContent: "flex-end", marginBottom: "12px" }}
+      >
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
@@ -66,8 +78,8 @@ const getRelativeTime = (date) => {
             fontSize: "13px",
           }}
         >
-          <option value="recent">Most Recent</option>
-          <option value="likes">Most Likes</option>
+          <option value="recent">{t("Most Recent")}</option>
+          <option value="likes">{t("Most Likes")}</option>
         </select>
       </div>
 
@@ -78,17 +90,14 @@ const getRelativeTime = (date) => {
           typeof log.movie === "string"
             ? log.movie
             : log.movie?.id || log.movie?._id || log.movieId;
-        
+
         if (!poster && movieId && log.poster) {
           poster = log.poster.startsWith("http")
             ? log.poster
             : `${TMDB_IMG}${log.poster}`;
         }
-        
 
         const isLikedByMe = log.likes?.includes(userId);
-
-        
 
         return (
           <div
@@ -96,23 +105,16 @@ const getRelativeTime = (date) => {
             onClick={() => {
               const hasReview = log.review?.trim();
               const tmdbId = log.tmdbId || log.movie?.id || log.movie;
-            
-              const user = JSON.parse(localStorage.getItem("user"));
-              const token = user?.token;
-            
+
               // 🚀 Prefer review if exists
               if (hasReview) {
                 return navigate(`/review/${log._id}`);
               }
-            
-              // 🧠 Fallback to movie page if logged in or guest
-              if (tmdbId) {
-                return navigate(`/movie/${tmdbId}`);
-              }
-            
+
+              if (tmdbId) return navigate(`/movie/${tmdbId}`);
+
               console.warn("⚠️ No TMDB ID or review for log:", log);
             }}
-                    
             style={{
               backgroundColor: "#181818",
               padding: "12px",
@@ -121,7 +123,7 @@ const getRelativeTime = (date) => {
               position: "relative",
             }}
           >
-            {/* 📅 Relative timestamp in top right */}
+            {/* 📅 Relative timestamp */}
             <div
               style={{
                 position: "absolute",
@@ -134,7 +136,7 @@ const getRelativeTime = (date) => {
               {getRelativeTime(log.watchedAt)}
             </div>
 
-            {/* 🎬 Movie poster + review */}
+            {/* 🎬 Poster + Review */}
             <div style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
               <img
                 src={poster}
@@ -147,10 +149,19 @@ const getRelativeTime = (date) => {
                 }}
               />
               <div style={{ flex: 1 }}>
-                <h4 style={{ margin: 0, color: "#fff", fontSize: "15px" }}>{log.title}</h4>
+                <h4 style={{ margin: 0, color: "#fff", fontSize: "15px" }}>
+                  {log.title}
+                </h4>
 
                 {/* ⭐ Rating */}
-                <div style={{ display: "flex", gap: "3px", marginTop: "4px", fontSize: "18px" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "3px",
+                    marginTop: "4px",
+                    fontSize: "18px",
+                  }}
+                >
                   {[...Array(5)].map((_, i) => {
                     const isFull = i + 1 <= log.rating;
                     const isHalf = log.rating >= i + 0.5 && log.rating < i + 1;
@@ -168,26 +179,26 @@ const getRelativeTime = (date) => {
                   })}
                 </div>
 
-                {/* 📝 Review text */}
+                {/* 📝 Review Text */}
                 {log.review &&
-  !["[GIF ONLY]", "[IMAGE ONLY]", "__media__"].includes(log.review.trim()) && (
-    <p
-      style={{
-        color: "#ccc",
-        fontSize: "13px",
-        fontFamily: "Inter, sans-serif",
-        marginTop: "8px",
-      }}
-    >
-      {log.review}
-    </p>
-)}
-
-
+                  !["[GIF ONLY]", "[IMAGE ONLY]", "__media__"].includes(
+                    log.review.trim()
+                  ) && (
+                    <p
+                      style={{
+                        color: "#ccc",
+                        fontSize: "13px",
+                        fontFamily: "Inter, sans-serif",
+                        marginTop: "8px",
+                      }}
+                    >
+                      {log.review}
+                    </p>
+                  )}
               </div>
             </div>
 
-            {/* 🎁 GIF or Image */}
+            {/* 🎁 Media */}
             {log.image && (
               <img
                 src={log.image}
@@ -215,7 +226,7 @@ const getRelativeTime = (date) => {
               />
             )}
 
-            {/* 🔥 Likes + 💬 Replies */}
+            {/* ❤️ Likes + 💬 Replies */}
             <div
               style={{
                 display: "flex",
@@ -224,9 +235,14 @@ const getRelativeTime = (date) => {
                 marginTop: "10px",
               }}
             >
-              {/* ❤️ Likes */}
+              {/* Likes */}
               <div
-                style={{ display: "flex", alignItems: "center", gap: "4px", cursor: "pointer" }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px",
+                  cursor: "pointer",
+                }}
                 onClick={(e) => {
                   e.stopPropagation();
                   handleLike(log._id);
@@ -237,13 +253,22 @@ const getRelativeTime = (date) => {
                 ) : (
                   <AiOutlineHeart style={{ fontSize: "14px", color: "#999" }} />
                 )}
-                <span style={{ fontSize: "13px", color: "#999" }}>{log.likes?.length || 0}</span>
+                <span style={{ fontSize: "13px", color: "#999" }}>
+                  {log.likes?.length || 0}
+                </span>
               </div>
 
-              {/* 💬 Replies */}
+              {/* Replies */}
               {log.replies?.length > 0 && (
-                <span style={{ fontSize: "12px", color: "#999" }}>
-                  💬 {log.replies.length} {log.replies.length === 1 ? "reply" : "replies"}
+                <span
+                  style={{ fontSize: "12px", color: "#999", cursor: "pointer" }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/replies/${log._id}`);
+                  }}
+                >
+                  💬 {log.replies.length}{" "}
+                  {log.replies.length === 1 ? t("reply") : t("replies")}
                 </span>
               )}
             </div>

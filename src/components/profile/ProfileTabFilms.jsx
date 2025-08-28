@@ -1,10 +1,10 @@
-// src/components/profile/ProfileTabFilms.jsx
 import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import StarRating from "../StarRating";
 import { AiFillHeart } from "react-icons/ai";
 import { FaRegComment } from "react-icons/fa";
 import axios from "../../api/api";
+import useTranslate from "../../utils/useTranslate";
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const FALLBACK_POSTER = "/default-poster.jpg";
@@ -28,6 +28,7 @@ export default function ProfileTabFilms({
   profileUserId,
   customPosters = {},
 }) {
+  const t = useTranslate();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [sortType, setSortType] = useState("added");
@@ -185,7 +186,7 @@ export default function ProfileTabFilms({
           color: "#888",
         }}
       >
-        🎞️ Loading your Scenes...
+        🎞️ {t("Loading your Scenes...")}
       </div>
     );
   }
@@ -217,11 +218,11 @@ export default function ProfileTabFilms({
             minWidth: "130px",
           }}
         >
-          <option value="added">Recently Added</option>
-          <option value="rating">Rating</option>
-          <option value="release">Release Date</option>
-          <option value="runtime">Runtime</option>
-          <option value="favorites">Favorites</option>
+          <option value="added">{t("Recently Added")}</option>
+          <option value="rating">{t("Rating")}</option>
+          <option value="release">{t("Release Date")}</option>
+          <option value="runtime">{t("Runtime")}</option>
+          <option value="favorites">{t("Favorites")}</option>
         </select>
 
         <select
@@ -238,8 +239,8 @@ export default function ProfileTabFilms({
             minWidth: "130px",
           }}
         >
-          <option value="desc">⬇ Descending</option>
-          <option value="asc">⬆ Ascending</option>
+          <option value="desc">⬇ {t("Descending")}</option>
+          <option value="asc">⬆ {t("Ascending")}</option>
         </select>
       </div>
 
@@ -254,16 +255,15 @@ export default function ProfileTabFilms({
           }}
         >
           {sortType === "favorites"
-            ? "You haven’t marked any favorite films yet."
-            : "No films found for this filter."}
+            ? t("You haven’t marked any favorite films yet.")
+            : t("No films found for this filter.")}
         </div>
       ) : (
         <div
           style={{
             display: "grid",
-            gridTemplateColumns:
-              "repeat(auto-fit, minmax(110px, 1fr))", // ✅ responsive grid
-            gap: "8px",
+            gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))",
+            gap: "6px",
           }}
         >
           {sortedLogs.map((lg) => {
@@ -304,7 +304,7 @@ export default function ProfileTabFilms({
                 <img
                   src={posterUrl}
                   loading="lazy"
-                  alt={lg.title || "Poster"}
+                  alt={lg.title || t("Poster")}
                   style={{
                     width: "100%",
                     aspectRatio: "2/3",
