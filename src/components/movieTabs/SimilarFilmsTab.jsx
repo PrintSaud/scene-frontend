@@ -100,6 +100,7 @@ export default function SimilarFilmsTab({ movieId, navigate }) {
           ))}
         </div>
       )}
+      
     </div>
   );
 }

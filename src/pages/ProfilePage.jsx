@@ -1,3 +1,4 @@
+// src/pages/ProfilePage.jsx
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import ColorThief from "colorthief";
@@ -12,6 +13,7 @@ import api, { getUserProfile } from "../api/api";
 import toast from "react-hot-toast";
 import { followUser } from "../api/api";
 import { getCustomPostersBatch } from "../api/api";
+import useTranslate from "../utils/useTranslate"; // ✅
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -30,7 +32,7 @@ export default function ProfilePage() {
   const [isFollowing, setIsFollowing] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
   const [resolvedPosters, setResolvedPosters] = useState({});
-
+  const t = useTranslate(); // ✅
 
   useEffect(() => {
     try {
@@ -58,9 +60,6 @@ export default function ProfilePage() {
         console.error("❌ Failed to load profile", err);
       }
     };
-    
-    
-    
 
     const fetchLogs = async () => {
       try {
@@ -75,41 +74,36 @@ export default function ProfilePage() {
     fetchLogs();
   }, [id]);
 
-
   useEffect(() => {
     if (!Array.isArray(logs) || !user) return;
-  
+
     const fetchCustomPosters = async () => {
       const userId = user._id;
-  
-      // helper: robust tmdb id extraction
+
       const getId = (obj) => {
         if (!obj) return null;
-        // if it's a number already
         if (typeof obj === "number") return obj;
-        // if it's a string number
         if (typeof obj === "string" && /^\d+$/.test(obj)) return Number(obj);
-        // object fields (use optional chaining)
         return Number(obj?.tmdbId ?? obj?.id ?? obj?._id) || null;
       };
-  
+
       const logIds = (logs || [])
         .filter(Boolean)
         .map((log) => getId(log?.tmdbId ?? log))
         .filter((v) => Number.isFinite(v));
-  
+
       const favIds = (user?.favoriteFilms || [])
-        .filter(Boolean) // <-- avoids nulls
+        .filter(Boolean)
         .map((m) => getId(m))
         .filter((v) => Number.isFinite(v));
-  
+
       const movieIds = [...new Set([...logIds, ...favIds])];
-  
+
       if (!userId || movieIds.length === 0) {
         console.warn("⚠️ Missing userId or valid movieIds for custom posters", { userId, movieIds });
         return;
       }
-  
+
       try {
         const data = await getCustomPostersBatch(userId, movieIds);
         setCustomPosters(data);
@@ -117,26 +111,23 @@ export default function ProfilePage() {
         console.error("❌ Failed to fetch custom posters", err);
       }
     };
-  
+
     fetchCustomPosters();
-  }, [logs, user]); // keep as you had it
-  
-  
+  }, [logs, user]);
+
   useEffect(() => {
     if (!logs.length || !user) return;
-  
+
     const finalPosters = {};
     logs.forEach((log) => {
       const tmdbId = log.tmdbId;
       const custom = customPosters[tmdbId];
       const tmdb = log.poster_path ? `https://image.tmdb.org/t/p/w500${log.poster_path}` : null;
-      finalPosters[tmdbId] = custom || tmdb || "/fallback.jpg"; // or your default image
+      finalPosters[tmdbId] = custom || tmdb || "/fallback.jpg";
     });
-  
-    setResolvedPosters(finalPosters); // ✅ new state
+
+    setResolvedPosters(finalPosters);
   }, [logs, customPosters]);
-  
-    
 
   useEffect(() => {
     if (stored && user) {
@@ -144,54 +135,46 @@ export default function ProfilePage() {
     }
   }, [user, stored]);
 
+  async function handleFollow(targetId) {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const token = user?.token;
 
+      const res = await api.post(
+        `/api/users/${user._id}/follow/${targetId}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-// example handleFollow
+      setIsFollowing(res.data.following);
+      toast.success(res.data.message || t("Follow status updated"));
+    } catch (err) {
+      console.error("❌ Follow toggle failed:", err);
 
-
-async function handleFollow(targetId) {
-  try {
-    const user = JSON.parse(localStorage.getItem("user"));
-    const token = user?.token;
-
-    const res = await api.post(
-      `/api/users/${user._id}/follow/${targetId}`,
-      {},
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    // If server blocked with 403, this won't run (it’ll throw)
-    setIsFollowing(res.data.following);
-    toast.success(res.data.message);
-  } catch (err) {
-    console.error("❌ Follow toggle failed:", err);
-
-    if (err.response?.status === 403) {
-      // 🚫 Blocked
-      toast.error("لا حقتي");
-      setIsFollowing(false); // make sure button stays "Follow"
-    } else {
-      toast.error("Failed to update follow status");
+      if (err.response?.status === 403) {
+        toast.error(t("Action not allowed"));
+        setIsFollowing(false);
+      } else {
+        toast.error(t("Failed to update follow status"));
+      }
     }
   }
-}
-  
 
   const handleCopyLink = () => {
     const link = `${window.location.origin}/profile/${user._id}`;
     navigator.clipboard.writeText(link);
-    toast.success("Profile link copied!");
+    toast.success(t("Profile link copied!"));
   };
 
   const handleRemoveFollower = async () => {
-    if (!window.confirm("Remove this follower?")) return;
+    if (!window.confirm(t("Remove this follower?"))) return;
     try {
       await api.post(`/api/users/${stored._id}/remove-follower/${user._id}`);
-      toast.success("Removed follower!");
+      toast.success(t("Removed follower!"));
       window.location.reload();
     } catch (err) {
       console.error("❌ Failed to remove follower", err);
-      toast.error("Failed to remove follower.");
+      toast.error(t("Failed to remove follower."));
     }
   };
 
@@ -215,9 +198,9 @@ async function handleFollow(targetId) {
     window.addEventListener("refreshMyLists", refresh);
     return () => window.removeEventListener("refreshMyLists", refresh);
   }, []);
-  
+
   useEffect(() => {
-    const handleNavigateToFilms = () => setActiveTab("Films"); // Capital "F" 
+    const handleNavigateToFilms = () => setActiveTab("Films");
     window.addEventListener("navigateToFilms", handleNavigateToFilms);
     return () => window.removeEventListener("navigateToFilms", handleNavigateToFilms);
   }, []);
@@ -234,8 +217,7 @@ async function handleFollow(targetId) {
           },
         }
       );
-  
-      // ✅ Optional: update log likes in real-time
+
       setLogs((prevLogs) =>
         prevLogs.map((log) =>
           log._id === logId
@@ -252,84 +234,93 @@ async function handleFollow(targetId) {
       console.error("❌ Failed to like log", err);
     }
   };
+
+  if (!user)
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",       // full screen height
+          backgroundColor: "#0e0e0e",
+          color: "white",
+          fontSize: "18px",
+        }}
+      >
+        {t("Loading...")}
+      </div>
+    );
   
-  
-  
-  if (!user) return <div style={{ color: "white", padding: "20px" }}>Loading...</div>;
 
   return (
     <div style={{ backgroundColor: "#0e0e0e", color: "white", minHeight: "100vh", paddingBottom: "100px", position: "relative" }}>
       <ProfileHeader
-  user={user}
-  logs={logs}            // <-- pass logs here
-  navigate={navigate}
-  imgRef={imgRef}
-  isOwner={isOwner}
-  isFollowing={isFollowing}
-  handleFollow={handleFollow}
-  handleRemoveFollower={handleRemoveFollower}  // ✅ now wired
-/>
+        user={user}
+        logs={logs}
+        navigate={navigate}
+        imgRef={imgRef}
+        isOwner={isOwner}
+        isFollowing={isFollowing}
+        handleFollow={handleFollow}
+        handleRemoveFollower={handleRemoveFollower}
+      />
 
+      <ProfileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
-<ProfileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+      <div style={{ padding: "0 16px" }}>
+        {activeTab === "Profile" && user && (
+          <ProfileTabProfile
+            user={user}
+            logs={logs}
+            favoriteMovies={user?.favoriteFilms}
+            profileUserId={user._id}
+            customPosters={customPosters}
+          />
+        )}
 
-<div style={{ padding: "0 16px" }}>
-{activeTab === "Profile" && user && (
-  <ProfileTabProfile
-    user={user}
-    logs={logs}
-    favoriteMovies={user?.favoriteFilms} 
-    profileUserId={user._id}
-    customPosters={customPosters}
-  />
-)}
+        {activeTab === "Reviews" && (
+          <ProfileTabReviews
+            logs={logs}
+            filter={reviewFilter}
+            setFilter={setReviewFilter}
+            navigate={navigate}
+            handleLike={handleLike}
+            customPosters={customPosters}
+          />
+        )}
 
-{activeTab === "Reviews" && (
-  <ProfileTabReviews
-    logs={logs}
-    filter={reviewFilter}
-    setFilter={setReviewFilter}
-    navigate={navigate}
-    handleLike={handleLike} // ✅ now passed
-    customPosters={customPosters}
-  />
-)}
+        {activeTab === "Watchlist" && (
+          <ProfileTabWatchlist
+            user={user}
+            sortType={sortType}
+            setSortType={setSortType}
+            order={order}
+            setOrder={setOrder}
+            watchList={watchlist}
+            setWatchList={setWatchlist}
+            profileUserId={id}
+          />
+        )}
 
+        {activeTab === "Lists" && (
+          <ProfileTabLists
+            user={stored}
+            profileUserId={id}
+            refreshTrigger={listRefreshKey}
+            triggerRefresh={() => setListRefreshKey((prev) => prev + 1)}
+          />
+        )}
 
-  {activeTab === "Watchlist" && (
-    <ProfileTabWatchlist
-      user={user}
-      sortType={sortType}
-      setSortType={setSortType}
-      order={order}
-      setOrder={setOrder}
-      watchList={watchlist}
-      setWatchList={setWatchlist}
-      profileUserId={id}
-    />
-  )}
-
-  {activeTab === "Lists" && (
-    <ProfileTabLists
-      user={stored}
-      profileUserId={id}
-      refreshTrigger={listRefreshKey}
-      triggerRefresh={() => setListRefreshKey((prev) => prev + 1)}
-    />
-  )}
-
-{activeTab === "Films" && (
-  <ProfileTabFilms
-  logs={logs}
-  favorites={user?.favorites}
-  profileUserId={user?._id}
-  customPosters={customPosters}
-/>
-)}
-
-</div>
-
-
+        {activeTab === "Films" && (
+          <ProfileTabFilms
+            logs={logs}
+            favorites={user?.favorites}
+            profileUserId={user?._id}
+            customPosters={customPosters}
+          />
+        )}
+      </div>
     </div>
   );
 }

@@ -25,6 +25,7 @@ export default function WhereToWatchTab({ providers, selectedRegion, setSelected
                 fontFamily: "Inter",
               }}
             >
+              
               {Object.keys(providers).map((region) => (
                 <option key={region} value={region}>
                   {region}

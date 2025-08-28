@@ -40,6 +40,7 @@ export default function MoviePage() {
   const editLogId = searchParams.get("logId");
 
 
+  
   const [movie, setMovie] = useState(null);
   const [credits, setCredits] = useState(null);
   const [trailerKey, setTrailerKey] = useState(null);

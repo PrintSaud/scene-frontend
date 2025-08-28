@@ -1,11 +1,14 @@
+// src/pages/TrendingPage.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { backend } from "../config";
+import useTranslate from "../utils/useTranslate"; // ✅ translation hook
 
 export default function TrendingPage() {
   const [movies, setMovies] = useState([]);
   const navigate = useNavigate();
+  const t = useTranslate();
 
   useEffect(() => {
     const fetchTrending = async () => {
@@ -27,11 +30,11 @@ export default function TrendingPage() {
         color: "#fff",
         backgroundColor: "#0e0e0e",
         minHeight: "100dvh",
-        paddingBottom: "120px", // 🧽 Extra space for scroll
+        paddingBottom: "120px",
         boxSizing: "border-box",
       }}
     >
-      {/* 🔙 Back to Home (Scene-style) */}
+      {/* 🔙 Back to Home */}
       <button
         onClick={() => navigate("/home")}
         style={{
@@ -48,7 +51,7 @@ export default function TrendingPage() {
           cursor: "pointer",
         }}
       >
-        ← Back
+        ← {t("Back")}
       </button>
 
       {/* 🔥 Header */}
@@ -61,7 +64,7 @@ export default function TrendingPage() {
           fontWeight: "600",
         }}
       >
-         Trending Movies This Week 🔥
+        {t("Trending Movies This Week 🔥")}
       </h1>
 
       {/* 🎬 Movie Grid */}
@@ -125,7 +128,7 @@ export default function TrendingPage() {
           ))
         ) : (
           <p style={{ gridColumn: "1 / -1", textAlign: "center" }}>
-            No trending movies available.
+            {t("No trending movies available.")}
           </p>
         )}
       </div>

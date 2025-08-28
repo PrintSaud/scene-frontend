@@ -122,7 +122,7 @@ export default function ActorPage() {
                     overflow: "hidden",
                     fontFamily: "Inter, sans-serif",
                   }}
-                >
+                > 
                   {actor.biography}
                 </p>
                 {actor.biography.length > 300 && (

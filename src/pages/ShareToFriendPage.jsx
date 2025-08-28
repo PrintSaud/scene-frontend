@@ -12,6 +12,8 @@ import {
 
 
 
+
+
 export default function ShareToFriendPage() {
   const { type, id } = useParams(); // 🔥 universal support
   const navigate = useNavigate();

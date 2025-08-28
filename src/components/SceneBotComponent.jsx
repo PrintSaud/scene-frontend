@@ -1,290 +1,248 @@
+// src/pages/SceneBotComponent.jsx
 import { useState, useRef, useEffect } from "react";
 import { callSceneBot } from "../utils/callSceneBot";
 import { FiSend } from "react-icons/fi";
 import { funPrompts } from "../utils/funPrompts";
-import { backend } from "../config";
-import { useLocation } from "react-router-dom";
+import { detectLang } from "../utils/detectLang";
+import useTranslate from "../utils/useTranslate";
 
 export default function SceneBotComponent() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [typingText, setTypingText] = useState("");
-  const messagesEndRef = useRef(null);
-  const location = useLocation();
 
-  // 🧠 Get a prompt by lang (fallback to English)
-  const getRandomPrompt = (lang) => {
-    const list = funPrompts[lang] || funPrompts["english"];
+  const messagesEndRef = useRef(null);
+  const typeTimerRef = useRef(null);          // ✅ single typewriter timer
+  const replyRef = useRef("");                // buffer for current reply
+  const indexRef = useRef(0);                 // current index while typing
+  const t = useTranslate();
+
+  const botLang = detectLang();
+  const isRTL = botLang === "arabic";
+
+  const pickPrompt = () => {
+    const list = funPrompts[botLang] || funPrompts.english || [];
+    if (!list.length) return "";
     return list[Math.floor(Math.random() * list.length)];
   };
-  
 
-  // 📌 Lang from storage
-  const userLang = localStorage.getItem("sceneLang") || "english";
-  const prompt = getRandomPrompt(userLang);
-
+  // hydrate history (24h)
   useEffect(() => {
     const saved = localStorage.getItem("scenebotHistory");
-    if (saved) {
+    if (!saved) return;
+    try {
       const parsed = JSON.parse(saved);
       const lastTime = parsed[parsed.length - 1]?.time;
       const isFresh = Date.now() - lastTime < 24 * 60 * 60 * 1000;
-
-      if (isFresh) {
-        setMessages(parsed.map((msg) => ({ ...msg, time: undefined })));
-      } else {
-        localStorage.removeItem("scenebotHistory");
-      }
-    }
+      if (isFresh) setMessages(parsed.map((m) => ({ ...m, time: undefined })));
+      else localStorage.removeItem("scenebotHistory");
+    } catch {}
   }, []);
 
-  const saveToStorage = (msgArray) => {
-    const withTime = msgArray.map((msg) => ({ ...msg, time: Date.now() }));
+  const saveToStorage = (arr) => {
+    const withTime = arr.map((m) => ({ ...m, time: Date.now() }));
     localStorage.setItem("scenebotHistory", JSON.stringify(withTime));
   };
-  
-  const handleAsk = async (customPrompt, forcedLang = null) => {
-    // 🧹 Normalize input
-    let rawInput = customPrompt || input || "";
-    if (typeof rawInput !== "string") {
-      console.warn("⚠️ Input was not string. Converting to string:", rawInput);
-      rawInput = String(rawInput);
-    }
-  
-    const question = rawInput.trim();
-    if (!question) return;
-  
-    // 🌍 Language Triggers
-    const lower = question.toLowerCase();
-    if (lower.includes("reply in english")) {
-      localStorage.setItem("sceneLang", "english");
-    } else if (lower.includes("reply in arabic")) {
-      localStorage.setItem("sceneLang", "arabic");
-    } else if (lower.includes("reply in french")) {
-      localStorage.setItem("sceneLang", "french");
-    } else if (lower.includes("reset language")) {
-      localStorage.removeItem("sceneLang");
-    }
-  
-    // 🧠 Save user message
-    const userMsg = {
-      sender: "user",
-      text: typeof question === "string" ? question : JSON.stringify(question),
-    };
-  
-    const newMessages = [...messages, userMsg];
-    setMessages(newMessages);
-    saveToStorage(newMessages);
-    setLoading(true);
-    setInput("");
-  
-    // 🚀 Call SceneBot
-    const lang = forcedLang || localStorage.getItem("sceneLang") || "english";
-    console.log("🧠 CONFIRMATION — calling callSceneBot with:", question);
-    console.trace();
-  
-    const result = await callSceneBot(question, lang);
-    setLoading(false);
-  
-    const replyText = typeof result === "string" ? result : JSON.stringify(result);
-    if (!replyText) return;
-  
-    setTypingText("");
-  
-    const botMsg = {
-      sender: "bot",
-      text: "", // start empty, we'll type it
-    };
-  
-    let fullMessages = [...newMessages, botMsg];
-    setMessages(fullMessages);
-  
-    // ✍️ Typewriter Effect
-    let i = 0;
-    const typeChar = () => {
-      if (i < replyText.length) {
-        fullMessages = [...fullMessages];
-        fullMessages[fullMessages.length - 1] = {
-          ...fullMessages[fullMessages.length - 1],
-          text: fullMessages[fullMessages.length - 1].text + replyText[i],
-        };
-        setMessages(fullMessages);
-        i++;
-        setTimeout(typeChar, 15); // or use requestAnimationFrame for buttery smoothness
-      } else {
-        saveToStorage(fullMessages);
-      }
-    };
-  
-    typeChar();
+
+  // small helper to remove duplicated trailing paragraph/sentence
+  const dedupeTail = (text) => {
+    // if last ~200 chars repeat, drop the duplicate
+    const s = text.trim();
+    const chunk = s.slice(-200);
+    const without = s.slice(0, -200);
+    return without.endsWith(chunk) ? without : s;
   };
-  
-  
-  useEffect(() => {
-    if (location.state?.autoAsk) {
-      const text = location.state.autoAsk;
-      setInput(""); // clear input UI
-      handleAsk(text); // auto fire
-    }
-  }, [location.state]);
-  
 
-  const translatePrompt = async (text, lang) => {
-    if (lang === "english" || lang === "arabic") return text;
+  const startTypewriter = () => {
+    // clear any previous timer just in case
+    if (typeTimerRef.current) clearInterval(typeTimerRef.current);
 
-    try {
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/scenebot/translate`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))?.token}`,
-        },
-        body: JSON.stringify({ text, target: lang }),
+    typeTimerRef.current = setInterval(() => {
+      const full = replyRef.current;
+      const i = indexRef.current;
+
+      if (i >= full.length) {
+        clearInterval(typeTimerRef.current);
+        typeTimerRef.current = null;
+        setLoading(false);
+        // final dedupe safeguard
+        setMessages((prev) => {
+          const copy = [...prev];
+          const last = copy[copy.length - 1];
+          if (last?.sender === "bot") {
+            last.text = dedupeTail(last.text);
+          }
+          saveToStorage(copy);
+          return copy;
+        });
+        return;
+      }
+
+      setMessages((prev) => {
+        const copy = [...prev];
+        const last = copy[copy.length - 1];
+        if (last?.sender === "bot") {
+          last.text = full.slice(0, i + 1);     // ✅ substring, no additive drift
+        }
+        return copy;
       });
 
-      const data = await res.json();
-      return data.translated || text;
-    } catch (err) {
-      console.error("Prompt translation failed", err);
-      return text;
+      indexRef.current = i + 1;
+      // keep view stuck to bottom while typing
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 12);
+  };
+
+  const handleAsk = async (customPrompt) => {
+    if (loading) return; // ✅ prevent double-fire while typing
+
+    const question = String(customPrompt ?? input ?? "").trim();
+    if (!question) return;
+
+    // append user message
+    const userMsg = { sender: "user", text: question };
+    const next = [...messages, userMsg];
+    setMessages(next);
+    saveToStorage(next);
+    setLoading(true);
+    setInput("");
+
+    // ensure a fresh typewriter state
+    if (typeTimerRef.current) clearInterval(typeTimerRef.current);
+    replyRef.current = "";
+    indexRef.current = 0;
+
+    try {
+      const replyText = await callSceneBot(question, botLang);
+      // buffer the reply for the interval loop
+      replyRef.current = replyText || "";
+
+      // create (single) bot bubble to fill progressively
+      setMessages((prev) => [...prev, { sender: "bot", text: "" }]);
+
+      // go!
+      startTypewriter();
+    } catch (e) {
+      setLoading(false);
+      const errMsg = { sender: "bot", text: t("Something went wrong") };
+      const copy = [...next, errMsg];
+      setMessages(copy);
+      saveToStorage(copy);
     }
   };
 
   const handleFunPrompt = async () => {
-    const lang = localStorage.getItem("sceneLang") || "english";
-    const randomPrompt = getRandomPrompt(lang);
-    const finalPrompt =
-      lang === "english" || lang === "arabic"
-        ? randomPrompt
-        : await translatePrompt(randomPrompt, lang);
-
-    await handleAsk(finalPrompt, lang);
+    const p = pickPrompt();
+    if (!p) return;
+    await handleAsk(p);
   };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
+  // cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (typeTimerRef.current) clearInterval(typeTimerRef.current);
+    };
+  }, []);
+
   return (
     <div
-  style={{
-    display: "flex",
-    flexDirection: "column",
-    height: "100vh",
-    background: "#0e0e0e",
-    color: "#fff",
-    fontFamily: "Inter, sans-serif",
-    position: "relative",
-  }}
->
-  {/* 🧠 Sticky Header with ❓ Icon */}
-  <div
-    style={{
-      position: "sticky",
-      top: 0,
-      background: "#0e0e0e",
-      zIndex: 100,
-      padding: "20px 16px",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      borderBottom: "1px solid #222",
-    }}
-  >
-    {/* Centered Title */}
-    <div style={{ fontSize: "20px", fontWeight: "600", flex: 1, textAlign: "center" }}>
-      SceneBot 🎬
-    </div>
-
-    {/* ❓ Icon — now truly top right */}
-    <div
-      onClick={() =>
-        alert(
-          `🌍 To change language, just type:\n\nreply in "arabic"\nreply in "french"\nreply in "english"\n\nTo reset, type: reset language`
-        )
-      }
+      dir={isRTL ? "rtl" : "ltr"}
       style={{
-        position: "absolute",
-        top: 20,
-        right: 16,
-        fontSize: "20px",
-        cursor: "pointer",
-        color: "#ccc",
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+        background: "#0e0e0e",
+        color: "#fff",
+        fontFamily: "Inter, sans-serif",
       }}
-      title="Language Info"
     >
-      🌍
-    </div>
-  </div>
+      {/* Header */}
+      <div
+        style={{
+          position: "sticky",
+          top: 0,
+          background: "#0e0e0e",
+          zIndex: 100,
+          padding: "14px 16px",          // tighter
+          borderBottom: "1px solid #222",
+          textAlign: "center",
+          fontSize: 18,
+          fontWeight: 600,
+        }}
+      >
+        SceneBot 🎬
+      </div>
 
-  
-      {/* 🗨️ Messages */}
+      {/* Messages */}
       <div
         style={{
           flex: 1,
           overflowY: "auto",
-          padding: "0 16px 140px",
-          paddingTop: "0px", // ✅ REMOVE TOP GAP
-          display: "flex",
-          flexDirection: "column",
-          gap: "0px",
+          padding: "8px 12px 96px",       // tighter: less bottom padding
         }}
       >
-        {messages.map((msg, i) => (
+        {messages.map((m, i) => (
           <div
             key={i}
             style={{
-              alignSelf: msg.sender === "user" ? "end" : "start",
-              marginLeft: msg.sender === "user" ? "auto" : 0,
-              marginRight: msg.sender === "user" ? 0 : "auto",
-              marginTop: i === 0 ? "0px" : "14px", // ✅ FIRST MESSAGE NO MARGIN-TOP
-              background: msg.sender === "user" ? "#fff" : "#1a1a1a",
-              color: msg.sender === "user" ? "#000" : "#fff",
-              padding: "14px 18px",
-              borderRadius: "16px",
-              maxWidth: "80%",
-              fontSize: "14.5px",
+              alignSelf: m.sender === "user" ? "end" : "start",
+              marginLeft: m.sender === "user" ? "auto" : 0,
+              marginRight: m.sender === "user" ? 0 : "auto",
+              marginTop: i === 0 ? 4 : 10, // tighter vertical rhythm
+              background: m.sender === "user" ? "#fff" : "#1a1a1a",
+              color: m.sender === "user" ? "#000" : "#fff",
+              padding: "10px 14px",        // tighter bubble padding
+              borderRadius: 14,
+              maxWidth: "78%",             // a touch wider on mobile
+              fontSize: 14.5,
+              lineHeight: 1.55,
               whiteSpace: "pre-wrap",
-              border: msg.sender === "bot" ? "1px solid #333" : "none",
+              border: m.sender === "bot" ? "1px solid #333" : "none",
+              textAlign: isRTL ? "right" : "left",
             }}
           >
-            {String(msg.text)}
+            {String(m.text)}
           </div>
         ))}
-  
-        {loading && !typingText && (
+
+        {loading && (
           <div
             style={{
               background: "#1a1a1a",
-              padding: "14px 16px",
-              borderRadius: "16px",
-              maxWidth: "80%",
+              padding: "10px 14px",
+              borderRadius: 14,
+              maxWidth: "60%",
               alignSelf: "flex-start",
-              fontSize: "14px",
+              fontSize: 13.5,
               color: "#ccc",
               fontStyle: "italic",
+              border: "1px solid #333",
             }}
           >
-            SceneBot is typing...
+            {t("SceneBot is typing...")}
           </div>
         )}
-  
-        <div ref={messagesEndRef} style={{ height: "100px" }} />
+
+        <div ref={messagesEndRef} style={{ height: 80 }} />
       </div>
-  
-      {/* ✍️ Input + Buttons */}
+
+      {/* Input row */}
       <div
         style={{
           position: "fixed",
-          bottom: "60px",
+          bottom: 60,                      // keep room for your tab bar
           left: 0,
-          width: "95%",
-          padding: "14px 16px",
+          width: "90%",
+          padding: "12px 12px",
           background: "#0e0e0e",
           borderTop: "1px solid #222",
           display: "flex",
           alignItems: "center",
+          gap: 8,
           zIndex: 99,
         }}
       >
@@ -292,50 +250,51 @@ export default function SceneBotComponent() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleAsk()}
-          placeholder="Ask Anything about Movies..."
+          placeholder={t("Ask Anything about Movies...")}
+          dir={isRTL ? "rtl" : "ltr"}
+          disabled={loading}               // ✅ block typing during generation
           style={{
             flex: 1,
-            padding: "12px 16px",
-            borderRadius: "999px",
+            padding: "11px 14px",
+            borderRadius: 999,
             border: "1px solid #444",
             background: "#2a2a2a",
             color: "#fff",
-            fontSize: "15px",
-            fontFamily: "Inter, sans-serif",
+            fontSize: 15,
             outline: "none",
           }}
         />
         <button
           onClick={() => handleAsk()}
+          disabled={loading}
           style={{
-            marginLeft: "8px",
             background: "transparent",
             border: "none",
-            color: "#fff",
-            fontSize: "22px",
-            cursor: "pointer",
-            top: "0.5px",
+            color: loading ? "#888" : "#fff",
+            fontSize: 22,
+            cursor: loading ? "not-allowed" : "pointer",
           }}
+          aria-label={t("Send")}
+          title={t("Send")}
         >
           <FiSend />
         </button>
         <button
           onClick={handleFunPrompt}
+          disabled={loading}
           style={{
-            marginLeft: "8px",
             background: "transparent",
             border: "none",
-            color: "#fff",
-            fontSize: "22px",
-            cursor: "pointer",
-            top: "-0.5px",
+            color: loading ? "#888" : "#fff",
+            fontSize: 22,
+            cursor: loading ? "not-allowed" : "pointer",
           }}
-          title="Surprise me!"
+          title={t("Surprise me!")}
+          aria-label={t("Surprise me!")}
         >
           🎲
         </button>
       </div>
     </div>
   );
-  
 }

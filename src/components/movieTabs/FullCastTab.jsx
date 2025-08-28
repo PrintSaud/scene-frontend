@@ -51,6 +51,7 @@ export default function FullCastTab({ credits, navigate }) {
             {actor.name}
           </p>
           <p
+          
             style={{
               fontSize: "11px",
               color: "#aaa",

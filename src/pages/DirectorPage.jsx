@@ -15,6 +15,7 @@ export default function DirectorPage() {
   const [movies, setMovies] = useState([]);
   const [showFullBio, setShowFullBio] = useState(false);
 
+  
   const getAwards = (name = "") => {
     const normalized = name.trim().toLowerCase();
     const directAward = Object.keys(directorAwards).find(

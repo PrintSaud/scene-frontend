@@ -18,6 +18,7 @@ export default function PersonPage({ isDirector }) {
 
 
 
+  
   const [person, setPerson] = useState(null);
   const [credits, setCredits] = useState([]);
   const [showFullBio, setShowFullBio] = useState(false);
