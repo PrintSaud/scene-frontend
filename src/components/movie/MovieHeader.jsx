@@ -1,6 +1,7 @@
 // src/components/movie/MovieHeader.jsx
 import React from "react";
 import { backend } from "../../config";
+import useTranslate from "../../utils/useTranslate";
 
 export default function MovieHeader({
   movie,
@@ -9,13 +10,15 @@ export default function MovieHeader({
   handleWatchTrailer,
   handleSceneBotReview,
 }) {
+  const t = useTranslate();
+
   const TMDB_IMG = "https://image.tmdb.org/t/p/original";
-  const defaultPoster = "/default-poster.jpg"; // Add this to your public folder if you want
+  const defaultPoster = "/default-poster.jpg";
 
   const finalPoster =
     posterOverride ||
     (movie.poster_path ? `${TMDB_IMG}${movie.poster_path}` : defaultPoster);
-  
+
   return (
     <div style={{ padding: "24px", marginTop: "-90px", position: "relative", zIndex: 3 }}>
       <div
@@ -30,7 +33,7 @@ export default function MovieHeader({
       >
         <img
           src={finalPoster}
-          alt="Poster"
+          alt={t("alt.poster")}
           style={{ width: "150px", borderRadius: "8px" }}
           onError={(e) => {
             e.target.onerror = null;
@@ -48,9 +51,11 @@ export default function MovieHeader({
           }}
         >
           <div>
+            {/* ✅ Keep movie title always original */}
             <h1 style={{ fontSize: "16px", fontWeight: "600", marginBottom: "2px" }}>
               {movie.title}
             </h1>
+
             {movie.tagline && (
               <p
                 style={{
@@ -60,14 +65,16 @@ export default function MovieHeader({
                   marginBottom: "4px",
                 }}
               >
-                {movie.tagline}
+                {t(movie.tagline)}
               </p>
             )}
+
             <p style={{ fontSize: "12px", color: "#ccc", marginBottom: "2px" }}>
-              {movie.release_date?.slice(0, 4)} • {movie.runtime} min
+              {movie.release_date?.slice(0, 4)} • {movie.runtime} {t("minutes")}
             </p>
+
             <p style={{ fontSize: "12px", color: "#ccc", marginBottom: "8px" }}>
-              {movie.genres?.map((g) => g.name).join(", ")}
+              {movie.genres?.map((g) => t(g.name)).join(", ")}
             </p>
           </div>
 
@@ -87,7 +94,7 @@ export default function MovieHeader({
                 cursor: "pointer",
               }}
             >
-              + Log
+              + {t("log")}
             </button>
 
             <button
@@ -104,7 +111,7 @@ export default function MovieHeader({
                 cursor: "pointer",
               }}
             >
-              🎞️ Trailer
+              🎞️ {t("trailer")}
             </button>
 
             <button
@@ -121,7 +128,7 @@ export default function MovieHeader({
                 cursor: "pointer",
               }}
             >
-              🤖 Ask SceneBot
+              🤖 {t("ask_scenebot")}
             </button>
           </div>
         </div>

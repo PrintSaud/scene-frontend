@@ -152,7 +152,7 @@ export default function ProfilePage() {
       console.error("❌ Follow toggle failed:", err);
 
       if (err.response?.status === 403) {
-        toast.error(t("Action not allowed"));
+        toast.error(t("حقتي"));
         setIsFollowing(false);
       } else {
         toast.error(t("Failed to update follow status"));

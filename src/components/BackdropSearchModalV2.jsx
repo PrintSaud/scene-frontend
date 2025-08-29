@@ -8,6 +8,7 @@ export default function BackdropSearchModalV2({ onSelect, onClose }) {
   const [results, setResults] = useState([]);
 
 
+  
   useEffect(() => {
     const delay = setTimeout(() => {
       if (query.trim()) {

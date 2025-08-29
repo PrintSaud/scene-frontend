@@ -23,6 +23,7 @@ export default function BackdropPickerPage() {
     }, 400);
     return () => clearTimeout(delay);
   }, [query]);
+  
 
   const fetchMovies = async (q) => {
     try {

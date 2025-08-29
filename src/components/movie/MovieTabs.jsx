@@ -3,8 +3,7 @@ import React from "react";
 import FullCastTab from "../movieTabs/FullCastTab";
 import SimilarFilmsTab from "../movieTabs/SimilarFilmsTab";
 import WhereToWatchTab from "../movieTabs/WhereToWatchTab";
-import { backend } from "../../config";
-
+import useTranslate from "../../utils/useTranslate";
 
 export default function MovieTabs({
   activeTab,
@@ -16,10 +15,12 @@ export default function MovieTabs({
   selectedRegion,
   setSelectedRegion,
 }) {
+  const t = useTranslate();
+
   const tabs = [
-    { key: "cast", label: "Full Cast" },
-    { key: "similar", label: "Similar Films" },
-    { key: "watch", label: "Where to Watch" },
+    { key: "cast", label: t("Full Cast") },
+    { key: "similar", label: t("Similar Films") },
+    { key: "watch", label: t("Where to Watch") },
   ];
 
   return (
@@ -56,11 +57,7 @@ export default function MovieTabs({
 
       {/* 📂 Tab Content */}
       {activeTab === "cast" && <FullCastTab credits={credits} navigate={navigate} />}
-      {activeTab === "similar" && (
-        
-        <SimilarFilmsTab movieId={movieId} navigate={navigate} />
-        
-      )}
+      {activeTab === "similar" && <SimilarFilmsTab movieId={movieId} navigate={navigate} />}
       {activeTab === "watch" && (
         <WhereToWatchTab
           providers={providers}

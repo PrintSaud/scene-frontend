@@ -3,6 +3,7 @@ import { toast } from "react-hot-toast";
 import { toggleWatchlist } from "../../api/api";
 import axios from "axios";
 import { backend } from "../../config";
+import useTranslate from "../../utils/useTranslate";
 
 export default function MovieTopBar({
   navigate,
@@ -12,6 +13,7 @@ export default function MovieTopBar({
   setShowPosterModal,
   setShowAddToListModal,
 }) {
+  const t = useTranslate();
   const [showOptions, setShowOptions] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [myLog, setMyLog] = useState(null);
@@ -32,7 +34,6 @@ export default function MovieTopBar({
       setIsFavorite(false);
     }
   }, [tmdbId, validTmdb]);
-  
 
   // ✅ Fetch my log for this movie (to show Delete Log)
   useEffect(() => {
@@ -61,15 +62,17 @@ export default function MovieTopBar({
     try {
       const stored = JSON.parse(localStorage.getItem("user"));
       const token = stored?.token;
-      if (!token) return toast.error("Not logged in");
-      if (!validTmdb) return toast.error("Invalid movie id");
+      if (!token) return toast.error(t("errors.not_logged_in"));
+      if (!validTmdb) return toast.error(t("errors.invalid_movie_id"));
 
       await toggleWatchlist(tmdbId);
       setIsInWatchlist((prev) => !prev);
-      toast.success(isInWatchlist ? "Removed from Watchlist" : "Added to Watchlist");
+      toast.success(
+        isInWatchlist ? t("watchlist.removed") : t("watchlist.added")
+      );
     } catch (err) {
       console.error("❌ Watchlist error:", err.response?.data || err.message);
-      toast.error("Failed to update watchlist");
+      toast.error(t("errors.watchlist_update_failed"));
     }
   };
 
@@ -77,9 +80,9 @@ export default function MovieTopBar({
     try {
       const stored = JSON.parse(localStorage.getItem("user"));
       const token = stored?.token;
-      if (!token) return toast.error("Not logged in");
-      if (!validTmdb) return toast.error("Invalid movie id");
-  
+      if (!token) return toast.error(t("errors.not_logged_in"));
+      if (!validTmdb) return toast.error(t("errors.invalid_movie_id"));
+
       let data;
       if (isFavorite) {
         const res = await axios.delete(
@@ -87,7 +90,7 @@ export default function MovieTopBar({
           { headers: { Authorization: `Bearer ${token}` } }
         );
         data = res.data;
-        toast.success("❌ Removed from Favorites");
+        toast.success(t("favorites.removed"));
       } else {
         const res = await axios.post(
           `${backend}/api/users/${stored._id}/favorites/${tmdbId}`,
@@ -95,23 +98,22 @@ export default function MovieTopBar({
           { headers: { Authorization: `Bearer ${token}` } }
         );
         data = res.data;
-        toast.success("❤️ Added to Favorites");
+        toast.success(t("favorites.added"));
       }
-  
+
       // ✅ Trust server → sync local user + state
       const nextUser = { ...stored, favorites: data.favorites || [] };
       localStorage.setItem("user", JSON.stringify(nextUser));
       setIsFavorite((data.favorites || []).map(Number).includes(tmdbId));
     } catch (err) {
       console.error("❌ Favorite error:", err.response?.data || err.message);
-      toast.error("Failed to update favorites");
+      toast.error(t("errors.favorites_update_failed"));
     }
   };
-  
 
   const handleDeleteLog = async () => {
     if (!myLog) return;
-    if (!window.confirm("Are you sure you want to delete your log for this film?")) return;
+    if (!window.confirm(t("confirm.delete_log"))) return;
 
     try {
       const stored = JSON.parse(localStorage.getItem("user"));
@@ -119,28 +121,34 @@ export default function MovieTopBar({
       await axios.delete(`${backend}/api/logs/${myLog._id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      toast.success("✅ Log deleted successfully!");
+      toast.success(t("logs.deleted_success"));
       setMyLog(null);
     } catch (err) {
       console.error("❌ Delete log error:", err);
-      toast.error("Failed to delete log");
+      toast.error(t("errors.delete_log_failed"));
     }
   };
 
   const menuItems = [
-    { label: "🖼 Change Poster", onClick: () => setShowPosterModal(true) },
+    { label: `🖼 ${t("change_poster")}`, onClick: () => setShowPosterModal(true) },
     {
-      label: isInWatchlist ? "❌ Remove From Watchlist" : "➕ Add to Watchlist",
+      label: isInWatchlist
+        ? `❌ ${t("remove_from_watchlist")}`
+        : `➕ ${t("add_to_watchlist")}`,
       onClick: handleToggleWatchlist,
     },
     {
-      label: `❤️ ${isFavorite ? "Remove From Favorites" : "Add to Favorites"}`,
+      label: isFavorite
+        ? `❤️ ${t("remove_from_favorites")}`
+        : `❤️ ${t("add_to_favorites")}`,
       onClick: handleToggleFavorite,
     },
-    { label: "🎞 Add to List", onClick: () => setShowAddToListModal(true) },
-    { label: "📤 Share to a Friend", onClick: () => navigate(`/share/movie/${tmdbId}`) },
-    myLog && { label: "🗑️ Delete Log", onClick: handleDeleteLog },
+    { label: `🎞 ${t("add_to_list")}`, onClick: () => setShowAddToListModal(true) },
+    { label: `📤 ${t("share_to_friend")}`, onClick: () => navigate(`/share/movie/${tmdbId}`) },
+    myLog && { label: `🗑️ ${t("delete_log")}`, onClick: handleDeleteLog },
   ].filter(Boolean);
+  
+  
 
   return (
     <div
@@ -157,6 +165,8 @@ export default function MovieTopBar({
     >
       <button
         onClick={() => navigate(-1)}
+        aria-label={t("a11y.back")}
+        title={t("a11y.back")}
         style={{
           background: "rgba(0,0,0,0.5)",
           border: "none",
@@ -177,6 +187,8 @@ export default function MovieTopBar({
       <div style={{ position: "relative" }}>
         <button
           onClick={() => setShowOptions((p) => !p)}
+          aria-label={t("a11y.open_menu")}
+          title={t("a11y.open_menu")}
           style={{
             background: "rgba(0,0,0,0.5)",
             border: "none",

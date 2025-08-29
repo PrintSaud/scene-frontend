@@ -51,6 +51,7 @@ const dictionary = {
     "Horror": "Horror",
     "Romance": "Romance",
     "Animation": "Animation",
+    "Music": "Music",
     "Crime": "Crime",
     "Thriller": "Thriller",
     "This movie has no valid TMDB ID.": "This movie has no valid TMDB ID.",
@@ -161,6 +162,9 @@ const dictionary = {
     "No comments yet.": "No comments yet.",
     "Avatar": "Avatar",
     "Image": "Image",
+    "Mystery": "Mystery",
+    "Adventure": "Adventure",
+    "Family": "Family",
 
     "More reviews": "More reviews",
     "…read more": "…read more",
@@ -276,6 +280,85 @@ const dictionary = {
     "Removed follower!": "Removed follower!",
     "Failed to remove follower.": "Failed to remove follower.",
 
+    "loading_movie": "Loading movie...",
+    "overview": "Overview",
+    "director": "Director",
+    "no_director_found": "No director found",
+    "starring": "Starring",
+    "watched_by_friends": "Watched by Friends",
+    "no_friends_logged": "No friends have logged this film yet.",
+    "more": "More →",
+    "popular_reviews": "Popular Reviews",
+    "no_reviews": "No reviews yet.",
+    "reply": "Reply",
+    "read_more": "Read more",
+    "time.just_now": "Just now",
+    "time.minutes_ago": "{{min}}min ago",
+    "time.hours_ago": "{{hr}}h ago",
+    "time.days_ago": "{{day}}d ago",
+    "alt.backdrop": "Backdrop",
+    "no_trailer": "No trailer available",
+    "scenebot_autoask": "What do you think about \"{{title}}\"?", 
+
+    "alt.poster": "Poster",
+    "minutes": "min",
+    "log": "Log",
+    "trailer": "Trailer",
+    "ask_scenebot": "Ask SceneBot", 
+
+ 
+          "not_logged_in": "Not logged in",
+          "invalid_movie_id": "Invalid movie id",
+          "watchlist_update_failed": "Failed to update watchlist",
+          "favorites_update_failed": "Failed to update favorites",
+          "delete_log_failed": "Failed to delete log",
+      
+    
+          "added": "Added to Watchlist",
+          "removed": "Removed from Watchlist",
+    
+  
+          "added": "Added to Favorites",
+          "removed": "Removed from Favorites",
+      
+ 
+          "delete_log": "Are you sure you want to delete your log for this film?",
+  
+
+          "deleted_success": "Log deleted successfully!",
+     
+
+     
+  
+              "change_poster": "Change Poster",
+              "remove_from_watchlist": "Remove From Watchlist",
+              "add_to_watchlist": "Add to Watchlist",
+              "remove_from_favorites": "Remove From Favorites",
+              "add_to_favorites": "Add to Favorites",
+              "add_to_list": "Add to List",
+              "share_to_friend": "Share to a Friend",
+              "delete_log": "Delete Log",
+           
+    
+          
+
+
+          "back": "Back",
+          "open_menu": "Open menu",
+
+          "Full Cast": "Full Cast",
+          "Similar Films": "Similar Films",
+          "Where to Watch": "Where to Watch",
+
+          "poster.choose_new": "Choose a New Poster",
+          "poster.confirm": "✅ Confirm",
+          "poster.saving": "Saving...",
+          "poster.close": "Close",
+          "poster.approved_only": "Only the approved poster can be used for this film.",
+        
+
+      
+
   
   },
   ar: {
@@ -329,6 +412,7 @@ const dictionary = {
 "Animation": "رسوم متحركة",
 "Crime": "جريمة",
 "Thriller": "إثارة",
+
 "This movie has no valid TMDB ID.": "هذا الفيلم لا يحتوي على معرف TMDB صالح.",
 "This watchlist is empty.": "قائمة المشاهدة فارغة.",
 
@@ -338,6 +422,7 @@ const dictionary = {
 "Friends": "الأصدقاء",
 "Add List": "إضافة قائمة",
 "unknown": "مجهول",
+"Family": "عائلي",
 
 "Favorites": "المفضلة",
 "Descending": "تنازلي",
@@ -367,6 +452,7 @@ const dictionary = {
 "Add / Edit Connections": "إضافة / تعديل الروابط",
 "Enter your {{platform}} link or username": "أدخل رابط أو اسم مستخدم {{platform}}",
 "Transfer Data from Letterboxd": "نقل البيانات من Letterboxd",
+"Music": "موسيقي",
 
 "Import complete.": "اكتمل الاستيراد.",
   "Welcome to Scene!": " !نورتنا ❤️ حياك الله في سين",
@@ -497,6 +583,9 @@ const dictionary = {
   "Movies": "الأفلام",
   "Untitled": "بدون عنوان",
 
+  "Mystery": "غموض",
+  "Adventure": "مغامرة",
+
   "Notifications": "الإشعارات",
   "You're all caught up. No notifications yet!": "كل شيء محدث. لا توجد إشعارات بعد!",
   "Failed to load notifications": "فشل في تحميل الإشعارات",
@@ -552,6 +641,86 @@ const dictionary = {
   "Profile link copied!": "تم نسخ رابط الملف الشخصي!",
   "Remove this follower?": "هل تريد إزالة هذا المتابع؟",
   "Removed follower!": "تمت إزالة المتابع!",
+
+  "loading_movie": "جاري تحميل الفيلم...",
+  "overview": "القصة",
+  "director": "المخرج",
+  "no_director_found": "لا يوجد مخرج",
+  "starring": "بتمثيل",
+  "watched_by_friends": "شاهدها أصدقاؤك",
+  "no_friends_logged": "لا يوجد أصدقاء سجلوا هذا الفيلم بعد.",
+  "more": "المزيد →",
+  "popular_reviews": "المراجعات الشائعة",
+  "no_reviews": "لا توجد مراجعات بعد.",
+  "reply": "رد",
+  "read_more": "اقرأ المزيد",
+  "time.just_now": "الآن",
+  "time.minutes_ago": "منذ {{min}} دقيقة",
+  "time.hours_ago": "منذ {{hr}} ساعة",
+  "time.days_ago": "منذ {{day}} يوم",
+  "alt.backdrop": "خلفية",
+  "no_trailer": "لا يوجد إعلان متاح",
+  "scenebot_autoask": "ما رأيك في \"{{title}}\"؟", 
+
+  "alt.poster": "الملصق",
+  "minutes": "دقيقة",
+  "log": "تسجيل المشاهدة",
+  "trailer": "إعلان",
+  "ask_scenebot": "اسأل سين بوت",
+
+
+
+      "not_logged_in": "غير مسجل الدخول",
+      "invalid_movie_id": "معرّف فيلم غير صالح",
+      "watchlist_update_failed": "فشل في تحديث قائمة المشاهدة",
+      "favorites_update_failed": "فشل في تحديث المفضلة",
+      "delete_log_failed": "فشل في حذف تسجيل المشاهدة",
+    
+
+      "added": "تمت الإضافة إلى قائمة المشاهدة",
+      "removed": "تمت الإزالة من قائمة المشاهدة",
+
+
+      "added": "تمت الإضافة إلى المفضلة",
+      "removed": "تمت الإزالة من المفضلة",
+  
+
+      "delete_log": "هل أنت متأكد أنك تريد حذف تسجيل مشاهدتك لهذا الفيلم؟",
+ 
+
+      "deleted_success": "تم حذف السجل بنجاح!",
+  
+
+  
+          "change_poster": "تغيير الملصق",
+          "remove_from_watchlist": "إزالة من قائمة المشاهدة",
+          "add_to_watchlist": "إضافة إلى قائمة المشاهدة",
+          "remove_from_favorites": "إزالة من المفضلة",
+          "add_to_favorites": "إضافة إلى المفضلة",
+          "add_to_list": "إضافة إلى قائمة",
+          "share_to_friend": "مشاركة مع صديق",
+          "delete_log": "حذف تسجيل المشاهدة",
+  
+      
+      "back": "رجوع",
+      "open_menu": "فتح القائمة",
+
+      "Full Cast": "طاقم التمثيل كاملًا",
+      "Similar Films": "أفلام مشابهة",
+      "Where to Watch": "أماكن المشاهدة",
+
+      "poster.choose_new": " اختر ملصقًا جديدًا",
+      "poster.confirm": "✅ تأكيد",
+      "poster.saving": "جاري الحفظ...",
+      "poster.close": "إغلاق",
+      "poster.approved_only": "يمكن استخدام الملصق المعتمد فقط لهذا الفيلم.",
+      "poster.alt": "ملصق",
+
+  
+
+
+
+
   },
 };
 

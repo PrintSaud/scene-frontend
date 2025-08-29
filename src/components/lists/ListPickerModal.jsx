@@ -21,6 +21,7 @@ export default function ListPickerModal({ movie, onClose }) {
       }
     };
 
+    
     fetchLists();
   }, []);
 

@@ -106,7 +106,7 @@ formData.append("rewatchCount", rewatchCount.toString());         // Actual nume
         toast.success("🎬 Log submitted!");
       }
       
-      
+
 
       if (isFavorite && user) {
         await api.post(`/api/users/${user._id}/favorites/${movieId}`);
@@ -182,6 +182,7 @@ formData.append("rewatchCount", rewatchCount.toString());         // Actual nume
 
         <div>
           <h2
+          
             style={{
               fontSize: "14px",
               fontWeight: "bold",
