@@ -55,7 +55,8 @@ export default function filterMovies(movies) {
       return false;
     }
 
-    if (!movie.poster_path) {
+    // 🔑 FIXED: check poster || poster_path
+    if (!(movie.poster || movie.poster_path)) {
       if (window?.location?.hostname === "localhost")
         console.log("⛔ No poster:", movie.title, id);
       return false;
