@@ -2,11 +2,12 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/api";
-import { subDays, isBefore, formatDistanceToNowStrict } from "date-fns";
+import { formatDistanceToNowStrict } from "date-fns";
 import { FaRegComment } from "react-icons/fa";
 import { HiOutlineRefresh } from "react-icons/hi";
 import StarRating from "../components/StarRating";
-import useTranslate from "../utils/useTranslate"; // ✅ translation hook
+import useTranslate from "../utils/useTranslate";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -17,20 +18,21 @@ export default function HomePage() {
   const [currentSection, setCurrentSection] = useState(0);
   const scrollRef = useRef();
   const t = useTranslate();
+  const { language } = useLanguage();
 
   const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 
+  // Load user from localStorage
   useEffect(() => {
     const stored = localStorage.getItem("user");
-    let parsedUser;
     try {
-      parsedUser = stored ? JSON.parse(stored) : null;
+      setUser(stored ? JSON.parse(stored) : null);
     } catch {
-      parsedUser = null;
+      setUser(null);
     }
-    if (parsedUser) setUser(parsedUser);
   }, []);
 
+  // Fetch trending + daily movie
   useEffect(() => {
     async function fetchTrending() {
       try {
@@ -41,7 +43,6 @@ export default function HomePage() {
         const results = data.results || [];
         setMovies(results);
 
-        // ✅ daily cache
         const stored = localStorage.getItem("dailyMovie");
         const today = new Date().toDateString();
 
@@ -53,26 +54,50 @@ export default function HomePage() {
           }
         }
 
-        // ✅ Filter valid movies
+        // Filter eligible movies
         const eligible = results.filter(
           (m) => m.vote_average >= 7.5 && m.vote_count >= 3000
         );
-
         const fallback = results[Math.floor(Math.random() * results.length)];
-
         const selected = eligible.length
           ? eligible[Math.floor(Math.random() * eligible.length)]
           : fallback;
 
+        // Fetch EN + AR details
+        const [detailEnRes, detailArRes] = await Promise.all([
+          fetch(
+            `https://api.themoviedb.org/3/movie/${selected.id}?api_key=${
+              import.meta.env.VITE_TMDB_API_KEY
+            }&language=en-US`
+          ),
+          fetch(
+            `https://api.themoviedb.org/3/movie/${selected.id}?api_key=${
+              import.meta.env.VITE_TMDB_API_KEY
+            }&language=ar-SA`
+          ),
+        ]);
+
+        const detailEn = await detailEnRes.json();
+        const detailAr = await detailArRes.json();
+
         const daily = {
           id: selected.id,
-          title: selected.title,
           poster: `https://image.tmdb.org/t/p/w500${selected.poster_path}`,
-          overview: selected.overview,
+          title_en: detailEn.title || selected.title,
+          title_ar: detailAr.title || detailEn.title || selected.title,
+          overview_en: detailEn.overview || "",
+          overview_ar: detailAr.overview || detailEn.overview || "",
+          original_language: detailEn.original_language, // ✅ add this
         };
+        
+        
+        
 
         setDailyMovie(daily);
-        localStorage.setItem("dailyMovie", JSON.stringify({ date: today, movie: daily }));
+        localStorage.setItem(
+          "dailyMovie",
+          JSON.stringify({ date: today, movie: daily })
+        );
       } catch (err) {
         console.error("Failed to fetch trending:", err);
       }
@@ -80,20 +105,20 @@ export default function HomePage() {
     fetchTrending();
   }, []);
 
+  // Fetch feed logs
   useEffect(() => {
-    const fetchFeed = async () => {
-      if (!user?._id) return;
+    if (!user?._id) return;
+    (async () => {
       try {
         const res = await api.get(`/api/logs/feed/${user._id}`);
         setFeedLogs(res.data);
       } catch (err) {
         console.error("🔥 Failed to fetch feed logs:", err);
       }
-    };
-    fetchFeed();
+    })();
   }, [user]);
 
-  // ✅ Bulletproof scroll detection
+  // Scroll indicator
   useEffect(() => {
     const container = scrollRef.current;
     if (!container) return;
@@ -145,7 +170,12 @@ export default function HomePage() {
     >
       {/* 👋 Welcome Header */}
       <div style={{ textAlign: "center", marginBottom: "40px" }}>
-        <h1>{t("Welcome back, {name} 🎬").replace("{name}", user.username || user.name)}</h1>
+        <h1>
+          {t("Welcome back, {name} 🎬").replace(
+            "{name}",
+            user.username || user.name
+          )}
+        </h1>
         <img
           src={
             user?.avatar?.startsWith("http")
@@ -156,7 +186,6 @@ export default function HomePage() {
           }
           alt={t("Profile")}
           onError={(e) => {
-            console.warn("❌ Avatar failed to load:", user?.avatar);
             e.target.src = "/default-avatar.png";
           }}
           style={{
@@ -170,46 +199,83 @@ export default function HomePage() {
       </div>
 
       {/* 🎬 Daily Movie */}
-      {dailyMovie && (
-        <>
-          <h2 style={{ fontSize: "20px", textAlign: "center", marginBottom: "20px" }}>
-            {t("New Day. New Amazing Film. It’s a Scene Thing. 🎥")}
-          </h2>
+{dailyMovie && (
+  <>
+    <h2
+      style={{
+        fontSize: "20px",
+        textAlign: "center",
+        marginBottom: "20px",
+      }}
+    >
+      {t("New Day. New Amazing Film. It’s a Scene Thing. 🎥")}
+    </h2>
 
-          <div
-            onClick={() => navigate(`/movie/${dailyMovie.id}`)}
-            style={{
-              display: "flex",
-              backgroundColor: "#111",
-              borderRadius: "12px",
-              overflow: "hidden",
-              cursor: "pointer",
-            }}
-          >
-            <img
-              src={dailyMovie.poster}
-              alt={dailyMovie.title}
-              style={{ width: "150px", height: "220px", objectFit: "cover" }}
-            />
-            <div
-              style={{ padding: "15px", display: "flex", flexDirection: "column", justifyContent: "center" }}
-            >
-              <h3 style={{ fontSize: "16px", fontWeight: "600", margin: "0 0 8px 0", lineHeight: "1.3" }}>
-                {dailyMovie.title}
-              </h3>
-              <p style={{ fontSize: "12px", color: "#ccc", lineHeight: "1.5", marginBottom: 0 }}>
-                {dailyMovie.overview.split(" ").slice(0, 20).join(" ")}...
-                <span
-                  onClick={() => navigate(`/movie/${dailyMovie.id}`)}
-                  style={{ color: "#aaa", marginLeft: "6px", fontWeight: "500", cursor: "pointer" }}
-                >
-                  {t("Read more")}
-                </span>
-              </p>
-            </div>
-          </div>
-        </>
-      )}
+    <div
+      onClick={() => navigate(`/movie/${dailyMovie.id}`)}
+      style={{
+        display: "flex",
+        backgroundColor: "#111",
+        borderRadius: "12px",
+        overflow: "hidden",
+        cursor: "pointer",
+      }}
+    >
+      <img
+        src={dailyMovie.poster}
+        alt={dailyMovie.title_en || dailyMovie.title_ar || "Movie Poster"}
+        style={{ width: "150px", height: "220px", objectFit: "cover" }}
+      />
+      <div
+        style={{
+          padding: "15px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+        }}
+      >
+<h3
+  style={{
+    fontSize: "16px",
+    fontWeight: "600",
+    margin: "0 0 8px 0",
+    lineHeight: "1.3",
+  }}
+>
+  {dailyMovie.original_language === "ar" && dailyMovie.title_ar?.trim()
+    ? dailyMovie.title_ar
+    : dailyMovie.title_en || dailyMovie.title}
+</h3>
+
+
+        <p style={{ fontSize: "12px", color: "#ccc", lineHeight: "1.5", marginBottom: 0 }}>
+  {(() => {
+    const rawOverview =
+      language === "ar"
+        ? dailyMovie?.overview_ar?.trim() || dailyMovie?.overview_en?.trim() || ""
+        : dailyMovie?.overview_en?.trim() || dailyMovie?.overview_ar?.trim() || "";
+
+    const snippet = rawOverview.split(" ").slice(0, 20).join(" ");
+    return snippet.length > 0 ? snippet + "..." : t("No overview available.");
+  })()}
+  <span
+    onClick={() => navigate(`/movie/${dailyMovie.id}`)}
+    style={{ color: "#aaa", marginLeft: "6px", fontWeight: "500", cursor: "pointer" }}
+  >
+    {t("Read more")}
+  </span>
+</p>
+
+
+
+
+
+
+      </div>
+    </div>
+  </>
+)}
+
 
       {/* 👀 Recent Activities */}
       <h2 style={{ marginTop: "50px", fontSize: "22px" }}>{t("Recent Activities")}</h2>

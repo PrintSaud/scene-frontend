@@ -86,7 +86,7 @@ export const actorAwards = {
 "Felicity Jones": "🏆 1 BAFTA, 1 Golden Globe nomination",
 "Naomi Watts": "🏆 1 Golden Globe nomination",
 "Emma Thompson": "🏆 2 Oscars, 1 Golden Globe", 
-"Ryan Gosling": "🏆 2 Oscar Nominations, 1 Golden Globe, 1 BAFTA Nomination,      Boy oh boy where do i even begin, Ryan Thomas Gosling, He's Just the Goat fr, Also He's literally Scene's Founder btw",
+"Ryan Gosling": "🏆 2 Oscar Nominations, 1 Golden Globe, 1 BAFTA Nomination,      Boy oh boy where do i even begin, Ryan Thomas Gosling, He's Just the Goat fr, Also He's literally us",
     "Mahershala Ali": "🏆 2 Oscars, 1 Golden Globe, 1 BAFTA",
     "Timothée Chalamet": "🏆 1 Oscar Nomination, 2 Golden Globe Nominations, 1 BAFTA Nomination",
     "Austin Butler": "🏆 1 BAFTA, 1 Golden Globe, 1 Oscar Nomination",

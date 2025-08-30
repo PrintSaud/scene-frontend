@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import api from "../../api/api";
 import toast from "react-hot-toast";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
+import useTranslate from "../../utils/useTranslate";
 
 export default function ListPickerModal({ movie, onClose }) {
   const [lists, setLists] = useState([]);
   const [loading, setLoading] = useState(true);
+  const t = useTranslate();
 
   const user = JSON.parse(localStorage.getItem("user"));
 
@@ -17,11 +19,10 @@ export default function ListPickerModal({ movie, onClose }) {
         setLoading(false);
       } catch (err) {
         console.error("❌ Failed to load lists", err);
-        toast.error("Failed to load your lists");
+        toast.error(t("lists.failed_load"));
       }
     };
 
-    
     fetchLists();
   }, []);
 
@@ -34,11 +35,11 @@ export default function ListPickerModal({ movie, onClose }) {
       });
 
       window.dispatchEvent(new Event("refreshMyLists"));
-      toast.success("✅ Added to list!");
+      toast.success(t("lists.added_success"));
       onClose();
     } catch (err) {
       console.error("❌ Failed to add movie to list", err);
-      toast.error("❌ Failed to add movie.");
+      toast.error(t("lists.added_fail"));
     }
   };
 
@@ -58,20 +59,22 @@ export default function ListPickerModal({ movie, onClose }) {
     >
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", marginBottom: "16px" }}>
-        <button onClick={onClose} style={backBtn}>← Back</button>
-        <h3 style={{ marginLeft: "16px", fontSize: "16px" }}>Select a list to add this film</h3>
+        <button onClick={onClose} style={backBtn}>← {t("back")}</button>
+        <h3 style={{ marginLeft: "16px", fontSize: "16px", color: "#fff" }}>
+          {t("lists.select_add")}
+        </h3>
       </div>
 
       {/* Content */}
       {loading ? (
-        <p style={{ color: "#aaa" }}>Loading your lists...</p>
+        <p style={{ color: "#aaa" }}>{t("lists.loading")}</p>
       ) : lists.length === 0 ? (
-        <p style={{ color: "#aaa" }}>You haven’t made any lists yet.</p>
+        <p style={{ color: "#aaa" }}>{t("lists.none_yet")}</p>
       ) : (
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "1fr",
+            gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", // ✅ responsive
             gap: "16px",
             paddingBottom: "24px",
           }}
@@ -121,19 +124,23 @@ export default function ListPickerModal({ movie, onClose }) {
                   @{list.user?.username || "unknown"}
                 </div>
 
-                <div style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "4px",
-                  fontSize: "12px",
-                  marginTop: "4px"
-                }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "4px",
+                    fontSize: "12px",
+                    marginTop: "4px",
+                  }}
+                >
                   {list.likes?.includes(user?._id) ? (
                     <AiFillHeart style={{ fontSize: "14px", color: "#B327F6" }} />
                   ) : (
                     <AiOutlineHeart style={{ fontSize: "14px", color: "#999" }} />
                   )}
-                  <span style={{ fontSize: "12px", color: "#bbb" }}>{list.likes?.length || 0}</span>
+                  <span style={{ fontSize: "12px", color: "#bbb" }}>
+                    {list.likes?.length || 0}
+                  </span>
                 </div>
               </div>
             </div>

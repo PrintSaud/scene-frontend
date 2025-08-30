@@ -153,6 +153,8 @@ export default function ProfilePage() {
 
       if (err.response?.status === 403) {
         toast.error(t("احبها حقتي"));
+
+        
         setIsFollowing(false);
       } else {
         toast.error(t("Failed to update follow status"));

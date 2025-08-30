@@ -1,8 +1,8 @@
+// src/components/movie/ChangePosterModal.jsx
 import React, { useState, useEffect, useRef } from "react";
 import axios from "../../api/api";
 import { changePoster } from "../../api/api";
 import useTranslate from "../../utils/useTranslate"; 
-
 
 export default function ChangePosterModal({ movieId, onClose }) {
   const [posters, setPosters] = useState([]);
@@ -14,7 +14,6 @@ export default function ChangePosterModal({ movieId, onClose }) {
   const scrollRef = useRef();
   const t = useTranslate();
 
-  // Responsive breakpoint (no CSS, just JS)
   useEffect(() => {
     const onResize = () => setIsPhone(window.innerWidth <= 640);
     window.addEventListener("resize", onResize);
@@ -69,9 +68,7 @@ export default function ChangePosterModal({ movieId, onClose }) {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  
-
-  // Inline styles
+  // Styles
   const overlayStyle = {
     position: "fixed",
     inset: 0,
@@ -101,50 +98,55 @@ export default function ChangePosterModal({ movieId, onClose }) {
     justifyContent: "center",
   };
 
-  // Center the content block
   const contentStyle = {
     width: "min(100%, 1000px)",
-    margin: "80px auto 0", // centered container
-    paddingLeft: 8,
-    paddingRight: 8,
+    margin: "80px auto 0",
+    padding: 0,
   };
+  
 
   const titleStyle = {
     color: "#fff",
     marginBottom: 8,
-    textAlign: "left",
+    textAlign: "center",
     fontSize: 18,
   };
 
-  // Grid wrapper centers the whole grid
-  const gridWrapperStyle = {
-    display: "flex",
-    justifyContent: "center", // center the grid block
-    width: "100%",
-  };
+  // ✅ FORCE LEFT
+// grid wrapper
+const gridWrapperStyle = {
+  width: "100%",
+  margin: "0",
+  padding: "0",
+};
 
-  // Grid: 3 columns on phones; auto-fill on wider screens; center items in cells
-  const gridStyle = {
-    display: "grid",
-    gap: 12,
-    padding: "10px 6px",
-    right: "20px",
-    left:"90px",
-    justifyItems: "center", // center posters within cells
-    gridTemplateColumns: isPhone
-      ? "repeat(3, 1fr)"
-      : "repeat(auto-fill, minmax(140px, 1fr))",
-    maxWidth: isPhone ? "100%" : 900,
-    width: "100%",
-  };
+// grid itself
+const gridStyle = {
+  display: "grid",
+  gridAutoFlow: "row",
+  gridGap: "0px",
+  gridTemplateColumns: isPhone
+    ? "repeat(auto-fill, minmax(100px, 1fr))"
+    : "repeat(auto-fill, 120px)", // 🔥 smaller posters
+  justifyContent: "start",
+  alignItems: "start",
+  marginLeft: "-8px",
+  marginright: "-4px",
+  padding: 0,
+};
+
+
+  
 
   const posterStyle = (selected) => ({
-    width: "100%",
+    width: "95%",
+    maxWidth: "160px",
     borderRadius: 8,
     cursor: "pointer",
     border: selected ? "3px solid #fff" : "2px solid transparent",
     transition: "transform .12s ease, box-shadow .12s ease, border-color .12s ease",
   });
+  
 
   const actionsStyle = {
     marginTop: 48,
@@ -180,22 +182,20 @@ export default function ChangePosterModal({ movieId, onClose }) {
       <div onClick={(e) => e.stopPropagation()} style={contentStyle}>
         <h3 style={titleStyle}>🖼 {t("poster.choose_new")}</h3>
 
-        <div style={gridWrapperStyle}>
-          <div style={gridStyle}>
-            {posters.map((poster) => {
-              const src = `https://image.tmdb.org/t/p/w500${poster.file_path}`;
-              const isSelected = selectedPoster === poster.file_path;
-              return (
-                <img
-                  key={poster.file_path}
-                  src={src}
-                  alt={t("poster.alt")}
-                  style={posterStyle(isSelected)}
-                  onClick={() => handlePosterClick(poster.file_path)}
-                />
-              );
-            })}
-          </div>
+        <div style={gridStyle}>
+          {posters.map((poster) => {
+            const src = `https://image.tmdb.org/t/p/w500${poster.file_path}`;
+            const isSelected = selectedPoster === poster.file_path;
+            return (
+              <img
+                key={poster.file_path}
+                src={src}
+                alt={t("poster.alt")}
+                style={posterStyle(isSelected)}
+                onClick={() => handlePosterClick(poster.file_path)}
+              />
+            );
+          })}
         </div>
 
         <div ref={scrollRef} style={actionsStyle}>
@@ -211,7 +211,3 @@ export default function ChangePosterModal({ movieId, onClose }) {
     </div>
   );
 }
- 
-
-
-

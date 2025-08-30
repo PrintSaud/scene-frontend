@@ -1,3 +1,4 @@
+// src/pages/MovieFriendsPage.jsx
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../api/api";
@@ -5,12 +6,14 @@ import StarRating from "../components/StarRating";
 import { HiOutlineRefresh } from "react-icons/hi";
 import { FaRegComment } from "react-icons/fa";
 import { formatDistanceToNowStrict } from "date-fns";
+import useTranslate from "../utils/useTranslate";
 
 export default function MovieFriendsPage() {
   const { id } = useParams(); // TMDB movie ID
   const navigate = useNavigate();
   const [logs, setLogs] = useState([]);
   const [filter, setFilter] = useState("friends"); // "friends" | "all"
+  const t = useTranslate();
 
   // ✅ Smart timestamp formatter
   const formatTime = (date) => {
@@ -42,7 +45,7 @@ export default function MovieFriendsPage() {
     fetchLogs();
   }, [id, filter]);
 
-  // ✅ Deduplicate by user (for both friends + all)
+  // ✅ Deduplicate by user
   const seen = new Set();
   const uniqueLogs = logs.filter((log) => {
     if (seen.has(log.user._id)) return false;
@@ -84,7 +87,8 @@ export default function MovieFriendsPage() {
             ←
           </button>
           <h2 style={{ fontWeight: "bold", fontSize: "20px" }}>
-            Watched by {filter === "friends" ? "Friends" : "All"}
+            {t("watched_by")}{" "}
+            {filter === "friends" ? t("friends") : t("all")}
           </h2>
         </div>
 
@@ -102,7 +106,7 @@ export default function MovieFriendsPage() {
               cursor: "pointer",
             }}
           >
-            Friends
+            {t("friends")}
           </button>
           <button
             onClick={() => setFilter("all")}
@@ -116,7 +120,7 @@ export default function MovieFriendsPage() {
               cursor: "pointer",
             }}
           >
-            All
+            {t("all")}
           </button>
         </div>
       </div>
@@ -125,14 +129,12 @@ export default function MovieFriendsPage() {
       {uniqueLogs.length === 0 ? (
         <p style={{ color: "#888" }}>
           {filter === "friends"
-            ? "No friends have logged this film yet."
-            : "No one has logged this film yet."}
+            ? t("no_friends_logged")
+            : t("no_one_logged")}
         </p>
       ) : (
         uniqueLogs.map((log, index) => {
-          const sameUserLogs = logs.filter(
-            (l) => l.user._id === log.user._id
-          );
+          const sameUserLogs = logs.filter((l) => l.user._id === log.user._id);
 
           const reviews = sameUserLogs.filter((l) => l.review);
           const hasMultipleReviews = reviews.length > 1;
@@ -149,8 +151,7 @@ export default function MovieFriendsPage() {
           const hasRewatch =
             (typeof displayLog.rewatchCount === "number" &&
               displayLog.rewatchCount > 0) ||
-            (typeof displayLog.rewatch === "number" &&
-              displayLog.rewatch > 0);
+            (typeof displayLog.rewatch === "number" && displayLog.rewatch > 0);
 
           return (
             <React.Fragment key={log._id + index}>
@@ -199,7 +200,7 @@ export default function MovieFriendsPage() {
                       display: "flex",
                       alignItems: "center",
                       gap: "8px",
-                      fontFamily: "Inter, sans-serif", // ✅ Inter font for usernames
+                      fontFamily: "Inter, sans-serif",
                     }}
                   >
                     @{log.user.username}
@@ -224,12 +225,7 @@ export default function MovieFriendsPage() {
                     }}
                   >
                     {hasRating && <StarRating rating={displayLog.rating} />}
-                    {hasReview && (
-                      <FaRegComment
-                        size={14}
-                        style={{ position: "relative", top: "-1px" }}
-                      />
-                    )}
+                    {hasReview && <FaRegComment size={14} />}
                     {hasRewatch && <HiOutlineRefresh size={16} />}
                   </div>
                 </div>

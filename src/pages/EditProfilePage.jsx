@@ -7,7 +7,6 @@ import MovieListSortable from "../components/lists/MovieListSortable";
 import AddMovieModal from "../components/lists/AddMovieModal";
 import CropperModal from "../components/CropperModal";
 import ReactModal from "react-modal";
-import BackdropSearchModalV2 from "../components/BackdropSearchModalV2";
 import useTranslate from "../utils/useTranslate";
 
 ReactModal.setAppElement("#root");

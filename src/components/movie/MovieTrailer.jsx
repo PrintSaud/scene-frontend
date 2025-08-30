@@ -26,7 +26,7 @@ export default function MovieTrailer({ trailerKey, setShowTrailer }) {
         style={{
           position: "absolute",
           top: "20px",
-          right: "20px",
+          right: "50px",
           background: "#222",
           color: "#fff",
           border: "none",

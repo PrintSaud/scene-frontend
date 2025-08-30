@@ -11,7 +11,7 @@ import StarRating from "../components/StarRating";
 import { FaRegComment } from "react-icons/fa";
 import { HiOutlineRefresh } from "react-icons/hi";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
-
+import { useLanguage } from "../context/LanguageContext";
 // Components
 import MovieTopBar from "../components/movie/MovieTopBar";
 import MovieHeader from "../components/movie/MovieHeader";
@@ -20,6 +20,7 @@ import MovieTrailer from "../components/movie/MovieTrailer";
 import ChangePosterModal from "../components/movie/ChangePosterModal";
 import AddMovieModal from "../components/lists/AddMovieModal";
 import useTranslate from "../utils/useTranslate";
+import getDisplayTitle from "../utils/getDisplayTitle";
 
 export default function MoviePage() {
   const t = useTranslate();
@@ -79,73 +80,165 @@ export default function MoviePage() {
     return `${d.getDate()} ${d.toLocaleString("default", { month: "short" })}`;
   };
 
-  // inside MoviePage.jsx, replace your fetchData() useEffect content with this:
+// ...
+
+const { language } = useLanguage();
 
 useEffect(() => {
   const fetchData = async () => {
     try {
       const TMDB_BASE = "https://api.themoviedb.org/3";
-      // map your UI lang to TMDB locale
-      const uiLang = (JSON.parse(localStorage.getItem("user"))?.language) || "en";
-      const tmdbLocale = uiLang === "ar" ? "ar-SA" : "en-US";
+      const langMap = { en: "en-US", ar: "ar-SA" };
+      const tmdbLocale = langMap[language] || "en-US";
 
-      // 1) Fetch movie (EN) + translations in one call (title stays EN)
-      const movieReq = axios.get(
+      // ✅ Requests
+      const movieEnReq = axios.get(
         `${TMDB_BASE}/movie/${id}?api_key=${TMDB_KEY}&language=en-US&append_to_response=translations`
       );
-      // 2) Other payloads
+      const movieLocalizedReq = axios.get(
+        `${TMDB_BASE}/movie/${id}?api_key=${TMDB_KEY}&language=${tmdbLocale}`
+      );
       const creditsReq = axios.get(
+        `${TMDB_BASE}/movie/${id}/credits?api_key=${TMDB_KEY}&language=${tmdbLocale}`
+      );
+      const creditsEnReq = axios.get(
         `${TMDB_BASE}/movie/${id}/credits?api_key=${TMDB_KEY}&language=en-US`
       );
-      const videosReq = axios.get(
+      const videosLocalizedReq = axios.get(
+        `${TMDB_BASE}/movie/${id}/videos?api_key=${TMDB_KEY}&language=${tmdbLocale}`
+      );
+      const videosEnReq = axios.get(
         `${TMDB_BASE}/movie/${id}/videos?api_key=${TMDB_KEY}&language=en-US`
       );
       const providersReq = axios.get(
         `${TMDB_BASE}/movie/${id}/watch/providers?api_key=${TMDB_KEY}`
       );
 
-      const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
-        movieReq, creditsReq, videosReq, providersReq
+      // ✅ Parallel
+      const [
+        movieEnRes,
+        movieLocalizedRes,
+        creditsRes,
+        creditsEnRes,
+        videosLocalRes,
+        videosEnRes,
+        providersRes,
+      ] = await Promise.all([
+        movieEnReq,
+        movieLocalizedReq,
+        creditsReq,
+        creditsEnReq,
+        videosLocalizedReq,
+        videosEnReq,
+        providersReq,
       ]);
 
-      // pull localized overview/tagline from translations
-      let localizedOverview = movieRes.data.overview || "";
-      let localizedTagline = movieRes.data.tagline || "";
+      // ✅ Credits (dual)
+      setCredits({
+        local: creditsRes.data,
+        en: creditsEnRes.data,
+      });
 
-      const translations = movieRes.data.translations?.translations || [];
-      const wanted = translations.find(
-        (tr) => tr.iso_639_1 === (uiLang === "ar" ? "ar" : "en")
-      );
+      // ✅ Movie data merge
+      const movieDataEn = movieEnRes.data;
+      const movieDataLocal = movieLocalizedRes.data;
 
-      if (wanted?.data) {
-        // only override if TMDB actually has a translation
-        if (wanted.data.overview) localizedOverview = wanted.data.overview;
-        if (wanted.data.tagline) localizedTagline = wanted.data.tagline;
-      }
 
-      // Keep EN title, but inject localized overview/tagline
-      const movieWithLocalizedText = {
-        ...movieRes.data,
-        overview: localizedOverview,
-        tagline: localizedTagline,
-      };
 
-      setMovie(movieWithLocalizedText);
-      setCredits(creditsRes.data);
+      let localizedOverview = movieDataEn.overview;
+let localizedTagline = movieDataEn.tagline;
+
+if (language === "ar") {
+  // Prefer localized API fields if they exist
+  if (movieDataLocal.overview && movieDataLocal.overview.trim() !== "") {
+    localizedOverview = movieDataLocal.overview;
+  }
+  if (movieDataLocal.tagline && movieDataLocal.tagline.trim() !== "") {
+    localizedTagline = movieDataLocal.tagline;
+  }
+
+  // Check translations array
+  const translations = movieDataEn.translations?.translations || [];
+  const wanted = translations.find((tr) => tr.iso_639_1 === "ar");
+
+  if (wanted?.data) {
+    if (wanted.data.overview && wanted.data.overview.trim() !== "" && wanted.data.overview !== "N/A") {
+      localizedOverview = wanted.data.overview;
+    }
+    if (wanted.data.tagline && wanted.data.tagline.trim() !== "" && wanted.data.tagline !== "N/A") {
+      localizedTagline = wanted.data.tagline;
+    }
+  }
+
+  // As a last resort, if still English, try translating manually
+  if (localizedTagline === movieDataEn.tagline) {
+    localizedTagline = t(movieDataEn.tagline);
+  }
+}
+
+
+
+   // ✅ Centralized poster logic
+const fallbackPoster =
+posterOverride ||
+(movieDataEn.poster_path
+  ? `${TMDB_IMG}${movieDataEn.poster_path}`
+  : movieDataLocal.poster_path
+  ? `${TMDB_IMG}${movieDataLocal.poster_path}`
+  : "/default-poster.jpg");
+
+// ✅ Final decision
+setMovie({
+  id: movieDataEn.id,
+  title: movieDataEn.title,          // always keep English
+  original_title: movieDataEn.original_title,
+  title_ar: movieDataLocal.title,    // Arabic title (if exists)
+  localized_title: movieDataLocal.title, // backup, same as above
+  original_language: movieDataEn.original_language, // ✅ add this
+  poster: fallbackPoster,
+  backdrop_path: movieDataEn.backdrop_path,
+
+  overview: language === "ar" ? localizedOverview : movieDataEn.overview,
+  tagline: language === "ar" ? localizedTagline : movieDataEn.tagline,
+
+  genres:
+    language === "ar" && movieDataLocal.genres?.length > 0
+      ? movieDataLocal.genres
+      : movieDataEn.genres,
+
+  release_date: movieDataEn.release_date,
+  runtime: movieDataEn.runtime,
+  vote_average: movieDataEn.vote_average,
+  vote_count: movieDataEn.vote_count,
+  popularity: movieDataEn.popularity,
+});
+
+
+
+      
+
+      // ✅ Trailers (Arabic first, fallback to English)
       setTrailerKey(
-        videoRes.data.results.find(
+        (videosLocalRes.data.results.find(
           (v) => v.type === "Trailer" && v.site === "YouTube"
-        )?.key || null
+        ) ||
+          videosEnRes.data.results.find(
+            (v) => v.type === "Trailer" && v.site === "YouTube"
+          ))?.key || null
       );
+
+      // ✅ Providers
       setProviders(providersRes.data.results || {});
       setScrollReady(true);
     } catch (err) {
-      console.error("Failed to fetch movie:", err);
+      console.error("❌ Failed to fetch movie:", err);
     }
   };
 
   fetchData();
-}, [id]);
+}, [id, language]);
+
+
 
 
   // Popular reviews
@@ -207,35 +300,6 @@ useEffect(() => {
     }
   }, [scrollReady]);
 
-  // Fetch movie, credits, videos, providers
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const TMDB_BASE = "https://api.themoviedb.org/3";
-        const [movieRes, creditsRes, videoRes, providersRes] = await Promise.all([
-          axios.get(`${TMDB_BASE}/movie/${id}?api_key=${TMDB_KEY}&language=en-US`),
-          axios.get(`${TMDB_BASE}/movie/${id}/credits?api_key=${TMDB_KEY}&language=en-US`),
-          axios.get(`${TMDB_BASE}/movie/${id}/videos?api_key=${TMDB_KEY}&language=en-US`),
-          axios.get(`${TMDB_BASE}/movie/${id}/watch/providers?api_key=${TMDB_KEY}`)
-        ]);
-
-        setMovie(movieRes.data);
-        setCredits(creditsRes.data);
-        setTrailerKey(
-          videoRes.data.results.find(
-            (v) => v.type === "Trailer" && v.site === "YouTube"
-          )?.key || null
-        );
-        setProviders(providersRes.data.results || {});
-        setScrollReady(true);
-      } catch (err) {
-        console.error("Failed to fetch movie:", err);
-      }
-    };
-
-    fetchData();
-  }, [id]);
-
   // Watchlist status
   useEffect(() => {
     if (!movie?.id) return;
@@ -290,8 +354,13 @@ useEffect(() => {
     );
   }
 
-  const director = credits.crew.find((p) => p.job === "Director");
-  const starring = credits.cast.slice(0, 4);
+  // ✅ Directors dual-language
+  const directorLocal = credits.local.crew.find((p) => p.job === "Director");
+  const directorEn = credits.en.crew.find((p) => p.job === "Director");
+
+  // ✅ Starring dual-language
+  const starringLocal = credits.local.cast.slice(0, 4);
+  const starringEn = credits.en.cast;
 
   return (
     <div
@@ -341,21 +410,34 @@ useEffect(() => {
       </div>
 
       <MovieHeader
-        movie={movie}
-        posterOverride={posterOverride}
-        handleLogClick={() => setShowLogModal(true)}
-        handleWatchTrailer={() => {
-          if (!trailerKey) return toast.error(t("no_trailer"));
-          setShowTrailer(true);
-        }}
-        handleSceneBotReview={() =>
-          navigate("/scenebot", {
-            state: {
-              autoAsk: t("scenebot_autoask", { title: movie.title }), // keep movie title as-is
-            },
-          })
-        }
-      />
+  movie={{
+    ...movie,
+    title: getDisplayTitle(movie, language), // ✅ FIX
+    poster: movie.poster,
+  }}
+  posterOverride={posterOverride}
+  handleLogClick={() => setShowLogModal(true)}
+  handleWatchTrailer={() => {
+    if (!trailerKey) return toast.error(t("no_trailer"));
+    setShowTrailer(true);
+  }}
+  handleSceneBotReview={() =>
+    navigate("/scenebot", {
+      state: {
+        movie: {
+          id: movie.id,
+          title: getDisplayTitle(movie, language), // ✅ FIX
+          poster: movie.poster,
+        },
+        autoAsk: t("scenebot_autoask", {
+          title: getDisplayTitle(movie, language), // ✅ FIX
+        }),
+      },
+    })
+  }
+/>
+
+
 
       {/* 📖 Overview */}
       <div style={{ marginTop: "10px", padding: "0 24px" }}>
@@ -373,11 +455,12 @@ useEffect(() => {
       </div>
 
       {/* 🎬 Director & ⭐ Cast */}
-      <div style={{ marginTop: "40px", padding: "0 24px" }}>
+       {/* 🎬 Director */}
+       <div style={{ marginTop: "40px", padding: "0 24px" }}>
         <h3 style={{ fontSize: "18px", marginBottom: "10px" }}>{t("director")}</h3>
-        {director ? (
+        {directorLocal ? (
           <div
-            onClick={() => navigate(`/director/${director.id}`)}
+            onClick={() => navigate(`/director/${directorLocal.id}`)}
             style={{
               display: "flex",
               alignItems: "center",
@@ -388,11 +471,11 @@ useEffect(() => {
           >
             <img
               src={
-                director.profile_path
-                  ? TMDB_AVATAR + director.profile_path
+                directorLocal.profile_path
+                  ? TMDB_AVATAR + directorLocal.profile_path
                   : "/default-avatar.png"
               }
-              alt={director.name} // keep name
+              alt={directorLocal.name}
               style={{
                 width: "85px",
                 height: "135px",
@@ -401,43 +484,57 @@ useEffect(() => {
               }}
             />
             <p style={{ fontFamily: "Inter", fontWeight: 600, fontSize: "15px" }}>
-              {director.name}
+              {directorLocal.name}
+              {directorEn?.name && directorEn.name !== directorLocal.name && (
+                <> / {directorEn.name}</>
+              )}
             </p>
           </div>
         ) : (
-          <p style={{ color: "#888", fontStyle: "italic" }}>
-            {t("no_director_found")}
-          </p>
+          <p style={{ color: "#888", fontStyle: "italic" }}>{t("no_director_found")}</p>
         )}
 
+        {/* ⭐ Starring */}
         <h3 style={{ fontSize: "18px", marginBottom: "10px" }}>{t("starring")}</h3>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px" }}>
-          {starring.map((actor) => (
-            <div
-              key={actor.id}
-              onClick={() => navigate(`/actor/${actor.id}`)}
-              style={{ cursor: "pointer", textAlign: "center" }}
-            >
-              <img
-                src={
-                  actor.profile_path
-                    ? TMDB_AVATAR + actor.profile_path
-                    : "/default-avatar.png"
-                }
-                alt={actor.name} // keep name
-                style={{
-                  width: "75px",
-                  height: "135px",
-                  objectFit: "cover",
-                  borderRadius: "12px",
-                }}
-              />
-              <p style={{ fontSize: "11.5px", marginTop: "6px", fontWeight: "500" }}>
-                {actor.name}
-              </p>
-              <p style={{ fontSize: "10.5px", color: "#aaa" }}>{actor.character}</p>
-            </div>
-          ))}
+          {starringLocal.map((actor) => {
+            const englishActor = starringEn.find((a) => a.id === actor.id);
+            return (
+              <div
+                key={actor.id}
+                onClick={() => navigate(`/actor/${actor.id}`)}
+                style={{ cursor: "pointer", textAlign: "center" }}
+              >
+                <img
+                  src={
+                    actor.profile_path
+                      ? TMDB_AVATAR + actor.profile_path
+                      : "/default-avatar.png"
+                  }
+                  alt={actor.name}
+                  style={{
+                    width: "75px",
+                    height: "135px",
+                    objectFit: "cover",
+                    borderRadius: "12px",
+                  }}
+                />
+                <p style={{ fontSize: "11.5px", marginTop: "6px", fontWeight: "500" }}>
+                  {actor.name}
+                  {englishActor?.name && englishActor.name !== actor.name && (
+                    <> / {englishActor.name}</>
+                  )}
+                </p>
+                <p style={{ fontSize: "10.5px", color: "#aaa" }}>
+                  {actor.character}
+                  {englishActor?.character &&
+                    englishActor.character !== actor.character && (
+                      <> / {englishActor.character}</>
+                    )}
+                </p>
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -808,28 +905,34 @@ useEffect(() => {
         />
       )}
 
-      {showAddToListModal && (
-        <ListPickerModal
-          movie={{
-            id: movie.id,
-            title: movie.title, // keep title
-            poster: posterOverride || `${TMDB_IMG}${movie.poster_path}`,
-          }}
-          onClose={() => setShowAddToListModal(false)}
-        />
-      )}
+{showAddToListModal && (
+  <ListPickerModal
+    movie={{
+      id: movie.id,
+      title: getDisplayTitle(movie, language), // ✅ FIX
+      poster: movie.poster,
+    }}
+    onClose={() => setShowAddToListModal(false)}
+  />
+)}
 
-      {showLogModal && (
-        <LogModal
-          movie={movie}
-          editLogId={editLogId}
-          onClose={() => {
-            setShowLogModal(false);
-            navigate(`/movie/${id}`); // remove query params
-          }}
-          refreshLogs={fetchLogs}
-        />
-      )}
+{showLogModal && (
+  <LogModal
+    movie={{
+      ...movie,
+      title: getDisplayTitle(movie, language), // ✅ FIX
+      poster: movie.poster,
+    }}
+    editLogId={editLogId}
+    onClose={() => {
+      setShowLogModal(false);
+      navigate(`/movie/${id}`);
+    }}
+    refreshLogs={fetchLogs}
+  />
+)}
+
+
     </div>
   );
 }

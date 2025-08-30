@@ -3,6 +3,7 @@ import axios from "../api/api";
 import filterMovies from "../utils/filterMovies";
 import { useNavigate } from "react-router-dom";
 import { backend } from "../config";
+import useTranslate from "../utils/useTranslate";
 
 export default function BackdropPickerPage() {
   const [query, setQuery] = useState("");
@@ -12,9 +13,9 @@ export default function BackdropPickerPage() {
   const [selectedBackdrop, setSelectedBackdrop] = useState(null);
   const [loading, setLoading] = useState(false);
 
-
   const navigate = useNavigate();
-  const doneRef = useRef(null); // 👇 anchor for scroll
+  const doneRef = useRef(null);
+  const t = useTranslate();
 
   useEffect(() => {
     const delay = setTimeout(() => {
@@ -23,7 +24,6 @@ export default function BackdropPickerPage() {
     }, 400);
     return () => clearTimeout(delay);
   }, [query]);
-  
 
   const fetchMovies = async (q) => {
     try {
@@ -42,7 +42,9 @@ export default function BackdropPickerPage() {
     try {
       const res = await axios.get(`${backend}/api/movies/${movie.id}`);
       const allBackdrops = res.data.backdrops || [];
-      const urls = allBackdrops.map((b) => `https://image.tmdb.org/t/p/original${b}`);
+      const urls = allBackdrops.map(
+        (b) => `https://image.tmdb.org/t/p/original${b}`
+      );
       setBackdrops(urls);
     } catch (err) {
       console.error("Backdrop fetch failed:", err);
@@ -65,7 +67,6 @@ export default function BackdropPickerPage() {
 
   const handleBackdropSelect = (url) => {
     setSelectedBackdrop(url);
-    // ⏬ scroll to "Done" button
     setTimeout(() => {
       doneRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
     }, 100);
@@ -80,51 +81,71 @@ export default function BackdropPickerPage() {
         padding: "24px",
         paddingBottom: "140px",
         overflowY: "auto",
+        position: "relative",
       }}
     >
+{/* Back button top-left */}
+<button
+  onClick={() => {
+    if (selectedMovie) {
+      // ✅ Go back to movie search instead of leaving the page
+      setSelectedMovie(null);
+      setBackdrops([]);
+      setSelectedBackdrop(null);
+    } else {
+      navigate(-1); // normal back if already in search mode
+    }
+  }}
+  style={{
+    position: "absolute",
+    top: "30px",
+    left: "20px",
+    background: "rgba(0,0,0,0.5)",
+    border: "none",
+    borderRadius: "50%",
+    width: "36px",
+    height: "36px",
+    color: "#fff",
+    fontSize: "18px",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  }}
+>
+  ←
+</button>
+
+
       {/* Header */}
       <div style={{ textAlign: "center", marginBottom: "24px" }}>
-        <h1 style={{ fontSize: "22px", fontWeight: "bold", marginBottom: "10-px", height: "9-px", }}>
-          Change Backdrop
+        <h1 style={{ fontSize: "22px", fontWeight: "bold", marginTop: "10px" }}>
+          {t("Change Backdrop")}
         </h1>
-        <button
-    onClick={() => navigate(-1)}
-    style={{
-      background: "rgba(0,0,0,0.5)",
-      border: "none",
-      borderRadius: "50%",
-      width: "32px",
-      height: "42px",
-      color: "#fff",
-      fontSize: "18px",
-      cursor: "pointer",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-    }}
-  >
-    ←
-  </button>
       </div>
 
-      {/* Search */}
-      <div style={{ display: "flex", justifyContent: "center", marginBottom: "24px" }}>
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search for a movie"
-          style={{
-            width: "100%",
-            maxWidth: "400px",
-            background: "#1a1a1a",
-            color: "#fff",
-            padding: "10px",
-            borderRadius: "6px",
-            border: "1px solid #333",
-            fontSize: "14px",
-          }}
-        />
-      </div>
+      {/* Search - hidden when a movie is selected */}
+      {!selectedMovie && (
+        <div
+          style={{ display: "flex", justifyContent: "center", marginBottom: "24px" }}
+        >
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={t("Search for a movie")}
+            style={{
+              width: "100%",
+              maxWidth: "400px",
+              background: "#1a1a1a",
+              color: "#fff",
+              padding: "10px",
+              borderRadius: "6px",
+              border: "1px solid #333",
+              fontSize: "14px",
+            }}
+          />
+        </div>
+      )}
 
       {/* Movie Grid */}
       {!selectedMovie && (
@@ -155,7 +176,13 @@ export default function BackdropPickerPage() {
                   aspectRatio: "2 / 3",
                 }}
               />
-              <p style={{ fontSize: "13px", textAlign: "center", padding: "6px" }}>
+              <p
+                style={{
+                  fontSize: "13px",
+                  textAlign: "center",
+                  padding: "6px",
+                }}
+              >
                 {movie.title}
               </p>
             </div>
@@ -167,7 +194,7 @@ export default function BackdropPickerPage() {
       {selectedMovie && (
         <div style={{ textAlign: "center", marginTop: "40px" }}>
           {loading ? (
-            <p style={{ color: "#888" }}>Loading backdrops...</p>
+            <p style={{ color: "#888" }}>{t("Loading backdrops...")}</p>
           ) : (
             backdrops.map((url, idx) => (
               <img
@@ -209,7 +236,7 @@ export default function BackdropPickerPage() {
                   marginTop: "16px",
                 }}
               >
-                ✅ Done
+                ✅ {t("Done")}
               </button>
             )}
           </div>

@@ -215,6 +215,7 @@ const dictionary = {
     "Failed to delete list.": "Failed to delete list.",
     "Loading...": "Loading...",
     "More options": "More options",
+    "ask_anything": "Ask Anything About Movies...",
     "Edit List": "Edit List",
     "Share to Friends": "Share to Friends",
     "Delete List": "Delete List",
@@ -355,6 +356,76 @@ const dictionary = {
           "poster.saving": "Saving...",
           "poster.close": "Close",
           "poster.approved_only": "Only the approved poster can be used for this film.",
+
+          "no_rating_yet": "No rating yet",
+          "marked_as_favorite": "Marked as Favorite",
+          "mark_as_favorite": "Mark as Favorite",
+          "mark_as_rewatch": "Mark as Rewatch",
+          "write_your_thoughts": "Write your thoughts...",
+          "update": "Update",
+          "log": "Log",
+          "log_updated": "✅ Log updated!",
+          "log_submitted": "🎬 Log submitted!",
+          "log_failed": "Failed to submit log.",
+
+          "not_logged_in": "Not logged in",
+          "untitled_log": "Untitled Log",
+          "untitled_list": "Untitled List",
+          "select_at_least_one": "Select at least one friend.",
+          "suggested_success": "✅ Suggested to {{count}} friend(s)!",
+          "failed_to_send": "Failed to send suggestions.",
+          "loading": "Loading...",
+          "invalid_resource": "Invalid resource",
+          "something_wrong": "Something went wrong.",
+          "go_back": "Go Back",
+          "share_to_friends": "Share to Friends",
+          "send": "Send",
+          "no_mutual_followers": "You have no mutual followers yet.",
+
+          "lists.select_add": "Select a list to add this film",
+          "lists.loading": "Loading your lists...",
+          "lists.none_yet": "You haven’t made any lists yet.",
+          "lists.failed_load": "❌ Failed to load your lists",
+          "lists.added_success": "✅ Added to list!",
+          "lists.added_fail": "❌ Failed to add movie.",
+
+          "watched_by": "Watched by",
+          "friends": "Friends",
+          "all": "All",
+          "no_friends_logged": "No friends have logged this film yet.",
+          "no_one_logged": "No one has logged this film yet.",
+
+          "just_now": "Just now",
+          "minutes_ago": "{min}min ago",
+          "hours_ago": "{hr}h ago",
+          "days_ago": "{day}d ago",
+
+          "friends_reviews": "Friends Reviews",
+          "all_reviews": "All Reviews",
+
+          "write_reply": "Write a reply...",
+          "reply_sent": "Reply sent 🎉",
+          "reply_failed": "Failed to send reply ❌",
+
+          "loading": "Loading...",
+          "check_imdb": "This person may have awards – check IMDb for more",
+          "read_more": "Read more",
+          "show_less": "Show less",
+          "all_films": "All Films",
+          "all_directed_films": "All Directed Films",
+
+          "awards.imdb_fallback": "🏆 {{name}} may have awards – check IMDb for more",
+
+          "Loading...": "Loading...",
+    "I’ve rated": "I’ve rated",
+    "on": "on",
+    "Saved! Check your device's Downloads folder.": "Saved! Check your device's Downloads folder.",
+
+    "Change Backdrop": "Change Backdrop",
+    "Search for a movie": "Search for a movie",
+    "Loading backdrops...": "Loading backdrops...",
+    "Done": "Done",
+      
         
 
       
@@ -430,7 +501,7 @@ const dictionary = {
 "You haven’t marked any favorite films yet.": "لم تحدد أي أفلام كمفضلة بعد.",
 "No films found for this filter.": "لم يتم العثور على أفلام لهذا الفلتر.",
 "Poster": "ملصق",
-
+ 
 "No changes to save.": "لا توجد تغييرات للحفظ.",
 "Profile updated!": "!تم تحديث الملف الشخصي",
 "Failed to update profile.": "فشل تحديث الملف الشخصي.",
@@ -716,13 +787,81 @@ const dictionary = {
       "poster.approved_only": "يمكن استخدام الملصق المعتمد فقط لهذا الفيلم.",
       "poster.alt": "ملصق",
 
-  
+      "no_rating_yet": "لا يوجد تقييم بعد",
+      "marked_as_favorite": "مضاف إلى المفضلة",
+      "mark_as_favorite": "أضف إلى المفضلة",
+      "mark_as_rewatch": "أضف كمشاهدة ثانية",
+      "write_your_thoughts": "اكتب أفكارك...",
+      "update": "تحديث",
+      "log": "تسجيل",
+      "log_updated": "✅ تم تحديث المشاهدة!",
+      "log_submitted": "🎬 تم تسجيل المشاهدة!",
+      "log_failed": "فشل في تسجيل المشاهدة.",
 
+      "not_logged_in": "غير مسجل الدخول",
+      "untitled_log": "مشاهدة بدون عنوان",
+      "untitled_list": "قائمة بدون عنوان",
+      "select_at_least_one": "اختر صديق واحد على الأقل.",
+      "suggested_success": "✅ تم الإرسال إلى {{count}} صديق",
+      "failed_to_send": "فشل في إرسال الاقتراحات.",
+      "loading": "جاري التحميل...",
+      "invalid_resource": "مورد غير صالح",
+      "something_wrong": "حدث خطأ ما.",
+      "go_back": "رجوع",
+      "share_to_friends": "شارك مع الأصدقاء",
+      "send": "إرسال",
+      "no_mutual_followers": "لا يوجد لديك متابعين مشتركين بعد.",
 
+      "lists.select_add": "اختر قائمة لإضافة هذا الفيلم",
+      "lists.loading": "جاري تحميل قوائمك...",
+      "lists.none_yet": "لم تقم بإنشاء أي قوائم بعد.",
+      "lists.failed_load": "❌ فشل في تحميل القوائم",
+      "lists.added_success": "✅ تمت الإضافة إلى القائمة!",
+      "lists.added_fail": "❌ فشل في إضافة الفيلم.",
+      "ask_anything": "اسأل أي شيء عن الأفلام...",
 
+      "watched_by": "تمت المشاهدة بواسطة",
+      "friends": "الأصدقاء",
+      "all": "الكل",
+      "no_friends_logged": "لم يقم أي صديق بتسجيل هذا الفيلم بعد.",
+      "no_one_logged": "لم يقم أي شخص بتسجيل هذا الفيلم بعد.",
+
+      "just_now": "الآن",
+      "minutes_ago": "قبل {min} دقيقة",
+      "hours_ago": "قبل {hr} ساعة",
+      "days_ago": "قبل {day} يوم",
+
+      "friends_reviews": "مراجعات الأصدقاء",
+      "all_reviews": "كل المراجعات",
+
+      "write_reply": "اكتب رداً...",
+      "reply_sent": "تم إرسال الرد 🎉",
+      "reply_failed": "فشل في إرسال الرد ❌",
+
+      "loading": "جاري التحميل...",
+      "check_imdb": "قد يكون لدى هذا الشخص جوائز – تحقق من IMDb لمزيد من المعلومات",
+      "read_more": "اقرأ المزيد",
+      "show_less": "إظهار أقل",
+      "all_films": "جميع الأفلام",
+      "all_directed_films": "جميع الأفلام التي أخرجها",
+
+      "awards.imdb_fallback":   "🏆 IMDB لمزيد من التفاصيل تحقق من ",
+
+      "Loading...": "جارٍ التحميل...",
+      "I’ve rated": "لقد قمت بتقييم",
+      "on": "على",
+      "Saved! Check your device's Downloads folder.": "✅ تم الحفظ! تحقق من مجلد التنزيلات في جهازك.",
+
+      "Change Backdrop": "تغيير الخلفية",
+      "Search for a movie": "ابحث عن فيلم",
+      "Loading backdrops...": "جارٍ تحميل الخلفيات...",
+      "Done": "تم",
+      
 
   },
 };
+
+
 
 // tiny helper to replace {{placeholders}}
 function interpolate(str, params) {
