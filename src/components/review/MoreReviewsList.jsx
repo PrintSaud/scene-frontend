@@ -54,12 +54,19 @@ export default function MoreReviewsList({ reviews = [], onClick }) {
     return `${englishOrdinal(dayNum)} ${monthName}`;
   };
 
-  const previewText = (text, wordLimit = 15) => {
+  const previewText = (text, wordLimit = 30) => {
     if (!text) return "";
     const words = text.trim().split(/\s+/);
     if (words.length <= wordLimit) return text;
-    return words.slice(0, wordLimit).join(" ") + " " + t("…read more");
+  
+    return (
+      <>
+        {words.slice(0, wordLimit).join(" ")}{" "}
+        <span style={{ color: "#B327F6" }}>{t("…Read more")}</span>
+      </>
+    );
   };
+  
 
   return (
     <div style={{ padding: "16px" }}>

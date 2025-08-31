@@ -86,10 +86,17 @@ export default function ActorPage() {
     actorEn?.name && Object.keys(saudiTalent.actors).includes(actorEn.name);
 
   // 🎭 Show both Arabic + English names
-  const displayName =
-    actorAr?.name && actorAr.name !== actorEn.name
-      ? `${actorAr.name} / ${actorEn.name}`
-      : actorEn.name;
+  // 🎭 Display name based on language
+let displayName = actorEn.name;
+if (
+  lang === "ar" &&
+  actorAr?.name &&
+  actorAr.name.trim() &&
+  actorAr.name !== actorEn.name
+) {
+  displayName = `${actorAr.name} / ${actorEn.name}`;
+}
+
 
   // 📖 Biography → Arabic if lang=ar and exists, else fallback to English
   let localizedBio = actorEn.biography || "";
@@ -226,32 +233,39 @@ export default function ActorPage() {
           )}
         </div>
 
-        {/* Movies */}
-        <h3 style={{ marginTop: "30px", fontSize: "16px" }}>
-          🎬 {t("all_films")}
-        </h3>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "10px",
-            marginTop: "12px",
-          }}
-        >
-          {movies.map((movie) => (
-            <img
-              key={movie.id}
-              src={
-                movie.poster_path
-                  ? TMDB_POSTER + movie.poster_path
-                  : "/default-poster.png"
-              }
-              alt={movie.title}
-              style={{ width: "100%", borderRadius: "6px", cursor: "pointer" }}
-              onClick={() => navigate(`/movie/${movie.id}`)}
-            />
-          ))}
-        </div>
+{/* 🎬 Movies */}
+<h3 style={{ marginTop: "30px", fontSize: "16px" }}>
+  🎬 {t("all_films")}
+</h3>
+<div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))",
+    gap: "10px",
+    marginTop: "12px",
+  }}
+>
+  {movies.map((movie) => (
+    <img
+      key={movie.id}
+      src={
+        movie.poster_path
+          ? TMDB_POSTER + movie.poster_path
+          : "/default-poster.png"
+      }
+      alt={movie.title}
+      style={{
+        width: "100%",
+        borderRadius: "6px",
+        cursor: "pointer",
+        objectFit: "cover",
+        aspectRatio: "2/3", // ✅ keeps poster ratio consistent
+      }}
+      onClick={() => navigate(`/movie/${movie.id}`)}
+    />
+  ))}
+</div>
+
 
         {/* Saudi Talent Message */}
         {isSaudiTalent && (

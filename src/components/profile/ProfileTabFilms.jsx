@@ -1,3 +1,4 @@
+// src/components/profile/ProfileTabFilms.jsx
 import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import StarRating from "../StarRating";
@@ -5,8 +6,8 @@ import { AiFillHeart } from "react-icons/ai";
 import { FaRegComment } from "react-icons/fa";
 import axios from "../../api/api";
 import useTranslate from "../../utils/useTranslate";
+import getPosterUrl from "../../utils/getPosterUrl";
 
-const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const FALLBACK_POSTER = "/default-poster.jpg";
 
 function toTmdbIdAny(x) {
@@ -17,14 +18,77 @@ function toTmdbIdAny(x) {
     x?.movieId ??
     x?.id ??
     (typeof x === "number" || (typeof x === "string" && /^\d+$/.test(x)) ? x : null);
-
   const n = Number(id);
   return Number.isFinite(n) ? n : null;
 }
 
+// ✅ Poster with shimmer that ALWAYS resolves
+function Poster({ src, alt, onClick }) {
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState(false);
+
+  const showSrc = !error && src ? src : FALLBACK_POSTER;
+
+  return (
+    <div
+      style={{
+        position: "relative",
+        width: "100%",
+        aspectRatio: "2/3",
+        borderRadius: "6px",
+        overflow: "hidden",
+        cursor: "pointer",
+      }}
+      onClick={onClick}
+    >
+      {/* Purple shimmer until load/error */}
+      {!loaded && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            borderRadius: "6px",
+            background:
+              "linear-gradient(90deg, #3a0d60 25%, #B327F6 50%, #3a0d60 75%)",
+            backgroundSize: "200% 100%",
+            animation: "shimmer 1.2s infinite",
+          }}
+        />
+      )}
+
+      <img
+        src={showSrc}
+        alt={alt}
+        loading="lazy"
+        onLoad={() => setLoaded(true)}
+        onError={() => {
+          setError(true);
+          setLoaded(true);
+        }}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          borderRadius: "6px",
+          display: "block",
+        }}
+      />
+
+      <style>
+        {`
+          @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+          }
+        `}
+      </style>
+    </div>
+  );
+}
+
 export default function ProfileTabFilms({
   logs = [],
-  favorites = [], // numeric TMDB ids
+  favorites = [],
   profileUserId,
   customPosters = {},
 }) {
@@ -33,10 +97,10 @@ export default function ProfileTabFilms({
   const [isLoading, setIsLoading] = useState(true);
   const [sortType, setSortType] = useState("added");
   const [order, setOrder] = useState("desc");
-  const [tmdbFallbacks, setTmdbFallbacks] = useState({});
   const [customPostersState, setCustomPostersState] = useState({});
   const [lsFavorites, setLsFavorites] = useState([]);
 
+  // Favorites from LS
   useEffect(() => {
     try {
       const stored = JSON.parse(localStorage.getItem("user"));
@@ -48,14 +112,13 @@ export default function ProfileTabFilms({
   }, []);
 
   const effectiveFavorites = favorites?.length ? favorites : lsFavorites;
-
   const favIds = useMemo(
     () => (effectiveFavorites || []).map((f) => Number(f)).filter(Number.isFinite),
     [effectiveFavorites]
   );
-
   const isFav = useCallback((tmdbId) => favIds.includes(Number(tmdbId)), [favIds]);
 
+  // Simulated loading
   useEffect(() => {
     if ((logs?.length || 0) > 100) {
       setIsLoading(true);
@@ -65,57 +128,12 @@ export default function ProfileTabFilms({
     setIsLoading(false);
   }, [logs]);
 
-  useEffect(() => {
-    const fetchFallbackPosters = async () => {
-      try {
-        const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY;
-        if (!TMDB_KEY) return;
-
-        const idsToFetch = [];
-        for (const log of logs) {
-          const id = toTmdbIdAny(log);
-          if (!id) continue;
-          if (customPosters[String(id)]) continue;
-          if (customPostersState[String(id)]) continue;
-          if (tmdbFallbacks[String(id)]) continue;
-          idsToFetch.push(id);
-        }
-
-        const uniqueIds = [...new Set(idsToFetch)];
-        if (uniqueIds.length === 0) return;
-
-        const posterMap = {};
-        for (const id of uniqueIds) {
-          try {
-            const res = await fetch(
-              `https://api.themoviedb.org/3/movie/${id}?api_key=${TMDB_KEY}`
-            );
-            const data = await res.json();
-            posterMap[id] = data?.poster_path
-              ? `${TMDB_IMG}${data.poster_path}`
-              : FALLBACK_POSTER;
-          } catch {
-            posterMap[id] = FALLBACK_POSTER;
-          }
-        }
-
-        if (Object.keys(posterMap).length) {
-          setTmdbFallbacks((prev) => ({ ...prev, ...posterMap }));
-        }
-      } catch {
-        // ignore
-      }
-    };
-
-    fetchFallbackPosters();
-  }, [logs, customPosters, customPostersState, tmdbFallbacks]);
-
+  // Custom posters fetch
   useEffect(() => {
     const fetchCustomPosters = async () => {
       try {
         const user = JSON.parse(localStorage.getItem("user"));
         const token = user?.token;
-
         const movieIds = logs.map(toTmdbIdAny).filter(Boolean);
         const uniqueIds = [...new Set(movieIds)];
         if (uniqueIds.length === 0) return;
@@ -125,7 +143,6 @@ export default function ProfileTabFilms({
           { userId: profileUserId, movieIds: uniqueIds },
           { headers: { Authorization: `Bearer ${token}` } }
         );
-
         if (data && typeof data === "object") {
           setCustomPostersState(data);
         }
@@ -133,23 +150,21 @@ export default function ProfileTabFilms({
         console.error("❌ Failed to load custom posters", err);
       }
     };
-
     if (profileUserId) fetchCustomPosters();
   }, [logs, profileUserId]);
 
+  // Sorting
   const sortedLogs = useMemo(() => {
     const base = Array.isArray(logs) ? [...logs] : [];
-
     if (sortType === "favorites") {
       return base.filter((lg) => {
         const id = toTmdbIdAny(lg);
         return id && isFav(id);
       });
     }
-
     base.sort((a, b) => {
-      let valA = 0;
-      let valB = 0;
+      let valA = 0,
+        valB = 0;
       switch (sortType) {
         case "rating":
           valA = Number(a.rating || 0);
@@ -170,7 +185,6 @@ export default function ProfileTabFilms({
       const dir = order === "asc" ? 1 : -1;
       return (valA - valB) * dir;
     });
-
     return base;
   }, [logs, sortType, order, isFav]);
 
@@ -193,9 +207,7 @@ export default function ProfileTabFilms({
 
   return (
     <>
-      <div style={{ height: "6px" }} />
-
-      {/* Sorting Controls */}
+      {/* Controls */}
       <div
         style={{
           display: "flex",
@@ -224,7 +236,6 @@ export default function ProfileTabFilms({
           <option value="runtime">{t("Runtime")}</option>
           <option value="favorites">{t("Favorites")}</option>
         </select>
-
         <select
           value={order}
           onChange={(e) => setOrder(e.target.value)}
@@ -244,109 +255,57 @@ export default function ProfileTabFilms({
         </select>
       </div>
 
-      {/* Logs Grid */}
-      {sortedLogs.length === 0 ? (
-        <div
-          style={{
-            textAlign: "center",
-            color: "#888",
-            marginTop: "30px",
-            fontSize: "14px",
-          }}
-        >
-          {sortType === "favorites"
-            ? t("You haven’t marked any favorite films yet.")
-            : t("No films found for this filter.")}
-        </div>
-      ) : (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))",
-            gap: "6px",
-          }}
-        >
-          {sortedLogs.map((lg) => {
-            const movieId = toTmdbIdAny(lg);
-            const posterUrl =
-              customPostersState[String(movieId)] ||
-              customPosters[String(movieId)] ||
-              tmdbFallbacks[String(movieId)] ||
-              (lg.movie?.poster_path ? `${TMDB_IMG}${lg.movie.poster_path}` : FALLBACK_POSTER);
+      {/* Grid */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))",
+          gap: "6px",
+        }}
+      >
+        {sortedLogs.map((lg) => {
+          const movieId = toTmdbIdAny(lg);
 
-            const favorite = isFav(movieId);
-            const hasReview = !!(lg.review && lg.review.trim().length > 0);
+          const posterUrl = getPosterUrl({
+            tmdbId: lg.tmdbId || lg.movie?.tmdbId,
+            posterPath: lg.poster_path || lg.movie?.poster_path,
+            override:
+              customPostersState[movieId] ||
+              lg.posterOverride ||
+              lg.movie?.posterOverride,
+          });
 
-            const handleClick = async () => {
-              const stored = JSON.parse(localStorage.getItem("user"));
-              const token = stored?.token;
-              const ownerId = lg.user?._id || lg.user;
-              if (!movieId) return;
+          const favorite = isFav(movieId);
+          const hasReview = !!(lg.review && lg.review.trim().length > 0);
 
-              if (!token || !ownerId) return navigate(`/movie/${movieId}`);
+          return (
+            <div key={lg._id} style={{ position: "relative" }}>
+              <Poster
+                src={posterUrl}
+                alt={lg.title || t("Poster")}
+                onClick={() => navigate(`/movie/${movieId}`)}
+              />
 
-              try {
-                const { data: logsForThisMovie } = await axios.get(
-                  `/api/logs/user/${ownerId}/movie/${movieId}`,
-                  { headers: { Authorization: `Bearer ${token}` } }
-                );
-                const reviewedLog = logsForThisMovie.find((x) => x.review?.trim());
-                if (reviewedLog) navigate(`/review/${reviewedLog._id}`);
-                else navigate(`/movie/${movieId}`);
-              } catch (err) {
-                console.error("Failed to fetch logs for this movie", err);
-                navigate(`/movie/${movieId}`);
-              }
-            };
-
-            return (
-              <div key={lg._id} onClick={handleClick} style={{ position: "relative", cursor: "pointer" }}>
-                <img
-                  src={posterUrl}
-                  loading="lazy"
-                  alt={lg.title || t("Poster")}
-                  style={{
-                    width: "100%",
-                    aspectRatio: "2/3",
-                    objectFit: "cover",
-                    borderRadius: "6px",
-                  }}
-                  onError={(e) => (e.currentTarget.src = FALLBACK_POSTER)}
-                />
-
-                {/* Rating + Review/Fav Icons */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "flex-start",
-                    gap: "4px",
-                    padding: "2px 4px 0 4px",
-                    fontSize: "10px",
-                    color: "#aaa",
-                    fontFamily: "Inter",
-                  }}
-                >
-                  <StarRating rating={lg.rating} size={12} />
-                  {hasReview && (
-                    <FaRegComment
-                      size={9}
-                      style={{ position: "relative", top: "-1.5px" }}
-                    />
-                  )}
-                  {favorite && (
-                    <AiFillHeart
-                      size={11}
-                      color="#B327F6"
-                      style={{ position: "relative", top: "-1.5px" }}
-                    />
-                  )}
-                </div>
+              {/* Rating + Icons */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px",
+                  padding: "2px 4px 0 4px",
+                  fontSize: "10px",
+                  color: "#aaa",
+                  fontFamily: "Inter",
+                }}
+              >
+                <StarRating rating={lg.rating} size={12} />
+                {hasReview && <FaRegComment size={9} />}
+                {favorite && <AiFillHeart size={11} color="#B327F6" />}
               </div>
-            );
-          })}
-        </div>
-      )}
+            </div>
+          );
+        })}
+      </div>
     </>
   );
 }

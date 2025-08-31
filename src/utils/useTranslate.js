@@ -425,6 +425,9 @@ const dictionary = {
     "Search for a movie": "Search for a movie",
     "Loading backdrops...": "Loading backdrops...",
     "Done": "Done",
+
+    "loading_actor": "Loading actor…",
+    "loading_director": "Loading director…",
       
         
 
@@ -856,6 +859,9 @@ const dictionary = {
       "Search for a movie": "ابحث عن فيلم",
       "Loading backdrops...": "جارٍ تحميل الخلفيات...",
       "Done": "تم",
+
+      "loading_actor": "جاري تحميل الممثل…",
+      "loading_director": "جاري تحميل المخرج…",
       
 
   },

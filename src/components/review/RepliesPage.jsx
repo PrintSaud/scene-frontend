@@ -44,6 +44,8 @@ export default function RepliesPage() {
   const rootReplies = topLevelReplies.length > 0 ? topLevelReplies : replies;
 
   const [tmdbId, setTmdbId] = useState(null);
+  const [animatingLikes, setAnimatingLikes] = useState([]);
+
   const [input, setInput] = useState("");
   const [selectedGif, setSelectedGif] = useState("");
   const [showGifModal, setShowGifModal] = useState(false);
@@ -83,7 +85,7 @@ export default function RepliesPage() {
 
   const handleReplyLike = async (replyId) => {
     try {
-      await likeReply(id, replyId);
+      // Optimistic update
       setReplies((prev) =>
         prev.map((r) =>
           r._id === replyId
@@ -96,10 +98,21 @@ export default function RepliesPage() {
             : r
         )
       );
+  
+      // 🚀 trigger animation
+      setAnimatingLikes((prev) => [...prev, replyId]);
+      setTimeout(() => {
+        setAnimatingLikes((prev) => prev.filter((id) => id !== replyId));
+      }, 400);
+  
+      // Backend call
+      await likeReply(id, replyId);
     } catch (err) {
       console.error("Failed to like reply", err);
+      toast.error(t("Failed to like reply"));
     }
   };
+  
 
   useEffect(() => {
     if (parentUsername) {
@@ -342,21 +355,31 @@ export default function RepliesPage() {
                     </button>
                   </div>
 
-                  {/* Like + 3-dots for parent */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <div
-                      style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
-                      onClick={() => handleReplyLike(parent._id)}
-                    >
-                      {isLikedByMeParent ? (
-                        <AiFillHeart size={16} color="#B327F6" />
-                      ) : (
-                        <AiOutlineHeart size={16} color="#888" />
-                      )}
-                      <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>
-                        {parent.likes?.length || 0}
-                      </span>
-                    </div>
+{/* Like + 3-dots for parent */}
+<div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+  <div
+    onClick={() => handleReplyLike(parent._id)}
+    style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+  >
+    <span
+      style={{
+        display: "flex",
+        alignItems: "center",
+        transition: "transform 0.3s ease, color 0.3s ease",
+        transform: animatingLikes.includes(parent._id) ? "scale(1.4)" : "scale(1)",
+      }}
+    >
+      {isLikedByMeParent ? (
+        <AiFillHeart size={16} color="#B327F6" style={{ transition: "color 0.3s ease" }} />
+      ) : (
+        <AiOutlineHeart size={16} color="#888" />
+      )}
+    </span>
+    <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>
+      {parent.likes?.length || 0}
+    </span>
+  </div>
+
 
                     {parent.userId === userId && (
                       <div style={{ position: "relative" }}>
@@ -462,21 +485,31 @@ export default function RepliesPage() {
                         </button>
                       </div>
 
-                      {/* Like + 3-dots for child */}
-                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <div
-                          style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
-                          onClick={() => handleReplyLike(child._id)}
-                        >
-                          {isLikedByMeChild ? (
-                            <AiFillHeart size={16} color="#B327F6" />
-                          ) : (
-                            <AiOutlineHeart size={16} color="#888" />
-                          )}
-                          <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>
-                            {child.likes?.length || 0}
-                          </span>
-                        </div>
+{/* Like + 3-dots for child */}
+<div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+  <div
+    onClick={() => handleReplyLike(child._id)}
+    style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+  >
+    <span
+      style={{
+        display: "flex",
+        alignItems: "center",
+        transition: "transform 0.3s ease, color 0.3s ease",
+        transform: animatingLikes.includes(child._id) ? "scale(1.4)" : "scale(1)",
+      }}
+    >
+      {isLikedByMeChild ? (
+        <AiFillHeart size={16} color="#B327F6" style={{ transition: "color 0.3s ease" }} />
+      ) : (
+        <AiOutlineHeart size={16} color="#888" />
+      )}
+    </span>
+    <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>
+      {child.likes?.length || 0}
+    </span>
+  </div>
+
 
                         {child.userId === userId && (
                           <div style={{ position: "relative" }}>

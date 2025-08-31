@@ -1,5 +1,5 @@
 // src/components/profile/ProfileTabProfile.jsx
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import StarRating from "../StarRating";
 import { useNavigate } from "react-router-dom";
 import { HiOutlineRefresh } from "react-icons/hi";
@@ -9,11 +9,75 @@ import { subDays, isBefore, formatDistanceToNowStrict } from "date-fns";
 import { FiExternalLink } from "react-icons/fi";
 import { AiOutlineCheck } from "react-icons/ai";
 import useTranslate from "../../utils/useTranslate";
+import getPosterUrl from "../../utils/getPosterUrl";
 
-const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const FALLBACK_POSTER = "/default-poster.jpg";
 
-// Normalize to TMDB id
+// ✅ Unified PosterWithLoader with shimmer
+function PosterWithLoader({ src, alt, onClick, style }) {
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState(false);
+
+  const showSrc = !error && src ? src : FALLBACK_POSTER;
+
+  return (
+    <div
+      style={{
+        position: "relative",
+        width: "100%",
+        aspectRatio: "2/3",
+        borderRadius: "6px",
+        overflow: "hidden",
+        cursor: "pointer",
+        ...style,
+      }}
+      onClick={onClick}
+    >
+      {!loaded && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            borderRadius: "6px",
+            background:
+              "linear-gradient(90deg, #3a0d60 25%, #B327F6 50%, #3a0d60 75%)",
+            backgroundSize: "200% 100%",
+            animation: "shimmer 1.2s infinite",
+          }}
+        />
+      )}
+
+      <img
+        src={showSrc}
+        alt={alt}
+        loading="lazy"
+        onLoad={() => setLoaded(true)}
+        onError={() => {
+          setError(true);
+          setLoaded(true);
+        }}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          borderRadius: "6px",
+          display: "block",
+        }}
+      />
+
+      <style>
+        {`
+          @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+          }
+        `}
+      </style>
+    </div>
+  );
+}
+
+// 🔹 Normalize to TMDB id
 const toTmdbId = (x) => {
   if (x == null) return null;
   if (typeof x === "number" && Number.isFinite(x)) return x;
@@ -27,16 +91,6 @@ const toTmdbId = (x) => {
   return null;
 };
 
-// Poster resolver
-const resolvePoster = ({ id, tmdbPosters, customPosters, raw }) => {
-  const key = String(id);
-  return (
-    (id && customPosters?.[key]) ||
-    (id && tmdbPosters?.[key]) ||
-    (raw?.poster_path ? `${TMDB_IMG}${raw.poster_path}` : FALLBACK_POSTER)
-  );
-};
-
 export default function ProfileTabProfile({
   user,
   favoriteMovies = [],
@@ -47,9 +101,8 @@ export default function ProfileTabProfile({
   const navigate = useNavigate();
   const t = useTranslate();
   const [showConnections, setShowConnections] = useState(true);
-  const [tmdbPosters, setTmdbPosters] = useState({});
 
-  // Recent logs
+  // ⏱️ Recent logs (latest 6)
   const recentlyWatched = useMemo(() => {
     const arr = Array.isArray(logs) ? logs : [];
     return arr
@@ -62,56 +115,7 @@ export default function ProfileTabProfile({
       .slice(0, 6);
   }, [logs]);
 
-  // All TMDB ids
-  const allTmdbIds = useMemo(() => {
-    const favIds = (favoriteMovies || []).map(toTmdbId).filter(Boolean);
-    const recentIds = (recentlyWatched || [])
-      .map((log) =>
-        toTmdbId(log?.tmdbId ?? log?.movie ?? log?.movieId ?? log?.movie?.id)
-      )
-      .filter(Boolean);
-
-    return [...new Set([...favIds, ...recentIds])];
-  }, [favoriteMovies, recentlyWatched]);
-
-  // Fetch TMDB posters
-  useEffect(() => {
-    const fetchPosters = async () => {
-      try {
-        const TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY;
-        if (!TMDB_KEY) return;
-
-        const need = allTmdbIds.filter(
-          (id) => !customPosters[String(id)] && !tmdbPosters[String(id)]
-        );
-        if (need.length === 0) return;
-
-        const updates = {};
-        for (const id of need) {
-          try {
-            const res = await fetch(
-              `https://api.themoviedb.org/3/movie/${id}?api_key=${TMDB_KEY}`
-            );
-            const data = await res.json();
-            updates[String(id)] = data?.poster_path
-              ? `${TMDB_IMG}${data.poster_path}`
-              : FALLBACK_POSTER;
-          } catch {
-            updates[String(id)] = FALLBACK_POSTER;
-          }
-        }
-        if (Object.keys(updates).length) {
-          setTmdbPosters((prev) => ({ ...prev, ...updates }));
-        }
-      } catch {
-        // ignore
-      }
-    };
-    fetchPosters();
-  }, [allTmdbIds, customPosters, tmdbPosters]);
-
   const handleLogClick = (log) => {
-    if (!navigate) return;
     if (log?.review?.trim()) return navigate(`/review/${log._id}`);
     const id = toTmdbId(
       log?.tmdbId ?? log?.movie ?? log?.movieId ?? log?.movie?.id
@@ -141,29 +145,25 @@ export default function ProfileTabProfile({
               const id = toTmdbId(movie);
               if (!id) return null;
 
-              const posterUrl = resolvePoster({
-                id,
-                tmdbPosters,
-                customPosters,
-                raw: movie && typeof movie === "object" ? movie : null,
-              });
+              // ✅ Normalize movie object with fallback logic
+              const normalized = {
+                tmdbId: id,
+                // if poster_path missing, still pass null → getPosterUrl will build from id
+                posterPath: movie.poster_path || movie.poster || null,
+                override: customPosters?.[id],
+                size: "w342", // optional, consistent with other places
+              };
+              
+
+              const posterUrl = getPosterUrl(normalized);
 
               return (
-                <img
-                  key={`${id}-${idx}`}
+                <PosterWithLoader
+                  key={`${id}-${idx}-${customPosters?.[id] || ""}`} // ✅ re-render when override arrives
                   src={posterUrl}
-                  alt={(movie && movie.title) || "Poster"}
-                  style={{
-                    width: "21vw",
-                    maxWidth: "110px",
-                    aspectRatio: "2/3",
-                    objectFit: "cover",
-                    borderRadius: "6px",
-                    flexShrink: 0,
-                    cursor: "pointer",
-                  }}
+                  alt={movie?.title || "Poster"}
+                  style={{ width: "21vw", maxWidth: "110px" }}
                   onClick={() => navigate(`/movie/${id}`)}
-                  onError={(e) => (e.currentTarget.src = FALLBACK_POSTER)}
                 />
               );
             })}
@@ -175,159 +175,129 @@ export default function ProfileTabProfile({
         </p>
       )}
 
-{/* 🕒 Recent Activity */}
-{(recentlyWatched?.length || 0) > 0 ? (
-  <div style={{ marginTop: "12px" }}>
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-      }}
-    >
-      <h3 style={{ fontSize: "12px", fontWeight: "600" }}>
-        {t("Recent Activities")}
-      </h3>
-      <button
-        onClick={() =>
-          window.dispatchEvent(new CustomEvent("navigateToFilms"))
-        }
-        style={{
-          background: "none",
-          border: "none",
-          color: "#ccc",
-          fontSize: "13px",
-          cursor: "pointer",
-        }}
-      >
-        {t("More →")}
-      </button>
-    </div>
-
-    {/* grid */}
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns:
-          typeof window !== "undefined" && window.innerWidth <= 600
-            ? "repeat(3, 1fr)" // phones → 3 per row
-            : "repeat(auto-fill, minmax(140px, 1fr))", // desktops/tablets → fluid
-        gap: "8px",
-        justifyItems: "center",
-        marginTop: "12px",
-      }}
-    >
-      {recentlyWatched.map((log) => {
-        const id = toTmdbId(
-          log?.tmdbId ?? log?.movie ?? log?.movieId ?? log?.movie?.id
-        );
-        if (!id) return null;
-
-        const posterUrl = resolvePoster({
-          id,
-          tmdbPosters,
-          customPosters,
-          raw: log?.movie,
-        });
-
-        const hasReview = !!(log?.review && log.review.trim().length > 0);
-
-        const logDate = new Date(
-          log?.createdAt || log?.watchedAt || Date.now()
-        );
-        const sevenDaysAgo = subDays(new Date(), 7);
-        const timestamp = isBefore(logDate, sevenDaysAgo)
-          ? logDate.toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-            })
-          : formatDistanceToNowStrict(logDate, { addSuffix: true });
-
-        return (
+      {/* 🕒 Recent Activity */}
+      {(recentlyWatched?.length || 0) > 0 ? (
+        <div style={{ marginTop: "12px" }}>
           <div
-            key={log._id}
-            onClick={() => handleLogClick(log)}
             style={{
-              position: "relative",
-              cursor: "pointer",
-              width: "100%", // fills its grid column
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
             }}
           >
-            <img
-              src={posterUrl}
-              alt={log?.title || "Poster"}
+            <h3 style={{ fontSize: "12px", fontWeight: "600" }}>
+              {t("Recent Activities")}
+            </h3>
+            <button
+              onClick={() =>
+                window.dispatchEvent(new CustomEvent("navigateToFilms"))
+              }
               style={{
-                width: "100%",
-                aspectRatio: "2 / 3", // consistent shape
-                objectFit: "cover",
-                borderRadius: "6px",
-              }}
-              onError={(e) => (e.currentTarget.src = FALLBACK_POSTER)}
-            />
-
-            <div
-              style={{
-                position: "absolute",
-                top: "6px",
-                right: "6px",
-                fontSize: "11px",
-                background: "rgba(0,0,0,0.7)",
-                padding: "2px 6px",
-                borderRadius: "6px",
-                color: "#fff",
+                background: "none",
+                border: "none",
+                color: "#ccc",
+                fontSize: "13px",
+                cursor: "pointer",
               }}
             >
-              {timestamp}
-            </div>
+              {t("More →")}
+            </button>
+          </div>
 
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "4px",
-                marginTop: "4px",
-                fontSize: "10px",
-                color: "#aaa",
-              }}
-            >
-              <StarRating rating={log?.rating} size={12} />
-              {hasReview && (
-                <FaRegComment
-                  size={9}
-                  style={{ position: "relative", top: "-1.0px" }}
-                />
-              )}
-              {log?.rewatchCount > 0 && (
-                <div style={{ display: "flex", alignItems: "center", gap: "2px" }}>
-                  <HiOutlineRefresh
-                    size={11}
-                    color="#aaa"
-                    style={{ position: "relative", top: "-1.5px" }}
-                  />
-                  <span
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns:
+                typeof window !== "undefined" && window.innerWidth <= 600
+                  ? "repeat(3, 1fr)"
+                  : "repeat(auto-fill, minmax(140px, 1fr))",
+              gap: "8px",
+              justifyItems: "center",
+              marginTop: "12px",
+            }}
+          >
+            {recentlyWatched.map((log) => {
+              const id = toTmdbId(
+                log?.tmdbId ?? log?.movie ?? log?.movieId ?? log?.movie?.id
+              );
+              if (!id) return null;
+
+              const posterUrl = getPosterUrl({
+                tmdbId: log.tmdbId || log.movie?.id,
+                posterPath: log.movie?.poster_path || log.poster,
+                override: customPosters[id],
+              });
+
+              const hasReview =
+                !!(log?.review && log.review.trim().length > 0);
+
+              const logDate = new Date(
+                log?.createdAt || log?.watchedAt || Date.now()
+              );
+              const sevenDaysAgo = subDays(new Date(), 7);
+              const timestamp = isBefore(logDate, sevenDaysAgo)
+                ? logDate.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  })
+                : formatDistanceToNowStrict(logDate, { addSuffix: true });
+
+              return (
+                <div
+                  key={log._id}
+                  style={{ position: "relative", width: "100%" }}
+                  onClick={() => handleLogClick(log)}
+                >
+                  <PosterWithLoader src={posterUrl} alt={log?.title || "Poster"} />
+
+                  <div
                     style={{
-                      fontSize: "10px",
-                      color: "#aaa",
-                      position: "relative",
-                      top: "-1.5px",
+                      position: "absolute",
+                      top: "6px",
+                      right: "6px",
+                      fontSize: "11px",
+                      background: "rgba(0,0,0,0.7)",
+                      padding: "2px 6px",
+                      borderRadius: "6px",
+                      color: "#fff",
                     }}
                   >
-                    {log.rewatchCount}x
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  </div>
-) : (
-  <p style={{ color: "#888", marginTop: "20px" }}>
-    {t("No recent logs yet.")}
-  </p>
-)}
+                    {timestamp}
+                  </div>
 
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "4px",
+                      marginTop: "4px",
+                      fontSize: "10px",
+                      color: "#aaa",
+                    }}
+                  >
+                    <StarRating rating={log?.rating} size={12} />
+                    {hasReview && <FaRegComment size={9} />}
+                    {log?.rewatchCount > 0 && (
+                      <div
+                        style={{ display: "flex", alignItems: "center", gap: "2px" }}
+                      >
+                        <HiOutlineRefresh size={11} color="#aaa" />
+                        <span style={{ fontSize: "10px", color: "#aaa" }}>
+                          {log.rewatchCount}x
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ) : (
+        <p style={{ color: "#888", marginTop: "20px" }}>
+          {t("No recent logs yet.")}
+        </p>
+      )}
 
       {/* 🔗 Connections */}
       {Object.values(user?.socials || {}).some(Boolean) && (
@@ -361,7 +331,7 @@ export default function ProfileTabProfile({
               {showConnections ? t("Hide") : t("Show")}
             </button>
           </div>
-          {/* connections list */}
+
           {showConnections && (
             <div
               style={{
@@ -409,15 +379,7 @@ export default function ProfileTabProfile({
                           gap: "12px",
                         }}
                       >
-                        <div
-                          style={{
-                            fontSize: "20px",
-                            position: "relative",
-                            top: "2px",
-                          }}
-                        >
-                          {icon}
-                        </div>
+                        <div style={{ fontSize: "20px" }}>{icon}</div>
                         <div
                           style={{
                             fontSize: "14px",
@@ -444,14 +406,7 @@ export default function ProfileTabProfile({
                           </span>
                         </div>
                       </div>
-                      <span
-                        style={{
-                          fontSize: "16px",
-                          color: "#aaa",
-                          display: "flex",
-                          alignItems: "center",
-                        }}
-                      >
+                      <span style={{ fontSize: "16px", color: "#aaa" }}>
                         <FiExternalLink />
                       </span>
                     </a>

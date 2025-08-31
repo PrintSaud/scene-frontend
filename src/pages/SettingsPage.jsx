@@ -155,7 +155,7 @@ export default function SettingsPage() {
           <p>
             📧 {t("Contact Us")}:{" "}
             <a href="mailto:support@scenesa.com" style={{ color: "#a855f7" }}>
-              support@scenesa.com
+              scenewebapp@gmail.com
             </a>
           </p>
         </div>
@@ -199,19 +199,20 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* 🎬 Footer above navbar */}
-      <footer
-        style={{
-          textAlign: "center",
-          marginTop: "20px",
-          fontSize: "12px",
-          color: "#888",
-          marginBottom: "60px", // ✅ ensures above bottom nav
-        }}
-      >
-        🎬 Scene — {t("Built with ❤️ in Saudi Arabia")}
-        <br />© {new Date().getFullYear()} Scene. {t("All rights reserved.")}.
-      </footer>
+{/* 🎬 Footer above navbar */}
+<footer
+  style={{
+    textAlign: "center",
+    marginTop: "20px",
+    fontSize: "12px",
+    color: "#888",
+    marginBottom: "99px", // ⬆️ was 60px, now sits a bit higher
+  }}
+>
+  🎬 Scene — {t("Built with ❤️ in Saudi Arabia")}
+  <br />© {new Date().getFullYear()} Scene. {t("All rights reserved.")}.
+</footer>
+
     </div>
   );
 }

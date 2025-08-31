@@ -23,6 +23,8 @@ export default function LogModal({ movie, onClose, refreshLogs, editLogId }) {
   const [rewatchCount, setRewatchCount] = useState(0);
   const [review, setReview] = useState("");
   const [gifUrl, setGifUrl] = useState(null);
+  const [animatingFav, setAnimatingFav] = useState(false);
+
   const [uploadedImageFile, setUploadedImageFile] = useState(null);
   const [showGifModal, setShowGifModal] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
@@ -115,6 +117,24 @@ export default function LogModal({ movie, onClose, refreshLogs, editLogId }) {
     setRating(isHalf ? index + 0.5 : index + 1);
   };
 
+  const [customPoster, setCustomPoster] = useState(null);
+
+useEffect(() => {
+  const fetchPoster = async () => {
+    try {
+      if (!movieId || !user?._id) return;
+      const res = await api.get(`/api/posters/${movieId}?userId=${user._id}`);
+      if (res.data?.posterOverride) {
+        setCustomPoster(res.data.posterOverride);
+      }
+    } catch (err) {
+      console.warn("⚠️ Failed to fetch custom poster", err);
+    }
+  };
+  fetchPoster();
+}, [movieId, user?._id]);
+
+
   return (
     <div style={{ position: "fixed", top: 0, left: 0, zIndex: 9999, width: "100vw", height: "100vh", backgroundColor: "#0e0e0e", color: "#fff", overflowY: "auto", padding: "20px 20px 40px" }}>
       <button
@@ -125,23 +145,24 @@ export default function LogModal({ movie, onClose, refreshLogs, editLogId }) {
       </button>
 
       {/* Poster + Title + Stars */}
-      <div style={{ display: "flex", gap: "16px", marginBottom: "20px" }}>
-        <img
-          src={
-            movieData?.posterOverride
-              ? movieData.posterOverride
-              : movieData?.poster && movieData.poster.startsWith("http")
-              ? movieData.poster
-              : movieData?.poster_path
-              ? `https://image.tmdb.org/t/p/w300${movieData.poster_path}`
-              : "/default-poster.png"
-          }
-          alt={movieData?.title}
-          style={{ width: "150px", height: "240px", objectFit: "cover", borderRadius: "10px" }}
-        />
+      <div style={{ display: "flex", gap: "16px", marginBottom: "20px", }}>
+      <img
+  src={
+    customPoster ||
+    (movieData?.poster && movieData.poster.startsWith("http")
+      ? movieData.poster
+      : movieData?.poster_path
+      ? `https://image.tmdb.org/t/p/w300${movieData.poster_path}`
+      : "/default-poster.png")
+  }
+  alt={movieData?.title}
+  style={{ width: "150px", height: "240px", objectFit: "cover", borderRadius: "10px" }}
+/>
+
+
 
         <div>
-          <h2 style={{ fontSize: "16px", fontWeight: "bold", fontFamily: "Inter" }}>
+          <h2 style={{ fontSize: "14px", fontWeight: "bold", fontFamily: "Inter" }}>
             {movieData?.title}
           </h2>
 
@@ -165,12 +186,46 @@ export default function LogModal({ movie, onClose, refreshLogs, editLogId }) {
           </p>
 
           {/* Favorite */}
-          <div onClick={() => setIsFavorite((prev) => !prev)} style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", cursor: "pointer", color: "#aaa" }}>
-            {isFavorite ? <AiFillHeart style={{ color: "#B327F6", fontSize: "20px" }} /> : <AiOutlineHeart style={{ color: "#777", fontSize: "20px" }} />}
-            <span style={{ fontSize: "13px" }}>
-              {isFavorite ? t("marked_as_favorite") : t("mark_as_favorite")}
-            </span>
-          </div>
+          <div
+  onClick={() => {
+    setIsFavorite((prev) => !prev);
+    setAnimatingFav(true);
+    setTimeout(() => setAnimatingFav(false), 300);
+  }}
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    marginTop: "6px",
+    cursor: "pointer",
+    color: "#aaa",
+  }}
+>
+  {isFavorite ? (
+    <AiFillHeart
+      style={{
+        color: "#B327F6",
+        fontSize: "20px",
+        transition: "transform 0.3s ease, color 0.3s ease",
+        transform: animatingFav ? "scale(1.4)" : "scale(1)",
+      }}
+    />
+  ) : (
+    <AiOutlineHeart
+      style={{
+        color: "#777",
+        fontSize: "20px",
+        transition: "transform 0.3s ease, color 0.3s ease",
+        transform: animatingFav ? "scale(1.4)" : "scale(1)",
+      }}
+    />
+  )}
+  <span style={{ fontSize: "13px" }}>
+    {isFavorite ? t("marked_as_favorite") : t("mark_as_favorite")}
+  </span>
+</div>
+
+
 
           {/* Rewatch */}
           <div onClick={() => setRewatchCount((prev) => prev + 1)} style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "6px", cursor: "pointer", color: "#aaa" }}>

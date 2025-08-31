@@ -26,6 +26,8 @@ export default function ReviewHeader({
   const { id } = useParams();
   const TMDB_IMG = "https://image.tmdb.org/t/p/original";
   const fallbackImage = "https://scenesa.com/scene-og-review-fallback.png";
+  const [animating, setAnimating] = useState(false);
+
 
   const backdropUrl =
     review.customBackdrop ||
@@ -372,20 +374,34 @@ export default function ReviewHeader({
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-            <span
-              onClick={onLike}
-              style={{ cursor: "pointer", fontSize: "20px", position: "relative", top: "1px" }}
-              aria-label={t("Like")}
-              title={t("Like")}
-            >
-              {(review.likes || []).includes(userId) ? (
-                <AiFillHeart style={{ color: "#B327F6" }} />
-              ) : (
-                <AiOutlineHeart />
-              )}
-            </span>
-            <span style={{ fontSize: "13px" }}>{review.likes?.length || 0}</span>
-          </div>
+  <span
+    onClick={() => {
+      onLike?.();
+      setAnimating(true);
+      setTimeout(() => setAnimating(false), 400);
+    }}
+    style={{
+      cursor: "pointer",
+      fontSize: "20px",
+      position: "relative",
+      top: "1px",
+      display: "flex",
+      alignItems: "center",
+      transition: "transform 0.3s ease, color 0.3s ease",
+      transform: animating ? "scale(1.4)" : "scale(1)",
+    }}
+    aria-label={t("Like")}
+    title={t("Like")}
+  >
+    {(review.likes || []).includes(userId) ? (
+      <AiFillHeart style={{ color: "#B327F6", transition: "color 0.3s ease" }} />
+    ) : (
+      <AiOutlineHeart style={{ color: "#888" }} />
+    )}
+  </span>
+  <span style={{ fontSize: "13px" }}>{review.likes?.length || 0}</span>
+</div>
+
 
           <button
             style={{

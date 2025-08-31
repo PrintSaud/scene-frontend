@@ -30,6 +30,7 @@ export default function MoviePage() {
   const [searchParams] = useSearchParams();
   const editMode = searchParams.get("edit") === "1";
   const editLogId = searchParams.get("logId");
+  const [animatingLikes, setAnimatingLikes] = useState([]);
 
   const [movie, setMovie] = useState(null);
   const [credits, setCredits] = useState(null);
@@ -255,24 +256,40 @@ setMovie({
   }, [id]);
 
   const handleLikeReview = async (reviewId) => {
+    if (!userId) return;
+
+    // Optimistic UI toggle
+    setPopularReviews((prev) =>
+      prev.map((r) => {
+        if (r._id !== reviewId) return r;
+        const alreadyLiked = r.likes?.includes(userId);
+        return {
+          ...r,
+          likes: alreadyLiked
+            ? r.likes.filter((uid) => uid !== userId)
+            : [...(r.likes || []), userId],
+        };
+      })
+    );
+
+    // 🚀 trigger animation
+    setAnimatingLikes((prev) => [...prev, reviewId]);
+    setTimeout(() => {
+      setAnimatingLikes((prev) => prev.filter((id) => id !== reviewId));
+    }, 400);
+
     try {
-      await api.post(`/api/logs/${reviewId}/like`);
-      setPopularReviews((prev) =>
-        prev.map((r) =>
-          r._id === reviewId
-            ? {
-                ...r,
-                likes: r.likes.includes(userId)
-                  ? r.likes.filter((uid) => uid !== userId)
-                  : [...r.likes, userId],
-              }
-            : r
-        )
-      );
+      await api.post(`/api/logs/${reviewId}/like`, {}, {
+        headers: {
+          Authorization: `Bearer ${user?.token}`,
+        },
+      });
     } catch (err) {
       console.error("❌ Failed to like review:", err);
+      toast.error(t("like_failed"));
     }
   };
+
 
   useEffect(() => {
     if (editMode && editLogId) setShowLogModal(true);
@@ -861,18 +878,28 @@ setMovie({
                   </div>
 
                   <div
-                    onClick={() => handleLikeReview(r._id)}
-                    style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
-                  >
-                    {isLikedByMe ? (
-                      <AiFillHeart size={16} color="#B327F6" />
-                    ) : (
-                      <AiOutlineHeart size={16} color="#888" />
-                    )}
-                    <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>
-                      {r.likes?.length || 0}
-                    </span>
-                  </div>
+  onClick={() => handleLikeReview(r._id)}
+  style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+>
+  <span
+    style={{
+      display: "flex",
+      alignItems: "center",
+      transition: "transform 0.3s ease, color 0.3s ease",
+      transform: animatingLikes.includes(r._id) ? "scale(1.4)" : "scale(1)",
+    }}
+  >
+    {isLikedByMe ? (
+      <AiFillHeart size={16} color="#B327F6" style={{ transition: "color 0.3s ease" }} />
+    ) : (
+      <AiOutlineHeart size={16} color="#888" />
+    )}
+  </span>
+  <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>
+    {r.likes?.length || 0}
+  </span>
+</div>
+
                 </div>
               </div>
             );

@@ -1,3 +1,4 @@
+// src/components/profile/ProfileTabWatchlist.jsx
 import { useEffect, useState } from "react";
 import api from "../../api/api";
 import { useNavigate } from "react-router-dom";
@@ -5,8 +6,86 @@ import toast from "react-hot-toast";
 import getPosterUrl from "../../utils/getPosterUrl";
 import useTranslate from "../../utils/useTranslate";
 
-const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const FALLBACK_POSTER = "/default-poster.jpg";
+
+// ✅ Poster with shimmer loader
+function PosterWithLoader({ movie, navigate, t }) {
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState(false);
+
+  const posterUrl = getPosterUrl({
+    tmdbId: movie.tmdbId || movie.id,
+    posterPath: movie.poster_path,
+    override: movie.posterOverride,
+  });
+
+  const showSrc = !error && posterUrl ? posterUrl : FALLBACK_POSTER;
+
+  return (
+    <div
+      style={{
+        position: "relative",
+        width: "100%",
+        aspectRatio: "2/3",
+        borderRadius: "6px",
+        overflow: "hidden",
+        cursor: "pointer",
+      }}
+      onClick={() => {
+        const rawId = movie.tmdbId || movie.id;
+        const cleanedId = String(rawId).replace(/[^\d]/g, "");
+        const tmdbId = Number(cleanedId);
+        if (!tmdbId || isNaN(tmdbId)) {
+          console.warn("❌ Invalid TMDB ID:", movie);
+          toast.error(t("This movie has no valid TMDB ID."));
+          return;
+        }
+        navigate(`/movie/${tmdbId}`);
+      }}
+    >
+      {!loaded && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            borderRadius: "6px",
+            background:
+              "linear-gradient(90deg, #3a0d60 25%, #B327F6 50%, #3a0d60 75%)",
+            backgroundSize: "200% 100%",
+            animation: "shimmer 1.2s infinite",
+          }}
+        />
+      )}
+
+      <img
+        src={showSrc}
+        alt={movie.title}
+        loading="lazy"
+        onLoad={() => setLoaded(true)}
+        onError={() => {
+          setError(true);
+          setLoaded(true);
+        }}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          borderRadius: "6px",
+          display: "block",
+        }}
+      />
+
+      <style>
+        {`
+          @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+          }
+        `}
+      </style>
+    </div>
+  );
+}
 
 export default function ProfileTabWatchlist({
   user,
@@ -36,12 +115,7 @@ export default function ProfileTabWatchlist({
           ? res.data
           : res.data.filter((movie) => !movie.isPrivate);
         setWatchList(visibleWatchlist);
-
-        if (visibleWatchlist.length > 100) {
-          setTimeout(() => setIsLoading(false), 800);
-        } else {
-          setIsLoading(false);
-        }
+        setIsLoading(false);
       } catch (err) {
         console.error("Failed to fetch watchlist", err);
         setIsLoading(false);
@@ -50,23 +124,6 @@ export default function ProfileTabWatchlist({
 
     if (profileUserId) fetchWatchlist();
   }, [profileUserId, sortType, order, selectedGenre]);
-
-  if (isLoading) {
-    return (
-      <div
-        style={{
-          minHeight: "300px",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          fontSize: "18px",
-          color: "#888",
-        }}
-      >
-        🎞️ {t("Loading your Scenes...")}
-      </div>
-    );
-  }
 
   return (
     <div style={{ padding: "0" }}>
@@ -81,6 +138,7 @@ export default function ProfileTabWatchlist({
             padding: "4px 8px",
           }}
         >
+          {/* 🔽 Sorting Controls */}
           <select
             value={sortType}
             onChange={(e) => setSortType(e.target.value)}
@@ -145,7 +203,7 @@ export default function ProfileTabWatchlist({
 
       {watchList?.length > 0 ? (
         <div
-          className="watchlist-grid" // ✅ match the media query below
+          className="watchlist-grid"
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))",
@@ -153,43 +211,14 @@ export default function ProfileTabWatchlist({
             padding: "0",
           }}
         >
-          {watchList.map((movie) => {
-            const image = getPosterUrl(
-              movie.tmdbId || movie.id,
-              movie.poster_path,
-              movie.posterOverride
-            );
-
-            return (
-              <img
-                key={movie.id || movie.tmdbId || movie._id}
-                src={image}
-                alt={movie.title}
-                style={{
-                  width: "100%",
-                  aspectRatio: "2/3",
-                  objectFit: "cover",
-                  borderRadius: "6px",
-                  cursor: "pointer",
-                }}
-                onClick={() => {
-                  const rawId = movie.tmdbId || movie.id;
-                  const cleanedId = String(rawId).replace(/[^\d]/g, "");
-                  const tmdbId = Number(cleanedId);
-                  if (!tmdbId || isNaN(tmdbId)) {
-                    console.warn("❌ Invalid TMDB ID:", movie);
-                    toast.error(t("This movie has no valid TMDB ID."));
-                    return;
-                  }
-                  navigate(`/movie/${tmdbId}`);
-                }}
-                onError={(e) => {
-                  e.currentTarget.onerror = null;
-                  e.currentTarget.src = FALLBACK_POSTER;
-                }}
-              />
-            );
-          })}
+          {watchList.map((movie) => (
+            <PosterWithLoader
+              key={movie.id || movie.tmdbId || movie._id}
+              movie={movie}
+              navigate={navigate}
+              t={t}
+            />
+          ))}
         </div>
       ) : (
         <p style={{ textAlign: "center", marginTop: "40px", color: "#aaa" }}>
@@ -197,7 +226,7 @@ export default function ProfileTabWatchlist({
         </p>
       )}
 
-      {/* ✅ Responsive inline media query to force 3 cols on phones */}
+      {/* ✅ Responsive media query */}
       <style>
         {`
           @media (max-width: 480px) {

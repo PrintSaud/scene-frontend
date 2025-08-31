@@ -19,6 +19,8 @@ export default function AllReviewsPage() {
   const [activeReviewId, setActiveReviewId] = useState(null);
   const stored = localStorage.getItem("user");
   const user = stored ? JSON.parse(stored) : null;
+  const [animatingLikes, setAnimatingLikes] = useState([]);
+
 
   const [reviews, setReviews] = useState([]);
   const [userId, setUserId] = useState("");
@@ -85,6 +87,8 @@ export default function AllReviewsPage() {
     }
   };
 
+
+
   const handleReply = (commentId, username, reviewId) => {
     setReplyingTo({ id: commentId, username });
     setInput(`@${username} `);
@@ -121,6 +125,44 @@ export default function AllReviewsPage() {
       toast.error(t("reply_failed"));
     }
   };
+
+  const handleLike = async (reviewId) => {
+    if (!userId) return;
+
+    setReviews((prev) =>
+      prev.map((rev) => {
+        if (rev._id !== reviewId) return rev;
+
+        const alreadyLiked = rev.likes?.includes(userId);
+        return {
+          ...rev,
+          likes: alreadyLiked
+            ? rev.likes.filter((id) => id !== userId)
+            : [...(rev.likes || []), userId],
+        };
+      })
+    );
+
+    // 🚀 trigger animation
+    setAnimatingLikes((prev) => [...prev, reviewId]);
+    setTimeout(() => {
+      setAnimatingLikes((prev) => prev.filter((id) => id !== reviewId));
+    }, 400); // animation duration
+
+    try {
+      await api.post(`/api/logs/${reviewId}/like`, {}, {
+        headers: {
+          Authorization: `Bearer ${JSON.parse(localStorage.getItem("user"))?.token}`,
+        },
+      });
+    } catch (err) {
+      console.error("❌ Failed to like review:", err);
+      toast.error(t("like_failed"));
+    }
+  };
+
+
+
 
   return (
     <div style={{ padding: "16px 12px", paddingBottom: 80 }}>
@@ -216,10 +258,10 @@ export default function AllReviewsPage() {
                   <span style={{ fontSize: 10, color: "#888" }}>
                     {getRelativeTime(review.createdAt)}
                   </span>
-                </div>
+                </div>    
 
                 {review.review && review.review !== "__media__" && (
-                  <div style={{ fontSize: 14, color: "#ddd", marginTop: 2, whiteSpace: "pre-wrap",      fontFamily: "Inter, sans-serif", }}>
+                  <div style={{ fontSize: 12, color: "#ddd", marginTop: 2, whiteSpace: "pre-wrap",      fontFamily: "Inter, sans-serif", }}>
                     {review.review}
                   </div>
                 )}
@@ -235,12 +277,33 @@ export default function AllReviewsPage() {
                     {t("reply")}
                   </button>
 
-                  <div onClick={() => handleLike(review._id)} style={{ cursor: "pointer", display: "flex", alignItems: "center" }}>
-                    {isLiked ? <AiFillHeart size={16} color="#B327F6" /> : <AiOutlineHeart size={16} color="#888" />}
-                    <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>
-                      {review.likes?.length || 0}
-                    </span>
-                  </div>
+                  <div
+  onClick={() => handleLike(review._id)}
+  style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+>
+  <span
+    style={{
+      display: "flex",
+      alignItems: "center",
+      transition: "transform 0.3s ease, color 0.3s ease",
+      transform: animatingLikes.includes(review._id) ? "scale(1.4)" : "scale(1)",
+    }}
+  >
+    {isLiked ? (
+      <AiFillHeart
+        size={16}
+        color="#B327F6"
+        style={{ transition: "color 0.3s ease" }}
+      />
+    ) : (
+      <AiOutlineHeart size={16} color="#888" />
+    )}
+  </span>
+  <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>
+    {review.likes?.length || 0}
+  </span>
+</div>
+
                 </div>
               </div>
             </div>

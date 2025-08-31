@@ -179,22 +179,52 @@ export default function ProfileTabReviews({
                   })}
                 </div>
 
-                {/* 📝 Review Text */}
-                {log.review &&
-                  !["[GIF ONLY]", "[IMAGE ONLY]", "__media__"].includes(
-                    log.review.trim()
-                  ) && (
-                    <p
-                      style={{
-                        color: "#ccc",
-                        fontSize: "13px",
-                        fontFamily: "Inter, sans-serif",
-                        marginTop: "8px",
-                      }}
-                    >
-                      {log.review}
-                    </p>
-                  )}
+{/* 📝 Review Text */}
+{log.review &&
+  !["[GIF ONLY]", "[IMAGE ONLY]", "__media__"].includes(
+    log.review.trim()
+  ) && (() => {
+    const words = log.review.trim().split(/\s+/);
+    const isLong = words.length > 30;
+    const shortText = words.slice(0, 30).join(" ");
+
+    return (
+      <p
+        style={{
+          color: "#ccc",
+          fontSize: "13px",
+          fontFamily: "Inter, sans-serif",
+          marginTop: "8px",
+          lineHeight: 1.5,
+        }}
+      >
+        {isLong ? (
+          <>
+            {shortText}…{" "}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/review/${log._id}`);
+              }}
+              style={{
+                background: "none",
+                border: "none",
+                color: "#B327F6",
+                cursor: "pointer",
+                fontSize: "13px",
+                fontFamily: "Inter, sans-serif",
+                padding: 0,
+              }}
+            >
+              {t("Read more")}
+            </button>
+          </>
+        ) : (
+          log.review
+        )}
+      </p>
+    );
+  })()}
               </div>
             </div>
 

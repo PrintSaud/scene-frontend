@@ -5,6 +5,16 @@ import toast from "react-hot-toast";
 const MovieListSortable = React.memo(({ movies, setMovies, hideNumbers = false }) => {
   const MAX_MOVIES = 4;
 
+  const toKeyId = (movie) => {
+    if (!movie) return "unknown";
+    return (
+      movie.tmdbId?.toString() ||
+      movie.id?.toString() ||
+      movie._id?.toString() ||
+      Math.random().toString()
+    );
+  };
+
   const handleDragEnd = useCallback(
     (result) => {
       if (!result.destination) return;
@@ -19,7 +29,15 @@ const MovieListSortable = React.memo(({ movies, setMovies, hideNumbers = false }
   );
 
   const handleRemove = useCallback(
-    (id) => setMovies((prev) => prev.filter((m) => m.id !== id)),
+    (id) =>
+      setMovies((prev) =>
+        prev.filter(
+          (m) =>
+            m.tmdbId?.toString() !== id &&
+            m.id?.toString() !== id &&
+            m._id?.toString() !== id
+        )
+      ),
     [setMovies]
   );
 
@@ -40,73 +58,73 @@ const MovieListSortable = React.memo(({ movies, setMovies, hideNumbers = false }
               listStyle: "none",
             }}
           >
-            {movies.map((movie, index) => (
-              <Draggable
-                key={movie.id}
-                draggableId={movie.id.toString()}
-                index={index}
-              >
-                {(provided, snapshot) => (
-                  <li
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    style={{
-                      ...provided.draggableProps.style,
-                      background: "#1a1a1a",
-                      borderRadius: "6px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      padding: "10px 12px",
-                      marginBottom: "8px",
-                      boxShadow: snapshot.isDragging
-                        ? "0 2px 10px rgba(255,255,255,0.15)"
-                        : "none",
-                    }}
-                  >
-                    <span
-                      {...provided.dragHandleProps}
-                      style={{
-                        cursor: "grab",
-                        marginRight: "12px",
-                        fontSize: "18px",
-                      }}
-                      aria-label={`Drag ${movie.title}`}
-                    >
-                      ≡
-                    </span>
+            {movies.map((movie, index) => {
+              const keyId = toKeyId(movie);
 
-                    <span
+              return (
+                <Draggable key={keyId} draggableId={keyId} index={index}>
+                  {(provided, snapshot) => (
+                    <li
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
                       style={{
-                        flexGrow: 1,
-                        fontFamily: "Inter, sans-serif",
-                        fontSize: "15px",
-                        wordBreak: "break-word",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
+                        ...provided.draggableProps.style,
+                        background: "#1a1a1a",
+                        borderRadius: "6px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        padding: "10px 12px",
+                        marginBottom: "8px",
+                        boxShadow: snapshot.isDragging
+                          ? "0 2px 10px rgba(255,255,255,0.15)"
+                          : "none",
                       }}
                     >
-                      {!hideNumbers && <strong>{index + 1}.</strong>} {movie.title}
-                    </span>
+                      <span
+                        {...provided.dragHandleProps}
+                        style={{
+                          cursor: "grab",
+                          marginRight: "12px",
+                          fontSize: "18px",
+                        }}
+                        aria-label={`Drag ${movie.title}`}
+                      >
+                        ≡
+                      </span>
 
-                    <button
-                      onClick={() => handleRemove(movie.id)}
-                      style={{
-                        marginLeft: "8px",
-                        color: "#f55",
-                        background: "none",
-                        border: "none",
-                        cursor: "pointer",
-                        fontSize: "16px",
-                      }}
-                      aria-label={`Remove ${movie.title}`}
-                    >
-                      ❌
-                    </button>
-                  </li>
-                )}
-              </Draggable>
-            ))}
+                      <span
+                        style={{
+                          flexGrow: 1,
+                          fontFamily: "Inter, sans-serif",
+                          fontSize: "15px",
+                          wordBreak: "break-word",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                      >
+                        {!hideNumbers && <strong>{index + 1}.</strong>} {movie.title}
+                      </span>
+
+                      <button
+                        onClick={() => handleRemove(keyId)}
+                        style={{
+                          marginLeft: "8px",
+                          color: "#f55",
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                          fontSize: "16px",
+                        }}
+                        aria-label={`Remove ${movie.title}`}
+                      >
+                        ❌
+                      </button>
+                    </li>
+                  )}
+                </Draggable>
+              );
+            })}
 
             {/* ➕ Add Movie Placeholder (disabled if 4 reached) */}
             {movies.length < MAX_MOVIES && (

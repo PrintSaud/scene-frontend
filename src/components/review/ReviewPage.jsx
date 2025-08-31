@@ -15,6 +15,8 @@ export default function ReviewPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const [animatingLikeId, setAnimatingLikeId] = useState(null);
+
 
   const [review, setReview] = useState(null);
   const [replies, setReplies] = useState([]);
@@ -116,13 +118,18 @@ export default function ReviewPage() {
       setReview((prev) => ({
         ...prev,
         likes: (prev.likes || []).includes(userId)
-          ? (prev.likes || []).filter((uid) => uid !== userId)
+          ? prev.likes.filter((uid) => uid !== userId)
           : [...(prev.likes || []), userId],
       }));
+  
+      // 🔥 trigger animation
+      setAnimatingLikeId(review._id);
+      setTimeout(() => setAnimatingLikeId(null), 300);
     } catch {
       toast.error(t("Failed to like."));
     }
   };
+  
 
   const handleReplyLike = async (replyId) => {
     if (!userId) return toast.error(t("You must be logged in to like."));
@@ -140,10 +147,15 @@ export default function ReviewPage() {
             : r
         )
       );
+  
+      // 🔥 trigger animation
+      setAnimatingLikeId(replyId);
+      setTimeout(() => setAnimatingLikeId(null), 300);
     } catch {
       toast.error(t("Failed to like reply."));
     }
   };
+  
 
   const handleProfile = (profileId) => navigate(`/profile/${profileId}`);
   const handleMoreReviewsClick = (reviewId) => navigate(`/review/${reviewId}`);
@@ -190,7 +202,7 @@ export default function ReviewPage() {
               background: "none",
               border: "none",
               color: "#888",
-              fontSize: 14,
+              fontSize: 13,
               cursor: "pointer",
               marginRight: -12,
             }}
@@ -321,20 +333,29 @@ export default function ReviewPage() {
 
                     {/* Like button */}
                     <div
-                      style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
-                      onClick={() => handleReplyLike(r._id)}
-                      aria-label={t("Like")}
-                      title={t("Like")}
-                    >
-                      {isLikedByMe ? (
-                        <AiFillHeart size={16} color="#B327F6" />
-                      ) : (
-                        <AiOutlineHeart size={16} color="#888" />
-                      )}
-                      <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>
-                        {r.likes?.length || 0}
-                      </span>
-                    </div>
+  style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+  onClick={() => handleReplyLike(r._id)}
+>
+  <span
+    style={{
+      display: "flex",
+      alignItems: "center",
+      fontSize: 16,
+      transform: animatingLikeId === r._id ? "scale(1.4)" : "scale(1)",
+      transition: "transform 0.3s ease",
+    }}
+  >
+    {isLikedByMe ? (
+      <AiFillHeart color="#B327F6" />
+    ) : (
+      <AiOutlineHeart color="#888" />
+    )}
+  </span>
+  <span style={{ fontSize: 12, color: "#888", marginLeft: 4 }}>
+    {r.likes?.length || 0}
+  </span>
+</div>
+
                   </div>
                 </div>
               );

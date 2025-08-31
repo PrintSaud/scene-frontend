@@ -17,6 +17,7 @@
     "axios": "^1.9.0",
     "colorthief": "^2.6.0",
     "date-fns": "^4.1.0",
+    "dayjs": "^1.11.18",
     "html2canvas": "^1.4.1",
     "i18next": "^25.4.2",
     "lucide-react": "^0.513.0",

@@ -97,11 +97,17 @@ export default function DirectorPage() {
       (name) => name.toLowerCase() === directorEn.name.toLowerCase()
     );
 
-  // 🎭 Always show both Arabic + English names
-  const displayName =
-    directorAr?.name && directorAr.name !== directorEn.name
-      ? `${directorAr.name} / ${directorEn.name}`
-      : directorEn.name;
+// 🎭 Display name based on language
+let displayName = directorEn.name;
+if (
+  lang === "ar" &&
+  directorAr?.name &&
+  directorAr.name.trim() &&
+  directorAr.name !== directorEn.name
+) {
+  displayName = `${directorAr.name} / ${directorEn.name}`;
+}
+
 
   // 📖 Biography → Arabic if lang=ar and available, else English
   let localizedBio = directorEn.biography || "";
@@ -238,32 +244,39 @@ export default function DirectorPage() {
           )}
         </div>
 
-        {/* Movies */}
-        <h3 style={{ marginTop: "30px", fontSize: "16px" }}>
-          🎬 {t("all_films")}
-        </h3>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "10px",
-            marginTop: "12px",
-          }}
-        >
-          {movies.map((movie) => (
-            <img
-              key={movie.id}
-              src={
-                movie.poster_path
-                  ? TMDB_POSTER + movie.poster_path
-                  : "/default-poster.png"
-              }
-              alt={movie.title}
-              style={{ width: "100%", borderRadius: "6px", cursor: "pointer" }}
-              onClick={() => navigate(`/movie/${movie.id}`)}
-            />
-          ))}
-        </div>
+{/* 🎬 Movies */}
+<h3 style={{ marginTop: "30px", fontSize: "16px" }}>
+  🎬 {t("all_films")}
+</h3>
+<div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))",
+    gap: "10px",
+    marginTop: "12px",
+  }}
+>
+  {movies.map((movie) => (
+    <img
+      key={movie.id}
+      src={
+        movie.poster_path
+          ? TMDB_POSTER + movie.poster_path
+          : "/default-poster.png"
+      }
+      alt={movie.title}
+      style={{
+        width: "100%",
+        borderRadius: "6px",
+        cursor: "pointer",
+        objectFit: "cover",
+        aspectRatio: "2/3", // ✅ keeps poster ratio consistent
+      }}
+      onClick={() => navigate(`/movie/${movie.id}`)}
+    />
+  ))}
+</div>
+
 
         {/* Saudi Talent Message */}
         {isSaudi && (

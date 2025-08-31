@@ -8,6 +8,9 @@ import { HiOutlineRefresh } from "react-icons/hi";
 import StarRating from "../components/StarRating";
 import useTranslate from "../utils/useTranslate";
 import { useLanguage } from "../context/LanguageContext";
+import { dailyMoviePool, specialDays, getDailyMovie } from "../data/dailyMoviePool";
+import dayjs from "dayjs"; // ✅ only here
+
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -31,79 +34,104 @@ export default function HomePage() {
       setUser(null);
     }
   }, []);
-
-  // Fetch trending + daily movie
+  
   useEffect(() => {
-    async function fetchTrending() {
+    async function fetchDailyMovie() {
       try {
-        const res = await fetch(
-          `https://api.themoviedb.org/3/trending/movie/week?api_key=${import.meta.env.VITE_TMDB_API_KEY}`
-        );
-        const data = await res.json();
-        const results = data.results || [];
-        setMovies(results);
-
+        const today = new Date();
+        const todayKey = dayjs(today).format("MM-DD");
         const stored = localStorage.getItem("dailyMovie");
-        const today = new Date().toDateString();
-
+  
         if (stored) {
           const parsed = JSON.parse(stored);
-          if (parsed.date === today) {
+          if (parsed.date === today.toDateString()) {
             setDailyMovie(parsed.movie);
             return;
           }
         }
-
-        // Filter eligible movies
-        const eligible = results.filter(
-          (m) => m.vote_average >= 7.5 && m.vote_count >= 3000
-        );
-        const fallback = results[Math.floor(Math.random() * results.length)];
-        const selected = eligible.length
-          ? eligible[Math.floor(Math.random() * eligible.length)]
-          : fallback;
-
+  
+        // 🎯 Special days override
+        let chosen = null;
+        if (specialDays[todayKey]) {
+          chosen = specialDays[todayKey];
+        } else {
+          // calculate day index since Sept 1
+          const yearStart = dayjs(`${today.getFullYear()}-09-01`);
+          const diff =
+            today < yearStart
+              ? dayjs(today).diff(yearStart.subtract(1, "year"), "day")
+              : dayjs(today).diff(yearStart, "day");
+  
+          const idx = diff % dailyMoviePool.length;
+          chosen = dailyMoviePool[idx];
+        }
+  
+        if (!chosen?.id) return;
+  
         // Fetch EN + AR details
         const [detailEnRes, detailArRes] = await Promise.all([
           fetch(
-            `https://api.themoviedb.org/3/movie/${selected.id}?api_key=${
+            `https://api.themoviedb.org/3/movie/${chosen.id}?api_key=${
               import.meta.env.VITE_TMDB_API_KEY
             }&language=en-US`
           ),
           fetch(
-            `https://api.themoviedb.org/3/movie/${selected.id}?api_key=${
+            `https://api.themoviedb.org/3/movie/${chosen.id}?api_key=${
               import.meta.env.VITE_TMDB_API_KEY
             }&language=ar-SA`
           ),
         ]);
-
+  
         const detailEn = await detailEnRes.json();
         const detailAr = await detailArRes.json();
-
+  
         const daily = {
-          id: selected.id,
-          poster: `https://image.tmdb.org/t/p/w500${selected.poster_path}`,
-          title_en: detailEn.title || selected.title,
-          title_ar: detailAr.title || detailEn.title || selected.title,
-          overview_en: detailEn.overview || "",
-          overview_ar: detailAr.overview || detailEn.overview || "",
-          original_language: detailEn.original_language, // ✅ add this
+          id: chosen.id,
+          poster: detailEn.poster_path
+            ? `https://image.tmdb.org/t/p/w500${detailEn.poster_path}`
+            : "/default-poster.png",
+          title_en: detailEn.title,
+          title_ar: detailAr.title || detailEn.title,
+          overview_en: detailEn.overview,
+          overview_ar: detailAr.overview || detailEn.overview,
+          original_language: detailEn.original_language,
+          reason: chosen.reason || null, // 👈 special note (Saudi Day etc.)
         };
-        
-        
-        
-
+  
         setDailyMovie(daily);
         localStorage.setItem(
           "dailyMovie",
-          JSON.stringify({ date: today, movie: daily })
+          JSON.stringify({ date: today.toDateString(), movie: daily })
         );
       } catch (err) {
-        console.error("Failed to fetch trending:", err);
+        console.error("Failed to fetch daily movie:", err);
       }
     }
-    fetchTrending();
+  
+    fetchDailyMovie();
   }, []);
+
+  // Fetch trending movies
+useEffect(() => {
+  async function fetchTrending() {
+    try {
+      const res = await fetch(
+        `https://api.themoviedb.org/3/trending/movie/week?api_key=${
+          import.meta.env.VITE_TMDB_API_KEY
+        }`
+      );
+      const data = await res.json();
+      setMovies(data.results || []);
+    } catch (err) {
+      console.error("🔥 Failed to fetch trending:", err);
+      setMovies([]);
+    }
+  }
+  fetchTrending();
+}, []);
+
+  
+  
 
   // Fetch feed logs
   useEffect(() => {

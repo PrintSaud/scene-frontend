@@ -19,6 +19,9 @@ export default function ListViewPage({ customPosters = {} }) {
   const [isSaved, setIsSaved] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
   const [externalCustomPosters, setExternalCustomPosters] = useState({}); // viewer's own posters
+  const [animatingLikes, setAnimatingLikes] = useState([]);
+
+
 
   const isOwner = user && list?.user?._id === user?._id;
 
@@ -57,6 +60,13 @@ export default function ListViewPage({ customPosters = {} }) {
     if (!user?._id) return toast.error(t("You must be logged in."));
     try {
       await axios.post(`/api/lists/${id}/like`);
+  
+      // 🚀 Trigger animation
+      setAnimatingLikes((prev) => [...prev, id]);
+      setTimeout(() => {
+        setAnimatingLikes((prev) => prev.filter((x) => x !== id));
+      }, 400);
+  
       setIsLiked((prev) => {
         const next = !prev;
         setList((prevList) => {
@@ -76,6 +86,8 @@ export default function ListViewPage({ customPosters = {} }) {
       toast.error(t("Something went wrong."));
     }
   };
+  
+  
 
   const handleSave = async () => {
     if (!user?._id) return toast.error(t("You must be logged in."));
@@ -249,46 +261,65 @@ export default function ListViewPage({ customPosters = {} }) {
       </div>
 
       {/* Content */}
-      <div style={{ padding: "12px 16px 0 16px", marginTop: list.coverImage ? "0px" : "40px" }}>
-        <h2 style={{ marginBottom: 4, fontSize: 18, fontWeight: 600 }}>{list.title}</h2>
-        {list.description && (
-          <p
-            style={{
-              color: "#bbb",
-              marginBottom: 12,
-              fontFamily: "Inter, sans-serif",
-              fontSize: 14,
-              lineHeight: 1.4,
-            }}
-          >
-            {list.description}
-          </p>
-        )}
+<div style={{ padding: "12px 16px 0 16px", marginTop: list.coverImage ? "0px" : "40px" }}>
+  <h2 style={{ marginBottom: 4, fontSize: 18, fontWeight: 600 }}>{list.title}</h2>
+  {list.description && (
+    <p
+      style={{
+        color: "#bbb",
+        marginBottom: 12,
+        fontFamily: "Inter, sans-serif",
+        fontSize: 14,
+        lineHeight: 1.4,
+      }}
+    >
+      {list.description}
+    </p>
+  )}
 
-        <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, color: "#aaa" }}>
-          <div
-            style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}
-            onClick={() => navigate(`/profile/${list.user._id}`)}
-          >
-            <img
-              src={list.user.avatar || "/default-avatar.jpg"}
-              alt="avatar"
-              style={{ width: 28, height: 28, borderRadius: "50%", objectFit: "cover" }}
-              onError={(e) => {
-                e.currentTarget.onerror = null;
-                e.currentTarget.src = "/default-avatar.jpg";
-              }}
-            />
-            <span style={{ fontFamily: "Inter, sans-serif" }}>@{list.user.username}</span>
-          </div>
-          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 4 }}>
-            <span onClick={handleLike} style={{ cursor: "pointer", fontSize: 24 }}>
-              {isLiked ? <AiFillHeart style={{ color: "#B327F6" }} /> : <AiOutlineHeart />}
-            </span>
-            <span style={{ fontSize: 14 }}>{list.likes?.length || 0}</span>
-          </div>
-        </div>
-      </div>
+  <div style={{ display: "flex", alignItems: "center", fontSize: 14, color: "#aaa" }}>
+    {/* 👤 User info (left side) */}
+    <div
+      style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}
+      onClick={() => navigate(`/profile/${list.user._id}`)}
+    >
+      <img
+        src={list.user.avatar || "/default-avatar.jpg"}
+        alt="avatar"
+        style={{ width: 28, height: 28, borderRadius: "50%", objectFit: "cover" }}
+        onError={(e) => {
+          e.currentTarget.onerror = null;
+          e.currentTarget.src = "/default-avatar.jpg";
+        }}
+      />
+      <span style={{ fontFamily: "Inter, sans-serif" }}>@{list.user.username}</span>
+    </div>
+
+    {/* ❤️ Like button (far right) */}
+    <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 4 }}>
+    <span
+  onClick={handleLike}
+  style={{
+    cursor: "pointer",
+    fontSize: 24,
+    display: "flex",
+    alignItems: "center",
+    transition: "transform 0.25s ease, color 0.05s ease",
+    transform: animatingLikes.includes(id) ? "scale(1.4)" : "scale(1)",
+  }}
+>
+  {isLiked ? (
+    <AiFillHeart style={{ color: "#B327F6", transition: "color 0.25s ease" }} />
+  ) : (
+    <AiOutlineHeart style={{ color: "#888" }} />
+  )}
+</span>
+<span style={{ fontSize: 14 }}>{list.likes?.length || 0}</span>
+
+    </div>
+  </div>
+</div>
+
 
       {/* Movie Grid */}
       <div style={{ padding: "12px 16px", marginTop: list.coverImage ? "0px" : "12px", marginBottom: 24 }}>
