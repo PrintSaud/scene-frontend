@@ -368,6 +368,11 @@ const dictionary = {
           "log_submitted": "🎬 Log submitted!",
           "log_failed": "Failed to submit log.",
 
+          "watchlist.added": "Added to Watchlist ✅",
+          "watchlist.removed": "Removed from Watchlist ❌",
+          "favorites.added": "Added to Favorites ⭐",
+          "favorites.removed": "Removed from Favorites ❌",
+
           "not_logged_in": "Not logged in",
           "untitled_log": "Untitled Log",
           "untitled_list": "Untitled List",
@@ -585,6 +590,11 @@ const dictionary = {
   "Like": "إعجاب",
   "Reply": "رد",
   "Back": "رجوع",
+
+  "watchlist.added": "تمت الإضافة إلى قائمة المشاهدة ✅",
+  "watchlist.removed": "تمت الإزالة من قائمة المشاهدة ❌",
+  "favorites.added": "تمت الإضافة إلى المفضلة ⭐",
+  "favorites.removed": "تمت الإزالة من المفضلة ❌",
 
   "Delete this review?": "هل تريد حذف هذه المراجعة؟",
   "Review deleted!": "تم حذف المراجعة!",

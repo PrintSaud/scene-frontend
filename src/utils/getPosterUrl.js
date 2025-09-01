@@ -5,28 +5,35 @@ const OVERRIDDEN_POSTERS = {
   21484: "https://image.tmdb.org/t/p/original/iAdsTUNjpHIREH4C4UNhkbVDWYi.jpg",
 };
 
-function getPosterUrl(input) {
-  if (typeof input === "number" || typeof input === "string") {
-    return FALLBACK_POSTER; // keep primitive case simple
+function getPosterUrl(arg, posters = {}, movie) {
+  // Case 1: arg is number/string (tmdbId)
+  if (typeof arg === "number" || typeof arg === "string") {
+    const idNum = Number(arg);
+    if (!idNum) return FALLBACK_POSTER;
+
+    // custom overrides
+    if (OVERRIDDEN_POSTERS[idNum]) return OVERRIDDEN_POSTERS[idNum];
+    if (posters?.[idNum]) return posters[idNum];
+
+    // movie.poster_path fallback if provided
+    if (movie?.poster_path) {
+      return `${TMDB_BASE}w342${movie.poster_path}`;
+    }
+
+    return FALLBACK_POSTER;
   }
 
-  const { tmdbId, posterPath, override, ownerMap, size = "w342" } = input || {};
+  // Case 2: arg is object
+  const { tmdbId, posterPath, override, ownerMap, size = "w342" } = arg || {};
   const idNum = Number(tmdbId);
 
-  // custom overrides
   if (OVERRIDDEN_POSTERS[idNum]) return OVERRIDDEN_POSTERS[idNum];
   if (ownerMap?.[idNum]) return ownerMap[idNum];
   if (override) return override;
 
-  // if we have poster path, build TMDB URL
   if (posterPath) {
     if (posterPath.startsWith("http")) return posterPath;
     return `${TMDB_BASE}${size}${posterPath}`;
-  }
-
-  // ⚡ fallback: use TMDB id directly if no poster_path saved
-  if (idNum) {
-    return `https://image.tmdb.org/t/p/w342/${idNum}.jpg`;
   }
 
   return FALLBACK_POSTER;

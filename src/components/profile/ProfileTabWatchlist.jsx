@@ -1,25 +1,30 @@
 // src/components/profile/ProfileTabWatchlist.jsx
 import { useEffect, useState } from "react";
-import api from "../../api/api";
+import api, { getCustomPostersBatch } from "../../api/api";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import getPosterUrl from "../../utils/getPosterUrl";
 import useTranslate from "../../utils/useTranslate";
+import getPosterUrl from "../../utils/getPosterUrl";
 
 const FALLBACK_POSTER = "/default-poster.jpg";
 
+// Normalize ID like Films tab
+function toTmdbIdAny(x) {
+  const id =
+    x?.tmdbId ??
+    x?.movie?.tmdbId ??
+    x?.movie?.id ??
+    x?.movieId ??
+    x?.id ??
+    (typeof x === "number" || (typeof x === "string" && /^\d+$/.test(x)) ? x : null);
+  const n = Number(id);
+  return Number.isFinite(n) ? n : null;
+}
+
 // ✅ Poster with shimmer loader
-function PosterWithLoader({ movie, navigate, t }) {
+function Poster({ tmdbId, posters, movie, navigate, t }) {
   const [loaded, setLoaded] = useState(false);
-  const [error, setError] = useState(false);
-
-  const posterUrl = getPosterUrl({
-    tmdbId: movie.tmdbId || movie.id,
-    posterPath: movie.poster_path,
-    override: movie.posterOverride,
-  });
-
-  const showSrc = !error && posterUrl ? posterUrl : FALLBACK_POSTER;
+  const posterUrl = getPosterUrl(tmdbId, posters, movie) || FALLBACK_POSTER;
 
   return (
     <div
@@ -32,11 +37,7 @@ function PosterWithLoader({ movie, navigate, t }) {
         cursor: "pointer",
       }}
       onClick={() => {
-        const rawId = movie.tmdbId || movie.id;
-        const cleanedId = String(rawId).replace(/[^\d]/g, "");
-        const tmdbId = Number(cleanedId);
-        if (!tmdbId || isNaN(tmdbId)) {
-          console.warn("❌ Invalid TMDB ID:", movie);
+        if (!tmdbId) {
           toast.error(t("This movie has no valid TMDB ID."));
           return;
         }
@@ -56,16 +57,12 @@ function PosterWithLoader({ movie, navigate, t }) {
           }}
         />
       )}
-
       <img
-        src={showSrc}
-        alt={movie.title}
+        src={posterUrl}
+        alt="Movie"
         loading="lazy"
         onLoad={() => setLoaded(true)}
-        onError={() => {
-          setError(true);
-          setLoaded(true);
-        }}
+        onError={() => setLoaded(true)}
         style={{
           width: "100%",
           height: "100%",
@@ -74,7 +71,6 @@ function PosterWithLoader({ movie, navigate, t }) {
           display: "block",
         }}
       />
-
       <style>
         {`
           @keyframes shimmer {
@@ -100,6 +96,7 @@ export default function ProfileTabWatchlist({
   const navigate = useNavigate();
   const [selectedGenre, setSelectedGenre] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [posters, setPosters] = useState({});
   const t = useTranslate();
 
   const isOwner = user?._id === profileUserId;
@@ -111,13 +108,27 @@ export default function ProfileTabWatchlist({
         const res = await api.get(
           `/api/users/${profileUserId}/watchlist?sort=${sortType}&order=${order}&genre=${selectedGenre}`
         );
-        const visibleWatchlist = isOwner
+
+        const visible = isOwner
           ? res.data
-          : res.data.filter((movie) => !movie.isPrivate);
-        setWatchList(visibleWatchlist);
-        setIsLoading(false);
+          : res.data.filter((m) => !m.isPrivate);
+
+        setWatchList(visible);
+
+        // ✅ preload first 30 ids and batch fetch posters
+        const ids = visible.slice(0, 30).map(toTmdbIdAny).filter(Boolean);
+if (ids.length) {
+  try {
+    const batch = await getCustomPostersBatch(profileUserId, ids); // ✅ pass userId
+    setPosters(batch || {});
+  } catch (err) {
+    console.error("❌ Batch posters failed", err);
+  }
+}
+
       } catch (err) {
-        console.error("Failed to fetch watchlist", err);
+        console.error("❌ Failed to fetch watchlist", err);
+      } finally {
         setIsLoading(false);
       }
     };
@@ -138,7 +149,7 @@ export default function ProfileTabWatchlist({
             padding: "4px 8px",
           }}
         >
-          {/* 🔽 Sorting Controls */}
+          {/* Sorting Controls */}
           <select
             value={sortType}
             onChange={(e) => setSortType(e.target.value)}
@@ -201,7 +212,12 @@ export default function ProfileTabWatchlist({
         </div>
       )}
 
-      {watchList?.length > 0 ? (
+      {/* Loading State */}
+      {isLoading ? (
+        <p style={{ textAlign: "center", marginTop: "40px", color: "#aaa" }}>
+          🎞️ {t("Loading your Scenes...")}
+        </p>
+      ) : watchList?.length > 0 ? (
         <div
           className="watchlist-grid"
           style={{
@@ -211,14 +227,21 @@ export default function ProfileTabWatchlist({
             padding: "0",
           }}
         >
-          {watchList.map((movie) => (
-            <PosterWithLoader
-              key={movie.id || movie.tmdbId || movie._id}
-              movie={movie}
-              navigate={navigate}
-              t={t}
-            />
-          ))}
+          {watchList.map((movie) => {
+            const tmdbId = toTmdbIdAny(movie);
+
+            return (
+              <Poster
+  key={tmdbId || movie._id}
+  tmdbId={tmdbId}
+  posters={posters}
+  movie={movie} // 👈 now movie.poster_path works too
+  navigate={navigate}
+  t={t}
+/>
+
+            );
+          })}
         </div>
       ) : (
         <p style={{ textAlign: "center", marginTop: "40px", color: "#aaa" }}>
@@ -226,7 +249,7 @@ export default function ProfileTabWatchlist({
         </p>
       )}
 
-      {/* ✅ Responsive media query */}
+      {/* Responsive */}
       <style>
         {`
           @media (max-width: 480px) {

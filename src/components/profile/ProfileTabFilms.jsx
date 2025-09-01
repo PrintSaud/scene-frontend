@@ -191,19 +191,49 @@ export default function ProfileTabFilms({
   if (isLoading) {
     return (
       <div
+        className="films-grid"
         style={{
-          minHeight: "300px",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          fontSize: "18px",
-          color: "#888",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))",
+          gap: "6px",
+          padding: "0",
         }}
       >
-        🎞️ {t("Loading your Scenes...")}
+        {Array.from({ length: 12 }).map((_, i) => (
+          <div
+            key={i}
+            style={{
+              position: "relative",
+              width: "100%",
+              aspectRatio: "2/3",
+              borderRadius: "6px",
+              overflow: "hidden",
+              background:
+                "linear-gradient(90deg, #3a0d60 25%, #B327F6 50%, #3a0d60 75%)",
+              backgroundSize: "200% 100%",
+              animation: "shimmer 1.2s infinite",
+            }}
+          />
+        ))}
+  
+        <style>
+          {`
+            @keyframes shimmer {
+              0% { background-position: 200% 0; }
+              100% { background-position: -200% 0; }
+            }
+  
+            @media (max-width: 480px) {
+              .films-grid {
+                grid-template-columns: repeat(3, 1fr) !important;
+              }
+            }
+          `}
+        </style>
       </div>
     );
   }
+  
 
   return (
     <>

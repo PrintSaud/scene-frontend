@@ -91,7 +91,7 @@ export default function ProfileHeader({
           backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.2), #0e0e0e), url(${user.profileBackdrop || "/default-backdrop.jpg"})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          overflow: "hidden",
+          overflow: "visible",
         }}
       >
         <img
@@ -167,7 +167,7 @@ export default function ProfileHeader({
                 boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
                 padding: "12px 0",
                 width: "190px",
-                zIndex: 9999,
+                zIndex: 10000,
               }}
             >
               {items.map((item, i) => (
