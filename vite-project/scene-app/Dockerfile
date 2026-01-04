@@ -10,7 +10,7 @@ COPY package*.json ./
 RUN npm ci
 
 # Copy scene-app source
-COPY scene-app/ ./scene-app/
+COPY . ./
 
 # Build the app
 WORKDIR /app/scene-app
