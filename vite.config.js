@@ -12,16 +12,13 @@ export default defineConfig({
 
   // Dev server
   server: {
-    // ❌ Remove host:true to stop exposing over LAN/IP
     port: 5173,
     proxy: {
-      // All frontend calls to /api → backend in dev
       '/api': {
-        target: 'http://localhost:4001', // ← match your server.js PORT
+        target: 'http://localhost:4001',
         changeOrigin: true,
         secure: false,
       },
-      // If you serve socket.io on same backend origin, this helps in some setups:
       '/socket.io': {
         target: 'http://localhost:4001',
         ws: true,
@@ -41,11 +38,13 @@ export default defineConfig({
     ],
   },
 
+  // ✅ Change here: build from src/
+  root: path.resolve(__dirname, 'src'),
   build: {
+    outDir: path.resolve(__dirname, 'dist'),
+    emptyOutDir: true,
     rollupOptions: {
-      input: {
-        main: path.resolve(__dirname, 'index.html'),
-      },
+      input: path.resolve(__dirname, 'src/index.html'), // entrypoint inside src
     },
   },
 })
