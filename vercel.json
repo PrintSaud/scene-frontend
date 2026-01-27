@@ -1,0 +1,9 @@
+{
+    "rewrites": [
+      {
+        "source": "/og/review/:id",
+        "destination": "https://backend.scenesa.com/api/og/review/:id"
+      }
+    ]
+  }
+  
