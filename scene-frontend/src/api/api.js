@@ -1,3 +1,5 @@
+console.log("🔥 Production backend env:", import.meta.env.VITE_BACKEND_URL);
+
 import axios from "axios";
 
 const api = axios.create({
