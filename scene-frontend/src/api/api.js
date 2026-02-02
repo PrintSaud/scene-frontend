@@ -4,6 +4,10 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL?.trim(),
 });
 
+console.log("👉 Backend is:", import.meta.env.VITE_BACKEND_URL);
+if (!import.meta.env.VITE_BACKEND_URL) {
+  throw new Error("❌ VITE_BACKEND_URL is missing. Add it to scene-frontend/.env");
+}
 
 // ✅ Automatically add token only when needed
 api.interceptors.request.use((config) => {
