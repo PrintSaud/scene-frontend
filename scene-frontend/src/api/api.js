@@ -1,17 +1,11 @@
 import axios from "axios";
+import { backend } from "../config"; // adjust path if needed
 
-const RAW = import.meta.env.VITE_BACKEND_URL;
-const BASE_URL = RAW?.trim()?.replace(/\/$/, "");
+console.log("🔥 Using backend:", backend);
 
-const FALLBACK = "https://backend.scenesa.com";
-const FINAL_BASE = BASE_URL || FALLBACK;
-
-console.log("🔥 Production backend env:", BASE_URL);
-if (!BASE_URL) {
-  console.error("❌ VITE_BACKEND_URL missing at build time. Falling back to:", FALLBACK);
-}
-
-const api = axios.create({ baseURL: FINAL_BASE });
+const api = axios.create({
+  baseURL: backend, // ✅ always has fallback
+});
 
 // ✅ Automatically add token only when needed
 api.interceptors.request.use((config) => {
