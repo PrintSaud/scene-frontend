@@ -1,10 +1,6 @@
 import axios from "axios";
-import { backend } from "../config"; // adjust path if needed
-
-console.log("🔥 Using backend:", backend);
-
 const api = axios.create({
-  baseURL: backend, // ✅ always has fallback
+  baseURL: "https://backend.scenesa.com",
 });
 
 // ✅ Automatically add token only when needed
@@ -14,7 +10,7 @@ api.interceptors.request.use((config) => {
 
   const isPublicAuthRoute =
     config.url.includes("/auth/login") ||
-    config.url.includes("/auth/signup") ||
+    config.url.includes("/auth/register") ||
     config.url.includes("/auth/forgot-password") ||
     config.url.includes("/auth/reset-password");
 
