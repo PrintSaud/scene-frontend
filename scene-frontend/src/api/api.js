@@ -1,22 +1,23 @@
-console.log("🔥 Production backend env:", import.meta.env.VITE_BACKEND_URL);
-
 import axios from "axios";
 
-const BASE_URL = import.meta.env.VITE_BACKEND_URL?.trim();
+const RAW = import.meta.env.VITE_BACKEND_URL;
+const BASE_URL = RAW?.trim()?.replace(/\/$/, "");
+
+const FALLBACK = "https://backend.scenesa.com";
+const FINAL_BASE = BASE_URL || FALLBACK;
+
+console.log("🔥 Production backend env:", BASE_URL);
 if (!BASE_URL) {
-  throw new Error(
-    "❌ VITE_BACKEND_URL is missing! Make sure it is set in Railway env vars before building."
-  );
+  console.error("❌ VITE_BACKEND_URL missing at build time. Falling back to:", FALLBACK);
 }
 
-const api = axios.create({ baseURL: BASE_URL });
+const api = axios.create({ baseURL: FINAL_BASE });
 
 // ✅ Automatically add token only when needed
 api.interceptors.request.use((config) => {
   const user = JSON.parse(localStorage.getItem("user"));
   const token = user?.token;
 
-  // 🔐 Skip adding token for public auth routes
   const isPublicAuthRoute =
     config.url.includes("/auth/login") ||
     config.url.includes("/auth/signup") ||
@@ -29,7 +30,6 @@ api.interceptors.request.use((config) => {
 
   return config;
 });
-
 
 //
 // 🧠 AUTH
