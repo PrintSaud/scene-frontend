@@ -8,7 +8,7 @@
     "build": "node -e \"console.log('BUILD VITE_BACKEND_URL =', process.env.VITE_BACKEND_URL)\" && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "caddy run --config /assets/Caddyfile --adapter caddyfile"
+    "start": "serve -s dist -l $PORT"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
