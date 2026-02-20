@@ -1,11 +1,16 @@
 :{$PORT}
 
-# ✅ Send API requests to backend
+# quick proof endpoint
+handle /api/health {
+  respond "api-proxy-ok" 200
+}
+
+# proxy API to backend
 handle_path /api/* {
   reverse_proxy https://backend.scenesa.com
 }
 
-# ✅ Everything else is the SPA
+# serve SPA
 handle {
   root * /app/dist
   try_files {path} /index.html
