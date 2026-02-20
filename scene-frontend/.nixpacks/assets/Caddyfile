@@ -1,17 +1,11 @@
 :{$PORT}
 
-# ✅ Proxy ALL /api requests (GET/POST/OPTIONS/etc.)
 handle /api/* {
   reverse_proxy https://backend.scenesa.com
 }
 
-# ✅ Serve SPA for everything else
 handle {
   root * /app/dist
   try_files {path} /index.html
   file_server
-}
-
-handle /api/health {
-  respond "api-proxy-ok" 200
 }
