@@ -1,25 +1,82 @@
 import axios from "axios";
+
+const BASE = "https://backend.scenesa.com";
+
+console.log("🚀 API INIT — baseURL =", BASE);
+
 const api = axios.create({
-  baseURL: "https://backend.scenesa.com",
+  baseURL: BASE,
 });
 
-// ✅ Automatically add token only when needed
-api.interceptors.request.use((config) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const token = user?.token;
+// ===============================
+// 🧠 REQUEST INTERCEPTOR (DEBUG)
+// ===============================
+api.interceptors.request.use(
+  (config) => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const token = user?.token;
 
-  const isPublicAuthRoute =
-    config.url.includes("/auth/login") ||
-    config.url.includes("/auth/register") ||
-    config.url.includes("/auth/forgot-password") ||
-    config.url.includes("/auth/reset-password");
+    // 🔍 Force /api calls to backend (safety net)
+    if ((config.url || "").startsWith("/api/")) {
+      config.baseURL = BASE;
+    }
 
-  if (!isPublicAuthRoute && token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    const fullUrl = (config.baseURL || "") + (config.url || "");
+
+    console.log("📤 API REQUEST");
+    console.log("   method:", config.method?.toUpperCase());
+    console.log("   url:", config.url);
+    console.log("   baseURL:", config.baseURL);
+    console.log("   FULL:", fullUrl);
+
+    const isPublicAuthRoute =
+      config.url.includes("/auth/login") ||
+      config.url.includes("/auth/register") ||
+      config.url.includes("/auth/forgot-password") ||
+      config.url.includes("/auth/reset-password");
+
+    if (!isPublicAuthRoute && token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  (error) => {
+    console.log("❌ REQUEST SETUP ERROR:", error);
+    return Promise.reject(error);
   }
+);
 
-  return config;
-});
+// ===============================
+// 📥 RESPONSE INTERCEPTOR (DEBUG)
+// ===============================
+api.interceptors.response.use(
+  (response) => {
+    console.log("✅ API RESPONSE");
+    console.log("   status:", response.status);
+    console.log("   url:", response.config?.url);
+    console.log("   FULL:", (response.config?.baseURL || "") + response.config?.url);
+    return response;
+  },
+  (error) => {
+    console.log("🔥 API ERROR");
+
+    if (error.response) {
+      console.log("   status:", error.response.status);
+      console.log("   data:", error.response.data);
+      console.log(
+        "   FULL:",
+        (error.config?.baseURL || "") + error.config?.url
+      );
+    } else if (error.request) {
+      console.log("   ❗ NO RESPONSE RECEIVED");
+    } else {
+      console.log("   ❗ SETUP ERROR:", error.message);
+    }
+
+    return Promise.reject(error);
+  }
+);
 
 //
 // 🧠 AUTH

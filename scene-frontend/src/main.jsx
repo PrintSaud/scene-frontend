@@ -8,6 +8,7 @@ import { NotificationProvider } from './context/NotificationContext';
 import { LanguageProvider } from './context/LanguageContext';   // ⬅️ add this
 import { backend } from "./config";
 
+console.log("BUILD", "2026-02-21-13:45");
 console.log("👉 Backend is:", backend);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
