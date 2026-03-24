@@ -110,6 +110,8 @@ export default function SignupScreen() {
     }
   };
   
+// check for dublicated usernames 
+
 
   const showError = (msg) => {
     setError(msg);

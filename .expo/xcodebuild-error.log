@@ -1,0 +1,10 @@
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:iOS Simulator, arch:arm64, id:0F54CCA2-5902-40A8-AA01-7929474A6989, OS:18.6, name:iPhone 16 Pro }
+{ platform:iOS Simulator, arch:x86_64, id:0F54CCA2-5902-40A8-AA01-7929474A6989, OS:18.6, name:iPhone 16 Pro }
+** BUILD FAILED **
+
+
+The following build commands failed:
+	ScanDependencies /Users/saudceo/Library/Developer/Xcode/DerivedData/sceneapp-epvwenzrbrastfgintfzravtxvix/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/React-RuntimeHermes.build/Objects-normal/arm64/React-RuntimeHermes-dummy.o /Users/saudceo/flick-frontend/ios/Pods/Target\ Support\ Files/React-RuntimeHermes/React-RuntimeHermes-dummy.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler (in target 'React-RuntimeHermes' from project 'Pods')
+	Building workspace sceneapp with scheme sceneapp and configuration Debug
+(2 failures)

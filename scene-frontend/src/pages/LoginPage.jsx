@@ -2,11 +2,12 @@
 import { useEffect, useState } from "react";
 import axios from "../api/api";
 import "../styles/LoginPage.css";
-import { GoogleLogin } from "@react-oauth/google";
+// import { GoogleLogin } from "@react-oauth/google";
 import toast from "react-hot-toast";
 import { FaSpinner } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../context/LanguageContext"; // ⬅️ add this
+import { login } from "../api/api"; // adjust if your path differs
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -22,7 +23,7 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const res = await axios.post(`/api/auth/login`, { email, password });
+      const res = await login({ email, password });
 
       const mergedUser = {
         ...res.data.user,

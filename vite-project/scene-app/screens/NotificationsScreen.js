@@ -16,7 +16,7 @@ import { formatDistanceToNow } from "date-fns";
 import { socket } from "shared/socket";
 import api from "shared/api/api";
 import useTranslate from "shared/utils/useTranslate";
-import { useNotification } from "shared/context/NotificationContext";
+import { useNotification } from "scene-app/context/NotificationContext";
 
 const FALLBACK_AVATAR = "https://scenesa.com/default-avatar.png";
 
@@ -65,9 +65,11 @@ export default function NotificationsScreen() {
       }
 
       try {
-        await api.patch("/api/notifications/read");
-        markAllRead();
-        syncUnreadCount();
+        try {
+          await markAllRead();
+        } catch (err) {
+          console.error("❌ Failed to mark all as read", err);
+        }
       } catch (err) {
         console.error("❌ Failed to mark all as read", err);
       }
@@ -91,6 +93,15 @@ export default function NotificationsScreen() {
   const markAsReadAndNavigate = async (n, destination) => {
     try {
       await api.patch(`/api/notifications/read-single/${n._id}`);
+  
+      setNotifications((prev) =>
+        prev.map((item) =>
+          item._id === n._id ? { ...item, read: true } : item
+        )
+      );
+  
+      await syncUnreadCount();
+  
       navigation.navigate(destination.screen, destination.params);
     } catch (err) {
       console.error("❌ Failed to mark notification as read", err);

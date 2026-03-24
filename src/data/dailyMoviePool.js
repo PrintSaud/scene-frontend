@@ -7,7 +7,6 @@ export const specialDays = {
     "10-31": { id: 948, title: "Halloween" }, // Halloween 🎃
     "02-14": { id: 76, title: "Before Sunrise" }, // Valentine’s 💜
     "01-01": { id: 210577, title: "The Great Gatsby" }, // New Year ✨
-    "12-14": { id: 44214, title: "Black Swan" }, // Special Day 🩰🖤
   };  
 
 export const dailyMoviePool = [

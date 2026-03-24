@@ -60,8 +60,6 @@ const TRENDING_ITEM_W = Math.floor(
 
 
 
-
-
 export default function HomeScreen() {
   const navigation = useNavigation();
   const [user, setUser] = useState(null);
@@ -639,7 +637,7 @@ sceneDot: {
   marginHorizontal: 4,
 },
 
-
   // empty state
   emptyText: { color: "#888", marginTop: 1, paddingHorizontal: 16,   fontFamily: "PixelifySans_700Bold", },
 });
+

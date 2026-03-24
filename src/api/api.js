@@ -2,9 +2,14 @@ console.log("🔥 Production backend env:", import.meta.env.VITE_BACKEND_URL);
 
 import axios from "axios";
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL?.trim(),
-});
+const BASE_URL = import.meta.env.VITE_BACKEND_URL?.trim();
+if (!BASE_URL) {
+  throw new Error(
+    "❌ VITE_BACKEND_URL is missing! Make sure it is set in Railway env vars before building."
+  );
+}
+
+const api = axios.create({ baseURL: BASE_URL });
 
 console.log("👉 Backend is:", import.meta.env.VITE_BACKEND_URL);
 if (!import.meta.env.VITE_BACKEND_URL) {
