@@ -1,7 +1,8 @@
 // src/components/profile/ProfileTabs.js
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import useTranslate from "shared/utils/useTranslate";
+import useTranslate from "../../../../shared/utils/useTranslate";
+// import useTranslate from "shared/utils/useTranslate";
 
 export default function ProfileTabs({ activeTab, setActiveTab }) {
   const t = useTranslate();

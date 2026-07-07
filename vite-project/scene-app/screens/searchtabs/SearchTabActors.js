@@ -12,10 +12,17 @@ import { Dimensions } from "react-native";
 const TMDB_IMG = "https://image.tmdb.org/t/p/w300";
 const FALLBACK_AVATAR = "https://scenesa.com/default-avatar.png";
 
+const getDepartmentLabel = (dept) => {
+  if (dept === "Acting") return "Actor";
+  if (dept === "Directing") return "Director";
+  if (dept === "Camera") return "Cinematographer";
+  return dept || "Person";
+};
+
 export default function SearchTabActors({ results, saveToRecentSearches, onPressActor }) {
   if (!results || results.length === 0) {
     return (
-      <Text style={styles.emptyText}>No actors found.</Text>
+      <Text style={styles.emptyText}>No People found.</Text>
     );
   }
 
@@ -34,7 +41,7 @@ export default function SearchTabActors({ results, saveToRecentSearches, onPress
         return (
           <TouchableOpacity
             onPress={() => {
-              saveToRecentSearches(item.name, "actors");
+              saveToRecentSearches(item.name, "people");
               if (onPressActor) onPressActor(item);
             }}
             style={styles.card}
@@ -44,7 +51,7 @@ export default function SearchTabActors({ results, saveToRecentSearches, onPress
               {item.name}
             </Text>
             <Text style={styles.subtle}>
-              {item.known_for_department || "Actor"}
+            {getDepartmentLabel(item.known_for_department)}
             </Text>
           </TouchableOpacity>
         );

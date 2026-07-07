@@ -16,10 +16,13 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
-import { useLanguage } from "shared/context/LanguageContext";
-import useTranslate from "shared/utils/useTranslate";
+// import { useLanguage } from "shared/context/LanguageContext";
+import { useLanguage } from "../../../shared/context/LanguageContext";
+import useTranslate from "../../../shared/utils/useTranslate";
+// import useTranslate from "shared/utils/useTranslate";
 import StarRating from "../components/StarRating";
-import filterMovies, { isQueryBanned, whitelistIds } from "shared/utils/filterMovies";
+// import filterMovies, { isQueryBanned, whitelistIds } from "shared/utils/filterMovies";
+import filterMovies, { isQueryBanned, whitelistIds } from "../../../shared/utils/filterMovies";
 import UsersTab from "./searchtabs/SearchTabUsers";
 import ListsTab from "./searchtabs/SearchTabLists";
 import ActorsTab from "./searchtabs/SearchTabActors";
@@ -46,21 +49,20 @@ export default function SearchScreen() {
 
   // state
   const [query, setQuery] = useState("");
-  const [activeTab, setActiveTab] = useState("films"); // films | users | lists | actors | directors
+  const [activeTab, setActiveTab] = useState("films"); // films | users | lists | people
   const [results, setResults] = useState([]);
   const [posterOverrides, setPosterOverrides] = useState({});
   const [recentSearches, setRecentSearches] = useState([]);
   const [loading, setLoading] = useState(false);
 
   // tabs
-  const tabs = ["films", "users", "lists", "actors", "directors"];
-  const tabLabels = {
-    films: t("Movies"),
-    users: t("Users"),
-    lists: t("Lists"),
-    actors: t("Actors"),
-    directors: t("Directors"),
-  };
+  const tabs = ["films", "users", "lists", "people"];
+const tabLabels = {
+  films: t("Movies"),
+  users: t("Users"),
+  lists: t("Lists"),
+  people: t("People"),
+};
 
   const activeTabRef = useRef(activeTab);
 useEffect(() => { activeTabRef.current = activeTab; }, [activeTab]);
@@ -251,22 +253,25 @@ else if (qTab === "lists") {
 }
 
 
-      // ACTORS / DIRECTORS
-      else if (qTab === "actors" || qTab === "directors") {
-        const apiKey = process.env.EXPO_PUBLIC_TMDB_API_KEY;
-        const res = await fetch(
-          `https://api.themoviedb.org/3/search/person?query=${encodeURIComponent(
-            q
-          )}&api_key=${apiKey}`
-        );
-        const data = await res.json();
-        const filtered = (data.results || []).filter((p) =>
-          qTab === "actors"
-            ? p.known_for_department === "Acting"
-            : p.known_for_department === "Directing"
-        );
-        setResults(filtered);
-      }
+// PEOPLE (Actors + Directors + Cinematographers)
+else if (qTab === "people") {
+  const apiKey = process.env.EXPO_PUBLIC_TMDB_API_KEY;
+  const res = await fetch(
+    `https://api.themoviedb.org/3/search/person?query=${encodeURIComponent(q)}&api_key=${apiKey}`
+  );
+  const data = await res.json();
+
+  const allowedDepartments = ["Acting", "Directing", "Camera"];
+
+  const filtered = (data.results || []).filter(
+    (p) =>
+      p.profile_path &&
+      allowedDepartments.includes(p.known_for_department)
+  );
+
+  setResults(filtered);
+}
+
     } catch (err) {
       console.error("Search error:", err);
       setResults([]);
@@ -399,26 +404,6 @@ const FILM_COLS = isTablet ? 5 : 2;
     />
   );
 
-  const renderPeople = () => (
-    <FlatList
-      data={results}
-      keyExtractor={(p) => String(p.id)}
-      numColumns={2}
-      columnWrapperStyle={{ gap: 12, paddingHorizontal: 16 }}
-      contentContainerStyle={{ paddingTop: 4 }}
-      renderItem={({ item }) => {
-        const pic = item.profile_path ? `${TMDB_IMG}/w300${item.profile_path}` : FALLBACK_AVATAR;
-        return (
-          <View style={{ width: ITEM_W, marginBottom: 12, alignItems: "center" }}>
-            <Image source={{ uri: pic }} style={{ width: ITEM_W, height: Math.round(ITEM_W * 1.2), borderRadius: 8 }} />
-            <Text numberOfLines={1} style={styles.movieTitle}>{item.name}</Text>
-            <Text style={styles.subtle}>{item.known_for_department || ""}</Text>
-          </View>
-        );
-      }}
-    />
-  );
-
   const renderRecent = () => (
     <View style={{ paddingHorizontal: 16 }}>
       <Text style={[styles.subtle, { marginBottom: 10 }]}>{t("Recent searches")}</Text>
@@ -470,16 +455,27 @@ const FILM_COLS = isTablet ? 5 : 2;
       );
     }
     
-    if (activeTab === "actors") {
+    if (activeTab === "people") {
       return (
         <ActorsTab
-          results={results.filter((p) => p.profile_path)} // remove no-photo actors
+          results={results.filter((p) => p.profile_path)}
           saveToRecentSearches={saveToRecentSearches}
-          onPressActor={(actor) => navigation.navigate("Actor", { id: actor.id })}
+          onPressActor={(person) => {
+            const dept = person.known_for_department;
+    
+            if (dept === "Acting") {
+              navigation.navigate("Actor", { id: person.id });
+            } else if (dept === "Directing") {
+              navigation.navigate("Director", { id: person.id });
+            } else if (dept === "Camera") {
+              navigation.navigate("Cinematographer", { id: person.id });
+            }
+          }}
         />
       );
     }
     return null;
+
   }, [query, activeTab, results, posterOverrides, loading, recentSearches, language]);
 
   return (

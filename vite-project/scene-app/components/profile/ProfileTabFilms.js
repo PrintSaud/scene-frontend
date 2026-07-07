@@ -13,9 +13,12 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import api from "shared/api/api";
-import useTranslate from "shared/utils/useTranslate";
-import getPosterUrl from "shared/utils/getPosterUrl";
+import api from "../../../../shared/api/api";
+// import api from "shared/api/api";
+import useTranslate from "../../../../shared/utils/useTranslate";
+// import useTranslate from "shared/utils/useTranslate";
+// import getPosterUrl from "shared/utils/getPosterUrl";
+import getPosterUrl from "../../../../shared/utils/getPosterUrl";
 import StarRating from "../StarRating";
 import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 

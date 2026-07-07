@@ -13,11 +13,19 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
-import api from "shared/api/api";
-import useTranslate from "shared/utils/useTranslate";
-import { useLanguage } from "shared/context/LanguageContext";
+
+import api from "../../../shared/api/api";
+// import api from "shared/api/api";
+
+// import useTranslate from "shared/utils/useTranslate";
+import useTranslate from "../../../shared/utils/useTranslate";
+
+// import { useLanguage } from "shared/context/LanguageContext";
+import { useLanguage } from "../../../shared/context/LanguageContext";
+
 import * as Updates from "expo-updates";
-import { useUser } from "../../App";
+// import { useUser } from "../../App";
+import { useUser } from "../../../App";
 export default function SettingsScreen() {
   const navigation = useNavigation();
   const t = useTranslate();
@@ -75,23 +83,36 @@ const handleLogout = async () => {
 
   const saveLanguage = async (newLang) => {
     try {
+      // 1. Update language context immediately
       setLanguage(newLang);
-
-      if (user?.token) {
+  
+      // 2. Update backend if logged in
+      if (user?.token && user?._id) {
         await api.patch(
           `/api/users/${user._id}/language`,
           { language: newLang },
           { headers: { Authorization: `Bearer ${user.token}` } }
         );
       }
-
+  
+      // 3. Update stored user locally
       const updatedUser = { ...user, language: newLang };
-      await AsyncStorage.setItem("user", JSON.stringify(updatedUser));
-
-      Toast.show({ type: "scene", text1: "🌐 " + t("Language updated!") });
+await AsyncStorage.setItem("user", JSON.stringify(updatedUser));
+setUser(updatedUser);
+  
+      Toast.show({
+        type: "scene",
+        text1: newLang === "ar" ? "🌐 تم تغيير اللغة!" : "🌐 Language updated!",
+        position: "bottom",
+      });
     } catch (err) {
       console.error("❌ Language update failed", err);
-      Toast.show({ type: "scene", text1: t("Failed to update language") });
+  
+      Toast.show({
+        type: "scene",
+        text1: language === "ar" ? "فشل تغيير اللغة" : "Failed to update language",
+        position: "bottom",
+      });
     }
   };
 
@@ -157,19 +178,20 @@ const handleLogout = async () => {
         <Text style={styles.rowText}>🚪 {t("Log Out")}</Text>
       </TouchableOpacity>
 
-      <View style={styles.row}>
-        <Text style={[styles.rowText, { flex: 1 , paddingTop: 22, top:-16, }]}>
-          🌐 {t("Change Language")}
-        </Text>
-        <TouchableOpacity
-          style={styles.langBtn}
-          onPress={() => saveLanguage(language === "en" ? "ar" : "en")}
-        >
-          <Text style={{ color: "#fff" }}>
-            {language === "en" ? "English" : "العربية"}
-          </Text>
-        </TouchableOpacity>
-      </View>
+      <View style={styles.languageRow}>
+  <Text style={[styles.rowText, { flex: 1 }]}>
+    🌐 {t("Change Language")}
+  </Text>
+
+  <TouchableOpacity
+    style={styles.langBtn}
+    onPress={() => saveLanguage(language === "en" ? "ar" : "en")}
+  >
+    <Text style={styles.langBtnText}>
+      {language === "en" ? "English" : "العربية"}
+    </Text>
+  </TouchableOpacity>
+</View>
 
       <TouchableOpacity
         style={[styles.row, { backgroundColor: "#3a1a1a" }]}
@@ -205,6 +227,8 @@ const handleLogout = async () => {
       >
         <Text style={styles.rowText}>🔒 {t("Privacy Policy")}</Text>
       </TouchableOpacity>
+
+
 
 
       {/* 🎬 Footer */}
@@ -243,14 +267,31 @@ const styles = StyleSheet.create({
     marginBottom: 22,
   },
   rowText: { color: "#fff", fontSize: 13, fontWeight: "600" },
+
+  languageRow: {
+    backgroundColor: "#1a1a1a",
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 22,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  
   langBtn: {
     backgroundColor: "#111",
     borderWidth: 1,
     borderColor: "#333",
-    borderRadius: 6,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
+    borderRadius: 999,
+    paddingVertical: 7,
+    paddingHorizontal: 14,
   },
+  
+  langBtnText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "700",
+  },
+  
   footer: {
     textAlign: "center",
     marginTop: 20,

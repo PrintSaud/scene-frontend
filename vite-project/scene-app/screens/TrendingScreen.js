@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import useTranslate from "shared/utils/useTranslate";
+import useTranslate from "../../../shared/utils/useTranslate";
 import BottomNav from "../components/BottomNav";
 
 const FALLBACK_POSTER = "https://scenesa.com/default-poster.jpg";

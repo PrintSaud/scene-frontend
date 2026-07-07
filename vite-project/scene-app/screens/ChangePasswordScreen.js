@@ -11,8 +11,13 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
-import api from "shared/api/api";
-import useTranslate from "shared/utils/useTranslate";
+
+// import api from "shared/api/api";
+import api from "../../../shared/api/api";
+
+// import useTranslate from "shared/utils/useTranslate";
+import useTranslate from "../../../shared/utils/useTranslate";
+
 import { useNavigation } from "@react-navigation/native";
 
 export default function ChangePasswordScreen() {

@@ -1,29 +1,36 @@
 {
   "expo": {
-    "name": "scene-app",
+    "name": "Scene",
     "slug": "scene-app",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "sceneapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": false,
-        "jsEngine": "jsc"
-      },
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.scenesa.app",
-      "entitlements": {
-        "aps-environment": "production"
-      }
-    },
+  "supportsTablet": true,
+  "bundleIdentifier": "com.scenesa.app",
+  "buildNumber": "3",
+  "entitlements": {
+    "aps-environment": "production"
+  },
+  "infoPlist": {
+    "LSApplicationQueriesSchemes": [
+      "instagram"
+    ],
+    "NSPhotoLibraryUsageDescription": "Scene needs access to your photos so you can upload avatars, review images, list covers, and share your favorite moments in the app.",
+    "NSPhotoLibraryAddUsageDescription": "Scene needs permission to save review cards and shareable images to your photo library."
+  }
+},
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#000000"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.scenesa.app"
+      "package": "com.scenesa.app",
+      "versionCode": 3
     },
     "web": {
       "bundler": "metro",
@@ -38,7 +45,7 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#000000"
         }
       ],
       "expo-localization",
@@ -69,4 +76,4 @@
       }
     }
   }
-
+}

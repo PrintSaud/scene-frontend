@@ -14,7 +14,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage"; // ✅ import
-import useTranslate from "shared/utils/useTranslate";
+import useTranslate from "../../../../shared/utils/useTranslate";
+// import useTranslate from "shared/utils/useTranslate";
 import * as Clipboard from "expo-clipboard";
 
 const FALLBACK_AVATAR = "https://scenesa.com/default-avatar.png";

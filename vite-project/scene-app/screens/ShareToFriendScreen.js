@@ -15,8 +15,12 @@ import api, {
   suggestMovieToFriends,
   suggestReviewToFriends,
   suggestListToFriends,
-} from "shared/api/api";
-import useTranslate from "shared/utils/useTranslate";
+} from "../../../shared/api/api";
+
+// import useTranslate from "shared/utils/useTranslate";
+import useTranslate from "../../../shared/utils/useTranslate";
+
+
 
 export default function ShareToFriendScreen() {
   const navigation = useNavigation();

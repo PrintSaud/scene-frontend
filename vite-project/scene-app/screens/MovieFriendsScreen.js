@@ -11,7 +11,10 @@ import {
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import useTranslate from "shared/utils/useTranslate";
+
+import useTranslate from "../../../shared/utils/useTranslate";
+//import useTranslate from "shared/utils/useTranslate";
+
 import StarRating from "../components/StarRating";
 import { MaterialIcons, MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 

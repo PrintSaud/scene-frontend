@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useCallback, useRef } from "react"
-import {
+  import {
     View,
     Text,
     ScrollView,
@@ -10,6 +10,7 @@ import {
     ActivityIndicator,
     FlatList,
     Linking,
+    Platform,
   } from "react-native";
   
   // ✅ Correct source for AdMob
@@ -21,8 +22,13 @@ import {
   
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import useTranslate from "shared/utils/useTranslate";
-import { useLanguage } from "shared/context/LanguageContext";
+
+import useTranslate from "../../../shared/utils/useTranslate";
+// import useTranslate from "shared/utils/useTranslate";
+
+// import { useLanguage } from "shared/context/LanguageContext";
+import { useLanguage } from "../../../src/context/LanguageContext";
+
 import StarRating from "../components/StarRating";
 import BottomNav from "../components/BottomNav";
 import { LinearGradient } from "expo-linear-gradient";
@@ -33,7 +39,9 @@ import { MaterialCommunityIcons, MaterialIcons, AntDesign } from "@expo/vector-i
 import LogScreen from "./LogScreen";
 import SceneAdBanner from "../components/SceneAdBanner";
 import { Ionicons } from "@expo/vector-icons";
-import axiosInstance from "shared/api/api";
+
+import axiosInstance from "../../../shared/api/api";
+// import axiosInstance from "shared/api/api";
 
 
 const screenWidth = Dimensions.get("window").width;

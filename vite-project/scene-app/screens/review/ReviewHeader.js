@@ -16,12 +16,11 @@ import { useNavigation } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
 import * as Clipboard from "expo-clipboard";
 import { LinearGradient } from "expo-linear-gradient";
-import { AntDesign } from "@expo/vector-icons";
-import { MaterialIcons } from "@expo/vector-icons"; // ⬅️ NEW
+import { MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import StarRating from "../../components/StarRating";
-import useTranslate from "shared/utils/useTranslate";
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons } from "@expo/vector-icons";
+import useTranslate from "../../../../shared/utils/useTranslate";
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/original";
 const FALLBACK_BACKDROP = "https://scenesa.com/scene-og-review-fallback.png";
@@ -33,7 +32,7 @@ const CONTENT_WIDTH = SCREEN_WIDTH - CONTENT_SIDE_PADDING * 2;
 
 // --- Auto-sizing media that NEVER crops (contain), keeps full aspect ratio
 function MediaAuto({ uri }) {
-  const [aspect, setAspect] = useState(null); // width / height
+  const [aspect, setAspect] = useState(null);
   const [firstLoadTried, setFirstLoadTried] = useState(false);
 
   useEffect(() => {
@@ -41,32 +40,34 @@ function MediaAuto({ uri }) {
     setFirstLoadTried(false);
   }, [uri]);
 
-  // Fallback attempt to prefetch size for most http(s)/file URIs
   useEffect(() => {
     let mounted = true;
-    if (!uri || uri.startsWith("data:")) return; // Image.getSize can't parse data URIs reliably
+
+    if (!uri || uri.startsWith("data:")) return;
+
     Image.getSize(
       uri,
       (w, h) => {
         if (mounted && w && h) setAspect(w / h);
       },
-      () => {} // ignore; we'll read from onLoad below
+      () => {}
     );
+
     return () => {
       mounted = false;
     };
   }, [uri]);
 
   const onLoad = (e) => {
-    // RN exposes intrinsic size on nativeEvent.source sometimes
     const wh = e?.nativeEvent?.source;
+
     if (wh?.width && wh?.height) {
       setAspect(wh.width / wh.height);
     }
+
     setFirstLoadTried(true);
   };
 
-  // While we don't know the aspect ratio yet, show a gentle loader in a placeholder box
   if (!aspect) {
     return (
       <View style={styles.mediaShell}>
@@ -75,23 +76,23 @@ function MediaAuto({ uri }) {
           onLoad={onLoad}
           style={{ width: "100%", height: 260, resizeMode: "contain" }}
         />
+
         {!firstLoadTried && (
           <View style={styles.mediaOverlayLoader}>
-            <ActivityIndicator color="#B327F6" />{/* ⬅️ purple */}
+            <ActivityIndicator color="#B327F6" />
           </View>
         )}
       </View>
     );
   }
 
-  // When we know the aspect, let RN compute height from width via aspectRatio (no crop)
   return (
     <View style={styles.mediaShell}>
       <Image
         source={{ uri }}
         style={{
           width: "100%",
-          aspectRatio: aspect, // height = width / aspect
+          aspectRatio: aspect,
           resizeMode: "contain",
         }}
       />
@@ -101,13 +102,14 @@ function MediaAuto({ uri }) {
 
 export default function ReviewHeader({
   review,
-  userId, // may be undefined → we’ll fallback to AsyncStorage
+  userId,
   onLike,
   onProfile,
   onChangeBackdrop,
   rewatchCount,
   onEdit,
   onDelete,
+  teamHashtag,
 }) {
   const t = useTranslate();
   const navigation = useNavigation();
@@ -115,7 +117,6 @@ export default function ReviewHeader({
   const [showOptions, setShowOptions] = useState(false);
   const likeScale = useRef(new Animated.Value(1)).current;
 
-  // ---- Scene toast wrapper (swap the type to your custom one if you have it registered)
   const showSceneToast = (msg, kind = "success") =>
     Toast.show({ type: kind === "success" ? "success" : "error", text1: msg });
 
@@ -125,17 +126,18 @@ export default function ReviewHeader({
     (review.movie?.backdrop_path ? `${TMDB_IMG}${review.movie.backdrop_path}` : "") ||
     FALLBACK_BACKDROP;
 
-  // fix RN onError fallback
   const [backdropSrc, setBackdropSrc] = useState(baseBackdrop);
+
   useEffect(() => setBackdropSrc(baseBackdrop), [baseBackdrop]);
 
-  // 🕒 Timestamp rules
   const MONTHS = useMemo(
-    () => ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+    () => ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
     []
   );
+
   const formatTimestamp = (iso) => {
     if (!iso) return "";
+
     const now = Date.now();
     const then = new Date(iso).getTime();
     const diff = now - then;
@@ -152,17 +154,21 @@ export default function ReviewHeader({
 
     const d = new Date(iso);
     const label = `${MONTHS[d.getMonth()]} ${d.getDate()}`;
+
     return year >= 1 ? `${label}, ${d.getFullYear()}` : label;
   };
+
   const timestamp = review.createdAt ? formatTimestamp(review.createdAt) : "";
 
-  // ---- Fallback: read logged-in user from AsyncStorage if prop userId missing
   const [fallbackUserId, setFallbackUserId] = useState(null);
+
   useEffect(() => {
     if (userId) return;
+
     (async () => {
       try {
         const raw = await AsyncStorage.getItem("user");
+
         if (raw) {
           const parsed = JSON.parse(raw);
           setFallbackUserId(parsed?._id || parsed?.id || null);
@@ -173,24 +179,24 @@ export default function ReviewHeader({
 
   const effectiveUserId = userId ?? fallbackUserId;
 
-  // 🔐 robust owner detection (handles user._id | userId | user.id; string/oid)
   const ownerId =
     review?.user?._id ??
     review?.userId ??
     review?.user?.id ??
     null;
+
   const isOwner = String(ownerId ?? "") === String(effectiveUserId ?? "");
 
   const handleCopyLink = () => {
     const link = `https://scenesa.com/review/${review._id}`;
     Clipboard.setStringAsync(link);
-  
+
     const backdrop =
       review.customBackdrop ||
       (review.reviewBackdrop ? `${TMDB_IMG}${review.reviewBackdrop}` : "") ||
       (review.movie?.backdrop_path ? `${TMDB_IMG}${review.movie.backdrop_path}` : "") ||
       FALLBACK_BACKDROP;
-  
+
     Toast.show({
       type: "scene",
       text1: "Link copied (Previews are cooming soon!) ",
@@ -203,61 +209,78 @@ export default function ReviewHeader({
         },
       },
     });
-  
+
     setShowOptions(false);
   };
-  
-  
-  
 
   const menuItems = isOwner
     ? [
         { label: t("🎨 Change Backdrop"), onPress: onChangeBackdrop },
         { label: t("✏️ Edit Review/Log"), onPress: onEdit },
         { label: t("🗑️ Delete Review/Log"), onPress: onDelete },
-        { label: t("📤 Share to Friends"), onPress: () => navigation.navigate("ShareToFriends", { type: "log", id: review._id }) },
-        { label: t("💾 Save Photo"), onPress: () => navigation.navigate("ShareReviewPage", { id: review._id }) },
+        {
+          label: t("📤 Share to Friends"),
+          onPress: () =>
+            navigation.navigate("ShareToFriends", {
+              type: "log",
+              id: review._id,
+            }),
+        },
+        {
+          label: t("💾 Save Photo"),
+          onPress: () => navigation.navigate("ShareReviewPage", { id: review._id }),
+        },
         { label: t("🔗 Copy Link"), onPress: handleCopyLink },
       ]
     : [
-        { label: t("📤 Share to Friends"), onPress: () => navigation.navigate("ShareToFriends", { type: "log", id: review._id }) },
+        {
+          label: t("📤 Share to Friends"),
+          onPress: () =>
+            navigation.navigate("ShareToFriends", {
+              type: "log",
+              id: review._id,
+            }),
+        },
         { label: t("🔗 Copy Link"), onPress: handleCopyLink },
       ];
 
   const pulseHeart = () => {
     Animated.sequence([
-      Animated.timing(likeScale, { toValue: 1.18, duration: 120, useNativeDriver: true }),
-      Animated.spring(likeScale, { toValue: 1, friction: 5, useNativeDriver: true }),
+      Animated.timing(likeScale, {
+        toValue: 1.18,
+        duration: 120,
+        useNativeDriver: true,
+      }),
+      Animated.spring(likeScale, {
+        toValue: 1,
+        friction: 5,
+        useNativeDriver: true,
+      }),
     ]).start();
   };
 
-  // 👍 liked state — coerce ids to strings so it matches even if types differ
   const liked = (review.likes || [])
     .map((x) => String(x ?? ""))
     .includes(String(effectiveUserId ?? ""));
 
-    
-const handleBack = () => {
-    // 1) normal case
+  const handleBack = () => {
     if (navigation.canGoBack()) {
       navigation.goBack();
       return;
     }
-  
-    // 2) if we know the movie, jump there
+
     const movieId = review?.movie?.id || review?.movie;
+
     if (movieId) {
       navigation.replace("Movie", { id: movieId });
       return;
     }
-  
-    // 3) last resort: land on your root/home tab (⚠️ change "Home" if different)
+
     navigation.reset({
       index: 0,
       routes: [{ name: "Home" }],
     });
   };
-  
 
   return (
     <View>
@@ -269,27 +292,37 @@ const handleBack = () => {
           onError={() => setBackdropSrc(FALLBACK_BACKDROP)}
         />
 
-        {/* REAL gradient fade into content */}
         <LinearGradient
           pointerEvents="none"
-          colors={["rgba(14,14,14,0)", "rgba(14,14,14,0.45)", "rgba(14,14,14,0.85)", "rgba(14,14,14,1)"]}
+          colors={[
+            "rgba(14,14,14,0)",
+            "rgba(14,14,14,0.45)",
+            "rgba(14,14,14,0.85)",
+            "rgba(14,14,14,1)",
+          ]}
           locations={[0, 0.35, 0.7, 1]}
           style={styles.gradient}
         />
 
         {/* Top buttons */}
         <View style={styles.topButtons}>
-          <TouchableOpacity style={styles.circleButton} onPress={() => navigation.goBack()}>
+          <TouchableOpacity style={styles.circleButton} onPress={handleBack}>
             <Text style={styles.iconText}>←</Text>
           </TouchableOpacity>
 
           <View>
-            <TouchableOpacity style={styles.circleButton} onPress={() => setShowOptions((p) => !p)}>
+            <TouchableOpacity
+              style={styles.circleButton}
+              onPress={() => setShowOptions((p) => !p)}
+            >
               <Text style={styles.iconText}>⋯</Text>
             </TouchableOpacity>
 
             <Modal visible={showOptions} transparent animationType="fade">
-              <Pressable style={styles.modalOverlay} onPress={() => setShowOptions(false)}>
+              <Pressable
+                style={styles.modalOverlay}
+                onPress={() => setShowOptions(false)}
+              >
                 <View style={styles.menu}>
                   {menuItems.map((item, i) => (
                     <TouchableOpacity
@@ -314,7 +347,9 @@ const handleBack = () => {
           <TouchableOpacity
             style={styles.goMovieBtn}
             onPress={() =>
-              navigation.navigate("Movie", { id: review.movie?.id || review.movie })
+              navigation.navigate("Movie", {
+                id: review.movie?.id || review.movie,
+              })
             }
           >
             <Text style={styles.goMovieText}>{t("Go to Movie")}</Text>
@@ -322,51 +357,53 @@ const handleBack = () => {
         )}
       </View>
 
-{/* Content */}
-{/* Content */}
-<View style={styles.content}>
-  {review.user && (
-    <>
-      <View style={styles.userRow}>
-        {/* Avatar → Profile */}
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate("ProfileScreen", { id: review.user._id })
-          }
-        >
-          <Image
-            source={{ uri: review.user?.avatar || FALLBACK_AVATAR }}
-            style={styles.avatar}
-          />
-        </TouchableOpacity>
+      {/* Content */}
+      <View style={styles.content}>
+        {review.user && (
+          <>
+            <View style={styles.userRow}>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("ProfileScreen", { id: review.user._id })
+                }
+              >
+                <Image
+                  source={{ uri: review.user?.avatar || FALLBACK_AVATAR }}
+                  style={styles.avatar}
+                />
+              </TouchableOpacity>
 
-        {/* Username → Profile */}
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate("ProfileScreen", { id: review.user._id })
-          }
-        >
-          <Text style={styles.username}>@{review.user.username}</Text>
-        </TouchableOpacity>
-      </View>
-
-
-
-
-
-
-
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("ProfileScreen", { id: review.user._id })
+                }
+              >
+                <Text style={styles.username}>@{review.user.username}</Text>
+              </TouchableOpacity>
+            </View>
 
             <View style={styles.rowBetween}>
-              <View style={[styles.row, { gap: 6 }]}>
-                <StarRating rating={review.rating} />
-                {rewatchCount > 0 && (
-                  <View style={styles.rewatchWrap}>
-                    <MaterialIcons name="refresh" size={12} color="#aaa" />
-                    <Text style={styles.rewatchText}>{rewatchCount}x</Text>
-                  </View>
-                )}
+              <View style={styles.ratingColumn}>
+                <View style={styles.ratingMetaRow}>
+                  <StarRating rating={review.rating} />
+
+                  {rewatchCount > 0 && (
+                    <View style={styles.rewatchWrap}>
+                      <MaterialIcons name="refresh" size={12} color="#aaa" />
+                      <Text style={styles.rewatchText}>{rewatchCount}x</Text>
+                    </View>
+                  )}
+
+{teamHashtag ? (
+  <View style={styles.teamHashtagPill}>
+    <Text style={styles.teamHashtag} numberOfLines={1}>
+      {teamHashtag}
+    </Text>
+  </View>
+) : null}
+                </View>
               </View>
+
               {timestamp ? <Text style={styles.timestamp}>{timestamp}</Text> : null}
             </View>
           </>
@@ -376,42 +413,37 @@ const handleBack = () => {
           <Text style={styles.reviewText}>{review.review}</Text>
         )}
 
-        {/* FULL media, never cropped */}
         {review.image ? <MediaAuto uri={review.image} /> : null}
         {review.gif ? <MediaAuto uri={review.gif} /> : null}
 
         <View style={styles.rowEnd}>
-          {/* Purple animated heart (Scene-style, smaller) */}
+          <TouchableOpacity
+            hitSlop={{ top: 8, right: 8, bottom: 8, left: 8 }}
+            activeOpacity={0.7}
+            onPress={() => {
+              if (!effectiveUserId) {
+                showSceneToast(t("You must be logged in to like."), "error");
+                return;
+              }
 
+              onLike?.();
+              pulseHeart();
+            }}
+            accessibilityRole="button"
+            accessibilityLabel={liked ? t("Unlike") : t("Like")}
+          >
+            <Animated.View style={{ transform: [{ scale: likeScale }] }}>
+              <Ionicons
+                name={liked ? "heart" : "heart-outline"}
+                size={18}
+                color={liked ? "#B327F6" : "#9BA1A6"}
+              />
+            </Animated.View>
+          </TouchableOpacity>
 
-{/* Purple animated heart (Scene-style, smaller) */}
-<TouchableOpacity
-  hitSlop={{ top: 8, right: 8, bottom: 8, left: 8 }}
-  activeOpacity={0.7}
-  onPress={() => {
-    if (!effectiveUserId) {
-      showSceneToast(t("You must be logged in to like."), "error");
-      return;
-    }
-    onLike?.();
-    pulseHeart();
-  }}
-  accessibilityRole="button"
-  accessibilityLabel={liked ? t("Unlike") : t("Like")}
->
-<Animated.View style={{ transform: [{ scale: likeScale }] }}>
-  <Ionicons
-    name={liked ? "heart" : "heart-outline"}
-    size={18}
-    color={liked ? "#B327F6" : "#9BA1A6"}
-  />
-</Animated.View>
-</TouchableOpacity>
-
-<Text style={[styles.likeCount, liked && { color: "#B327F6" }]}>
-  {Array.isArray(review?.likes) ? review.likes.length : 0}
-</Text>
-
+          <Text style={[styles.likeCount, liked && { color: "#B327F6" }]}>
+            {Array.isArray(review?.likes) ? review.likes.length : 0}
+          </Text>
 
           <TouchableOpacity
             style={styles.replyBtn}
@@ -426,8 +458,16 @@ const handleBack = () => {
 }
 
 const styles = StyleSheet.create({
-  backdropWrapper: { height: 240, marginBottom: -48 },
-  backdrop: { width: "100%", height: "100%" },
+  backdropWrapper: {
+    height: 240,
+    marginBottom: -48,
+  },
+
+  backdrop: {
+    width: "100%",
+    height: "100%",
+  },
+
   gradient: {
     position: "absolute",
     left: 0,
@@ -435,6 +475,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     height: "82%",
   },
+
   topButtons: {
     position: "absolute",
     top: 52,
@@ -443,6 +484,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
+
   circleButton: {
     backgroundColor: "rgba(0,0,0,0.5)",
     borderRadius: 16,
@@ -451,7 +493,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  iconText: { color: "#fff", fontSize: 18 },
+
+  iconText: {
+    color: "#fff",
+    fontSize: 18,
+  },
+
   modalOverlay: {
     flex: 1,
     justifyContent: "flex-start",
@@ -460,6 +507,7 @@ const styles = StyleSheet.create({
     paddingRight: 12,
     backgroundColor: "rgba(0,0,0,0.5)",
   },
+
   menu: {
     backgroundColor: "#1a1a1a",
     borderRadius: 12,
@@ -467,8 +515,17 @@ const styles = StyleSheet.create({
     width: 220,
     top: 32,
   },
-  menuItem: { paddingVertical: 12, paddingHorizontal: 14 },
-  menuText: { color: "#fff", fontSize: 14.5 },
+
+  menuItem: {
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+  },
+
+  menuText: {
+    color: "#fff",
+    fontSize: 14.5,
+  },
+
   goMovieBtn: {
     position: "absolute",
     bottom: 40,
@@ -478,13 +535,33 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 8,
   },
-  goMovieText: { color: "#fff", fontSize: 12 },
 
-  content: { padding: CONTENT_SIDE_PADDING },
+  goMovieText: {
+    color: "#fff",
+    fontSize: 12,
+  },
 
-  userRow: { flexDirection: "row", alignItems: "center" },
-  avatar: { width: 28, height: 28, borderRadius: 14, marginRight: 8 },
-  username: { fontSize: 13, color: "#fff", opacity: 0.9 },
+  content: {
+    padding: CONTENT_SIDE_PADDING,
+  },
+
+  userRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  avatar: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    marginRight: 8,
+  },
+
+  username: {
+    fontSize: 13,
+    color: "#fff",
+    opacity: 0.9,
+  },
 
   rowBetween: {
     flexDirection: "row",
@@ -492,17 +569,58 @@ const styles = StyleSheet.create({
     marginTop: 4,
     alignItems: "center",
   },
-  row: { flexDirection: "row", alignItems: "center" },
 
-  // ⬇️ rewatch bits
-  rewatchWrap: { flexDirection: "row", alignItems: "center" },
-  rewatchText: { fontSize: 10, color: "#aaa", marginLeft: 2 },
+  ratingColumn: {
+    flex: 1,
+    paddingRight: 10,
+  },
 
-  timestamp: { fontSize: 11, color: "#aaa" },
+  ratingMetaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    flexWrap: "wrap",
+  },
 
-  reviewText: { marginTop: 8, fontSize: 14, color: "#ddd", lineHeight: 20 },
+  teamHashtagPill: {
+    backgroundColor: "rgba(179,39,246,0.22)",
+    borderWidth: 1,
+    borderColor: "rgba(179,39,246,0.75)",
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    maxWidth: 180,
+  },
+  
+  teamHashtag: {
+    color: "#fff",
+    fontSize: 11.5,
+    fontWeight: "900",
+  },
 
-  // media wrapper with rounded corners; image itself uses contain+aspect
+  rewatchWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  rewatchText: {
+    fontSize: 10,
+    color: "#aaa",
+    marginLeft: 2,
+  },
+
+  timestamp: {
+    fontSize: 11,
+    color: "#aaa",
+  },
+
+  reviewText: {
+    marginTop: 8,
+    fontSize: 14,
+    color: "#ddd",
+    lineHeight: 20,
+  },
+
   mediaShell: {
     width: CONTENT_WIDTH,
     alignSelf: "center",
@@ -511,6 +629,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     backgroundColor: "#111",
   },
+
   mediaOverlayLoader: {
     ...StyleSheet.absoluteFillObject,
     alignItems: "center",
@@ -524,7 +643,14 @@ const styles = StyleSheet.create({
     marginTop: 8,
     gap: 8,
   },
-  likeCount: { fontSize: 13, color: "#fff", marginLeft: 4, marginRight: 12 },
+
+  likeCount: {
+    fontSize: 13,
+    color: "#fff",
+    marginLeft: 4,
+    marginRight: 12,
+  },
+
   replyBtn: {
     borderWidth: 1,
     borderColor: "#555",
@@ -532,5 +658,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
   },
-  replyText: { fontSize: 12, color: "#fff" },
+
+  replyText: {
+    fontSize: 12,
+    color: "#fff",
+  },
 });
+

@@ -19,8 +19,8 @@ import ProfileTabWatchlist from "../components/profile/ProfileTabWatchlist";
 import ProfileTabLists from "../components/profile/ProfileTabLists";
 import ProfileTabFilms from "../components/profile/ProfileTabFilms";
 
-import api, { getUserProfile, getCustomPostersBatch } from "shared/api/api";
-import useTranslate from "shared/utils/useTranslate";
+import api, { getUserProfile, getCustomPostersBatch } from "../../../shared/api/api";
+import useTranslate from "../../../shared/utils/useTranslate";
 
 export default function ProfilePage() {
   const route = useRoute();

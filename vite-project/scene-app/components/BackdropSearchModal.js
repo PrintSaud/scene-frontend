@@ -14,9 +14,14 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import axios from "axios";
-import filterMovies from "shared/utils/filterMovies"; // ⬅️ use the shared filter
-import useTranslate from "shared/utils/useTranslate";
-import { useLanguage } from "shared/context/LanguageContext";
+// import filterMovies from "shared/utils/filterMovies"; // ⬅️ use the shared filter
+import filterMovies from "../../../shared/utils/filterMovies";
+
+import useTranslate from "../../../shared/utils/useTranslate";
+import { useLanguage } from "../../../shared/context/LanguageContext";
+
+// import useTranslate from "shared/utils/useTranslate";
+// import { useLanguage } from "shared/context/LanguageContext";
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 const TMDB_ORIGINAL = "https://image.tmdb.org/t/p/original";

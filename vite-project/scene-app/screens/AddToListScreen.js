@@ -11,10 +11,11 @@ import {
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
-import AntDesign from "@expo/vector-icons/AntDesign"; // ✅ instead of react-icons
- // ✅ real Scene heart
-import api from "shared/api/api";
-import useTranslate from "shared/utils/useTranslate";
+import AntDesign from "@expo/vector-icons/AntDesign"; // ✅ instead of react-icons // ✅ real Scene heart
+// import api from "shared/api/api";
+import api from "../../../shared/api/api";
+// import useTranslate from "shared/utils/useTranslate";
+import useTranslate from "../../../shared/utils/useTranslate";
 
 export default function AddToListScreen() {
   const navigation = useNavigation();

@@ -12,8 +12,9 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
-import api, { toggleWatchlist } from "shared/api/api";
-import useTranslate from "shared/utils/useTranslate";
+import api, { toggleWatchlist } from "../../../../shared/api/api";
+import useTranslate from "../../../../shared/utils/useTranslate";
+// import useTranslate from "shared/utils/useTranslate";
 
 
 export default function MovieTopBar({ movie, setShowPosterModal }) {

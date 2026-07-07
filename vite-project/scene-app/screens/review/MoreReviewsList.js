@@ -2,7 +2,8 @@
 import React, { useMemo, useState } from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import StarRating from "../../components/StarRating";
-import useTranslate from "shared/utils/useTranslate";
+// import useTranslate from "shared/utils/useTranslate";
+import useTranslate from "../../../../shared/utils/useTranslate";
 
 const FALLBACK_POSTER = "https://scenesa.com/default-poster.jpg";
 

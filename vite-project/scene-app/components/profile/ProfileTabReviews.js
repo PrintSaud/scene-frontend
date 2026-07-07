@@ -10,7 +10,8 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MaterialIcons } from "@expo/vector-icons";
-import useTranslate from "shared/utils/useTranslate";
+import useTranslate from "../../../../shared/utils/useTranslate";
+// import useTranslate from "shared/utils/useTranslate";
 import StarRating from "../StarRating";
 
 const FALLBACK_POSTER = "https://scenesa.com/default-poster.jpg";

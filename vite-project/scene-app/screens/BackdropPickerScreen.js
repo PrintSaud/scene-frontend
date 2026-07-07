@@ -12,9 +12,14 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import api, { backend } from "shared/api/api";
-import useTranslate from "shared/utils/useTranslate";
-import filterMovies from "shared/utils/filterMovies";
+
+import api, { backend } from "../../../shared/api/api";
+
+import useTranslate from "../../../shared/utils/useTranslate";
+// import useTranslate from "shared/utils/useTranslate";
+
+import filterMovies from "../../../shared/utils/filterMovies";
+// import filterMovies from "shared/utils/filterMovies";
 
 const FALLBACK_POSTER = "https://scenesa.com/default-poster.jpg";
 

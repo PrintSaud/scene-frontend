@@ -13,9 +13,11 @@ import {
   Pressable,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import api, { getCustomPostersBatch } from "shared/api/api";
-import getPosterUrl from "shared/utils/getPosterUrl";
-import useTranslate from "shared/utils/useTranslate";
+import api, { getCustomPostersBatch } from "../../../../shared/api/api";
+import getPosterUrl from "../../../../shared/utils/getPosterUrl";
+// import getPosterUrl from "shared/utils/getPosterUrl";
+import useTranslate from "../../../../shared/utils/useTranslate";
+// import useTranslate from "shared/utils/useTranslate";
 
 const FALLBACK_POSTER = "https://scenesa.com/default-poster.jpg";
 

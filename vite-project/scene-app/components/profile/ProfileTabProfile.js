@@ -12,9 +12,11 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import StarRating from "../StarRating";
-import getPosterUrl from "shared/utils/getPosterUrl";
-import useTranslate from "shared/utils/useTranslate";
-import { getPlatformIcon } from "shared/utils/getPlatformIcon";
+import getPosterUrl from "../../../../shared/utils/getPosterUrl";
+// import getPosterUrl from "shared/utils/getPosterUrl";
+import useTranslate from "../../../../shared/utils/useTranslate";
+// import useTranslate from "shared/utils/useTranslate";
+import { getPlatformIcon } from "../../../../shared/utils/getPlatformIcon";
 
 const FALLBACK_POSTER = "https://scenesa.com/default-poster.jpg";
 const FALLBACK_AVATAR = "https://scenesa.com/default-avatar.png";

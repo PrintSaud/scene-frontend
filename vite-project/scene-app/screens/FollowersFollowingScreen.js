@@ -11,9 +11,18 @@ import {
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import useTranslate from "shared/utils/useTranslate";
-import api from "shared/api/api";
-import { backend } from "shared/config";
+
+import useTranslate from "../../../shared/utils/useTranslate";
+// import useTranslate from "shared/utils/useTranslate";
+
+// import api from "shared/api/api";
+import api from "../../../shared/api/api";
+import { backend } from "../../../shared/config";
+
+// from "shared/config";
+
+
+
 
 const FALLBACK_AVATAR = "https://scenesa.com/default-avatar.png";
 

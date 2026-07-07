@@ -10,7 +10,8 @@ import {
   Modal,
   Pressable,
 } from "react-native";
-import useTranslate from "shared/utils/useTranslate";
+import useTranslate from "../../../../shared/utils/useTranslate";
+// import useTranslate from "shared/utils/useTranslate";
 
 const LOGO_BASE = "https://image.tmdb.org/t/p/w92";
 

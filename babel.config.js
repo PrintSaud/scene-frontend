@@ -15,7 +15,6 @@ module.exports = function (api) {
         },
       ],
       // 👇 Must always be last for Reanimated to work correctly
-      "react-native-reanimated/plugin",
     ],
   };
 };

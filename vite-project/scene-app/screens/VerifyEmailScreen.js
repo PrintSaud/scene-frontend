@@ -9,8 +9,11 @@ import {
   ActivityIndicator,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import api from "shared/api/api";
-import { useUser } from "../../App";  // ✅ global user context
+import api from "../../../shared/api/api";
+
+// import api from "shared/api/api";
+// import { useUser } from "../../App";  // ✅ global user context
+import { useUser } from "../../../App";
 
 export default function VerifyEmailScreen() {
   const [code, setCode] = useState("");

@@ -10,7 +10,8 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
-import useTranslate from "shared/utils/useTranslate";
+import useTranslate from "../../../../shared/utils/useTranslate";
+// import useTranslate from "shared/utils/useTranslate";
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
 

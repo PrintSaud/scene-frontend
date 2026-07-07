@@ -20,9 +20,11 @@ import {
   getSavedLists,
   getPopularLists,
   getFriendsLists,
-} from "shared/api/api";
-import api from "shared/api/api";
-import useTranslate from "shared/utils/useTranslate";
+} from "../../../../shared/api/api";
+import api from "../../../../shared/api/api";
+// import api from "shared/api/api";
+import useTranslate from "../../../../shared/utils/useTranslate";
+// import useTranslate from "shared/utils/useTranslate";
 import { MaterialIcons } from "@expo/vector-icons";
 
 export default function ProfileTabLists({

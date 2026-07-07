@@ -11,12 +11,23 @@ import {
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { likeLog } from "shared/api/api";
-import useTranslate from "shared/utils/useTranslate";
+
+// import { likeLog } from "shared/api/api";
+
+import { likeLog } from "../../../shared/api/api";
+
+import useTranslate from "../../../shared/utils/useTranslate";
+//import useTranslate from "shared/utils/useTranslate";
+
 import StarRating from "../components/StarRating";
-import { formatTimestamp } from "shared/utils/time";
+
+import { formatTimestamp } from "../../../shared/utils/time";
+// import { formatTimestamp } from "shared/utils/time";
+
 import { MaterialIcons } from "@expo/vector-icons";
-import api from "shared/api/api";
+// import api from "shared/api/api";
+import api from "../../../shared/api/api";
+
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w300";
 const FALLBACK_POSTER = "https://scenesa.com/default-poster.jpg";

@@ -11,10 +11,12 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
-import { useLanguage } from "shared/context/LanguageContext";
-import api from "shared/api/api";
+
+import { useLanguage } from "../../../src/context/LanguageContext";
+import api from "../../../axiosInstance";
+
 import { LinearGradient } from "expo-linear-gradient";
-import { useUser } from "../../App"; // adjust path if needed
+import { useUser } from "../../../App";
 
 const { width, height } = Dimensions.get("window");
 
@@ -26,40 +28,72 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
 
   const navigation = useNavigation();
-  const { setLanguage } = useLanguage();
+  // const { setLanguage } = useLanguage();
 
  
-
-
   const handleLogin = async () => {
     setError("");
     setIsLoading(true);
   
     try {
       const res = await api.post(`/api/auth/login`, { email, password });
-      const mergedUser = { ...res.data.user, _id: res.data.user._id, token: res.data.token };
   
-      await AsyncStorage.setItem("user", JSON.stringify(mergedUser));
-      setUser(mergedUser);
-      setLanguage(res.data.user?.language || "en");
+      const mergedUser = {
+        ...res.data.user,
+        _id: res.data.user._id,
+        token: res.data.token,
+      };
   
-      // 🚨 Navigate based on emailVerified
+      // If email is not verified, stay in auth flow
       if (res.data.user?.emailVerified === false) {
         navigation.navigate("VerifyEmail", { email: res.data.user.email });
-      } else {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "Home" }],
-        });
+        return;
       }
+  
+      // Save user after successful verified login
+      await AsyncStorage.setItem("user", JSON.stringify(mergedUser));
+  
+      // This is enough. App.js will switch from Login stack to MainTabs.
+      setUser(mergedUser);
+  
     } catch (err) {
-      console.error(err);
+      console.error("Login error:", err?.response?.data || err.message || err);
       setError("Login failed. Please check your credentials.");
       Alert.alert("Error", "Login failed. Please check your credentials.");
     } finally {
       setIsLoading(false);
     }
   };
+
+ // const handleLogin = async () => {
+  //  setError("");
+  //  setIsLoading(true);
+  
+  //  try {
+    //  const res = await api.post(`/api/auth/login`, { email, password });
+     // const mergedUser = { ...res.data.user, _id: res.data.user._id, token: res.data.token };
+  
+    //  await AsyncStorage.setItem("user", JSON.stringify(mergedUser));
+    //  setUser(mergedUser);
+      // setLanguage(res.data.user?.language || "en");
+  
+      // 🚨 Navigate based on emailVerified
+     // if (res.data.user?.emailVerified === false) {
+     //   navigation.navigate("VerifyEmail", { email: res.data.user.email });
+    //  } else {
+      //  navigation.reset({
+      //    index: 0,
+       //   routes: [{ name: "Home" }],
+     //   });
+   //   }
+  //  } catch (err) {
+     // console.error(err);
+    //  setError("Login failed. Please check your credentials.");
+    //  Alert.alert("Error", "Login failed. Please check your credentials.");
+  //  } finally {
+  //    setIsLoading(false);
+  //  }
+ // };
   
 
   

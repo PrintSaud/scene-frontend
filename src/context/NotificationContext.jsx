@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { AppState } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import api from "shared/api/api";
-import { socket } from "shared/socket";
+import api from "../api/api";
+import { socket } from "../socket";
 
 const NotificationContext = createContext();
 

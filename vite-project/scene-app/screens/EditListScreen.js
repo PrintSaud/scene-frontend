@@ -19,8 +19,11 @@ import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 
-import api from "shared/api/api";
-import useTranslate from "shared/utils/useTranslate";
+import api from "../../../shared/api/api";
+// import api from "shared/api/api";
+
+import useTranslate from "../../../shared/utils/useTranslate";
+// import useTranslate from "shared/utils/useTranslate";
 import AddMovieModal from "../components/AddMovieModal"; // ✅ correct path
 
 const TMDB_IMG = "https://image.tmdb.org/t/p/w500";

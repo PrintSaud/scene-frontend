@@ -16,9 +16,14 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
 import Toast from "react-native-toast-message";
 import * as ImagePicker from "expo-image-picker";
-import api from "shared/api/api";
-import useTranslate from "shared/utils/useTranslate";
-import { getPlatformIcon } from "shared/utils/getPlatformIcon";
+
+import api from "../../../shared/api/api";
+//import api from "shared/api/api";
+// import useTranslate from "shared/utils/useTranslate";
+import useTranslate from "../../../shared/utils/useTranslate";
+
+// import getPlatformIcon from "../../../shared/utils/getPlatformIcon";
+import { getPlatformIcon } from "../../../shared/utils/getPlatformIcon";
 import AddMovieModal from "../components/AddMovieModal";
 import BackdropSearchModal from "../components/BackdropSearchModal";
 
@@ -66,34 +71,78 @@ export default function EditProfileScreen() {
 
   // 🔄 Load user
   useEffect(() => {
-    (async () => {
+    const loadProfile = async () => {
       try {
         const stored = await AsyncStorage.getItem("user");
-        if (!stored) return;
-
+        if (!stored) {
+          setLoading(false);
+          return;
+        }
+  
         const parsed = JSON.parse(stored);
         setUser(parsed);
-
+  
+        // 1) quick local fallback so screen opens fast
         setBio(parsed.bio || "");
         setAvatar(parsed.avatar || "");
         setBackdrop(parsed.profileBackdrop || "");
-        setFavoriteFilms(parsed.favoriteFilms || []);
+        setFavoriteFilms(Array.isArray(parsed.favoriteFilms) ? parsed.favoriteFilms : []);
         setSocials({
-            X: parsed.socials?.X || "",
-            youtube: parsed.socials?.youtube || "",
-            instagram: parsed.socials?.instagram || "",
-            tiktok: parsed.socials?.tiktok || "",
-            imdb: parsed.socials?.imdb || "",
-            tmdb: parsed.socials?.tmdb || "",
-            website: parsed.socials?.website || "",
-          });
-                                  
+          X: parsed.socials?.X || "",
+          youtube: parsed.socials?.youtube || "",
+          instagram: parsed.socials?.instagram || "",
+          tiktok: parsed.socials?.tiktok || "",
+          imdb: parsed.socials?.imdb || "",
+          tmdb: parsed.socials?.tmdb || "",
+          website: parsed.socials?.website || "",
+        });
+  
+        // 2) fetch fresh backend profile
+        const res = await api.get(`/api/users/${parsed._id}`);
+        const freshUser = res?.data?.user || res?.data || null;
+  
+        if (!freshUser) {
+          setLoading(false);
+          return;
+        }
+  
+        const mergedUser = {
+          ...parsed,
+          ...freshUser,
+          socials: freshUser.socials || parsed.socials || {},
+          favoriteFilms: Array.isArray(freshUser.favoriteFilms)
+            ? freshUser.favoriteFilms
+            : parsed.favoriteFilms || [],
+          profileBackdrop:
+            freshUser.profileBackdrop || parsed.profileBackdrop || "",
+        };
+  
+        setUser(mergedUser);
+        setBio(mergedUser.bio || "");
+        setAvatar(mergedUser.avatar || "");
+        setBackdrop(mergedUser.profileBackdrop || "");
+        setFavoriteFilms(
+          Array.isArray(mergedUser.favoriteFilms) ? mergedUser.favoriteFilms : []
+        );
+        setSocials({
+          X: mergedUser.socials?.X || "",
+          youtube: mergedUser.socials?.youtube || "",
+          instagram: mergedUser.socials?.instagram || "",
+          tiktok: mergedUser.socials?.tiktok || "",
+          imdb: mergedUser.socials?.imdb || "",
+          tmdb: mergedUser.socials?.tmdb || "",
+          website: mergedUser.socials?.website || "",
+        });
+  
+        await AsyncStorage.setItem("user", JSON.stringify(mergedUser));
       } catch (err) {
-        console.error("❌ Failed to load user", err);
+        console.error("❌ Failed to load fresh profile", err.response?.data || err);
       } finally {
         setLoading(false);
       }
-    })();
+    };
+  
+    loadProfile();
   }, []);
 
   // 📸 Change photo
@@ -143,7 +192,10 @@ export default function EditProfileScreen() {
   
       // ✅ update local state + AsyncStorage
       setAvatar(data.avatar);
-      await AsyncStorage.setItem("user", JSON.stringify({ ...me, avatar: data.avatar }));
+      const updated = { ...me, avatar: data.avatar };
+setUser(updated);
+setAvatar(data.avatar);
+await AsyncStorage.setItem("user", JSON.stringify(updated));
   
       Toast.show({ type: "scene", text1: "✅ Avatar updated!" });
     } catch (err) {
@@ -170,10 +222,15 @@ export default function EditProfileScreen() {
   
       console.log("✅ Response:", res.data);
   
+      const returnedUser = res?.data?.user || {};
       const merged = {
         ...user,
-        ...res.data.user,
-        socials: res.data.user.socials || {},
+        ...returnedUser,
+        bio,
+        avatar,
+        profileBackdrop: backdrop,
+        favoriteFilms,
+        socials: returnedUser.socials || socials || {},
       };
       
       // https://www.instagram.com/hhhhiimmmm?igsh=MW5mY2VieXQ1bm13bg%3D%3D&utm_source=qr

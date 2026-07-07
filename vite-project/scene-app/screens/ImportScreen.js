@@ -15,8 +15,11 @@ import { useNavigation } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
 import Toast from "react-native-toast-message";
 import SceneAdBanner from "../components/SceneAdBanner";
-import api from "shared/api/api";
-import useTranslate from "shared/utils/useTranslate";
+// import api from "shared/api/api";
+import api from "../../../shared/api/api";
+
+// import useTranslate from "shared/utils/useTranslate";
+import useTranslate from "../../../shared/utils/useTranslate";
 
 const importEndpoints = {
   diary: "/api/letterboxd/logs",

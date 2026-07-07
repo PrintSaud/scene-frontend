@@ -12,7 +12,8 @@ import {
   Pressable,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import api from "shared/api/api";
+// import api from "shared/api/api";
+import api from "../../../shared/api/api";
 
 const GIPHY_API = "https://api.giphy.com/v1/gifs";
 const API_KEY = process.env.EXPO_PUBLIC_GIPHY_API_KEY;
@@ -164,7 +165,8 @@ export default function GifSearchModal({ visible, onSelect, onClose }) {
           {/* Attribution */}
           <View style={{ alignItems: "center", marginTop: 12 }}>
           <Image
-  source={require("../../assets/images/PoweredBy_200px-White_HorizLogo.png")}
+//  source={require("../../../../assets/images/PoweredBy_200px-White_HorizLogo.png")}
+  source={require("../../../assets/images/PoweredBy_200px-White_HorizLogo.png")}
   style={{ width: 100, height: 30, resizeMode: "contain" }}
 />
 

@@ -17,11 +17,16 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { addLogReply, likeReply, deleteReply } from "shared/api/api";
+import { addLogReply, likeReply, deleteReply } from "../../../../shared/api/api";
 import StarRating from "../../components/StarRating";
 import GifSearchModal from "../../components/GifSearchModal"; // RN version
-import useTranslate from "shared/utils/useTranslate";
-import api from "shared/api/api";
+
+import api from "../../../../shared/api/api";
+import useTranslate from "../../../../shared/utils/useTranslate";
+
+//import useTranslate from "shared/utils/useTranslate";
+// import api from "shared/api/api";
+
 import { Ionicons } from "@expo/vector-icons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
@@ -406,42 +411,75 @@ export default function RepliesPage() {
 </ScrollView>
 
 
-      {/* Composer */}
-      <View style={styles.composer}>
-        {(selectedGif || selectedImage) && (
-          <View style={styles.preview}>
-            <Image source={{ uri: selectedGif || selectedImage }} style={styles.previewImg} />
-            <TouchableOpacity
-              style={styles.removeBtn}
-              onPress={() => {
-                setSelectedGif("");
-                setSelectedImage("");
-              }}
-            >
-              <Text style={{ color: "#fff" }}>×</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-        <View style={styles.row}>
-          <TouchableOpacity onPress={handlePickImage}>
-            <Text style={styles.attachBtn}>Photo</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setShowGifModal(true)}>
-            <Text style={styles.attachBtn}>GIF</Text>
-          </TouchableOpacity>
-          <TextInput
-            ref={inputRef}
-            value={input}
-            onChangeText={setInput}
-            placeholder={t("Write a comment...")}
-            placeholderTextColor="#aaa"
-            style={styles.input}
-          />
-          <TouchableOpacity onPress={handleSend}>
-            <Text style={styles.sendBtn}>➤</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+{/* Composer */}
+<View style={styles.composer}>
+  {(selectedGif || selectedImage) && (
+    <View style={styles.preview}>
+      <Image
+        source={{ uri: selectedGif || selectedImage }}
+        style={styles.previewImg}
+      />
+
+      <TouchableOpacity
+        style={styles.removeBtn}
+        onPress={() => {
+          setSelectedGif("");
+          setSelectedImage("");
+        }}
+      >
+        <Ionicons name="close" size={15} color="#fff" />
+      </TouchableOpacity>
+    </View>
+  )}
+
+  <View style={styles.glassInputWrap}>
+    <TouchableOpacity
+      onPress={handlePickImage}
+      style={styles.iconBtn}
+      activeOpacity={0.75}
+    >
+      <Ionicons
+        name="image-outline"
+        size={22}
+        color="rgba(255,255,255,0.68)"
+      />
+    </TouchableOpacity>
+
+    <TouchableOpacity
+      onPress={() => setShowGifModal(true)}
+      style={styles.gifBtn}
+      activeOpacity={0.75}
+    >
+      <Text style={styles.gifText}>GIF</Text>
+    </TouchableOpacity>
+
+    <TextInput
+      ref={inputRef}
+      value={input}
+      onChangeText={setInput}
+      placeholder={String(t("Write a comment...") || "Write a comment...")}
+      placeholderTextColor="rgba(255,255,255,0.34)"
+      style={styles.input}
+      multiline={false}
+      returnKeyType="send"
+      onSubmitEditing={handleSend}
+    />
+
+    <TouchableOpacity
+      onPress={handleSend}
+      disabled={!input.trim() && !selectedGif && !selectedImage}
+      style={[
+        styles.sendCircle,
+        !input.trim() && !selectedGif && !selectedImage
+          ? styles.sendCircleDisabled
+          : null,
+      ]}
+      activeOpacity={0.8}
+    >
+      <Ionicons name="arrow-up" size={20} color="#fff" />
+    </TouchableOpacity>
+  </View>
+</View>
 
       {showGifModal && (
         <GifSearchModal
@@ -456,8 +494,119 @@ export default function RepliesPage() {
   );
 }
 
+
+
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#0e0e0e" },
+
+  container: { 
+    flex: 1, 
+    backgroundColor: "#000000" 
+  },
+
+  //
+
+  composer: {
+    borderTopWidth: 0.5,
+    borderTopColor: "rgba(255,255,255,0.08)",
+    paddingHorizontal: 24,
+    paddingTop: 10,
+    paddingBottom: Platform.OS === "ios" ? 24 : 14,
+    backgroundColor: "#000000",
+  },
+  
+  preview: {
+    position: "relative",
+    marginBottom: 8,
+    alignSelf: "flex-start",
+  },
+  
+  previewImg: {
+    width: 170,
+    height: 170,
+    borderRadius: 12,
+    backgroundColor: "#111",
+  },
+  
+  removeBtn: {
+    position: "absolute",
+    top: 7,
+    right: 7,
+    backgroundColor: "rgba(0,0,0,0.65)",
+    borderRadius: 14,
+    width: 26,
+    height: 26,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  
+  glassInputWrap: {
+    height: 58,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(255,255,255,0.08)",
+    borderRadius: 999,
+    borderWidth: 0.5,
+    borderColor: "rgba(255,255,255,0.18)",
+    paddingLeft: 14,
+    paddingRight: 6,
+    paddingVertical: 5,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.28,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 6,
+      },
+    }),
+  },
+  
+  iconBtn: {
+    width: 34,
+    height: 42,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  
+  gifBtn: {
+    height: 42,
+    paddingHorizontal: 8,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  
+  gifText: {
+    color: "rgba(255,255,255,0.72)",
+    fontSize: 13,
+    fontWeight: "900",
+  },
+  
+  input: {
+    flex: 1,
+    color: "#fff",
+    fontSize: 16,
+    paddingVertical: 0,
+    paddingHorizontal: 10,
+    height: 42,
+  },
+  
+  sendCircle: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: "rgba(124,58,237,0.96)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: 4,
+  },
+  
+  sendCircleDisabled: {
+    backgroundColor: "rgba(255,255,255,0.09)",
+  },
+
+  //
 
   header: {
     position: "absolute",
@@ -480,7 +629,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   headerTitle: { fontSize: 18, fontWeight: "500", color: "#fff" },
-  separator: { marginTop: 99, height: 1, backgroundColor: "#333", opacity: 0.6 },
+  
+  separator: { 
+    marginTop: 99, 
+    height: 1, 
+    backgroundColor: "rgba(255,255,255,0.08)" 
+  },
 
   noComments: { textAlign: "center", marginTop: 40, color: "#888", fontSize: 14 },
 
@@ -567,38 +721,4 @@ const styles = StyleSheet.create({
   likeBtn: { flexDirection: "row", alignItems: "center", marginLeft: 8 },
   likeCount: { fontSize: 12, color: "#A6A6A6", marginLeft: 6 },
   likeCountActive: { color: "#B327F6", fontWeight: "600" },
-
-  composer: {
-    borderTopWidth: 1,
-    borderTopColor: "#222",
-    padding: 8,
-    backgroundColor: "#0e0e0e",
-  },
-  preview: { position: "relative", marginBottom: 8 },
-  previewImg: { width: "100%", height: 180, borderRadius: 8 },
-  removeBtn: {
-    position: "absolute",
-    top: 4,
-    right: 4,
-    backgroundColor: "rgba(0,0,0,0.6)",
-    borderRadius: 12,
-    width: 24,
-    height: 24,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  attachBtn: { fontSize: 18, color: "#888", marginHorizontal: 6 },
-  input: {
-    flex: 1,
-    backgroundColor: "#2a2a2a",
-    color: "#fff",
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    fontSize: 15,
-    marginHorizontal: 6,
-    marginTop: 42,
-    top: -22,
-  },
-  sendBtn: { fontSize: 30, color: "#fff", marginLeft: 8 },
 });

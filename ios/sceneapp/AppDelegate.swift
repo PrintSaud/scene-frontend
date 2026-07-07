@@ -1,9 +1,6 @@
 import Expo
 import React
 import ReactAppDependencyProvider
-import UIKit
-import os.log
-import Firebase // <-- Add this
 
 @UIApplicationMain
 public class AppDelegate: ExpoAppDelegate {
@@ -16,14 +13,6 @@ public class AppDelegate: ExpoAppDelegate {
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
   ) -> Bool {
-    // First, let ExpoAppDelegate do its thing
-    let launched = super.application(application, didFinishLaunchingWithOptions: launchOptions)
-
-    // --- Initialize Firebase here ---
-    FirebaseApp.configure()
-    FirebaseConfiguration.shared.setLoggerLevel(.debug) // <-- Enable debug logs
-
-    // Then initialize React Native manually
     let delegate = ReactNativeDelegate()
     let factory = ExpoReactNativeFactory(delegate: delegate)
     delegate.dependencyProvider = RCTAppDependencyProvider()
@@ -33,30 +22,15 @@ public class AppDelegate: ExpoAppDelegate {
     bindReactNativeFactory(factory)
 
 #if os(iOS) || os(tvOS)
-    if window == nil {
-      window = UIWindow(frame: UIScreen.main.bounds)
-    }
+    window = UIWindow(frame: UIScreen.main.bounds)
     factory.startReactNative(
       withModuleName: "main",
       in: window,
       launchOptions: launchOptions)
 #endif
 
-    return launched
+    return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
-
-  // ---- Safe orientation override ----
-  public override func application(
-    _ application: UIApplication,
-    supportedInterfaceOrientationsFor window: UIWindow?
-  ) -> UIInterfaceOrientationMask {
-    if let uiWindow = window ?? self.window,
-       let root = uiWindow.rootViewController {
-      return root.supportedInterfaceOrientations
-    }
-    return .portrait
-  }
-  // -------------------------------------------------------------------------
 
   // Linking API
   public override func application(
@@ -79,15 +53,18 @@ public class AppDelegate: ExpoAppDelegate {
 }
 
 class ReactNativeDelegate: ExpoReactNativeFactoryDelegate {
+  // Extension point for config-plugins
+
   override func sourceURL(for bridge: RCTBridge) -> URL? {
+    // needed to return the correct URL for expo-dev-client.
     bridge.bundleURL ?? bundleURL()
   }
 
   override func bundleURL() -> URL? {
-  #if DEBUG
+#if DEBUG
     return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: ".expo/.virtual-metro-entry")
-  #else
+#else
     return Bundle.main.url(forResource: "main", withExtension: "jsbundle")
-  #endif
+#endif
   }
 }

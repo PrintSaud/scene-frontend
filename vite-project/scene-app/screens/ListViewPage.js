@@ -9,8 +9,12 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import api from "shared/api/api";
-import useTranslate from "shared/utils/useTranslate";
+// import api from "shared/api/api";
+import api from "../../../shared/api/api";
+
+// import useTranslate from "shared/utils/useTranslate";
+import useTranslate from "../../../shared/utils/useTranslate";
+
 import { MaterialIcons } from "@expo/vector-icons";
 
 

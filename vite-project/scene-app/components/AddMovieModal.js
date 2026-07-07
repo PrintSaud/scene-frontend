@@ -16,10 +16,17 @@ import {
 import axios from "axios";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
-import useTranslate from "shared/utils/useTranslate";
-import { useLanguage } from "shared/context/LanguageContext";
-import filterMovies from "shared/utils/filterMovies";
-import api from "shared/api/api";
+
+//import useTranslate from "shared/utils/useTranslate";
+//import { useLanguage } from "shared/context/LanguageContext";
+
+import useTranslate from "../../../shared/utils/useTranslate";
+import { useLanguage } from "../../../shared/context/LanguageContext";
+
+// import filterMovies from "shared/utils/filterMovies";
+import filterMovies from "../../../shared/utils/filterMovies";
+// import api from "shared/api/api";
+import api from "../../../shared/api/api";
 
 const TMDB_IMG_W300 = "https://image.tmdb.org/t/p/w300";
 const FALLBACK_POSTER = "https://scenesa.com/default-poster.jpg";
