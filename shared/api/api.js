@@ -4,8 +4,19 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // 🔧 Backend URL: comes from .env (EXPO_PUBLIC_BACKEND_URL). Falls back to a local IP if missing.
 
+const RAW_BACKEND_URL =
+  process.env.EXPO_PUBLIC_BACKEND_URL ||
+  process.env.VITE_BACKEND_URL ||
+  "https://backend.scenesa.com";
+
+const BASE_URL =
+  RAW_BACKEND_URL.trim().replace(/\/$/, "");
+
+console.log("🔥 Mobile backend env:", RAW_BACKEND_URL);
+console.log("👉 Backend is:", BASE_URL);
+
 const api = axios.create({
-  baseURL: "https://backend.scenesa.com", // force hosted backend
+  baseURL: BASE_URL,
 });
 
 
