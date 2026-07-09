@@ -39,6 +39,7 @@ import LoginScreen from "./vite-project/scene-app/screens/LoginScreen";
 import SignupScreen from "./vite-project/scene-app/screens/SignupScreen";
 import VerifyEmailScreen from "./vite-project/scene-app/screens/VerifyEmailScreen";
 import TrendingScreen from "./vite-project/scene-app/screens/TrendingScreen";
+import TVTrendingScreen from "./vite-project/scene-app/screens/TVTrendingScreen";
 import MovieScreen from "./vite-project/scene-app/screens/MovieScreen";
 import AddToListScreen from "./vite-project/scene-app/screens/AddToListScreen";
 import ShareToFriendScreen from "./vite-project/scene-app/screens/ShareToFriendScreen";
@@ -171,6 +172,7 @@ export default function App() {
                     <Stack.Screen name="Intro" component={AppIntro} />
                     <Stack.Screen name="SceneBotScreen" component={SceneBotScreen} />
                     <Stack.Screen name="Trending" component={TrendingScreen} />
+                    <Stack.Screen name="TVTrending" component={TVTrendingScreen} />
                     <Stack.Screen name="Movie" component={MovieScreen} />
                     <Stack.Screen name="AddToList" component={AddToListScreen} />
 

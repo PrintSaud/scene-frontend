@@ -73,7 +73,7 @@ const TRENDING_ITEM_W = Math.floor(
     TRENDING_COLS
 );
 
-export default function HomeScreen() {
+export default function HomeScreen({ onSwitchMode, switchingMode }) {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
   const t = useTranslate();
@@ -591,12 +591,38 @@ export default function HomeScreen() {
     () => (
       <View>
         <View style={styles.header}>
+          <View style={styles.modeSwitchMini}>
+            <View style={styles.modeSwitchMiniActive}>
+              <MaterialCommunityIcons
+                name="filmstrip"
+                size={12}
+                color="#fff"
+              />
+              <Text style={styles.modeSwitchMiniActiveText}>Movies</Text>
+            </View>
+
+            <TouchableOpacity
+              activeOpacity={0.88}
+              style={styles.modeSwitchMiniItem}
+              onPress={() => onSwitchMode?.("tv")}
+              disabled={switchingMode}
+            >
+              <MaterialCommunityIcons
+                name="television-classic"
+                size={12}
+                color="#8a8a8a"
+              />
+              <Text style={styles.modeSwitchMiniText}>TV</Text>
+            </TouchableOpacity>
+          </View>
+
           <Text style={styles.welcomeText}>
             {t("Welcome back, {name} 🎬").replace(
               "{name}",
               user?.username || user?.name || ""
             )}
           </Text>
+
           <Image
             source={{
               uri: user?.avatar?.startsWith?.("http")
@@ -830,7 +856,7 @@ export default function HomeScreen() {
             marginBottom: 2,
           }}
         >
-          <Text style={styles.sectionTitle}>🔥 {t("Trending Movies")}</Text>
+          <Text style={styles.sectionTitle}> {t("Trending Movies")}</Text>
 
           <TouchableOpacity
             onPress={() => navigation.navigate("Trending")}
@@ -920,15 +946,67 @@ const styles = StyleSheet.create({
     backgroundColor: "#000",
   },
 
-  header: { alignItems: "center", marginVertical: 95, marginBottom: 35 },
+  header: {
+    alignItems: "center",
+    marginTop: 92,
+    marginBottom: 34,
+    position: "relative",
+    minHeight: 185,
+  },
   welcomeText: {
     fontSize: 20,
     color: "#fff",
-    marginBottom: -50,
     fontWeight: "700",
     fontFamily: "PixelifySans_700Bold",
+    textAlign: "center",
+    paddingHorizontal: 72,
+    marginBottom: -50,
   },
   avatar: { width: 100, height: 100, borderRadius: 50, marginTop: 90 },
+
+  modeSwitchMini: {
+    position: "absolute",
+    right: 18,
+    top: 42,
+    padding: 3,
+    borderRadius: 13,
+    backgroundColor: "rgba(18,18,18,0.94)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
+    zIndex: 5,
+  },
+
+  modeSwitchMiniItem: {
+    width: 38,
+    height: 55,
+    borderRadius: 4,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  modeSwitchMiniActive: {
+    width: 38,
+    height: 55,
+    borderRadius: 34,
+    backgroundColor: "#B327F6",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 3,
+  },
+
+  modeSwitchMiniText: {
+    color: "#8a8a8a",
+    fontSize: 7,
+    fontWeight: "800",
+    marginTop: -2,
+  },
+
+  modeSwitchMiniActiveText: {
+    color: "#fff",
+    fontSize: 7,
+    fontWeight: "900",
+    marginTop: -2,
+  },
 
   dailyTagline: {
     fontSize: 16,
