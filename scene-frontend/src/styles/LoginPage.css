@@ -1,271 +1,1552 @@
-@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');
-
-/* 🔄 GLOBAL RESET + SCENE BACKGROUND */
-html, body, #root {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  background: #111;
-  color: #fff;
-  font-family: 'Pixelify Sans', sans-serif;
+html,
+body,
+#root {
+  min-height: 100%;
 }
 
-html, body {
-  overscroll-behavior: none;
-  touch-action: pan-y;
-}
-
-html, body {
-  overflow-x: hidden !important;
-  max-width: 100vw;
-}
-
-
-:root {
-  --scene-theme: #111;
-}
-
-nav, .bottom-nav {
-  background-color: var(--scene-theme);
-}
-
-/* ✅ Full scrollbar hiding on body */
 body {
-  -ms-overflow-style: none;  /* IE & Edge */
-  scrollbar-width: none;     /* Firefox */
-  font-family: 'Pixelify Sans', sans-serif;
-}
-body::-webkit-scrollbar {
-  display: none;
+  margin: 0;
 }
 
-/* ✅ Optional: use this class on scrollable containers instead of hiding global scrollbar */
-.scene-scroll {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.scene-scroll::-webkit-scrollbar {
-  display: none;
+.scene-login-page {
+  --scene-purple: #9b5cff;
+  --scene-purple-dark: #5f1dcc;
+
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      circle at 20% 20%,
+      rgba(125, 51, 238, 0.09),
+      transparent 28%
+    ),
+    #050506;
+
+  color: #fff;
+
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
 }
 
-/* 🔘 Visible scrollbars if needed */
-::-webkit-scrollbar {
-  height: 6px;
-}
-::-webkit-scrollbar-thumb {
-  background: #666;
-  border-radius: 1px;
+.scene-login-page * {
+  box-sizing: border-box;
 }
 
-/* ================= LOGIN STYLES ================= */
-.login-container {
-  height: 100vh;
-  color: white;
+.scene-login-grid {
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+
+  background-image:
+    linear-gradient(
+      rgba(154, 83, 255, 0.055) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(154, 83, 255, 0.055) 1px,
+      transparent 1px
+    );
+
+  background-size: 42px 42px;
+
+  mask-image:
+    linear-gradient(
+      to bottom,
+      black,
+      transparent 90%
+    );
+
+  z-index: 0;
+}
+
+.scene-login-purple-glow {
+  position: absolute;
+
+  border-radius: 50%;
+
+  pointer-events: none;
+
+  filter: blur(130px);
+
+  z-index: 0;
+}
+
+.scene-login-purple-glow-one {
+  width: 600px;
+  height: 600px;
+
+  top: -300px;
+  left: 15%;
+
+  background: #7d32ec;
+
+  opacity: 0.25;
+}
+
+.scene-login-purple-glow-two {
+  width: 480px;
+  height: 480px;
+
+  right: -200px;
+  bottom: -200px;
+
+  background: #6925d3;
+
+  opacity: 0.13;
+}
+
+.scene-login-back {
+  position: absolute;
+
+  top: 30px;
+  left: 36px;
+
+  z-index: 20;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  border: 0;
+  padding: 10px 13px;
+
+  border-radius: 11px;
+
+  background:
+    rgba(13, 13, 16, 0.65);
+
+  border:
+    1px solid rgba(255, 255, 255, 0.08);
+
+  backdrop-filter: blur(16px);
+
+  color: #aaaab3;
+
+  cursor: pointer;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.scene-login-back:hover {
+  color: #fff;
+
+  border-color:
+    rgba(174, 109, 255, 0.22);
+
+  transform: translateX(-2px);
+}
+
+/* ======================================
+   POSTER WALL
+   ====================================== */
+
+.scene-login-poster-wall {
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 62%;
+  height: 100%;
+
+  overflow: hidden;
+
+  z-index: 1;
+
+  opacity: 0.94;
+
+  transform:
+    perspective(1200px)
+    rotateY(5deg)
+    scale(1.06);
+
+  transform-origin: left center;
+}
+
+.scene-login-poster-track {
+  position: absolute;
+
+  left: -30px;
+
   display: flex;
+
+  gap: 13px;
+
+  width: max-content;
+
+  will-change: transform;
+}
+
+.scene-login-row-one {
+  top: 11%;
+
+  animation:
+    scenePosterMoveOne 48s linear infinite;
+}
+
+.scene-login-row-two {
+  top: 39%;
+
+  transform: translateX(-330px);
+
+  animation:
+    scenePosterMoveTwo 58s linear infinite;
+}
+
+.scene-login-row-three {
+  top: 67%;
+
+  transform: translateX(-150px);
+
+  animation:
+    scenePosterMoveThree 52s linear infinite;
+}
+
+.scene-login-poster {
+  width: 135px;
+  aspect-ratio: 2 / 3;
+
+  flex: 0 0 auto;
+
+  overflow: hidden;
+
+  border-radius: 14px;
+
+  background: #111114;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.08);
+
+  box-shadow:
+    0 22px 45px rgba(0, 0, 0, 0.38);
+}
+
+.scene-login-poster img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  opacity: 0.72;
+}
+
+.scene-login-poster-wall::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  z-index: 3;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(5, 5, 6, 0.20) 0%,
+      rgba(5, 5, 6, 0.05) 30%,
+      rgba(5, 5, 6, 0.68) 78%,
+      #050506 100%
+    );
+}
+
+.scene-login-wall-fade {
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+
+  z-index: 4;
+
+  background:
+    linear-gradient(
+      180deg,
+      #050506 0%,
+      transparent 14%,
+      transparent 84%,
+      #050506 100%
+    );
+}
+
+@keyframes scenePosterMoveOne {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-1480px);
+  }
+}
+
+@keyframes scenePosterMoveTwo {
+  from {
+    transform: translateX(-330px);
+  }
+
+  to {
+    transform: translateX(-1810px);
+  }
+}
+
+@keyframes scenePosterMoveThree {
+  from {
+    transform: translateX(-150px);
+  }
+
+  to {
+    transform: translateX(-1630px);
+  }
+}
+
+/* ======================================
+   LAYOUT
+   ====================================== */
+
+.scene-login-layout {
+  position: relative;
+
+  z-index: 8;
+
+  width:
+    min(
+      1220px,
+      calc(100% - 80px)
+    );
+
+  min-height: 100vh;
+
+  margin: 0 auto;
+
+  display: grid;
+
+  grid-template-columns:
+    1.08fr
+    0.92fr;
+
+  gap: 90px;
+
+  align-items: center;
+
+  padding:
+    105px
+    0
+    60px;
+}
+
+/* ======================================
+   HERO
+   ====================================== */
+
+.scene-login-hero {
+  align-self: end;
+
+  padding-bottom: 58px;
+
+  max-width: 600px;
+}
+
+.scene-login-brand {
+  margin-bottom: 22px;
+}
+
+.scene-login-brand img {
+  display: block;
+
+  width: 62px;
+  height: 62px;
+
+  object-fit: contain;
+
+  border-radius: 15px;
+
+  filter:
+    drop-shadow(
+      0 15px 28px
+      rgba(120, 52, 225, 0.26)
+    );
+}
+
+.scene-login-eyebrow {
+  display: block;
+
+  margin-bottom: 13px;
+
+  color: #ac72ff;
+
+  font-size: 10px;
+  font-weight: 900;
+
+  letter-spacing: 0.19em;
+}
+
+.scene-login-copy h1 {
+  max-width: 590px;
+
+  margin:
+    0
+    0
+    18px;
+
+  font-size:
+    clamp(
+      48px,
+      5.4vw,
+      78px
+    );
+
+  line-height: 0.97;
+
+  letter-spacing: -4.6px;
+}
+
+.scene-login-copy h1 span {
+  display: block;
+
+  background:
+    linear-gradient(
+      90deg,
+      #fff,
+      #c69dff 48%,
+      #8b50ed
+    );
+
+  -webkit-background-clip: text;
+  background-clip: text;
+
+  color: transparent;
+}
+
+.scene-login-copy p {
+  max-width: 500px;
+
+  margin: 0;
+
+  color: #9696a0;
+
+  font-size: 14px;
+
+  line-height: 1.75;
+}
+
+/* ======================================
+   LOGIN PANEL
+   ====================================== */
+
+.scene-login-panel {
+  justify-self: end;
+
+  width: min(100%, 440px);
+}
+
+.scene-login-card {
+  position: relative;
+
+  overflow: hidden;
+
+  padding: 38px;
+
+  border-radius: 26px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(18, 18, 22, 0.97),
+      rgba(10, 10, 13, 0.95)
+    );
+
+  border:
+    1px solid rgba(165, 99, 255, 0.18);
+
+  backdrop-filter: blur(28px);
+
+  box-shadow:
+    0 40px 100px
+      rgba(0, 0, 0, 0.62),
+    0 15px 55px
+      rgba(109, 42, 220, 0.12);
+}
+
+.scene-login-card::before {
+  content: "";
+
+  position: absolute;
+
+  width: 260px;
+  height: 260px;
+
+  right: -120px;
+  top: -130px;
+
+  border-radius: 50%;
+
+  background: #8038e8;
+
+  opacity: 0.09;
+
+  filter: blur(65px);
+
+  pointer-events: none;
+}
+
+.scene-login-card-header {
+  position: relative;
+
+  z-index: 1;
+
+  text-align: center;
+
+  margin-bottom: 27px;
+}
+
+.scene-login-card-kicker {
+  display: block;
+
+  margin-bottom: 13px;
+
+  color: #a66dff;
+
+  font-size: 9px;
+  font-weight: 900;
+
+  letter-spacing: 0.2em;
+}
+
+.scene-login-card h2 {
+  margin:
+    0
+    0
+    7px;
+
+  font-size: 29px;
+
+  letter-spacing: -1.2px;
+}
+
+.scene-login-card-header p {
+  margin: 0;
+
+  color: #777780;
+
+  font-size: 12px;
+}
+
+.scene-login-error {
+  margin-bottom: 16px;
+
+  padding: 11px 12px;
+
+  border-radius: 11px;
+
+  text-align: center;
+
+  color: #ff7777;
+
+  background:
+    rgba(255, 76, 76, 0.07);
+
+  border:
+    1px solid
+    rgba(255, 76, 76, 0.17);
+
+  font-size: 11px;
+}
+
+.scene-login-form {
+  display: flex;
+
   flex-direction: column;
+}
+
+.scene-login-field {
+  display: block;
+
+  margin-bottom: 15px;
+}
+
+.scene-login-field > span {
+  display: block;
+
+  margin:
+    0
+    0
+    7px
+    2px;
+
+  color: #92929c;
+
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.scene-login-input-wrap {
+  min-height: 52px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 0 14px;
+
+  border-radius: 13px;
+
+  background:
+    rgba(255, 255, 255, 0.035);
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.09);
+
+  color: #65656f;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.scene-login-input-wrap:focus-within {
+  background:
+    rgba(255, 255, 255, 0.045);
+
+  border-color:
+    rgba(166, 99, 255, 0.42);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(137, 67, 237, 0.08);
+
+  color: #a970ff;
+}
+
+.scene-login-input-wrap input {
+  width: 100%;
+
+  border: 0;
+  outline: 0;
+
+  padding: 0;
+
+  background: transparent;
+
+  color: #fff;
+
+  font: inherit;
+
+  font-size: 13px;
+}
+
+.scene-login-input-wrap input::placeholder {
+  color: #5d5d66;
+}
+
+.scene-login-forgot {
+  align-self: flex-end;
+
+  border: 0;
+
+  margin:
+    -2px
+    0
+    17px;
+
+  padding: 0;
+
+  background: transparent;
+
+  color: #a46bf4;
+
+  cursor: pointer;
+
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.scene-login-forgot:hover {
+  color: #c499ff;
+}
+
+.scene-login-submit,
+.scene-login-signup {
+  width: 100%;
+
+  min-height: 52px;
+
+  border-radius: 13px;
+
+  cursor: pointer;
+
+  font: inherit;
+
+  font-size: 12px;
+
+  font-weight: 900;
+
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.scene-login-submit {
+  display: flex;
+
   align-items: center;
   justify-content: center;
-  padding: 0 20px;
+
+  gap: 8px;
+
+  border: 0;
+
+  color: #fff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #9b5cff,
+      #7c35f2 52%,
+      #5f1dcc
+    );
+
+  box-shadow:
+    0 16px 36px
+    rgba(110, 44, 222, 0.27);
 }
 
-.scene-logo {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
+.scene-login-submit:hover:not(:disabled) {
+  transform: translateY(-1px);
 }
 
-.popcorn {
-  font-size: 1.8rem;
+.scene-login-submit:disabled {
+  cursor: default;
+
+  opacity: 0.65;
 }
 
-.welcome-text {
-  font-family: 'Pixelify Sans', sans-serif;
-  font-size: 1.5rem;
-  margin-bottom: 2rem;
-}
+.scene-login-divider {
+  display: grid;
 
-.login-input {
-  width: 280px;
-  height: 42px;
-  background: #0f0e1a;
-  border: 2px solid #6a5acd;
-  border-radius: 12px;
-  padding: 0 12px;
-  color: white;
-  font-size: 0.95rem;
-  margin-bottom: 14px;
-  outline: none;
-}
+  grid-template-columns:
+    1fr
+    auto
+    1fr;
 
-.login-button {
-  width: 280px;
-  height: 44px;
-  border: none;
-  border-radius: 12px;
-  background: linear-gradient(to right, #4d4be3, #a950ff);
-  color: white;
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
-  margin-top: 10px;
-  box-shadow: 0 0 10px #a970ff33;
-}
-
-.or-separator {
-  margin: 16px 0;
-  color: #aaa;
-}
-
-.google-button {
-  width: 280px;
-  height: 42px;
-  background: white;
-  border: none;
-  border-radius: 12px;
-  display: flex;
   align-items: center;
+
+  gap: 11px;
+
+  margin: 23px 0 16px;
+}
+
+.scene-login-divider span {
+  height: 1px;
+
+  background:
+    rgba(255, 255, 255, 0.065);
+}
+
+.scene-login-divider small {
+  color: #62626b;
+
+  font-size: 8px;
+  font-weight: 900;
+
+  letter-spacing: 0.12em;
+}
+
+.scene-login-signup {
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.105);
+
+  color: #dddde2;
+
+  background:
+    rgba(255, 255, 255, 0.025);
+}
+
+.scene-login-signup:hover {
+  border-color:
+    rgba(168, 103, 255, 0.28);
+
+  transform: translateY(-1px);
+}
+
+.scene-login-support {
+  display: flex;
+
   justify-content: center;
-  gap: 10px;
-  cursor: pointer;
-}
 
-.google-button img {
-  width: 18px;
-  height: 18px;
-}
-
-.google-button span {
-  font-size: 0.95rem;
-  color: #333;
-  font-weight: 500;
-}
-
-.signup-row {
-  margin-top: 24px;
-  display: flex;
-  gap: 10px;
   align-items: center;
-  color: #ccc;
-  font-size: 0.9rem;
+
+  gap: 5px;
+
+  margin-top: 21px;
+
+  font-size: 9px;
 }
 
-.signup-link {
-  background: linear-gradient(to right, #4d4be3, #a950ff);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  padding: 6px 14px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
+.scene-login-support span {
+  color: #606069;
 }
 
-.login-form {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  align-items: center;
+.scene-login-support a {
+  color: #a66dff;
+
+  text-decoration: none;
+
+  font-weight: 800;
+}
+
+.scene-login-support a:hover {
+  text-decoration: underline;
+}
+
+.scene-login-bottom-copy {
+  margin:
+    18px
+    0
+    0;
+
+  text-align: center;
+
+  color: #55555d;
+
+  font-size: 9px;
+
+  letter-spacing: 0.08em;
 }
 
 .spin {
-  animation: spin 1s linear infinite;
-  display: inline-block;
+  animation:
+    sceneLoginSpin
+    0.8s linear infinite;
 }
 
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
+@keyframes sceneLoginSpin {
+  to {
     transform: rotate(360deg);
   }
 }
-.avatar-upload-label {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  border: 2px dashed #6a5acd;
-  cursor: pointer;
-  overflow: hidden;
-  margin: 0 auto 20px;
-  background: #0f0e1a;
-  color: #ccc;
-  transition: 0.3s ease;
+
+/* ======================================
+   TABLET
+   ====================================== */
+
+@media (max-width: 1050px) {
+  .scene-login-layout {
+    width:
+      min(
+        920px,
+        calc(100% - 50px)
+      );
+
+    grid-template-columns:
+      0.9fr
+      1.1fr;
+
+    gap: 45px;
+  }
+
+  .scene-login-poster-wall {
+    width: 68%;
+  }
+
+  .scene-login-copy h1 {
+    font-size:
+      clamp(
+        43px,
+        6vw,
+        64px
+      );
+  }
 }
 
-.avatar-upload-label:hover {
-  border-color: #a950ff;
-  color: white;
+/* ======================================
+   MOBILE
+   ====================================== */
+
+@media (max-width: 760px) {
+  .scene-login-page {
+    min-height: 100svh;
+
+    overflow-y: auto;
+  }
+
+  .scene-login-back {
+    top: 18px;
+    left: 18px;
+
+    padding: 9px;
+
+    border-radius: 50%;
+  }
+
+  .scene-login-back span {
+    display: none;
+  }
+
+  .scene-login-poster-wall {
+    position: absolute;
+
+    top: 45px;
+    left: 0;
+
+    width: 100%;
+    height: 310px;
+
+    transform: none;
+
+    opacity: 0.9;
+  }
+
+  .scene-login-poster-track {
+    gap: 8px;
+  }
+
+  .scene-login-poster {
+    width: 72px;
+
+    border-radius: 9px;
+  }
+
+  .scene-login-row-one {
+    top: 5px;
+  }
+
+  .scene-login-row-two {
+    top: 91px;
+  }
+
+  .scene-login-row-three {
+    top: 177px;
+  }
+
+  .scene-login-poster-wall::before {
+    background:
+      linear-gradient(
+        90deg,
+        #050506 0%,
+        transparent 12%,
+        transparent 88%,
+        #050506 100%
+      );
+  }
+
+  .scene-login-wall-fade {
+    background:
+      linear-gradient(
+        180deg,
+        #050506 0%,
+        transparent 10%,
+        transparent 45%,
+        #050506 100%
+      );
+  }
+
+  .scene-login-layout {
+    width:
+      min(
+        100% - 32px,
+        470px
+      );
+
+    min-height: 100svh;
+
+    grid-template-columns: 1fr;
+
+    gap: 18px;
+
+    padding:
+      245px
+      0
+      25px;
+  }
+
+  .scene-login-hero {
+    align-self: auto;
+
+    padding-bottom: 0;
+
+    text-align: center;
+
+    margin: 0 auto;
+
+    max-width: 430px;
+  }
+
+  .scene-login-brand {
+    margin-bottom: 8px;
+  }
+
+  .scene-login-brand img {
+    width: 48px;
+    height: 48px;
+
+    margin: 0 auto;
+
+    border-radius: 12px;
+  }
+
+  .scene-login-eyebrow {
+    display: none;
+  }
+
+  .scene-login-copy h1 {
+    margin-bottom: 9px;
+
+    font-size: 30px;
+
+    line-height: 1.04;
+
+    letter-spacing: -1.6px;
+  }
+
+  .scene-login-copy h1 span {
+    display: inline;
+  }
+
+  .scene-login-copy p {
+    max-width: 330px;
+
+    margin: 0 auto;
+
+    font-size: 11px;
+
+    line-height: 1.55;
+  }
+
+  .scene-login-panel {
+    width: 100%;
+
+    justify-self: stretch;
+  }
+
+  .scene-login-card {
+    padding: 22px 18px;
+
+    border-radius: 20px;
+  }
+
+  .scene-login-card-header {
+    margin-bottom: 19px;
+  }
+
+  .scene-login-card h2 {
+    font-size: 22px;
+  }
+
+  .scene-login-input-wrap {
+    min-height: 49px;
+  }
+
+  .scene-login-submit,
+  .scene-login-signup {
+    min-height: 49px;
+  }
+
+  .scene-login-bottom-copy {
+    margin-top: 12px;
+  }
 }
 
-.avatar-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  text-align: center;
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .scene-login-poster-track {
+    animation: none !important;
+  }
+
+  .scene-login-back,
+  .scene-login-submit,
+  .scene-login-signup {
+    transition: none;
+  }
 }
 
-.avatar-preview {
+
+/* ============================================================
+   LOGIN RESPONSIVE PASS
+   Desktop / Laptop / iPad / Mobile
+   ============================================================ */
+
+.scene-login-page {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-}
-.cropper-modal {
-  background: #111;
-  padding: 20px;
-  border-radius: 16px;
-  width: 90%;
-  max-width: 400px;
-  margin: auto;
-  position: relative;
-  color: white;
-  outline: none;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
-.cropper-overlay {
-  background-color: rgba(0, 0, 0, 0.8);
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* ---------- LARGE DESKTOP ---------- */
+
+@media (min-width: 1440px) {
+  .scene-login-layout {
+    width: min(1280px, calc(100% - 100px));
+    gap: 100px;
+  }
+
+  .scene-login-panel {
+    width: min(100%, 455px);
+  }
+
+  .scene-login-poster-wall {
+    width: 63%;
+  }
+
+  .scene-login-poster {
+    width: 145px;
+  }
 }
 
-.cropper-container {
-  position: relative;
-  width: 100%;
-  height: 300px;
-  margin: 16px 0;
+/* ---------- LAPTOP ---------- */
+
+@media (min-width: 1101px) and (max-width: 1439px) {
+  .scene-login-layout {
+    width: min(1120px, calc(100% - 60px));
+    gap: 58px;
+  }
+
+  .scene-login-poster-wall {
+    width: 60%;
+  }
+
+  .scene-login-poster {
+    width: 120px;
+  }
+
+  .scene-login-copy h1 {
+    font-size: clamp(48px, 5vw, 68px);
+  }
+
+  .scene-login-panel {
+    width: min(100%, 420px);
+  }
+
+  .scene-login-card {
+    padding: 32px;
+  }
 }
 
-.cropper-footer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
+/* ---------- iPAD LANDSCAPE / SMALL LAPTOP ---------- */
+
+@media (min-width: 861px) and (max-width: 1100px) {
+  .scene-login-layout {
+    width: min(920px, calc(100% - 48px));
+    grid-template-columns: .85fr 1.15fr;
+    gap: 38px;
+  }
+
+  .scene-login-poster-wall {
+    width: 58%;
+  }
+
+  .scene-login-poster {
+    width: 105px;
+    border-radius: 11px;
+  }
+
+  .scene-login-hero {
+    padding-bottom: 40px;
+  }
+
+  .scene-login-brand img {
+    width: 55px;
+    height: 55px;
+  }
+
+  .scene-login-copy h1 {
+    font-size: clamp(42px, 5.5vw, 58px);
+    letter-spacing: -3px;
+  }
+
+  .scene-login-copy p {
+    font-size: 12px;
+  }
+
+  .scene-login-panel {
+    width: min(100%, 410px);
+  }
+
+  .scene-login-card {
+    padding: 29px;
+  }
 }
 
-.crop-done-btn {
-  background: linear-gradient(to right, #4d4be3, #a950ff);
-  border: none;
-  padding: 10px 20px;
-  border-radius: 12px;
-  color: white;
-  font-weight: 600;
-  font-size: 14px;
-  cursor: pointer;
+/* ---------- iPAD PORTRAIT ---------- */
+
+@media (min-width: 601px) and (max-width: 860px) {
+  .scene-login-page {
+    overflow-y: auto;
+  }
+
+  .scene-login-back {
+    top: 22px;
+    left: 24px;
+  }
+
+  .scene-login-poster-wall {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 430px;
+    transform: none;
+    opacity: .85;
+  }
+
+  .scene-login-poster {
+    width: 95px;
+    border-radius: 10px;
+  }
+
+  .scene-login-row-one {
+    top: 35px;
+  }
+
+  .scene-login-row-two {
+    top: 160px;
+  }
+
+  .scene-login-row-three {
+    top: 285px;
+  }
+
+  .scene-login-poster-wall::before {
+    background:
+      linear-gradient(
+        90deg,
+        #050506 0%,
+        transparent 10%,
+        transparent 90%,
+        #050506 100%
+      );
+  }
+
+  .scene-login-wall-fade {
+    background:
+      linear-gradient(
+        180deg,
+        #050506 0%,
+        transparent 8%,
+        transparent 46%,
+        #050506 100%
+      );
+  }
+
+  .scene-login-layout {
+    width: min(620px, calc(100% - 44px));
+    min-height: 100svh;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 330px 0 50px;
+  }
+
+  .scene-login-hero {
+    align-self: auto;
+    padding-bottom: 0;
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .scene-login-brand img {
+    margin: 0 auto;
+  }
+
+  .scene-login-copy h1 {
+    font-size: 48px;
+    letter-spacing: -2.8px;
+  }
+
+  .scene-login-copy p {
+    margin: 0 auto;
+  }
+
+  .scene-login-panel {
+    width: min(100%, 480px);
+    justify-self: center;
+  }
 }
 
-.cropper-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* ---------- PHONES ---------- */
+
+@media (max-width: 600px) {
+  .scene-login-page {
+    min-height: 100svh;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .scene-login-grid {
+    background-size: 34px 34px;
+  }
+
+  .scene-login-back {
+    top: 14px;
+    left: 14px;
+    width: 38px;
+    height: 38px;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .scene-login-back span {
+    display: none;
+  }
+
+  .scene-login-poster-wall {
+    top: 34px;
+    width: 100%;
+    height: 275px;
+    transform: none;
+    opacity: .86;
+  }
+
+  .scene-login-poster-track {
+    gap: 7px;
+  }
+
+  .scene-login-poster {
+    width: 66px;
+    border-radius: 8px;
+  }
+
+  .scene-login-row-one {
+    top: 4px;
+  }
+
+  .scene-login-row-two {
+    top: 82px;
+  }
+
+  .scene-login-row-three {
+    top: 160px;
+  }
+
+  .scene-login-wall-fade {
+    background:
+      linear-gradient(
+        180deg,
+        #050506 0%,
+        transparent 10%,
+        transparent 40%,
+        #050506 100%
+      );
+  }
+
+  .scene-login-layout {
+    width: min(100% - 28px, 440px);
+    min-height: 100svh;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 218px 0 26px;
+  }
+
+  .scene-login-hero {
+    padding: 0;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .scene-login-brand {
+    margin-bottom: 7px;
+  }
+
+  .scene-login-brand img {
+    width: 45px;
+    height: 45px;
+    margin: 0 auto;
+    border-radius: 11px;
+  }
+
+  .scene-login-eyebrow {
+    display: none;
+  }
+
+  .scene-login-copy h1 {
+    font-size: clamp(27px, 8.5vw, 35px);
+    line-height: 1.02;
+    letter-spacing: -1.7px;
+    margin-bottom: 8px;
+  }
+
+  .scene-login-copy h1 span {
+    display: inline;
+  }
+
+  .scene-login-copy p {
+    max-width: 330px;
+    margin: 0 auto;
+    font-size: 10.5px;
+    line-height: 1.5;
+  }
+
+  .scene-login-panel {
+    width: 100%;
+    justify-self: stretch;
+  }
+
+  .scene-login-card {
+    width: 100%;
+    padding: 20px 16px;
+    border-radius: 19px;
+  }
+
+  .scene-login-card-header {
+    margin-bottom: 18px;
+  }
+
+  .scene-login-card h2 {
+    font-size: 21px;
+  }
+
+  .scene-login-card-header p {
+    font-size: 11px;
+  }
+
+  .scene-login-field {
+    margin-bottom: 12px;
+  }
+
+  .scene-login-input-wrap {
+    min-height: 48px;
+    border-radius: 11px;
+  }
+
+  .scene-login-submit,
+  .scene-login-signup {
+    min-height: 48px;
+    border-radius: 11px;
+  }
+
+  .scene-login-divider {
+    margin: 18px 0 14px;
+  }
+
+  .scene-login-support {
+    margin-top: 17px;
+  }
+
+  .scene-login-bottom-copy {
+    margin-top: 10px;
+    line-height: 1.5;
+  }
+}
+
+/* ---------- SMALL PHONES ---------- */
+
+@media (max-width: 390px) {
+  .scene-login-layout {
+    width: calc(100% - 22px);
+    padding-top: 205px;
+  }
+
+  .scene-login-poster-wall {
+    height: 255px;
+  }
+
+  .scene-login-poster {
+    width: 61px;
+  }
+
+  .scene-login-row-two {
+    top: 75px;
+  }
+
+  .scene-login-row-three {
+    top: 146px;
+  }
+
+  .scene-login-copy h1 {
+    font-size: 27px;
+  }
+
+  .scene-login-copy p {
+    font-size: 10px;
+  }
+
+  .scene-login-card {
+    padding: 18px 14px;
+  }
+}
+
+/* ---------- SHORT PHONE SCREENS ---------- */
+
+@media (max-width: 600px) and (max-height: 720px) {
+  .scene-login-poster-wall {
+    height: 220px;
+  }
+
+  .scene-login-layout {
+    padding-top: 180px;
+  }
+
+  .scene-login-brand img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .scene-login-copy h1 {
+    font-size: 26px;
+  }
+
+  .scene-login-copy p {
+    display: none;
+  }
+
+  .scene-login-card {
+    padding-top: 17px;
+    padding-bottom: 17px;
+  }
+}
+
+/* ---------- PHONE LANDSCAPE ---------- */
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .scene-login-poster-wall {
+    display: none;
+  }
+
+  .scene-login-layout {
+    width: min(850px, calc(100% - 50px));
+    min-height: 100vh;
+    grid-template-columns: .8fr 1.2fr;
+    gap: 35px;
+    padding: 55px 0 25px;
+  }
+
+  .scene-login-hero {
+    text-align: left;
+  }
+
+  .scene-login-brand img {
+    margin: 0;
+  }
+
+  .scene-login-copy p {
+    display: block;
+  }
+
+  .scene-login-panel {
+    width: min(100%, 400px);
+  }
+
+  .scene-login-card {
+    padding: 18px;
+  }
 }
