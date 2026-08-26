@@ -992,3 +992,45 @@ body { margin:0; background:#050507; }
     min-height: 330px;
   }
 }
+
+
+/* ============================================================
+   Full viewport reset
+   Prevent browser/body edges around Scene public pages
+   ============================================================ */
+
+html,
+body,
+#root {
+  width: 100%;
+  min-width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  background: #060608;
+}
+
+html {
+  background-color: #060608;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+}
+
+#root {
+  min-height: 100vh;
+  min-height: 100svh;
+  background: #060608;
+}
+
+@supports (padding: env(safe-area-inset-top)) {
+  html,
+  body,
+  #root {
+    background: #060608;
+  }
+}
