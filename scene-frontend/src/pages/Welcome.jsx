@@ -219,8 +219,22 @@ function CheckRow({ children }) {
   );
 }
 
-function Mockup({ src, alt, className = "" }) {
-  return <img className={`scene-site-mockup ${className}`} src={src} alt={alt} loading="lazy" />;
+function Mockup({
+  src,
+  alt,
+  className = "",
+  priority = false,
+}) {
+  return (
+    <img
+      className={`scene-site-mockup ${className}`}
+      src={src}
+      alt={alt}
+      loading={priority ? "eager" : "lazy"}
+      fetchPriority={priority ? "high" : "auto"}
+      decoding="async"
+    />
+  );
 }
 
 export default function Welcome() {
@@ -279,9 +293,35 @@ export default function Welcome() {
             <Globe2 size={15} /> {t.nav.language}
           </button>
           <button className="scene-site-login-link" onClick={openScene}>{user?.token ? t.nav.open : t.nav.login}</button>
-          {!user?.token && <button className="scene-site-nav-cta" onClick={goSignup}>{t.nav.join}<ArrowRight size={16} /></button>}
+          {!user?.token && (
+            <button
+              className="scene-site-nav-cta"
+              onClick={() => navigate("/login")}
+            >
+              {t.nav.login}
+              <ArrowRight size={16} />
+            </button>
+          )}
         </div>
       </nav>
+
+      <div className="scene-site-mobile-nav">
+        <a href="#features" onClick={scrollTo("features")}>
+          {t.nav.features}
+        </a>
+        <a href="#movies" onClick={scrollTo("movies")}>
+          {t.nav.movies}
+        </a>
+        <a href="#tv" onClick={scrollTo("tv")}>
+          {t.nav.tv}
+        </a>
+        <a href="#ai" onClick={scrollTo("ai")}>
+          {t.nav.ai}
+        </a>
+        <a href="#download" onClick={scrollTo("download")}>
+          {t.nav.download}
+        </a>
+      </div>
 
       <section className="scene-site-hero">
         <div className="scene-site-hero-copy">
@@ -301,9 +341,9 @@ export default function Welcome() {
 
         <div className="scene-site-product-stage" aria-label="Scene app previews">
           <div className="scene-site-stage-glow" />
-          <Mockup src="/landing/movie-details.png?v=3" alt="Scene movie details screen" className="scene-site-mockup-left" />
-          <Mockup src="/landing/tv-progress.png?v=3" alt="Scene TV progress screen" className="scene-site-mockup-center" />
-          <Mockup src="/landing/movie-log.png?v=3" alt="Scene movie logging screen" className="scene-site-mockup-right" />
+          <Mockup src="/landing/movie-details.png?v=3" alt="Scene movie details screen" className="scene-site-mockup-left" priority />
+          <Mockup src="/landing/tv-progress.png?v=3" alt="Scene TV progress screen" className="scene-site-mockup-center" priority />
+          <Mockup src="/landing/movie-log.png?v=3" alt="Scene movie logging screen" className="scene-site-mockup-right" priority />
         </div>
       </section>
 

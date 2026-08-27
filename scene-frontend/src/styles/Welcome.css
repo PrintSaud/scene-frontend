@@ -1034,3 +1034,174 @@ body {
     background: #060608;
   }
 }
+
+
+/* ============================================================
+   MOBILE HEADER + ABOVE-THE-FOLD PERFORMANCE
+   ============================================================ */
+
+/* Hidden because desktop already has the normal centered nav */
+.scene-site-mobile-nav {
+  display: none;
+}
+
+/* Prevent rendering delays / weird disappearing during load */
+.scene-site-hero-copy,
+.scene-site-product-stage,
+.scene-site-product-stage .scene-site-mockup {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Keep the hero stable while images decode */
+.scene-site-product-stage {
+  contain: layout;
+}
+
+@media (max-width: 820px) {
+  /*
+   * Main header stays sticky, then this becomes a second
+   * horizontally-scrollable navigation row.
+   */
+  .scene-site-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(6, 6, 8, .90);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+
+  .scene-site-mobile-nav {
+    position: sticky;
+    top: 70px;
+    z-index: 99;
+
+    display: flex;
+    align-items: center;
+    gap: 22px;
+
+    width: 100%;
+    min-height: 43px;
+
+    padding: 0 18px;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    white-space: nowrap;
+
+    background: rgba(6, 6, 8, .92);
+    border-bottom: 1px solid rgba(255,255,255,.07);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    scrollbar-width: none;
+
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .scene-site-mobile-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scene-site-mobile-nav a {
+    flex: 0 0 auto;
+
+    color: #96969f;
+    text-decoration: none;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    transition: color .2s ease;
+  }
+
+  .scene-site-mobile-nav a:active {
+    color: #fff;
+  }
+
+  /*
+   * The second sticky row changes where sections should stop
+   * when using smooth-scroll.
+   */
+  .scene-site-section,
+  .scene-site-showcase,
+  .scene-site-download-section {
+    scroll-margin-top: 125px;
+  }
+}
+
+@media (max-width: 600px) {
+  .scene-site-mobile-nav {
+    top: 64px;
+    min-height: 42px;
+    gap: 20px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  /*
+   * Keep hero immediately visible below the two header rows.
+   * No large dead space before content.
+   */
+  .scene-site-hero {
+    padding-top: 34px;
+  }
+
+  /*
+   * Above-fold phone images should not animate around while
+   * Safari is decoding them.
+   */
+  .scene-site-product-stage > .scene-site-mockup {
+    transition: none;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: flat;
+  }
+
+  /*
+   * Disable desktop hover animation entirely on touch devices.
+   */
+  .scene-site-product-stage:hover .scene-site-mockup-left {
+    transform: rotate(-6deg) translateY(42px) scale(.76);
+  }
+
+  .scene-site-product-stage:hover .scene-site-mockup-right {
+    transform: rotate(6deg) translateY(42px) scale(.76);
+  }
+}
+
+@media (max-width: 390px) {
+  /*
+   * We previously hid the nav CTA on very small phones.
+   * Don't do that anymore — Login needs to remain accessible.
+   */
+  .scene-site-nav-cta {
+    display: inline-flex;
+  }
+
+  .scene-site-language {
+    padding-left: 7px;
+    padding-right: 7px;
+  }
+
+  .scene-site-nav-cta {
+    padding-left: 9px;
+    padding-right: 9px;
+  }
+
+  .scene-site-nav-cta svg {
+    display: none;
+  }
+}
+
+/*
+ * Respect touch devices regardless of viewport width.
+ */
+@media (hover: none) {
+  .scene-site-product-stage > .scene-site-mockup {
+    transition: none;
+  }
+}
