@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const backend = "https://scene-backend-tv-production.up.railway.app"; // ✅ match all other files
-const DEFAULT_TIMEOUT = 75000;
+const DEFAULT_TIMEOUT = 100000;
 const MIN_CALL_INTERVAL_MS = 800;
 
 let _lastCallAt = 0;
