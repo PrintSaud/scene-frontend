@@ -1,5 +1,10 @@
 // src/screens/SceneBotScreen.js
-import React, { useState, useRef, useEffect } from "react";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+} from "react";
 import {
   View,
   Text,
@@ -11,8 +16,15 @@ import {
   KeyboardAvoidingView,
   Platform,
   Keyboard,
+  Modal,
+  Animated,
+  Easing,
 } from "react-native";
-import { useRoute, useNavigation } from "@react-navigation/native";
+import {
+  useRoute,
+  useNavigation,
+  useFocusEffect,
+} from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -25,6 +37,35 @@ import useTranslate from "../../../shared/utils/useTranslate";
 import { useLanguage } from "../../../src/context/LanguageContext";
 
 const INPUT_H = 58;
+const SUGGESTIONS_H = 48;
+
+const SAVED_MESSAGES_KEY =
+  "scenebotSavedMessages:v1";
+
+function getLocalDayKey() {
+  const d = new Date();
+
+  const year =
+    d.getFullYear();
+
+  const month =
+    String(
+      d.getMonth() + 1
+    ).padStart(
+      2,
+      "0"
+    );
+
+  const day =
+    String(
+      d.getDate()
+    ).padStart(
+      2,
+      "0"
+    );
+
+  return `${year}-${month}-${day}`;
+}
 
 function useSafeTabBarHeight() {
   try {
@@ -41,17 +82,94 @@ export default function SceneBotScreen() {
   const [loading, setLoading] = useState(false);
   const [typing, setTyping] = useState(false);
 
+  const [
+    savedMessages,
+    setSavedMessages,
+  ] = useState([]);
+
+  const [
+    savedOpen,
+    setSavedOpen,
+  ] = useState(false);
+
   const [hasAuth, setHasAuth] = useState(null);
   const [authToken, setAuthToken] = useState(null);
 
   const scrollRef = useRef(null);
   const typeTimerRef = useRef(null);
+const typingDotAnims =
+    useRef([
+      new Animated.Value(0.2),
+      new Animated.Value(0.2),
+      new Animated.Value(0.2),
+    ]).current;
   const replyRef = useRef("");
   const indexRef = useRef(0);
 
   const route = useRoute();
   const navigation = useNavigation();
-  const { movie, autoAsk } = route.params || {};
+
+  const {
+    movie,
+    show,
+    autoAsk,
+  } = route.params || {};
+
+  const attachedMedia =
+    movie
+      ? {
+          type: "movie",
+          id:
+            movie.id ??
+            movie.tmdbId ??
+            movie.movieId,
+
+          title:
+            movie.title ||
+            movie.originalTitle ||
+            movie.original_title ||
+            "Movie",
+
+          poster:
+            movie.posterOverride ||
+            movie.poster ||
+            (
+              movie.posterPath
+                ? `https://image.tmdb.org/t/p/w500${movie.posterPath}`
+                : movie.poster_path
+                ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+                : ""
+            ),
+        }
+      : show
+      ? {
+          type: "show",
+          id:
+            show.id ??
+            show.tmdbId ??
+            show.showTmdbId,
+
+          title:
+            show.nameEn ||
+            show.nameAr ||
+            show.name ||
+            show.originalName ||
+            show.original_name ||
+            show.title ||
+            "Show",
+
+          poster:
+            show.posterOverride ||
+            show.poster ||
+            (
+              show.posterPath
+                ? `https://image.tmdb.org/t/p/w500${show.posterPath}`
+                : show.poster_path
+                ? `https://image.tmdb.org/t/p/w500${show.poster_path}`
+                : ""
+            ),
+        }
+      : null;
 
   const t = useTranslate();
   const { language } = useLanguage();
@@ -76,7 +194,108 @@ export default function SceneBotScreen() {
 
   const bottomOffset = inputBottom;
 
-  const STORAGE_KEY = `scenebotHistory:${language}`;
+  /*
+   * Each calendar day gets one unified SceneBot
+   * thread regardless of where SceneBot was opened.
+   */
+  const STORAGE_KEY =
+    `scenebotHistory:${language}:${getLocalDayKey()}`;
+
+  /*
+   * Migration fallback for conversations created
+   * before this upgrade.
+   */
+  const LEGACY_STORAGE_KEY =
+    `scenebotHistory:${language}`;
+
+  const suggestionPrompts = (() => {
+    if (
+      attachedMedia?.type ===
+      "movie"
+    ) {
+      return [
+        t(
+          "What makes {{title}} special?",
+          {
+            title:
+              attachedMedia.title,
+          }
+        ),
+        t(
+          "Recommend movies like {{title}}",
+          {
+            title:
+              attachedMedia.title,
+          }
+        ),
+        t(
+          "Tell me about the cast of {{title}}",
+          {
+            title:
+              attachedMedia.title,
+          }
+        ),
+        t(
+          "Explain the ending of {{title}}",
+          {
+            title:
+              attachedMedia.title,
+          }
+        ),
+      ];
+    }
+
+    if (
+      attachedMedia?.type ===
+      "show"
+    ) {
+      return [
+        t(
+          "What makes {{title}} special?",
+          {
+            title:
+              attachedMedia.title,
+          }
+        ),
+        t(
+          "Recommend shows like {{title}}",
+          {
+            title:
+              attachedMedia.title,
+          }
+        ),
+        t(
+          "Tell me about the characters in {{title}}",
+          {
+            title:
+              attachedMedia.title,
+          }
+        ),
+        t(
+          "What are the best episodes of {{title}}?",
+          {
+            title:
+              attachedMedia.title,
+          }
+        ),
+      ];
+    }
+
+    const list =
+      funPrompts[botLang] ||
+      funPrompts.english ||
+      [];
+
+    return list
+      .slice(
+        0,
+        6
+      )
+      .map(
+        (prompt) =>
+          t(prompt)
+      );
+  })();
 
   const pickPrompt = () => {
     const list = funPrompts[botLang] || funPrompts.english || [];
@@ -84,50 +303,231 @@ export default function SceneBotScreen() {
     return list[Math.floor(Math.random() * list.length)];
   };
 
-  const shouldShowBack = !!movie;
+  const shouldShowBack =
+    Boolean(attachedMedia);
 
   const handleBack = () => {
-    if (movie) {
-      if (navigation.canGoBack && navigation.canGoBack()) navigation.goBack();
-      else navigation.navigate("Movie", { id: movie.id });
+    if (
+      navigation.canGoBack &&
+      navigation.canGoBack()
+    ) {
+      navigation.goBack();
+      return;
+    }
+
+    if (
+      attachedMedia?.type ===
+      "movie"
+    ) {
+      navigation.navigate("Movie", {
+        id: attachedMedia.id,
+        /* SceneBot cleanup overrides */
+
+  botBubble: {
+    alignSelf: "stretch",
+    maxWidth: "100%",
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+    backgroundColor: "transparent",
+    borderWidth: 0,
+    borderColor: "transparent",
+    borderRadius: 0,
+    marginTop: 2,
+  },
+
+  botBubbleText: {
+    color: "rgba(255,255,255,0.92)",
+    fontSize: 17,
+    lineHeight: 28,
+  },
+
+  thinkingWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingHorizontal: 0,
+    paddingVertical: 4,
+  },
+
+  typingDots: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    minWidth: 30,
+  },
+
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "rgba(255,255,255,0.58)",
+  },
+
+  thinkingText: {
+    color: "rgba(255,255,255,0.56)",
+    fontSize: 13,
+    fontWeight: "600",
+  },
+});
+
+      return;
+    }
+
+    if (
+      attachedMedia?.type ===
+      "show"
+    ) {
+      navigation.navigate("Show", {
+        id: attachedMedia.id,
+        showTmdbId:
+          attachedMedia.id,
+      });
+
       return;
     }
 
     navigation.navigate("Home");
   };
 
+  const hydrateHistory =
+    useCallback(
+      async () => {
+        try {
+          let saved =
+            await AsyncStorage.getItem(
+              STORAGE_KEY
+            );
+
+          /*
+           * One-time migration from the previous
+           * rolling history storage.
+           */
+          if (!saved) {
+            const legacy =
+              await AsyncStorage.getItem(
+                LEGACY_STORAGE_KEY
+              );
+
+            if (legacy) {
+              saved = legacy;
+
+              await AsyncStorage.setItem(
+                STORAGE_KEY,
+                legacy
+              );
+            }
+          }
+
+          if (saved) {
+            const parsed =
+              JSON.parse(saved);
+
+            setMessages(
+              Array.isArray(parsed)
+                ? parsed
+                : []
+            );
+          } else {
+            setMessages([]);
+          }
+        } catch (e) {
+          if (__DEV__) {
+            console.warn(
+              "SceneBot: load history failed",
+              e
+            );
+          }
+        } finally {
+          setHydrated(true);
+        }
+      },
+      [
+        STORAGE_KEY,
+        LEGACY_STORAGE_KEY,
+      ]
+    );
+
   useEffect(() => {
-    let cancelled = false;
+    hydrateHistory();
+
+    return () => {
+      if (
+        typeTimerRef.current
+      ) {
+        clearInterval(
+          typeTimerRef.current
+        );
+      }
+    };
+  }, [
+    hydrateHistory,
+  ]);
+
+  /*
+   * IMPORTANT:
+   *
+   * SceneBot inside MainTabs and SceneBot opened
+   * from a Movie/Show screen can exist as two
+   * mounted screen instances.
+   *
+   * Rehydrate whenever this screen gets focus so
+   * both always display the same today's thread.
+   */
+  useFocusEffect(
+    useCallback(() => {
+      if (hydrated) {
+        hydrateHistory();
+      }
+
+      return undefined;
+    }, [
+      hydrated,
+      hydrateHistory,
+    ])
+  );
+
+  /*
+   * Saved messages live forever until explicitly
+   * removed by the user.
+   */
+  useEffect(() => {
+    let cancelled =
+      false;
 
     (async () => {
       try {
-        const saved = await AsyncStorage.getItem(STORAGE_KEY);
+        const raw =
+          await AsyncStorage.getItem(
+            SAVED_MESSAGES_KEY
+          );
 
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          const lastTime = parsed[parsed.length - 1]?.time;
-          const isFresh = Date.now() - lastTime < 24 * 60 * 60 * 1000;
+        if (
+          raw &&
+          !cancelled
+        ) {
+          const parsed =
+            JSON.parse(raw);
 
-          if (!cancelled) {
-            if (isFresh) {
-              setMessages(parsed.map((m) => ({ ...m, time: undefined })));
-            } else {
-              await AsyncStorage.removeItem(STORAGE_KEY);
-            }
-          }
+          setSavedMessages(
+            Array.isArray(parsed)
+              ? parsed
+              : []
+          );
         }
       } catch (e) {
-        if (__DEV__) console.warn("SceneBot: load history failed", e);
+        if (__DEV__) {
+          console.warn(
+            "SceneBot: saved messages load failed",
+            e
+          );
+        }
       }
-
-      if (!cancelled) setHydrated(true);
     })();
 
     return () => {
       cancelled = true;
-      if (typeTimerRef.current) clearInterval(typeTimerRef.current);
     };
-  }, [STORAGE_KEY]);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -193,14 +593,210 @@ export default function SceneBotScreen() {
     };
   }, []);
 
-  const saveToStorage = async (arr) => {
-    try {
-      const withTime = arr.map((m) => ({ ...m, time: Date.now() }));
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(withTime));
-    } catch (e) {
-      if (__DEV__) console.warn("SceneBot: save failed", e);
+  useEffect(() => {
+    const loops =
+      typingDotAnims.map(
+        (anim, index) =>
+          Animated.loop(
+            Animated.sequence([
+              Animated.delay(
+                index * 180
+              ),
+              Animated.timing(
+                anim,
+                {
+                  toValue: 1,
+                  duration: 260,
+                  easing:
+                    Easing.inOut(
+                      Easing.ease
+                    ),
+                  useNativeDriver: true,
+                }
+              ),
+              Animated.timing(
+                anim,
+                {
+                  toValue: 0.2,
+                  duration: 260,
+                  easing:
+                    Easing.inOut(
+                      Easing.ease
+                    ),
+                  useNativeDriver: true,
+                }
+              ),
+              Animated.delay(180),
+            ])
+          )
+      );
+
+    if (typing) {
+      loops.forEach(
+        (loop) =>
+          loop.start()
+      );
+    } else {
+      typingDotAnims.forEach(
+        (anim) =>
+          anim.setValue(0.2)
+      );
     }
-  };
+
+    return () => {
+      loops.forEach(
+        (loop) => {
+          if (
+            typeof loop.stop ===
+            "function"
+          ) {
+            loop.stop();
+          }
+        }
+      );
+
+      typingDotAnims.forEach(
+        (anim) =>
+          anim.setValue(0.2)
+      );
+    };
+  }, [
+    typing,
+    typingDotAnims,
+  ]);
+  const saveToStorage =
+    async (arr) => {
+      try {
+        const now =
+          Date.now();
+
+        const withTime =
+          arr.map(
+            (m) => ({
+              ...m,
+
+              /*
+               * Keep the original message time
+               * instead of rewriting every message
+               * whenever a new one is sent.
+               */
+              time:
+                m?.time ||
+                now,
+            })
+          );
+
+        await AsyncStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify(
+            withTime
+          )
+        );
+      } catch (e) {
+        if (__DEV__) {
+          console.warn(
+            "SceneBot: save failed",
+            e
+          );
+        }
+      }
+    };
+
+  const saveSavedMessages =
+    async (arr) => {
+      try {
+        await AsyncStorage.setItem(
+          SAVED_MESSAGES_KEY,
+          JSON.stringify(arr)
+        );
+      } catch (e) {
+        if (__DEV__) {
+          console.warn(
+            "SceneBot: saved messages write failed",
+            e
+          );
+        }
+      }
+    };
+
+  const isMessageSaved =
+    (message) =>
+      savedMessages.some(
+        (item) =>
+          String(
+            item.sourceMessageId
+          ) ===
+          String(
+            message?.id
+          )
+      );
+
+  const toggleSavedMessage =
+    (message) => {
+      if (
+        !message ||
+        message.sender !==
+          "bot" ||
+        !String(
+          message.text || ""
+        ).trim()
+      ) {
+        return;
+      }
+
+      setSavedMessages(
+        (current) => {
+          const exists =
+            current.some(
+              (item) =>
+                String(
+                  item.sourceMessageId
+                ) ===
+                String(
+                  message.id
+                )
+            );
+
+          const next =
+            exists
+              ? current.filter(
+                  (item) =>
+                    String(
+                      item.sourceMessageId
+                    ) !==
+                    String(
+                      message.id
+                    )
+                )
+              : [
+                  {
+                    id:
+                      Date.now() +
+                      Math.random(),
+
+                    sourceMessageId:
+                      message.id,
+
+                    text:
+                      String(
+                        message.text
+                      ),
+
+                    savedAt:
+                      Date.now(),
+                  },
+
+                  ...current,
+                ];
+
+          saveSavedMessages(
+            next
+          );
+
+          return next;
+        }
+      );
+    };
 
   const dedupeTail = (text) => {
     const s = String(text || "").trim();
@@ -255,38 +851,137 @@ export default function SceneBotScreen() {
     }, 12);
   };
 
-  const callSceneBotWithRetries = async (prompt, lang, maxRetries = 2) => {
-    let attempt = 0;
-    let lastErr = null;
+  const callSceneBotWithRetries =
+    async (
+      prompt,
+      lang,
+      maxRetries = 1
+    ) => {
+      let attempt = 0;
+      let lastErr = null;
 
-    while (attempt <= maxRetries) {
-      try {
-        const res = await callSceneBot(prompt, lang, authToken);
-        return res;
-      } catch (err) {
-        lastErr = err;
-        attempt += 1;
-
-        if (__DEV__) {
-          console.warn(
-            `SceneBot request failed (attempt ${attempt})`,
-            err?.message || err
+      while (
+        attempt <=
+        maxRetries
+      ) {
+        try {
+          return await callSceneBot(
+            prompt,
+            lang,
+            authToken
           );
-        }
+        } catch (err) {
+          lastErr = err;
+          attempt += 1;
 
-        if (attempt <= maxRetries) {
-          await new Promise((r) => setTimeout(r, 800 * attempt));
-          continue;
-        }
+          const code =
+            err?.code ||
+            err?.inner?.code ||
+            null;
 
-        throw lastErr;
+          const status =
+            err?.status ||
+            err?.inner?.status ||
+            null;
+
+          const message =
+            String(
+              err?.message ||
+              ""
+            ).toLowerCase();
+
+          const underlyingMessage =
+            String(
+              err?.inner?.message ||
+              err?.inner?.inner?.message ||
+              ""
+            ).toLowerCase();
+
+          const isTimeout =
+            code ===
+              "TIMEOUT" ||
+            message.includes(
+              "timeout"
+            ) ||
+            underlyingMessage.includes(
+              "timeout"
+            );
+
+          const isAuthError =
+            code ===
+              "UNAUTHORIZED" ||
+            status ===
+              401 ||
+            status ===
+              403;
+
+          /*
+           * Never retry a timeout.
+           *
+           * If web search already took ~60s,
+           * immediately firing the same expensive
+           * request again only creates a worse demo
+           * experience.
+           */
+          if (
+            isTimeout ||
+            isAuthError
+          ) {
+            throw err;
+          }
+
+          if (__DEV__) {
+            console.warn(
+              `SceneBot request failed (attempt ${attempt})`,
+              {
+                message:
+                  err?.message ||
+                  null,
+
+                underlying:
+                  err?.inner
+                    ?.message ||
+                  err?.inner
+                    ?.inner
+                    ?.message ||
+                  null,
+
+                code,
+
+                status,
+              }
+            );
+          }
+
+          if (
+            attempt <=
+            maxRetries
+          ) {
+            /*
+             * One retry only, with a short delay.
+             */
+            await new Promise(
+              (resolve) =>
+                setTimeout(
+                  resolve,
+                  1000
+                )
+            );
+
+            continue;
+          }
+
+          throw lastErr;
+        }
       }
-    }
 
-    throw lastErr;
-  };
+      throw lastErr;
+    };
 
-  const handleAsk = async (customPrompt, attachMovie = null) => {
+  const handleAsk = async (
+    customPrompt,
+    mediaAttachment = null
+  ) => {
     if (loading) return;
 
     if (hasAuth === null) {
@@ -331,15 +1026,31 @@ export default function SceneBotScreen() {
     if (!question) return;
 
     const userMsg = {
-      id: Date.now() + Math.random(),
+      id:
+        Date.now() +
+        Math.random(),
+
       sender: "user",
       text: question,
-      ...(attachMovie
+      time: Date.now(),
+
+      ...(mediaAttachment
         ? {
-            movie: {
-              id: attachMovie.id,
-              poster: attachMovie.poster,
-              title: attachMovie.title,
+            media: {
+              type:
+                mediaAttachment.type ||
+                "movie",
+
+              id:
+                mediaAttachment.id,
+
+              poster:
+                mediaAttachment.poster ||
+                "",
+
+              title:
+                mediaAttachment.title ||
+                "",
             },
           }
         : {}),
@@ -364,13 +1075,19 @@ export default function SceneBotScreen() {
       id: Date.now() + Math.random(),
       sender: "bot",
       text: "",
+      time: Date.now(),
       isTypingBubble: true,
     };
 
     setMessages((prev) => [...prev, botTypingMsg]);
 
     try {
-      const replyText = await callSceneBotWithRetries(question, botLang, 2);
+      const replyText =
+        await callSceneBotWithRetries(
+          question,
+          botLang,
+          1
+        );
 
       replyRef.current = String(replyText || "");
 
@@ -394,9 +1111,36 @@ export default function SceneBotScreen() {
       let messageText = "SceneBot is temporarily unavailable. Please try again later.";
 
       if (__DEV__) {
-        const devMsg = String(err?.message || err);
-        console.warn("SceneBot error detail (dev-only):", devMsg);
-        messageText = `SceneBot is temporarily unavailable. (${devMsg})`;
+        const detail = {
+          message:
+            err?.message ||
+            null,
+
+          underlying:
+            err?.inner?.message ||
+            err?.inner?.inner?.message ||
+            null,
+
+          code:
+            err?.code ||
+            err?.inner?.code ||
+            null,
+
+          status:
+            err?.status ||
+            err?.inner?.status ||
+            null,
+        };
+
+        console.warn(
+          "SceneBot error detail (dev-only):",
+          detail
+        );
+
+        /*
+         * Keep the user-facing message clean.
+         * Error details belong only in the dev log.
+         */
       }
 
       setMessages((prev) => {
@@ -440,10 +1184,22 @@ export default function SceneBotScreen() {
     if (autoAsk) {
       bootAskedRef.current = true;
 
-      if (movie) handleAsk(autoAsk, movie);
-      else handleAsk(autoAsk);
+      if (attachedMedia) {
+        handleAsk(
+          autoAsk,
+          attachedMedia
+        );
+      } else {
+        handleAsk(autoAsk);
+      }
     }
-  }, [hydrated, autoAsk, movie?.id, botLang]);
+  }, [
+    hydrated,
+    autoAsk,
+    attachedMedia?.type,
+    attachedMedia?.id,
+    botLang,
+  ]);
 
   useEffect(() => {
     return () => {
@@ -491,6 +1247,65 @@ export default function SceneBotScreen() {
           </TouchableOpacity>
         )}
 
+        <TouchableOpacity
+          onPress={() =>
+            setSavedOpen(true)
+          }
+          style={[
+            styles.savedHeaderBtn,
+            {
+              /*
+               * Keep the button on the exact
+               * same vertical level as SceneBot.
+               */
+              bottom: 16,
+
+              /*
+               * Avoid overlapping the RTL back
+               * button when opened from media.
+               */
+              right:
+                shouldShowBack &&
+                isRTL
+                  ? 60
+                  : 16,
+            },
+          ]}
+          hitSlop={{
+            top: 12,
+            bottom: 12,
+            left: 12,
+            right: 12,
+          }}
+          activeOpacity={0.75}
+        >
+          <Ionicons
+            name="bookmark-outline"
+            size={20}
+            color="#fff"
+          />
+
+          {savedMessages.length >
+            0 && (
+            <View
+              style={
+                styles.savedCountBadge
+              }
+            >
+              <Text
+                style={
+                  styles.savedCountText
+                }
+              >
+                {savedMessages.length >
+                99
+                  ? "99+"
+                  : savedMessages.length}
+              </Text>
+            </View>
+          )}
+        </TouchableOpacity>
+
         <View pointerEvents="none" style={styles.headerCenterAbsolute}>
           <View style={styles.headerCenter}>
             <View style={styles.headerIconWrap}>
@@ -517,7 +1332,11 @@ export default function SceneBotScreen() {
         }}
         scrollEventThrottle={16}
         contentContainerStyle={{
-          paddingBottom: 30 + bottomOffset + INPUT_H,
+          paddingBottom:
+            30 +
+            bottomOffset +
+            INPUT_H +
+            SUGGESTIONS_H,
           paddingTop: 8,
         }}
       >
@@ -540,44 +1359,140 @@ export default function SceneBotScreen() {
               )}
 
               <View style={[styles.bubble, isBot ? styles.botBubble : styles.userBubble]}>
-                {!!m.movie && !isBot && (
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate("Movie", { id: m.movie.id })}
-                    activeOpacity={0.85}
-                    style={{
-                      alignItems: isRTL ? "flex-end" : "flex-start",
-                      marginBottom: m.text ? 8 : 0,
-                    }}
-                  >
-                    <Image
-                      source={{ uri: m.movie.poster }}
-                      style={styles.posterBubbleImage}
-                      resizeMode="cover"
-                    />
+                {!!(
+                  m.media ||
+                  m.movie
+                ) &&
+                  !isBot && (() => {
+                    /*
+                     * m.movie fallback keeps older
+                     * saved conversations working.
+                     */
+                    const media =
+                      m.media ||
+                      {
+                        ...m.movie,
+                        type: "movie",
+                      };
 
-                    {!!m.movie.title && !!m.text && (
-                      <Text
-                        style={[
-                          styles.bubbleText,
-                          styles.userBubbleText,
+                    const openMedia = () => {
+                      if (
+                        media.type ===
+                        "show"
+                      ) {
+                        navigation.navigate(
+                          "Show",
                           {
-                            marginTop: 8,
-                            textAlign: isRTL ? "right" : "left",
-                          },
-                        ]}
-                        numberOfLines={2}
+                            id: media.id,
+                            showTmdbId:
+                              media.id,
+                          }
+                        );
+
+                        return;
+                      }
+
+                      navigation.navigate(
+                        "Movie",
+                        {
+                          id: media.id,
+                        }
+                      );
+                    };
+
+                    return (
+                      <TouchableOpacity
+                        onPress={openMedia}
+                        activeOpacity={0.85}
+                        style={{
+                          alignItems:
+                            isRTL
+                              ? "flex-end"
+                              : "flex-start",
+
+                          marginBottom:
+                            m.text
+                              ? 8
+                              : 0,
+                        }}
                       >
-                        {String(m.movie.title)}
-                      </Text>
-                    )}
-                  </TouchableOpacity>
-                )}
+                        {!!media.poster && (
+                          <Image
+                            source={{
+                              uri:
+                                media.poster,
+                            }}
+                            style={
+                              styles.posterBubbleImage
+                            }
+                            resizeMode="cover"
+                          />
+                        )}
+
+                        {!!media.title &&
+                          !!m.text && (
+                          <Text
+                            style={[
+                              styles.bubbleText,
+                              styles.userBubbleText,
+                              {
+                                marginTop:
+                                  media.poster
+                                    ? 8
+                                    : 0,
+
+                                textAlign:
+                                  isRTL
+                                    ? "right"
+                                    : "left",
+                              },
+                            ]}
+                            numberOfLines={2}
+                          >
+                            {String(
+                              media.title
+                            )}
+                          </Text>
+                        )}
+                      </TouchableOpacity>
+                    );
+                  })()}
 
                 {showTypingDots ? (
-                  <View style={styles.typingDots}>
-                    <View style={[styles.dot, { opacity: 1 }]} />
-                    <View style={[styles.dot, { opacity: 0.6 }]} />
-                    <View style={[styles.dot, { opacity: 0.3 }]} />
+                  <View style={styles.thinkingWrap}>
+                    <View style={styles.typingDots}>
+                      <Animated.View
+                        style={[
+                          styles.dot,
+                          {
+                            opacity:
+                              typingDotAnims[0],
+                          },
+                        ]}
+                      />
+                      <Animated.View
+                        style={[
+                          styles.dot,
+                          {
+                            opacity:
+                              typingDotAnims[1],
+                          },
+                        ]}
+                      />
+                      <Animated.View
+                        style={[
+                          styles.dot,
+                          {
+                            opacity:
+                              typingDotAnims[2],
+                          },
+                        ]}
+                      />
+                    </View>
+
+                    <Text style={styles.thinkingText}>
+                      {t("Thinking...")}
+                    </Text>
                   </View>
                 ) : (
                   !!m.text && (
@@ -585,13 +1500,64 @@ export default function SceneBotScreen() {
                       style={[
                         styles.bubbleText,
                         isBot ? styles.botBubbleText : styles.userBubbleText,
-                        { textAlign: isRTL ? "right" : "left" },
+                        {
+                          textAlign:
+                            isRTL
+                              ? "right"
+                              : "left",
+                          writingDirection:
+                            isRTL
+                              ? "rtl"
+                              : "ltr",
+                        },
                       ]}
                     >
                       {String(m.text)}
                     </Text>
                   )
                 )}
+
+                {isBot &&
+                  !!m.text &&
+                  !m.isTypingBubble && (
+                    <TouchableOpacity
+                      onPress={() =>
+                        toggleSavedMessage(
+                          m
+                        )
+                      }
+                      style={
+                        styles.saveMessageBtn
+                      }
+                      hitSlop={{
+                        top: 8,
+                        bottom: 8,
+                        left: 8,
+                        right: 8,
+                      }}
+                      activeOpacity={
+                        0.7
+                      }
+                    >
+                      <Ionicons
+                        name={
+                          isMessageSaved(
+                            m
+                          )
+                            ? "bookmark"
+                            : "bookmark-outline"
+                        }
+                        size={15}
+                        color={
+                          isMessageSaved(
+                            m
+                          )
+                            ? "#B327F6"
+                            : "#8d8d8d"
+                        }
+                      />
+                    </TouchableOpacity>
+                  )}
               </View>
             </View>
           );
@@ -606,6 +1572,65 @@ export default function SceneBotScreen() {
           },
         ]}
       >
+        {!!suggestionPrompts.length && (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={
+              false
+            }
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={
+              styles.suggestionsContent
+            }
+            style={
+              styles.suggestionsScroll
+            }
+          >
+            {suggestionPrompts.map(
+              (
+                prompt,
+                index
+              ) => (
+                <TouchableOpacity
+                  key={`${prompt}-${index}`}
+                  onPress={() =>
+                    handleAsk(
+                      prompt
+                    )
+                  }
+                  disabled={
+                    loading ||
+                    hasAuth ===
+                      false
+                  }
+                  style={[
+                    styles.suggestionChip,
+
+                    (loading ||
+                      hasAuth ===
+                        false) &&
+                      styles.suggestionChipDisabled,
+                  ]}
+                  activeOpacity={
+                    0.78
+                  }
+                >
+                  <Text
+                    numberOfLines={
+                      1
+                    }
+                    style={
+                      styles.suggestionText
+                    }
+                  >
+                    {prompt}
+                  </Text>
+                </TouchableOpacity>
+              )
+            )}
+          </ScrollView>
+        )}
+
         <View style={styles.glassInputWrap}>
           <TextInput
             value={input}
@@ -656,6 +1681,189 @@ export default function SceneBotScreen() {
           </TouchableOpacity>
         </View>
       </View>
+
+      <Modal
+        visible={
+          savedOpen
+        }
+        animationType="slide"
+        transparent
+        onRequestClose={() =>
+          setSavedOpen(false)
+        }
+      >
+        <View
+          style={
+            styles.savedModalBackdrop
+          }
+        >
+          <View
+            style={[
+              styles.savedModalSheet,
+              {
+                paddingBottom:
+                  Math.max(
+                    insets.bottom,
+                    16
+                  ),
+              },
+            ]}
+          >
+            <View
+              style={
+                styles.savedModalHeader
+              }
+            >
+              <View
+                style={{
+                  flex: 1,
+                  paddingRight: 12,
+                }}
+              >
+                <Text
+                  style={
+                    styles.savedModalTitle
+                  }
+                >
+                  {t(
+                    "Saved Messages"
+                  )}
+                </Text>
+
+                <Text
+                  style={
+                    styles.savedModalSubtitle
+                  }
+                >
+                  {t(
+                    "SceneBot answers you want to keep."
+                  )}
+                </Text>
+              </View>
+
+              <TouchableOpacity
+                onPress={() =>
+                  setSavedOpen(
+                    false
+                  )
+                }
+                style={
+                  styles.savedModalClose
+                }
+              >
+                <Ionicons
+                  name="close"
+                  size={22}
+                  color="#fff"
+                />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView
+              showsVerticalScrollIndicator={
+                false
+              }
+              contentContainerStyle={
+                styles.savedListContent
+              }
+            >
+              {savedMessages.length ===
+              0 ? (
+                <View
+                  style={
+                    styles.savedEmpty
+                  }
+                >
+                  <Ionicons
+                    name="bookmark-outline"
+                    size={34}
+                    color="#777"
+                  />
+
+                  <Text
+                    style={
+                      styles.savedEmptyTitle
+                    }
+                  >
+                    {t(
+                      "No saved messages yet"
+                    )}
+                  </Text>
+
+                  <Text
+                    style={
+                      styles.savedEmptyText
+                    }
+                  >
+                    {t(
+                      "Tap the bookmark on any SceneBot answer."
+                    )}
+                  </Text>
+                </View>
+              ) : (
+                savedMessages.map(
+                  (item) => (
+                    <View
+                      key={
+                        item.id
+                      }
+                      style={
+                        styles.savedCard
+                      }
+                    >
+                      <Text
+                        style={[
+                          styles.savedCardText,
+                          {
+                            textAlign:
+                              isRTL
+                                ? "right"
+                                : "left",
+                          },
+                        ]}
+                      >
+                        {
+                          item.text
+                        }
+                      </Text>
+
+                      <TouchableOpacity
+                        onPress={() => {
+                          const next =
+                            savedMessages.filter(
+                              (
+                                saved
+                              ) =>
+                                saved.id !==
+                                item.id
+                            );
+
+                          setSavedMessages(
+                            next
+                          );
+
+                          saveSavedMessages(
+                            next
+                          );
+                        }}
+                        style={
+                          styles.savedDeleteBtn
+                        }
+                      >
+                        <Ionicons
+                          name="trash-outline"
+                          size={16}
+                          color="#9a9a9a"
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  )
+                )
+              )}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
@@ -735,7 +1943,7 @@ const styles = StyleSheet.create({
   backBtn: {
     position: "absolute",
     width: 36,
-    height: 36,
+    height: 26,
     borderRadius: 12,
 
     borderWidth: 0.5,
@@ -829,7 +2037,20 @@ const styles = StyleSheet.create({
     gap: 5,
     paddingHorizontal: 2,
     paddingVertical: 4,
-    minWidth: 42,
+  },
+
+  thinkingWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 7,
+    paddingHorizontal: 2,
+    paddingVertical: 3,
+  },
+
+  thinkingText: {
+    color: "rgba(255,255,255,0.52)",
+    fontSize: 12,
+    fontWeight: "600",
   },
 
   dot: {
@@ -837,6 +2058,208 @@ const styles = StyleSheet.create({
     height: 7,
     borderRadius: 4,
     backgroundColor: "rgba(255,255,255,0.45)",
+  },
+
+  savedHeaderBtn: {
+    position: "absolute",
+
+    width: 38,
+    height: 38,
+
+    borderRadius: 13,
+
+    alignItems: "center",
+    justifyContent: "center",
+
+    backgroundColor:
+      "rgba(255,255,255,0.07)",
+
+    borderWidth: 0.5,
+    borderColor:
+      "rgba(255,255,255,0.13)",
+
+    zIndex: 60,
+  },
+
+  savedCountBadge: {
+    position: "absolute",
+    top: -5,
+    right: -5,
+    minWidth: 18,
+    height: 18,
+    paddingHorizontal: 4,
+    borderRadius: 9,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor:
+      "#B327F6",
+    borderWidth: 2,
+    borderColor:
+      "#000",
+  },
+
+  savedCountText: {
+    color: "#fff",
+    fontSize: 8,
+    fontWeight: "900",
+  },
+
+  saveMessageBtn: {
+    marginTop: 2,
+    alignSelf: "flex-end",
+    width: 26,
+    height: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 8,
+    backgroundColor:
+      "rgba(255,255,255,0.04)",
+  },
+
+  suggestionsScroll: {
+    width: "100%",
+    marginBottom: 8,
+    flexGrow: 0,
+  },
+
+  suggestionsContent: {
+    paddingHorizontal: 2,
+    gap: 7,
+  },
+
+  suggestionChip: {
+    height: 34,
+    maxWidth: 230,
+    paddingHorizontal: 13,
+    borderRadius: 17,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor:
+      "rgba(255,255,255,0.075)",
+    borderWidth: 0.5,
+    borderColor:
+      "rgba(255,255,255,0.14)",
+  },
+
+  suggestionChipDisabled: {
+    opacity: 0.4,
+  },
+
+  suggestionText: {
+    color:
+      "rgba(255,255,255,0.78)",
+    fontSize: 11,
+    fontWeight: "600",
+  },
+
+  savedModalBackdrop: {
+    flex: 1,
+    justifyContent:
+      "flex-end",
+    backgroundColor:
+      "rgba(0,0,0,0.68)",
+  },
+
+  savedModalSheet: {
+    maxHeight: "78%",
+    minHeight: "44%",
+    paddingTop: 8,
+    paddingHorizontal: 16,
+    backgroundColor:
+      "#0b0b0b",
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    borderWidth: 1,
+    borderColor:
+      "rgba(255,255,255,0.10)",
+  },
+
+  savedModalHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent:
+      "space-between",
+    paddingTop: 14,
+    paddingBottom: 14,
+  },
+
+  savedModalTitle: {
+    color: "#fff",
+    fontSize: 21,
+    fontWeight: "900",
+  },
+
+  savedModalSubtitle: {
+    marginTop: 4,
+    color: "#777",
+    fontSize: 12,
+  },
+
+  savedModalClose: {
+    width: 38,
+    height: 38,
+    borderRadius: 13,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor:
+      "rgba(255,255,255,0.07)",
+  },
+
+  savedListContent: {
+    paddingBottom: 30,
+  },
+
+  savedCard: {
+    position: "relative",
+    marginBottom: 10,
+    padding: 14,
+    paddingRight: 42,
+    borderRadius: 18,
+    backgroundColor:
+      "rgba(255,255,255,0.065)",
+    borderWidth: 0.5,
+    borderColor:
+      "rgba(255,255,255,0.11)",
+  },
+
+  savedCardText: {
+    color:
+      "rgba(255,255,255,0.88)",
+    fontSize: 14,
+    lineHeight: 21,
+  },
+
+  savedDeleteBtn: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    width: 28,
+    height: 28,
+    borderRadius: 9,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  savedEmpty: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 70,
+    paddingHorizontal: 24,
+  },
+
+  savedEmptyTitle: {
+    marginTop: 12,
+    color: "#fff",
+    fontSize: 17,
+    fontWeight: "800",
+  },
+
+  savedEmptyText: {
+    marginTop: 6,
+    color: "#777",
+    fontSize: 12,
+    lineHeight: 18,
+    textAlign: "center",
   },
 
   inputRow: {
@@ -877,7 +2300,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     color: "#fff",
-    fontSize: 15,
+    fontSize: 12,
     paddingVertical: 7,
     paddingRight: 8,
     minHeight: 36,

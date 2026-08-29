@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const backend = "https://backend.scenesa.com"; // ✅ match all other files
-const DEFAULT_TIMEOUT = 12000;
+const backend = "https://scene-backend-tv-production.up.railway.app"; // ✅ match all other files
+const DEFAULT_TIMEOUT = 75000;
 const MIN_CALL_INTERVAL_MS = 800;
 
 let _lastCallAt = 0;
@@ -115,9 +115,21 @@ export const callSceneBot = async (message, lang = "english", optionsOrToken = {
       }
     } catch {}
 
-    const fe = new Error("SceneBot is currently unavailable. Please try again later.");
-    fe.code = "SERVICE_UNAVAILABLE";
-    fe.inner = err;
+    const fe = new Error(
+      "SceneBot is currently unavailable. Please try again later."
+    );
+
+    fe.code =
+      err?.code ||
+      "SERVICE_UNAVAILABLE";
+
+    fe.status =
+      err?.status ||
+      null;
+
+    fe.inner =
+      err;
+
     throw fe;
   }
 };
