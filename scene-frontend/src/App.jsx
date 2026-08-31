@@ -13,6 +13,7 @@ import { LanguageProvider } from "./context/LanguageContext.jsx";
 
 // Pages
 import HomePage from './pages/HomePage';
+import Welcome from './pages/Welcome';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import VerifyEmailPage from './pages/VerifyEmailPage';
@@ -53,6 +54,7 @@ import ShareToFriendPage from "./pages/ShareToFriendPage";
 import MoreReviewsPage from "./pages/MoreReviewsPage"; // adjust path if needed
 import OgReviewPage from "./pages/OgReviewPage";
 import SettingsPage from "./pages/SettingsPage"; // ✅ new
+import GetScenePage from "./pages/GetScenePage";
 
 function App() {
   const location = useLocation();
@@ -99,6 +101,7 @@ function App() {
   }, [user?._id]);
 
   const hideNavRoutes = [
+    '/',
     '/login',
     '/signup',
     '/forgot-password',
@@ -113,11 +116,33 @@ function App() {
     location.pathname.startsWith('/share')
   ) && user;
 
+  // Marketing/auth pages should not inherit the old app shell padding.
+  const isStandalonePage =
+    hideNavRoutes.includes(location.pathname);
+
   return (
     <LanguageProvider>
-      <div style={{ overflowX: "hidden", width: "100%", maxWidth: "100vw" }}>
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "100vw",
+          minHeight: "100svh",
+          overflowX: "hidden",
+          background: "#060608",
+        }}
+      >
         <Toaster position="top-right" />
-        <div className="min-h-screen pb-16 bg-[#0e0e0e]">
+
+        <div
+          className={isStandalonePage ? "" : "pb-16"}
+          style={{
+            width: "100%",
+            minHeight: "100svh",
+            background: isStandalonePage
+              ? "#060608"
+              : "#0e0e0e",
+          }}
+        >
           <Routes>
             <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
             <Route path="/signup" element={<PublicRoute><SignupPage /></PublicRoute>} />
@@ -125,7 +150,7 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/verify-reset-code" element={<VerifyResetCode />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
-            <Route path="/" element={<PrivateRoute><HomePage /></PrivateRoute>} />
+            <Route path="/" element={<Welcome />} />
             <Route path="/home" element={<PrivateRoute><HomePage /></PrivateRoute>} />
             <Route path="/choose-avatar" element={<UploadAvatar />} />
             <Route path="/friends-activity" element={<FriendsActivityPage />} />
@@ -162,7 +187,8 @@ function App() {
             <Route path="/log/:logId" element={<LogModal />} />
             <Route path="/share/:type/:id" element={<ShareToFriendPage />} />
             <Route path="/movie/:id/reviews" element={<MoreReviewsPage />} />
-          </Routes>
+                  <Route path="/get-scene" element={<GetScenePage />} />
+</Routes>
         </div>
   
         {shouldShowNav && <BottomNav hasUnread={hasUnreadCount} />}

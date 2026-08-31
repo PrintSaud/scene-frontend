@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { FaSpinner } from "react-icons/fa";
 import { TbUpload } from "react-icons/tb";
 import CropperModal from "../components/CropperModal";
+import defaultAvatar from "../assets/default-avatar.jpg";
 
 export default function SignupPage() {
   const [avatar, setAvatar] = useState(null);
@@ -98,23 +99,7 @@ export default function SignupPage() {
       setEmailCheckBusy(false);
     }
   };
-  
-
-  const uploadToCloudinary = async (file) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", "scene_avatar");
-
-    const res = await fetch("https://api.cloudinary.com/v1_1/scenewebapp/image/upload", {
-      method: "POST",
-      body: formData,
-    });
-
-    const data = await res.json();
-    return data.secure_url;
-  };
-
-  const handleAvatarChange = (e) => {
+const handleAvatarChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     setRawAvatarFile(file);
@@ -129,54 +114,145 @@ export default function SignupPage() {
 
   const handleSignup = async (e) => {
     e.preventDefault();
+
     setError("");
     setIsLoading(true);
 
-    if (!avatar) return showError("Please upload an avatar.");
-    if (!isValidUsername(username)) return showError("Invalid username format.");
-    if (usernameTaken) return showError("Username already taken.");
-    if (!validateEmailFormat(email)) return showError("Invalid email.");
-    if (emailTaken) return showError("Email already in use.");
-    if (password.length < 4) return showError("Password too short.");
+    const cleanUsername = username.trim();
+    const cleanEmail = email.trim().toLowerCase();
 
-    const okDeliver = await verifyDeliverability(email);
+    if (!isValidUsername(cleanUsername)) {
+      return showError("Invalid username format.");
+    }
+
+    if (usernameTaken) {
+      return showError("Username already taken.");
+    }
+
+    if (!validateEmailFormat(cleanEmail)) {
+      return showError("Invalid email.");
+    }
+
+    if (emailTaken) {
+      return showError("Email already in use.");
+    }
+
+    if (password.length < 4) {
+      return showError("Password too short.");
+    }
+
+    const okDeliver = await verifyDeliverability(cleanEmail);
+
     if (!okDeliver) {
-      const msg =
-        emailDeliverableReason === "no_mx"
-          ? "That email domain can’t receive mail. Please use a different email."
-          : "We couldn’t verify that email can receive mail. Please use a different email.";
-      return showError(msg);
+      return showError(
+        "We couldn’t verify that email can receive mail. Please use a different email."
+      );
     }
 
     try {
-      // register (without avatar)
-      const res = await api.post(`/api/auth/register`, { username, email, password });
+      const res = await api.post("/api/auth/register", {
+        username: cleanUsername,
+        email: cleanEmail,
+        password,
+        language: "en",
+      });
+
+      if (!res.data?.user || !res.data?.token) {
+        throw new Error("Invalid signup response");
+      }
 
       const mergedUser = {
         ...res.data.user,
-        _id: res.data.user._id,
         token: res.data.token,
       };
 
-      localStorage.setItem("user", JSON.stringify(mergedUser));
-      localStorage.setItem("token", res.data.token);
+      localStorage.setItem(
+        "user",
+        JSON.stringify(mergedUser)
+      );
 
-      // upload avatar to backend
+      localStorage.setItem(
+        "token",
+        res.data.token
+      );
+
       const formData = new FormData();
-      formData.append("avatar", avatar);
 
-      await api.post(`/api/upload/avatar/${mergedUser._id}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${res.data.token}`,
-        },
-      });
+      if (avatar) {
+        formData.append(
+          "avatar",
+          avatar,
+          "avatar.png"
+        );
+      } else {
+        const defaultResponse = await fetch(
+          defaultAvatar
+        );
 
-      toast.success("Signed up successfully! Check your inbox to verify.");
-      window.location.href = "/verify-email";
+        if (!defaultResponse.ok) {
+          throw new Error(
+            "Failed to load Scene default avatar"
+          );
+        }
+
+        const defaultBlob =
+          await defaultResponse.blob();
+
+        formData.append(
+          "avatar",
+          defaultBlob,
+          "default-avatar.jpg"
+        );
+      }
+
+      await api.post(
+        `/api/upload/avatar/${mergedUser._id}`,
+        formData,
+        {
+          headers: {
+            "Content-Type":
+              "multipart/form-data",
+            Authorization:
+              `Bearer ${res.data.token}`,
+          },
+        }
+      );
+
+      toast.success(
+        "Account created! Check your inbox to verify your email."
+      );
+
+      window.location.href =
+        "/verify-email";
     } catch (err) {
-      setError(err.response?.data?.error || "Signup failed.");
-      toast.error("Signup failed. Try again.");
+      console.error(
+        "Signup failed:",
+        err
+      );
+
+      const message =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        err.message ||
+        "Signup failed. Try again.";
+
+      const lowerMessage =
+        String(message).toLowerCase();
+
+      if (
+        lowerMessage.includes("username")
+      ) {
+        setUsernameTaken(true);
+      }
+
+      if (
+        lowerMessage.includes("email")
+      ) {
+        setEmailTaken(true);
+      }
+
+      setError(message);
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -203,7 +279,7 @@ export default function SignupPage() {
           ) : (
             <div className="avatar-placeholder">
               <TbUpload size={24} />
-              <span>Upload Avatar</span>
+              <span>Upload Avatar (Optional)</span>
             </div>
           )}
         </label>
