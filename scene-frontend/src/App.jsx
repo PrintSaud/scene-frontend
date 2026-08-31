@@ -54,6 +54,7 @@ import ShareToFriendPage from "./pages/ShareToFriendPage";
 import MoreReviewsPage from "./pages/MoreReviewsPage"; // adjust path if needed
 import OgReviewPage from "./pages/OgReviewPage";
 import SettingsPage from "./pages/SettingsPage"; // ✅ new
+import GetScenePage from "./pages/GetScenePage";
 
 function App() {
   const location = useLocation();
@@ -186,7 +187,8 @@ function App() {
             <Route path="/log/:logId" element={<LogModal />} />
             <Route path="/share/:type/:id" element={<ShareToFriendPage />} />
             <Route path="/movie/:id/reviews" element={<MoreReviewsPage />} />
-          </Routes>
+                  <Route path="/get-scene" element={<GetScenePage />} />
+</Routes>
         </div>
   
         {shouldShowNav && <BottomNav hasUnread={hasUnreadCount} />}
