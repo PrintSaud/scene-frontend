@@ -7,17 +7,21 @@ import {
   Clapperboard,
   Globe2,
   Heart,
+  Linkedin,
   MessageCircle,
   Play,
   Sparkles,
   Star,
   Tv,
+  Twitter,
   Users,
 } from "lucide-react";
 import "../styles/Welcome.css";
 
 const APP_STORE_URL = "https://apps.apple.com/sa/app/scene-movie-tv/id6753978530";
 const GOOGLE_PLAY_URL = "#download";
+const LINKEDIN_URL = "https://www.linkedin.com/company/sceneappsa/";
+const X_URL = "https://x.com/joinsceneapp?s=11";
 
 const copy = {
   en: {
@@ -239,6 +243,19 @@ function Mockup({
 
 export default function Welcome() {
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    const heroMockups = [
+      "/landing/movie-details.png",
+      "/landing/tv-progress.png",
+      "/landing/movie-log.png",
+    ];
+
+    heroMockups.forEach((src) => {
+      const image = new Image();
+      image.src = src;
+    });
+  }, []);
   const [language, setLanguage] = useState(() => localStorage.getItem("sceneLandingLanguage") || "en");
   const t = copy[language];
   const isArabic = language === "ar";
@@ -464,14 +481,47 @@ export default function Welcome() {
           />
           <span>{t.footer.tagline}</span>
         </div>
+
         <div className="scene-site-footer-links">
-          <a href="#features" onClick={scrollTo("features")}>{t.nav.features}</a>
-          <a href="#movies" onClick={scrollTo("movies")}>{t.nav.movies}</a>
-          <a href="#tv" onClick={scrollTo("tv")}>{t.nav.tv}</a>
-          <a href="#download" onClick={scrollTo("download")}>{t.nav.download}</a>
-          <a href="mailto:support@scenesa.com">support@scenesa.com</a>
+          <a href="#features" onClick={scrollTo("features")}>
+            {t.nav.features}
+          </a>
+          <a href="#movies" onClick={scrollTo("movies")}>
+            {t.nav.movies}
+          </a>
+          <a href="#tv" onClick={scrollTo("tv")}>
+            {t.nav.tv}
+          </a>
+          <a href="#download" onClick={scrollTo("download")}>
+            {t.nav.download}
+          </a>
         </div>
-        <span className="scene-site-footer-copy">{t.footer.copyright}</span>
+
+        <div className="scene-site-footer-right">
+          <div className="scene-site-footer-socials">
+            <a
+              href={LINKEDIN_URL}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Scene on LinkedIn"
+            >
+              <Linkedin size={19} />
+            </a>
+
+            <a
+              href={X_URL}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Scene on X"
+            >
+              <Twitter size={19} />
+            </a>
+          </div>
+
+          <span className="scene-site-footer-copy">
+            {t.footer.copyright}
+          </span>
+        </div>
       </footer>
     </main>
   );
