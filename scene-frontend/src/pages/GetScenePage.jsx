@@ -3,7 +3,7 @@ import { useEffect, useMemo } from "react";
 import "../styles/GetScenePage.css";
 
 const APP_STORE_URL =
-  "https://apps.apple.com/";
+  "https://apps.apple.com/sa/app/scene-movie-tv/id6753978530";
 
 const hideSceneNavigation = () => {
   const selectors = [
