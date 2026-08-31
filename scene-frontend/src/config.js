@@ -1,9 +1,12 @@
 // src/config.js
 
-const RAW = process.env.EXPO_PUBLIC_BACKEND_URL;
+const RAW =
+  import.meta.env.VITE_BACKEND_URL ||
+  import.meta.env.EXPO_PUBLIC_BACKEND_URL;
 
-// ✅ Normalize + fallback so production never becomes undefined
 export const backend =
-  RAW?.trim()?.replace(/\/$/, "") || "https://backend.scenesa.com";
+  RAW?.trim()?.replace(/\/$/, "") ||
+  "https://scene-backend-tv-production.up.railway.app";
 
-export const TMDB_IMG = "https://image.tmdb.org/t/p/w500";
+export const TMDB_IMG =
+  "https://image.tmdb.org/t/p/w500";

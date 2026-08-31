@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE = "https://backend.scenesa.com";
+const BASE = "https://scene-backend-tv-production.up.railway.app";
 
 console.log("🚀 API INIT — baseURL =", BASE);
 
