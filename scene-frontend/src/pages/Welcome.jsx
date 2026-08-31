@@ -13,7 +13,6 @@ import {
   Sparkles,
   Star,
   Tv,
-  Twitter,
   Users,
 } from "lucide-react";
 import "../styles/Welcome.css";
@@ -306,16 +305,27 @@ export default function Welcome() {
         </div>
 
         <div className="scene-site-nav-actions">
-          <button className="scene-site-language" onClick={switchLanguage} aria-label="Change language">
+          <button
+            className="scene-site-language"
+            onClick={switchLanguage}
+            aria-label="Change language"
+          >
             <Globe2 size={15} /> {t.nav.language}
           </button>
-          <button className="scene-site-login-link" onClick={openScene}>{user?.token ? t.nav.open : t.nav.login}</button>
+
+          <button
+            className="scene-site-login-link"
+            onClick={openScene}
+          >
+            {user?.token ? t.nav.open : t.nav.login}
+          </button>
+
           {!user?.token && (
             <button
               className="scene-site-nav-cta"
-              onClick={() => navigate("/login")}
+              onClick={goSignup}
             >
-              {t.nav.login}
+              {t.nav.join}
               <ArrowRight size={16} />
             </button>
           )}
@@ -514,7 +524,7 @@ export default function Welcome() {
               rel="noreferrer"
               aria-label="Scene on X"
             >
-              <Twitter size={19} />
+              <span className="scene-site-x-mark">X</span>
             </a>
           </div>
 
