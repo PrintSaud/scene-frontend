@@ -15,7 +15,12 @@ export default function BottomNav() {
   const navigate = useNavigate();
   const { unreadCount } = useNotification(); // ✅ Live count from context
 
-  const hiddenRoutes = ["/upload-avatar"];
+  const hiddenRoutes = [
+  "/upload-avatar",
+  "/signup",
+  "/verify-email",
+  "/get-scene",
+];
   if (hiddenRoutes.includes(location.pathname)) return null;
 
   const showDot = unreadCount > 0 && location.pathname !== "/notifications";
