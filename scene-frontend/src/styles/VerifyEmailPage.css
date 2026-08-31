@@ -1,0 +1,152 @@
+body.scene-auth-no-nav {
+  margin: 0 !important;
+  background: #000 !important;
+}
+
+body.scene-auth-no-nav nav,
+body.scene-auth-no-nav .navbar,
+body.scene-auth-no-nav .bottom-nav,
+body.scene-auth-no-nav .bottom-navbar,
+body.scene-auth-no-nav .desktop-navbar,
+body.scene-auth-no-nav .mobile-navbar,
+body.scene-auth-no-nav .navigation-bar,
+body.scene-auth-no-nav .navigation {
+  display: none !important;
+}
+
+.scene-verify-root {
+  min-height: 100vh;
+  width: 100%;
+  background: #000;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 28px 24px;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Inter,
+    sans-serif;
+}
+
+.scene-verify-card {
+  width: 100%;
+  max-width: 460px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.scene-verify-title {
+  margin: 0 0 16px;
+  color: #fff;
+  font-family:
+    "Pixelify Sans",
+    "PixelifySans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 30px;
+  line-height: 1.1;
+  font-weight: 700;
+  text-align: center;
+}
+
+.scene-verify-instructions {
+  margin: 0 0 24px;
+  color: #aaa;
+  font-size: 14px;
+  line-height: 1.55;
+  text-align: center;
+}
+
+.scene-verify-email {
+  color: #fff;
+  font-weight: 700;
+  margin-left: 4px;
+}
+
+.scene-verify-error {
+  width: 100%;
+  margin: 0 0 12px;
+  color: #ff4d4d;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.scene-verify-code {
+  width: 100%;
+  min-height: 52px;
+  box-sizing: border-box;
+  border: 3px solid #5c2e91;
+  border-radius: 12px;
+  outline: none;
+  background: #070707;
+  color: #fff;
+  padding: 12px 14px;
+  text-align: center;
+  letter-spacing: 8px;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-size: 18px;
+  margin-bottom: 18px;
+}
+
+.scene-verify-code::placeholder {
+  color: #555;
+  letter-spacing: 0;
+}
+
+.scene-verify-code:focus {
+  border-color: #a020f0;
+}
+
+.scene-verify-button {
+  width: 100%;
+  min-height: 48px;
+  border: 0;
+  border-radius: 8px;
+  background: #a020f0;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.scene-verify-button:disabled {
+  opacity: 0.6;
+}
+
+.scene-verify-resend {
+  margin-top: 16px;
+  border: 0;
+  background: transparent;
+  color: #a020f0;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.scene-verify-resend:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+@media (max-width: 520px) {
+  .scene-verify-root {
+    padding: 24px 20px;
+  }
+
+  .scene-verify-title {
+    font-size: 28px;
+  }
+}
