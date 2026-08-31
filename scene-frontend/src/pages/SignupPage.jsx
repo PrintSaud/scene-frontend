@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import api from "../api/api";
-import "../styles/LoginPage.css";
+import "../styles/SignupPage.css";
 import toast from "react-hot-toast";
 import { FaSpinner } from "react-icons/fa";
 import { TbUpload } from "react-icons/tb";
 import CropperModal from "../components/CropperModal";
 import defaultAvatar from "../assets/default-avatar.jpg";
+
+const SCENE_PURPLE = "#B327F6";
 
 export default function SignupPage() {
   const [avatar, setAvatar] = useState(null);
@@ -16,100 +18,174 @@ export default function SignupPage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const [selectedLanguage, setSelectedLanguage] =
+    useState("en");
+
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const [usernameValid, setUsernameValid] = useState(true);
   const [usernameTaken, setUsernameTaken] = useState(false);
+
   const [emailValid, setEmailValid] = useState(true);
   const [emailTaken, setEmailTaken] = useState(false);
-  const [emailCheckBusy, setEmailCheckBusy] = useState(false);
-  const [emailDeliverable, setEmailDeliverable] = useState(null); // null | true | false
-  const [emailDeliverableReason, setEmailDeliverableReason] = useState("");
 
-  const isValidUsername = (u) => /^[a-zA-Z0-9_]{3,20}$/.test(u);
-  const validateEmailFormat = (e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+  const [emailCheckBusy, setEmailCheckBusy] = useState(false);
+  const [emailDeliverable, setEmailDeliverable] = useState(null);
+
+  useEffect(() => {
+    document.body.classList.add("hide-navbar");
+
+    return () => {
+      document.body.classList.remove("hide-navbar");
+    };
+  }, []);
+
+  const isValidUsername = (u) =>
+    /^[a-zA-Z0-9_]{3,20}$/.test(u);
+
+  const validateEmailFormat = (e) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 
   const handleUsernameChange = async (e) => {
-    const val = e.target.value.trim();
+    const val = e.target.value;
+
     setUsername(val);
-    const valid = isValidUsername(val);
-    setUsernameValid(valid);
     setUsernameTaken(false);
 
-    if (!valid || !val) return;
+    const clean = val.trim();
+    const valid = isValidUsername(clean);
+
+    setUsernameValid(
+      clean.length === 0 ? true : valid
+    );
+
+    if (!valid || !clean) return;
 
     try {
-      const res = await api.get(`/api/auth/check-username`, { params: { username: val } });
-      setUsernameTaken(!res.data?.available);
+      const res = await api.get(
+        "/api/auth/check-username",
+        {
+          params: {
+            username: clean,
+          },
+        }
+      );
+
+      setUsernameTaken(
+        !res.data?.available
+      );
     } catch {
       setUsernameTaken(false);
     }
   };
 
   const handleEmailChange = async (e) => {
-    const val = e.target.value.trim();
+    const val = e.target.value;
+
     setEmail(val);
-    const valid = validateEmailFormat(val);
-    setEmailValid(valid);
     setEmailTaken(false);
     setEmailDeliverable(null);
-    setEmailDeliverableReason("");
 
-    if (!valid || !val) return;
+    const clean =
+      val.trim().toLowerCase();
+
+    const valid =
+      validateEmailFormat(clean);
+
+    setEmailValid(
+      clean.length === 0 ? true : valid
+    );
+
+    if (!valid || !clean) return;
 
     try {
-      const res = await api.get(`/api/auth/check-email`, { params: { email: val } });
-      setEmailTaken(!res.data?.available);
+      const res = await api.get(
+        "/api/auth/check-email",
+        {
+          params: {
+            email: clean,
+          },
+        }
+      );
+
+      setEmailTaken(
+        !res.data?.available
+      );
     } catch {
       setEmailTaken(false);
     }
   };
 
-  const verifyDeliverability = async (emailToCheck) => {
+  const verifyDeliverability = async (
+    emailToCheck
+  ) => {
     try {
       setEmailCheckBusy(true);
       setEmailDeliverable(null);
-      setEmailDeliverableReason("");
-      const { data } = await api.post(`/api/auth/validate-email`, { email: emailToCheck });
-      setEmailDeliverable(!!data?.ok);
-      setEmailDeliverableReason(data?.reason || "");
+
+      const { data } = await api.post(
+        "/api/auth/validate-email",
+        {
+          email: emailToCheck,
+        }
+      );
+
+      setEmailDeliverable(
+        !!data?.ok
+      );
+
       if (data?.didYouMean) {
-        toast((t) => (
-          <span>
-            Did you mean <b>{data.didYouMean}</b>?
-            <button
-              style={{ marginLeft: 8 }}
-              onClick={() => {
-                setEmail(data.didYouMean);
-                toast.dismiss(t.id);
-              }}
-            >
-              Use it
-            </button>
-          </span>
-        ));
+        toast(
+          `Did you mean ${data.didYouMean}?`
+        );
       }
+
       return !!data?.ok;
     } catch {
-      setEmailDeliverable(false);
-      setEmailDeliverableReason("validator_unreachable");
-      return false;
+      /*
+       * Don't completely block LEAP signups
+       * if the optional validator itself is
+       * temporarily unreachable.
+       */
+      setEmailDeliverable(null);
+      return true;
     } finally {
       setEmailCheckBusy(false);
     }
   };
-const handleAvatarChange = (e) => {
-    const file = e.target.files[0];
+
+  const handleAvatarChange = (e) => {
+    const file = e.target.files?.[0];
+
     if (!file) return;
+
     setRawAvatarFile(file);
     setShowCropper(true);
   };
 
   const handleCropped = (croppedBlob) => {
-    const previewURL = URL.createObjectURL(croppedBlob);
+    if (avatarPreview) {
+      URL.revokeObjectURL(
+        avatarPreview
+      );
+    }
+
+    const previewURL =
+      URL.createObjectURL(
+        croppedBlob
+      );
+
     setAvatar(croppedBlob);
     setAvatarPreview(previewURL);
+    setShowCropper(false);
+  };
+
+  const showError = (msg) => {
+    setError(msg);
+    setIsLoading(false);
+    toast.error(msg);
   };
 
   const handleSignup = async (e) => {
@@ -118,57 +194,106 @@ const handleAvatarChange = (e) => {
     setError("");
     setIsLoading(true);
 
-    const cleanUsername = username.trim();
-    const cleanEmail = email.trim().toLowerCase();
+    const cleanUsername =
+      username.trim();
 
-    if (!isValidUsername(cleanUsername)) {
-      return showError("Invalid username format.");
+    const cleanEmail =
+      email.trim().toLowerCase();
+
+    if (
+      !isValidUsername(
+        cleanUsername
+      )
+    ) {
+      return showError(
+        "Invalid username format."
+      );
     }
 
     if (usernameTaken) {
-      return showError("Username already taken.");
+      return showError(
+        "Username already taken."
+      );
     }
 
-    if (!validateEmailFormat(cleanEmail)) {
-      return showError("Invalid email.");
+    if (
+      !validateEmailFormat(
+        cleanEmail
+      )
+    ) {
+      return showError(
+        "Invalid email."
+      );
     }
 
     if (emailTaken) {
-      return showError("Email already in use.");
+      return showError(
+        "Email already in use."
+      );
     }
 
     if (password.length < 4) {
-      return showError("Password too short.");
+      return showError(
+        "Password too short."
+      );
     }
 
-    const okDeliver = await verifyDeliverability(cleanEmail);
+    const okDeliver =
+      await verifyDeliverability(
+        cleanEmail
+      );
 
     if (!okDeliver) {
       return showError(
-        "We couldn’t verify that email can receive mail. Please use a different email."
+        "We couldn't verify that email can receive mail. Please use a different email."
       );
     }
 
     try {
-      const res = await api.post("/api/auth/register", {
-        username: cleanUsername,
-        email: cleanEmail,
-        password,
-        language: "en",
-      });
+      /*
+       * SAME Scene registration backend
+       * used by the mobile app.
+       */
+      const res = await api.post(
+        "/api/auth/register",
+        {
+          username:
+            cleanUsername,
 
-      if (!res.data?.user || !res.data?.token) {
-        throw new Error("Invalid signup response");
+          email:
+            cleanEmail,
+
+          password,
+
+          language:
+            selectedLanguage,
+        }
+      );
+
+      if (
+        !res.data?.user ||
+        !res.data?.token
+      ) {
+        throw new Error(
+          "Invalid signup response"
+        );
       }
 
       const mergedUser = {
         ...res.data.user,
-        token: res.data.token,
+        token:
+          res.data.token,
+
+        language:
+          res.data.user?.language ||
+          selectedLanguage,
       };
 
       localStorage.setItem(
         "user",
-        JSON.stringify(mergedUser)
+        JSON.stringify(
+          mergedUser
+        )
       );
 
       localStorage.setItem(
@@ -176,7 +301,17 @@ const handleAvatarChange = (e) => {
         res.data.token
       );
 
-      const formData = new FormData();
+      localStorage.setItem(
+        "language",
+        mergedUser.language
+      );
+
+      /*
+       * Avatar behavior matches mobile:
+       * selected avatar OR Scene fallback.
+       */
+      const formData =
+        new FormData();
 
       if (avatar) {
         formData.append(
@@ -185,13 +320,16 @@ const handleAvatarChange = (e) => {
           "avatar.png"
         );
       } else {
-        const defaultResponse = await fetch(
-          defaultAvatar
-        );
+        const defaultResponse =
+          await fetch(
+            defaultAvatar
+          );
 
-        if (!defaultResponse.ok) {
+        if (
+          !defaultResponse.ok
+        ) {
           throw new Error(
-            "Failed to load Scene default avatar"
+            "Failed to load default avatar"
           );
         }
 
@@ -212,6 +350,7 @@ const handleAvatarChange = (e) => {
           headers: {
             "Content-Type":
               "multipart/form-data",
+
             Authorization:
               `Bearer ${res.data.token}`,
           },
@@ -219,7 +358,7 @@ const handleAvatarChange = (e) => {
       );
 
       toast.success(
-        "Account created! Check your inbox to verify your email."
+        "Account created! Check your inbox to verify."
       );
 
       window.location.href =
@@ -236,144 +375,268 @@ const handleAvatarChange = (e) => {
         err.message ||
         "Signup failed. Try again.";
 
-      const lowerMessage =
-        String(message).toLowerCase();
+      const lower =
+        String(message)
+          .toLowerCase();
 
       if (
-        lowerMessage.includes("username")
+        lower.includes(
+          "username"
+        )
       ) {
         setUsernameTaken(true);
       }
 
       if (
-        lowerMessage.includes("email")
+        lower.includes(
+          "email"
+        )
       ) {
         setEmailTaken(true);
       }
 
-      setError(message);
-      toast.error(message);
+      showError(message);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const showError = (msg) => {
-    setError(msg);
-    setIsLoading(false);
-  };
-
   return (
-    <div className="login-container">
-      <h1 className="scene-logo">Join Scene 🎬</h1>
-      <p className="welcome-text" style={{ textAlign: "center", fontSize: "16px", marginBottom: "16px" }}>
-        Create your account to log your films ✨
-      </p>
+    <main className="scene-signup-root">
+      <section className="scene-signup-panel">
+        <h1 className="scene-signup-title">
+          Join Scene 🎬
+        </h1>
 
-      {error && <p style={{ color: "#ff4d4d", textAlign: "center" }}>{error}</p>}
+        <p className="scene-signup-subtitle">
+          Your movies, shows, reviews and friends — all in one place.
+        </p>
 
-      <form onSubmit={handleSignup} className="login-form" style={{ marginTop: "10px" }}>
-        <label htmlFor="avatar-upload" className="avatar-upload-label">
-          {avatarPreview ? (
-            <img src={avatarPreview} alt="Preview" className="avatar-preview" />
-          ) : (
-            <div className="avatar-placeholder">
-              <TbUpload size={24} />
-              <span>Upload Avatar (Optional)</span>
-            </div>
-          )}
-        </label>
-        <input
-          type="file"
-          id="avatar-upload"
-          style={{ display: "none" }}
-          accept="image/*"
-          onChange={handleAvatarChange}
-        />
-
-        <input
-          type="text"
-          placeholder="Username"
-          className="login-input"
-          value={username}
-          onChange={handleUsernameChange}
-        />
-        {!usernameValid && (
-          <p style={{ color: "#ff4d4d", fontSize: "12px" }}>
-            ❌ 3–20 letters, numbers, or underscores only
-          </p>
-        )}
-        {usernameValid && username && usernameTaken && (
-          <p style={{ color: "#ff4d4d", fontSize: "12px" }}>❌ Username is already taken</p>
-        )}
-        {usernameValid && username && !usernameTaken && (
-          <p style={{ color: "#90ee90", fontSize: "12px" }}>✅ Username looks good!</p>
+        {error && (
+          <div className="scene-signup-error">
+            {error}
+          </div>
         )}
 
-        <div style={{ position: "relative" }}>
+        <form
+          onSubmit={handleSignup}
+          className="scene-signup-form"
+        >
+          <label
+            htmlFor="avatar-upload"
+            className="scene-signup-avatar"
+          >
+            {avatarPreview ? (
+              <img
+                src={avatarPreview}
+                alt="Your avatar"
+                className="scene-signup-avatar-image"
+              />
+            ) : (
+              <div className="scene-signup-avatar-placeholder">
+                <TbUpload size={20} />
+                <span>
+                  Upload Avatar
+                </span>
+                <small>
+                  Optional
+                </small>
+              </div>
+            )}
+          </label>
+
           <input
-            type="email"
-            placeholder="Email"
-            className="login-input"
-            value={email}
-            onChange={handleEmailChange}
+            type="file"
+            id="avatar-upload"
+            hidden
+            accept="image/*"
+            onChange={handleAvatarChange}
           />
-          {emailCheckBusy && (
-            <span
-              style={{
-                position: "absolute",
-                right: "10px",
-                top: "50%",
-                transform: "translateY(-50%)",
-                fontSize: 12,
-                color: "#aaa",
-              }}
-            >
-              checking…
-            </span>
-          )}
+
+          <div className="scene-signup-field">
+            <input
+              type="text"
+              placeholder="Username"
+              autoCapitalize="none"
+              autoComplete="username"
+              value={username}
+              onChange={handleUsernameChange}
+              className="scene-signup-input"
+            />
+
+            {!usernameValid && (
+              <p className="scene-signup-message error">
+                3–20 letters, numbers or underscores only
+              </p>
+            )}
+
+            {usernameValid &&
+              username &&
+              usernameTaken && (
+                <p className="scene-signup-message error">
+                  Username is already taken
+                </p>
+              )}
+
+            {usernameValid &&
+              username &&
+              !usernameTaken && (
+                <p className="scene-signup-message success">
+                  Username looks good
+                </p>
+              )}
+          </div>
+
+          <div className="scene-signup-field">
+            <div className="scene-signup-input-wrap">
+              <input
+                type="email"
+                placeholder="Email"
+                autoCapitalize="none"
+                autoComplete="email"
+                value={email}
+                onChange={handleEmailChange}
+                className="scene-signup-input"
+              />
+
+              {emailCheckBusy && (
+                <span className="scene-signup-checking">
+                  checking…
+                </span>
+              )}
+            </div>
+
+            {!emailValid && (
+              <p className="scene-signup-message error">
+                Invalid email format
+              </p>
+            )}
+
+            {emailValid &&
+              email &&
+              emailTaken && (
+                <p className="scene-signup-message error">
+                  Email already in use
+                </p>
+              )}
+
+            {emailDeliverable ===
+              true &&
+              !emailTaken && (
+                <p className="scene-signup-message success">
+                  Email looks good
+                </p>
+              )}
+          </div>
+
+          <div className="scene-signup-field">
+            <input
+              type="password"
+              placeholder="Password"
+              autoComplete="new-password"
+              value={password}
+              onChange={(e) =>
+                setPassword(
+                  e.target.value
+                )
+              }
+              className="scene-signup-input"
+            />
+          </div>
+
+          <div className="scene-signup-language">
+            <div className="scene-signup-language-title">
+              🌐 Choose Language
+            </div>
+
+            <div className="scene-signup-language-buttons">
+              <button
+                type="button"
+                onClick={() =>
+                  setSelectedLanguage(
+                    "en"
+                  )
+                }
+                className={
+                  selectedLanguage ===
+                  "en"
+                    ? "scene-language-button active"
+                    : "scene-language-button"
+                }
+              >
+                English
+              </button>
+
+              <button
+                type="button"
+                onClick={() =>
+                  setSelectedLanguage(
+                    "ar"
+                  )
+                }
+                className={
+                  selectedLanguage ===
+                  "ar"
+                    ? "scene-language-button active"
+                    : "scene-language-button"
+                }
+              >
+                العربية
+              </button>
+            </div>
+          </div>
+
+          <div className="scene-signup-selected">
+            Selected:{" "}
+            {selectedLanguage ===
+            "en"
+              ? "English"
+              : "العربية"}
+          </div>
+
+          <button
+            type="submit"
+            className="scene-signup-submit"
+            disabled={
+              isLoading ||
+              emailCheckBusy
+            }
+          >
+            {isLoading ? (
+              <FaSpinner className="scene-signup-spinner" />
+            ) : (
+              "Sign Up"
+            )}
+          </button>
+        </form>
+
+        <div className="scene-signup-login">
+          <span>
+            Already have an account?
+          </span>
+
+          <a href="/login">
+            Log in
+          </a>
         </div>
+      </section>
 
-        {!emailValid && <p style={{ color: "#ff4d4d", fontSize: "12px" }}>❌ Invalid email format</p>}
-        {emailValid && email && emailTaken && (
-          <p style={{ color: "#ff4d4d", fontSize: "12px" }}>❌ Email already in use</p>
+      {showCropper &&
+        rawAvatarFile && (
+          <CropperModal
+            file={rawAvatarFile}
+            onClose={() =>
+              setShowCropper(
+                false
+              )
+            }
+            onCropComplete={
+              handleCropped
+            }
+            shape="circle"
+            aspectRatio={1}
+          />
         )}
-        {emailValid && email && emailDeliverable === false && (
-          <p style={{ color: "#ff4d4d", fontSize: "12px" }}>
-            ❌ We couldn’t verify that email can receive mail. Try a different email.
-          </p>
-        )}
-        {emailValid && email && emailDeliverable === true && !emailTaken && (
-          <p style={{ color: "#90ee90", fontSize: "12px" }}>✅ Email looks deliverable</p>
-        )}
-
-        <input
-          type="password"
-          placeholder="Password"
-          className="login-input"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-
-        <button type="submit" className="login-button" disabled={isLoading || emailCheckBusy}>
-          {isLoading ? <FaSpinner className="spin" /> : "Sign Up"}
-        </button>
-      </form>
-
-      <div className="signup-row">
-        <span>Already have an account?</span>
-        <a href="/login" className="signup-link">Log in</a>
-      </div>
-
-      {showCropper && rawAvatarFile && (
-        <CropperModal
-          file={rawAvatarFile}
-          onClose={() => setShowCropper(false)}
-          onCropComplete={handleCropped}
-          shape="circle"
-          aspectRatio={1}
-        />
-      )}
-    </div>
+    </main>
   );
 }
