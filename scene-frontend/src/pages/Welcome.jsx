@@ -246,7 +246,7 @@ export default function Welcome() {
   React.useEffect(() => {
     const heroMockups = [
       "/landing/movie-details.png",
-      "/landing/tv-progress.png",
+      "/landing/profile.PNG",
       "/landing/movie-log.png",
     ];
 
