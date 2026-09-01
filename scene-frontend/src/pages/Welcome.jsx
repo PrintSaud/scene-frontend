@@ -369,7 +369,7 @@ export default function Welcome() {
         <div className="scene-site-product-stage" aria-label="Scene app previews">
           <div className="scene-site-stage-glow" />
           <Mockup src="/landing/movie-details.png?v=3" alt="Scene movie details screen" className="scene-site-mockup-left" priority />
-          <Mockup src="/landing/tv-progress.png?v=3" alt="Scene TV progress screen" className="scene-site-mockup-center" priority />
+          <Mockup src="/landing/profile.PNG" alt="Scene profile screen" className="scene-site-mockup-center" priority />
           <Mockup src="/landing/movie-log.png?v=3" alt="Scene movie logging screen" className="scene-site-mockup-right" priority />
         </div>
       </section>
