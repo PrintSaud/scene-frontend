@@ -56,6 +56,7 @@ import OgReviewPage from "./pages/OgReviewPage";
 import SettingsPage from "./pages/SettingsPage"; // ✅ new
 import GetScenePage from "./pages/GetScenePage";
 
+import DeleteAccountPage from "./pages/DeleteAccountPage";
 function App() {
   const location = useLocation();
   const [hasUnreadCount, setHasUnreadCount] = useState(0);
@@ -144,6 +145,7 @@ function App() {
           }}
         >
           <Routes>
+            <Route path="/delete-account" element={<DeleteAccountPage />} />
             <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
             <Route path="/signup" element={<PublicRoute><SignupPage /></PublicRoute>} />
             <Route path="/verify-email" element={<VerifyEmailPage />} />
