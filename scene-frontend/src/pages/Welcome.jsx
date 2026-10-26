@@ -467,25 +467,20 @@ export default function Welcome() {
             <p>{t.leap.body}</p>
             <div className="scene-site-event-meta"><div><span>LEAP 2026</span><strong>{t.leap.dates}</strong></div><div><span>{isArabic ? "المكان" : "LOCATION"}</span><strong>{t.leap.place}</strong></div></div>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 16, alignItems: "center" }}>
+          <div className="scene-site-leap-photo" style={{ width: "100%", maxWidth: 420 }}>
             <img
               src="/landing/leap-2026.jpg"
               alt="Scene exhibiting at LEAP 2026 in Riyadh"
               loading="lazy"
-              onError={(e) => { e.currentTarget.style.display = "none"; }}
               style={{
+                display: "block",
                 width: "100%",
-                maxWidth: 420,
-                maxHeight: 280,
+                aspectRatio: "4 / 3",
                 objectFit: "cover",
-                borderRadius: 18,
+                borderRadius: 20,
+                border: "1px solid rgba(168, 85, 247, 0.25)",
               }}
             />
-            <div className="scene-site-pod-badge">
-              <small>{isArabic ? "شاركنا في الجناح" : "OUR EXHIBITION POD"}</small>
-              <strong>{t.leap.pod}</strong>
-              <span>LEAP 2026</span>
-            </div>
           </div>
         </div>
       </section>
