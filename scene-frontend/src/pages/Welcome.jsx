@@ -18,7 +18,7 @@ import {
 import "../styles/Welcome.css";
 
 const APP_STORE_URL = "https://apps.apple.com/sa/app/scene-movie-tv/id6753978530";
-const GOOGLE_PLAY_URL = "#download";
+const GOOGLE_PLAY_URL = "https://play.google.com/store/apps/details?id=com.scenesa.app&pli=1";
 const LINKEDIN_URL = "https://www.linkedin.com/company/sceneappsa/";
 const X_URL = "https://x.com/joinsceneapp?s=11";
 
@@ -94,9 +94,9 @@ const copy = {
       body: "Scene is building a global home for movie and TV lovers while giving Saudi cinema and talent a place to be discovered, followed and celebrated.",
     },
     leap: {
-      eyebrow: "SEE SCENE IN PERSON",
-      title: "Scene is exhibiting at LEAP 2026.",
-      body: "If you are at LEAP in Riyadh, come see the product live and meet the founder.",
+      eyebrow: "A MILESTONE FOR SCENE",
+      title: "Scene at LEAP 2026.",
+      body: "From August 31 to September 3, Scene proudly exhibited at LEAP 2026 in Riyadh. We showcased our platform, met industry leaders, connected with potential partners, and shared our vision for the future of movies and TV.",
       pod: "H1A.P471",
       dates: "31 Aug – 3 Sep 2026",
       place: "Riyadh",
@@ -104,10 +104,10 @@ const copy = {
     download: {
       eyebrow: "START YOUR SCENE",
       title: "Your watching life deserves a home.",
-      body: "Join Scene on the web or download the iPhone app today.",
+      body: "Join Scene on the web or download the app on iOS and Android today.",
       appleTop: "Download on the",
       appleBottom: "App Store",
-      googleTop: "COMING SOON",
+      googleTop: "GET IT ON",
       googleBottom: "Google Play",
       web: "Continue on the web",
     },
@@ -187,9 +187,9 @@ const copy = {
       body: "يبني Scene بيتًا عالميًا لعشاق الأفلام والمسلسلات، مع مساحة تبرز السينما والمواهب السعودية وتساعد الناس على اكتشافها ومتابعتها والاحتفاء بها.",
     },
     leap: {
-      eyebrow: "شاهد SCENE على أرض الواقع",
-      title: "Scene يشارك في LEAP 2026.",
-      body: "إذا كنت في LEAP بالرياض، مر علينا وشاهد المنتج مباشرة وتعرّف على المؤسس.",
+      eyebrow: "محطة مهمة في رحلة SCENE",
+      title: "مشاركة Scene في LEAP 2026.",
+      body: "شاركنا بفخر في مؤتمر LEAP 2026 بالرياض من 31 أغسطس إلى 3 سبتمبر، حيث استعرضنا منصة Scene، والتقينا بقادة ورواد الأعمال وشركاء محتملين، وشاركنا رؤيتنا لمستقبل الأفلام والمسلسلات.",
       pod: "H1A.P471",
       dates: "31 أغسطس – 3 سبتمبر 2026",
       place: "الرياض",
@@ -197,10 +197,10 @@ const copy = {
     download: {
       eyebrow: "ابدأ عالمك في SCENE",
       title: "عالم مشاهدتك يستحق بيتًا.",
-      body: "انضم إلى Scene على الويب أو حمّل تطبيق الآيفون الآن.",
+      body: "انضم إلى Scene على الويب أو حمّل التطبيق الآن على أجهزة الآيفون والأندرويد.",
       appleTop: "حمّله من",
       appleBottom: "App Store",
-      googleTop: "قريبًا",
+      googleTop: "حمّله من",
       googleBottom: "Google Play",
       web: "استخدم Scene على الويب",
     },
@@ -467,7 +467,26 @@ export default function Welcome() {
             <p>{t.leap.body}</p>
             <div className="scene-site-event-meta"><div><span>LEAP 2026</span><strong>{t.leap.dates}</strong></div><div><span>{isArabic ? "المكان" : "LOCATION"}</span><strong>{t.leap.place}</strong></div></div>
           </div>
-          <div className="scene-site-pod-badge"><small>{isArabic ? "زورنا في الجناح" : "FIND SCENE AT"}</small><strong>{t.leap.pod}</strong><span>LEAP 2026</span></div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16, alignItems: "center" }}>
+            <img
+              src="/landing/leap-2026.jpg"
+              alt="Scene exhibiting at LEAP 2026 in Riyadh"
+              loading="lazy"
+              onError={(e) => { e.currentTarget.style.display = "none"; }}
+              style={{
+                width: "100%",
+                maxWidth: 420,
+                maxHeight: 280,
+                objectFit: "cover",
+                borderRadius: 18,
+              }}
+            />
+            <div className="scene-site-pod-badge">
+              <small>{isArabic ? "شاركنا في الجناح" : "OUR EXHIBITION POD"}</small>
+              <strong>{t.leap.pod}</strong>
+              <span>LEAP 2026</span>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -477,7 +496,7 @@ export default function Welcome() {
         <p>{t.download.body}</p>
         <div className="scene-site-download-actions">
           <a className="scene-site-store-button" href={APP_STORE_URL} target="_blank" rel="noreferrer"><span className="scene-site-store-icon"></span><span><small>{t.download.appleTop}</small><strong>{t.download.appleBottom}</strong></span></a>
-          <a className="scene-site-store-button scene-site-store-disabled" href={GOOGLE_PLAY_URL} onClick={(e) => e.preventDefault()}><span className="scene-site-play-triangle">▶</span><span><small>{t.download.googleTop}</small><strong>{t.download.googleBottom}</strong></span></a>
+          <a className="scene-site-store-button" href={GOOGLE_PLAY_URL} target="_blank" rel="noopener noreferrer"><span className="scene-site-play-triangle">▶</span><span><small>{t.download.googleTop}</small><strong>{t.download.googleBottom}</strong></span></a>
         </div>
         <button className="scene-site-web-cta" onClick={openScene}>{t.download.web}<ArrowRight size={15} /></button>
       </section>
