@@ -1,0 +1,391 @@
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  ArrowRight,
+  Bot,
+  Check,
+  ChevronRight,
+  Clapperboard,
+  Globe2,
+  Heart,
+  List,
+  MessageCircle,
+  Play,
+  Sparkles,
+  Star,
+  Tv,
+  Users,
+} from "lucide-react";
+import "../styles/Welcome.css";
+
+const APP_STORE_URL = "#download";
+const GOOGLE_PLAY_URL = "#download";
+
+const features = [
+  {
+    icon: Clapperboard,
+    title: "Log everything you watch",
+    text: "Movies, shows, episodes, ratings and rewatches — one watching history.",
+  },
+  {
+    icon: MessageCircle,
+    title: "Make every review yours",
+    text: "Write reviews, add GIFs or photos, choose custom backdrops and make every post feel personal.",
+  },
+  {
+    icon: Users,
+    title: "Watch with your people",
+    text: "Follow friends, see what they are watching, like reviews, reply and share discoveries.",
+  },
+  {
+    icon: Bot,
+    title: "Ask Scene",
+    text: "Scene AI helps you explore movies, TV, people and your own taste in a more personal way.",
+  },
+];
+
+const personalization = [
+  "Review backdrops",
+  "Profile backdrops",
+  "Movie posters",
+  "Show posters",
+  "List covers",
+  "Episode backdrops",
+];
+
+const movieItems = [
+  "Log films and rewatches",
+  "Ratings and reviews",
+  "Lists and watchlists",
+  "Favorite films",
+];
+
+const tvItems = [
+  "Track shows and episodes",
+  "Season-by-season progress",
+  "Favorite characters",
+  "Upcoming episodes",
+];
+
+function CheckRow({ children }) {
+  return (
+    <div className="scene-leap-check-row">
+      <span className="scene-leap-check-icon">
+        <Check size={14} strokeWidth={3} />
+      </span>
+      <span>{children}</span>
+    </div>
+  );
+}
+
+export default function Welcome() {
+  const navigate = useNavigate();
+
+  const user = (() => {
+    try {
+      return JSON.parse(localStorage.getItem("user") || "null");
+    } catch {
+      return null;
+    }
+  })();
+
+  const openScene = () => navigate(user?.token ? "/home" : "/login");
+  const goSignup = () => navigate("/signup");
+
+  return (
+    <main className="scene-leap-page">
+      <div className="scene-leap-grid" />
+      <div className="scene-leap-orb scene-leap-orb-one" />
+      <div className="scene-leap-orb scene-leap-orb-two" />
+
+      <nav className="scene-leap-nav">
+        <button
+          className="scene-leap-brand"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          aria-label="Scene home"
+        >
+          <span>Scene</span>
+          <span className="scene-leap-brand-mark">🎭</span>
+        </button>
+
+        <div className="scene-leap-nav-links">
+          <a href="#features">Features</a>
+          <a href="#movies-tv">Movies + TV</a>
+          <a href="#ai">Scene AI</a>
+          <a href="#leap">LEAP</a>
+        </div>
+
+        <div className="scene-leap-nav-actions">
+          <button className="scene-leap-login-link" onClick={openScene}>
+            {user?.token ? "Open Scene" : "Log in"}
+          </button>
+
+          {!user?.token && (
+            <button className="scene-leap-nav-cta" onClick={goSignup}>
+              Join Scene
+              <ArrowRight size={16} />
+            </button>
+          )}
+        </div>
+      </nav>
+
+      <section className="scene-leap-hero">
+        <div className="scene-leap-hero-copy">
+          <div className="scene-leap-event-pill">
+            <span className="scene-leap-live-dot" />
+            Meet Scene at LEAP 2026 · H1A.P471
+          </div>
+
+          <h1>
+            Your watching life,
+            <span> all in one place.</span>
+          </h1>
+
+          <p className="scene-leap-hero-description">
+            Log movies and TV shows, review what you watch, discover what your
+            friends love, and build a profile around your taste.
+          </p>
+
+          <div className="scene-leap-hero-actions">
+            <button className="scene-leap-primary-cta" onClick={goSignup}>
+              Join Scene
+              <ArrowRight size={18} />
+            </button>
+
+            <button className="scene-leap-secondary-cta" onClick={openScene}>
+              <Play size={16} fill="currentColor" />
+              Open Scene
+            </button>
+          </div>
+
+          <div className="scene-leap-hero-proof">
+            <div><Star size={15} fill="currentColor" />Movies + TV</div>
+            <div><Users size={15} />Social by design</div>
+            <div><Sparkles size={15} />Personal AI</div>
+          </div>
+        </div>
+
+        <div className="scene-leap-product-stage">
+          <div className="scene-leap-stage-glow" />
+
+          <div className="scene-leap-phone scene-leap-phone-left">
+            <div className="scene-leap-phone-top" />
+            <div className="scene-leap-mini-label">YOUR PROFILE</div>
+            <div className="scene-leap-profile-header">
+              <div className="scene-leap-avatar">S</div>
+              <div><strong>@scene</strong><span>Your watching life</span></div>
+            </div>
+            <div className="scene-leap-stat-grid">
+              <div><strong>184</strong><span>Films</span></div>
+              <div><strong>32</strong><span>Shows</span></div>
+              <div><strong>91</strong><span>Reviews</span></div>
+            </div>
+            <div className="scene-leap-poster-row">
+              <span className="scene-leap-poster p1" />
+              <span className="scene-leap-poster p2" />
+              <span className="scene-leap-poster p3" />
+              <span className="scene-leap-poster p4" />
+            </div>
+            <div className="scene-leap-profile-card">
+              <span>Recently watched</span>
+              <strong>Make your profile feel like you.</strong>
+            </div>
+          </div>
+
+          <div className="scene-leap-phone scene-leap-phone-center">
+            <div className="scene-leap-phone-top" />
+            <div className="scene-leap-mini-label">SCENE</div>
+            <div className="scene-leap-feed-card">
+              <div className="scene-leap-feed-art scene-leap-art-one" />
+              <div className="scene-leap-feed-copy">
+                <span>@saud watched</span><strong>Spider-Man</strong><small>★★★★★ · Just now</small>
+              </div>
+            </div>
+            <div className="scene-leap-feed-card">
+              <div className="scene-leap-feed-art scene-leap-art-two" />
+              <div className="scene-leap-feed-copy">
+                <span>@friend reviewed</span><strong>The Last of Us</strong><small>★★★★½ · Episode 3</small>
+              </div>
+            </div>
+            <div className="scene-leap-feed-card">
+              <div className="scene-leap-feed-art scene-leap-art-three" />
+              <div className="scene-leap-feed-copy">
+                <span>Scene AI</span><strong>What should I watch tonight?</strong><small>Built around your taste</small>
+              </div>
+            </div>
+          </div>
+
+          <div className="scene-leap-phone scene-leap-phone-right">
+            <div className="scene-leap-phone-top" />
+            <div className="scene-leap-mini-label">SHOW PROGRESS</div>
+            <div className="scene-leap-show-hero">
+              <Tv size={24} />
+              <span>Watching</span>
+              <strong>Season 2</strong>
+            </div>
+            <div className="scene-leap-progress-card">
+              <div className="scene-leap-progress-top"><span>Your progress</span><strong>73%</strong></div>
+              <div className="scene-leap-progress-track"><span /></div>
+            </div>
+            <div className="scene-leap-episode-list">
+              <div><span>✓</span> Episode 1</div>
+              <div><span>✓</span> Episode 2</div>
+              <div><span>▶</span> Episode 3</div>
+              <div><span>•</span> Episode 4</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="scene-leap-strip">
+        <p>Movies. TV. Friends. Reviews. Lists. Progress. AI. <strong>One Scene.</strong></p>
+      </section>
+
+      <section className="scene-leap-section" id="features">
+        <div className="scene-leap-section-heading">
+          <span className="scene-leap-eyebrow">BUILT AROUND WHAT YOU WATCH</span>
+          <h2>More than a watchlist.</h2>
+          <p>Scene turns everything you watch into something you can remember, share and make your own.</p>
+        </div>
+        <div className="scene-leap-feature-grid">
+          {features.map(({ icon: Icon, title, text }) => (
+            <article className="scene-leap-feature-card" key={title}>
+              <div className="scene-leap-feature-icon"><Icon size={21} /></div>
+              <h3>{title}</h3>
+              <p>{text}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="scene-leap-section scene-leap-personal-section">
+        <div className="scene-leap-personal-copy">
+          <span className="scene-leap-eyebrow">PERSONAL BY DEFAULT</span>
+          <h2>Your Scene should look like your Scene.</h2>
+          <p>Your taste is personal. Your profile should be too. Scene gives you control over how your watching life looks and feels.</p>
+          <div className="scene-leap-chip-grid">
+            {personalization.map((item) => <span key={item}>{item}</span>)}
+          </div>
+        </div>
+        <div className="scene-leap-personal-visual">
+          <div className="scene-leap-personal-big-card">
+            <span>YOUR REVIEW</span>
+            <h3>Make every watch yours.</h3>
+            <p>Choose the backdrop. Choose the mood. Leave your mark.</p>
+            <div className="scene-leap-rating-row">
+              <span>★★★★★</span>
+              <span className="scene-leap-team-pill">#TeamCharacter</span>
+            </div>
+          </div>
+          <div className="scene-leap-small-floating-card"><Sparkles size={18} /><span>Custom everything</span></div>
+        </div>
+      </section>
+
+      <section className="scene-leap-section" id="movies-tv">
+        <div className="scene-leap-section-heading">
+          <span className="scene-leap-eyebrow">ONE ACCOUNT · TWO WORLDS</span>
+          <h2>Movies and TV finally live together.</h2>
+          <p>Move between film and television without losing the social profile, history and identity that make Scene yours.</p>
+        </div>
+        <div className="scene-leap-world-grid">
+          <article className="scene-leap-world-card">
+            <div className="scene-leap-world-icon"><Clapperboard size={26} /></div>
+            <span className="scene-leap-world-kicker">MOVIES</span>
+            <h3>Every film becomes part of your story.</h3>
+            <div className="scene-leap-check-list">{movieItems.map((item) => <CheckRow key={item}>{item}</CheckRow>)}</div>
+          </article>
+          <article className="scene-leap-world-card scene-leap-world-card-tv">
+            <div className="scene-leap-world-icon"><Tv size={26} /></div>
+            <span className="scene-leap-world-kicker">TV</span>
+            <h3>Track the whole journey, episode by episode.</h3>
+            <div className="scene-leap-check-list">{tvItems.map((item) => <CheckRow key={item}>{item}</CheckRow>)}</div>
+          </article>
+        </div>
+      </section>
+
+      <section className="scene-leap-social-band">
+        <div>
+          <span className="scene-leap-eyebrow">THE SOCIAL SIDE OF WATCHING</span>
+          <h2>Watching is better with people.</h2>
+          <p>Follow friends. Discover what they love. Share reviews, lists, movies and shows — and turn watching into a conversation.</p>
+        </div>
+        <div className="scene-leap-social-icons">
+          <div><Heart size={20} /><span>Like</span></div>
+          <div><MessageCircle size={20} /><span>Reply</span></div>
+          <div><List size={20} /><span>Lists</span></div>
+          <div><Users size={20} /><span>Friends</span></div>
+        </div>
+      </section>
+
+      <section className="scene-leap-section scene-leap-ai-section" id="ai">
+        <div className="scene-leap-ai-orb"><Bot size={42} /></div>
+        <div className="scene-leap-ai-copy">
+          <span className="scene-leap-eyebrow">SCENE AI</span>
+          <h2>An AI that knows what you watch.</h2>
+          <p>Ask about movies, shows, actors, directors, your taste or what to watch next. Scene AI is designed around your watching life — not a blank conversation.</p>
+          <div className="scene-leap-ai-prompts">
+            <span>“What should I watch tonight?”</span>
+            <span>“Which director do I rate highest?”</span>
+            <span>“Find me something like my favorites.”</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="scene-leap-section scene-leap-saudi-section">
+        <div className="scene-leap-saudi-badge">🇸🇦</div>
+        <div>
+          <span className="scene-leap-eyebrow">BUILT IN SAUDI ARABIA</span>
+          <h2>Saudi-built. Global by ambition.</h2>
+          <p>Scene is building a home for movie and TV lovers while giving Saudi cinema, talent and stories a place alongside the rest of the world.</p>
+        </div>
+        <Globe2 className="scene-leap-globe" size={110} strokeWidth={1} />
+      </section>
+
+      <section className="scene-leap-section scene-leap-event-section" id="leap">
+        <div className="scene-leap-event-card">
+          <div className="scene-leap-event-copy">
+            <span className="scene-leap-eyebrow">LEAP 2026</span>
+            <h2>Come meet Scene in Riyadh.</h2>
+            <p>See the product, talk about the future of entertainment communities, and meet the founder behind Scene.</p>
+            <div className="scene-leap-event-meta">
+              <div><span>WHEN</span><strong>31 Aug — 3 Sep 2026</strong></div>
+              <div><span>WHERE</span><strong>Startup Pod H1A.P471</strong></div>
+            </div>
+          </div>
+          <div className="scene-leap-pod-badge">
+            <small>FIND US AT</small>
+            <strong>H1A.P471</strong>
+            <span>LEAP 2026</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="scene-leap-download-section" id="download">
+        <span className="scene-leap-eyebrow">START YOUR SCENE</span>
+        <h2>Your next watch starts here.</h2>
+        <p>Build your watching history, find your people and make every movie and show part of your Scene.</p>
+        <div className="scene-leap-download-actions">
+          <a className="scene-leap-store-button" href={APP_STORE_URL}>
+            <span className="scene-leap-store-icon"></span>
+            <span><small>Download on the</small><strong>App Store</strong></span>
+          </a>
+          <a className="scene-leap-store-button" href={GOOGLE_PLAY_URL}>
+            <span className="scene-leap-play-triangle">▶</span>
+            <span><small>GET IT ON</small><strong>Google Play</strong></span>
+          </a>
+        </div>
+        <button className="scene-leap-web-cta" onClick={openScene}>Or open Scene on the web <ChevronRight size={17} /></button>
+      </section>
+
+      <footer className="scene-leap-footer">
+        <div className="scene-leap-footer-brand"><strong>Scene 🎭</strong><span>Your watching life, all in one place.</span></div>
+        <div className="scene-leap-footer-links">
+          <a href="mailto:support@scenesa.com">support@scenesa.com</a>
+          <a href="/login">Log in</a>
+          <a href="/signup">Create account</a>
+        </div>
+        <span className="scene-leap-footer-copy">© 2026 Scene. Built in Saudi Arabia.</span>
+      </footer>
+    </main>
+  );
+}

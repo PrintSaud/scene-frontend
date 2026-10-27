@@ -158,6 +158,7 @@ function App() {
             <Route path="/friends-activity" element={<FriendsActivityPage />} />
             <Route path="/trending" element={<TrendingPage />} />
             <Route path="/search" element={<SearchPage />} />
+            <Route path="/u/:username" element={<ProfilePage />} />
             <Route path="/profile/:id" element={<ProfilePage />} />
             <Route path="/profile/" element={<ProfilePage />} />
             <Route path="/review/:id" element={<ReviewPage />} />

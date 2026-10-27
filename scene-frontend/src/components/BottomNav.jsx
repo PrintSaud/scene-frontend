@@ -21,6 +21,8 @@ export default function BottomNav() {
   "/verify-email",
   "/get-scene",
 ];
+  // SCENE_PUBLIC_HIDE_NAV: public web profiles have no mobile bottom navbar.
+  if (/^\/u\/[^/]+\/?$/i.test(location.pathname)) return null;
   if (hiddenRoutes.includes(location.pathname)) return null;
 
   const showDot = unreadCount > 0 && location.pathname !== "/notifications";

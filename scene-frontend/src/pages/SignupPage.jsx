@@ -4,12 +4,30 @@ import "../styles/SignupPage.css";
 import toast from "react-hot-toast";
 import { FaSpinner } from "react-icons/fa";
 import { TbUpload } from "react-icons/tb";
+import { ArrowLeft, ArrowRight, Mail, Lock, UserRound, Building2, Film, CheckCircle2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import CropperModal from "../components/CropperModal";
 import defaultAvatar from "../assets/default-avatar.jpg";
 
-const SCENE_PURPLE = "#B327F6";
+const TMDB_POSTER_BASE = "https://image.tmdb.org/t/p/w342";
+const POSTER_ROWS = [
+  ["/qJ2tW6WMUDux911r6m7haRef0WH.jpg", "/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg", "/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg", "/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg", "/arw2vcBveWOVZr6pxd9XTd1TdQa.jpg", "/uDO8zWDhfWwoFdKS4fzkUJt0Rf0.jpg"],
+  ["/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg", "/6oom5QYQ2yQTMJIbnvbkBL9cHo6.jpg", "/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg", "/fC2HDm5t0kHl7mTm7jxMR31b7by.jpg", "/2zmTngn1tYC1AvfnrFLhxeD82hz.jpg"],
+  ["/3bhkrj58Vtu7enYsRolD1fZdja1.jpg", "/or06FN3Dka5tukK1e9sl16pB3iy.jpg", "/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg", "/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg", "/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg", "/fqldf2t8ztc9aiwn3k6mlX3tvRT.jpg"]
+];
+
+function SignupPosterWall() {
+  return <div className="scene-signup-wall" aria-hidden="true">
+    {POSTER_ROWS.map((row, idx) => <div className={`scene-signup-poster-row scene-signup-poster-row-${idx + 1}`} key={idx}>
+      {[...row, ...row].map((poster, i) => <img key={`${poster}-${i}`} src={`${TMDB_POSTER_BASE}${poster}`} alt="" draggable="false" loading="lazy" />)}
+    </div>)}
+  </div>;
+}
+
 
 export default function SignupPage() {
+  const navigate = useNavigate();
+  const [showOrgPreview, setShowOrgPreview] = useState(false);
   const [avatar, setAvatar] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [showCropper, setShowCropper] = useState(false);
@@ -402,241 +420,117 @@ export default function SignupPage() {
   };
 
   return (
-    <main className="scene-signup-root">
-      <section className="scene-signup-panel">
-        <h1 className="scene-signup-title">
-          Join Scene 🎬
-        </h1>
+    <main className="scene-signup-v2">
+      <div className="scene-signup-grid" aria-hidden="true" />
+      <div className="scene-signup-ambient" aria-hidden="true" />
+      <SignupPosterWall />
+      <button type="button" className="scene-signup-back" onClick={() => navigate("/")}> 
+        <ArrowLeft size={18} /> Back to Scene
+      </button>
 
-        <p className="scene-signup-subtitle">
-          Your movies, shows, reviews and friends — all in one place.
-        </p>
-
-        {error && (
-          <div className="scene-signup-error">
-            {error}
+      <div className="scene-signup-layout">
+        <section className="scene-signup-hero">
+          <img className="scene-signup-brand" src="/landing/scene-logo.png" alt="Scene" />
+          <div className="scene-signup-hero-copy">
+            <span className="scene-signup-eyebrow">YOUR WATCHING LIFE</span>
+            <h1>Every story starts <em>somewhere.</em></h1>
+            <p>Discover what to watch. Remember everything you love. Share your Scene with the world.</p>
           </div>
-        )}
+        </section>
 
-        <form
-          onSubmit={handleSignup}
-          className="scene-signup-form"
-        >
-          <label
-            htmlFor="avatar-upload"
-            className="scene-signup-avatar"
-          >
-            {avatarPreview ? (
-              <img
-                src={avatarPreview}
-                alt="Your avatar"
-                className="scene-signup-avatar-image"
-              />
+        <section className="scene-signup-right">
+          <div className="scene-signup-card">
+            {!showOrgPreview ? (
+              <>
+                <header className="scene-signup-card-header">
+                  <span className="scene-signup-kicker">SCENE</span>
+                  <h2>Join the Scene.</h2>
+                  <p>Your next favorite story starts here.</p>
+                </header>
+                {error && <div className="scene-signup-error" role="alert">{error}</div>}
+                <form className="scene-signup-form" onSubmit={handleSignup}>
+                  <div className="scene-signup-avatar-line">
+                    <label htmlFor="avatar-upload" className="scene-signup-avatar">
+                      {avatarPreview ? <img src={avatarPreview} alt="Your avatar" /> : <TbUpload size={22} />}
+                    </label>
+                    <div><strong>Profile photo</strong><span>Choose your avatar · Optional</span></div>
+                    <input type="file" id="avatar-upload" hidden accept="image/*" onChange={handleAvatarChange} />
+                  </div>
+
+                  <label className="scene-signup-field">
+                    <span>Username</span>
+                    <div className="scene-signup-input-wrap"><UserRound size={17} />
+                      <input type="text" placeholder="Choose your username" autoCapitalize="none" autoComplete="username" value={username} onChange={handleUsernameChange} required />
+                    </div>
+                    {!usernameValid && <small className="scene-signup-message error">3–20 letters, numbers or underscores only</small>}
+                    {usernameValid && !!username && usernameTaken && <small className="scene-signup-message error">Username is already taken</small>}
+                    {usernameValid && !!username && !usernameTaken && <small className="scene-signup-message neutral">Availability will be confirmed when you sign up.</small>}
+                  </label>
+
+                  <label className="scene-signup-field">
+                    <span>Email address</span>
+                    <div className="scene-signup-input-wrap"><Mail size={17} />
+                      <input type="email" placeholder="you@example.com" autoCapitalize="none" autoComplete="email" value={email} onChange={handleEmailChange} required />
+                      {emailCheckBusy && <small>Checking…</small>}
+                    </div>
+                    {!emailValid && <small className="scene-signup-message error">Invalid email format</small>}
+                    {emailValid && !!email && emailTaken && <small className="scene-signup-message error">Email already in use</small>}
+                    {emailDeliverable === true && !emailTaken && <small className="scene-signup-message success">Email verified</small>}
+                  </label>
+
+                  <label className="scene-signup-field">
+                    <span>Password</span>
+                    <div className="scene-signup-input-wrap"><Lock size={17} />
+                      <input type="password" placeholder="Create a password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} minLength={4} required />
+                    </div>
+                  </label>
+
+                  <div className="scene-signup-language">
+                    <span>Preferred language</span>
+                    <div className="scene-signup-language-options">
+                      <button type="button" className={selectedLanguage === "en" ? "selected" : ""} onClick={() => setSelectedLanguage("en")}>English</button>
+                      <button type="button" className={selectedLanguage === "ar" ? "selected" : ""} onClick={() => setSelectedLanguage("ar")}>العربية</button>
+                    </div>
+                  </div>
+
+                  <button type="submit" className="scene-signup-primary" disabled={isLoading || emailCheckBusy}>
+                    {isLoading ? <FaSpinner className="scene-signup-spinner" /> : <>Create my account <ArrowRight size={17} /></>}
+                  </button>
+                </form>
+
+                <div className="scene-signup-divider"><span /> <small>PART OF A CINEMA COMMUNITY?</small> <span /></div>
+                <button className="scene-signup-org-button" type="button" onClick={() => setShowOrgPreview(true)}>
+                  <Building2 size={18} /> <span>Join Scene as an Organization</span><ArrowRight size={17} />
+                </button>
+                <p className="scene-signup-org-hint">Cinema clubs · Film societies · Studios · Festivals</p>
+                <div className="scene-signup-login">Already have an account? <button type="button" onClick={() => navigate("/login")}>Log in</button></div>
+              </>
             ) : (
-              <div className="scene-signup-avatar-placeholder">
-                <TbUpload size={20} />
-                <span>
-                  Upload Avatar
-                </span>
-                <small>
-                  Optional
-                </small>
+              <div className="scene-signup-org-preview">
+                <button type="button" className="scene-signup-text-back" onClick={() => setShowOrgPreview(false)}><ArrowLeft size={16} /> Back to signup</button>
+                <div className="scene-signup-org-symbol"><Building2 size={26}/></div>
+                <span className="scene-signup-kicker">SCENE STUDIO</span>
+                <h2>For the people behind the stories.</h2>
+                <p>Give your cinema club or film organization a home on Scene. Publish articles, showcase short films, curate lists and grow your community.</p>
+                <div className="scene-signup-org-features">
+                  <span><CheckCircle2 size={16}/> Organization profile</span>
+                  <span><CheckCircle2 size={16}/> Articles & film lists</span>
+                  <span><CheckCircle2 size={16}/> Short films & members</span>
+                  <span><CheckCircle2 size={16}/> Scene Studio dashboard</span>
+                </div>
+                <div className="scene-signup-info">
+                  <Film size={19}/>
+                  <span>Organization applications are coming soon. This is a preview; no application is being collected yet.</span>
+                </div>
+                <button type="button" className="scene-signup-primary" onClick={() => setShowOrgPreview(false)}>Return to Scene signup <ArrowRight size={17}/></button>
               </div>
             )}
-          </label>
-
-          <input
-            type="file"
-            id="avatar-upload"
-            hidden
-            accept="image/*"
-            onChange={handleAvatarChange}
-          />
-
-          <div className="scene-signup-field">
-            <input
-              type="text"
-              placeholder="Username"
-              autoCapitalize="none"
-              autoComplete="username"
-              value={username}
-              onChange={handleUsernameChange}
-              className="scene-signup-input"
-            />
-
-            {!usernameValid && (
-              <p className="scene-signup-message error">
-                3–20 letters, numbers or underscores only
-              </p>
-            )}
-
-            {usernameValid &&
-              username &&
-              usernameTaken && (
-                <p className="scene-signup-message error">
-                  Username is already taken
-                </p>
-              )}
-
-            {usernameValid &&
-              username &&
-              !usernameTaken && (
-                <p className="scene-signup-message success">
-                  Username looks good
-                </p>
-              )}
           </div>
+          <p className="scene-signup-footer">Movies · TV · Reviews · Friends · AI</p>
+        </section>
+      </div>
 
-          <div className="scene-signup-field">
-            <div className="scene-signup-input-wrap">
-              <input
-                type="email"
-                placeholder="Email"
-                autoCapitalize="none"
-                autoComplete="email"
-                value={email}
-                onChange={handleEmailChange}
-                className="scene-signup-input"
-              />
-
-              {emailCheckBusy && (
-                <span className="scene-signup-checking">
-                  checking…
-                </span>
-              )}
-            </div>
-
-            {!emailValid && (
-              <p className="scene-signup-message error">
-                Invalid email format
-              </p>
-            )}
-
-            {emailValid &&
-              email &&
-              emailTaken && (
-                <p className="scene-signup-message error">
-                  Email already in use
-                </p>
-              )}
-
-            {emailDeliverable ===
-              true &&
-              !emailTaken && (
-                <p className="scene-signup-message success">
-                  Email looks good
-                </p>
-              )}
-          </div>
-
-          <div className="scene-signup-field">
-            <input
-              type="password"
-              placeholder="Password"
-              autoComplete="new-password"
-              value={password}
-              onChange={(e) =>
-                setPassword(
-                  e.target.value
-                )
-              }
-              className="scene-signup-input"
-            />
-          </div>
-
-          <div className="scene-signup-language">
-            <div className="scene-signup-language-title">
-              🌐 Choose Language
-            </div>
-
-            <div className="scene-signup-language-buttons">
-              <button
-                type="button"
-                onClick={() =>
-                  setSelectedLanguage(
-                    "en"
-                  )
-                }
-                className={
-                  selectedLanguage ===
-                  "en"
-                    ? "scene-language-button active"
-                    : "scene-language-button"
-                }
-              >
-                English
-              </button>
-
-              <button
-                type="button"
-                onClick={() =>
-                  setSelectedLanguage(
-                    "ar"
-                  )
-                }
-                className={
-                  selectedLanguage ===
-                  "ar"
-                    ? "scene-language-button active"
-                    : "scene-language-button"
-                }
-              >
-                العربية
-              </button>
-            </div>
-          </div>
-
-          <div className="scene-signup-selected">
-            Selected:{" "}
-            {selectedLanguage ===
-            "en"
-              ? "English"
-              : "العربية"}
-          </div>
-
-          <button
-            type="submit"
-            className="scene-signup-submit"
-            disabled={
-              isLoading ||
-              emailCheckBusy
-            }
-          >
-            {isLoading ? (
-              <FaSpinner className="scene-signup-spinner" />
-            ) : (
-              "Sign Up"
-            )}
-          </button>
-        </form>
-
-        <div className="scene-signup-login">
-          <span>
-            Already have an account?
-          </span>
-
-          <a href="/login">
-            Log in
-          </a>
-        </div>
-      </section>
-
-      {showCropper &&
-        rawAvatarFile && (
-          <CropperModal
-            file={rawAvatarFile}
-            onClose={() =>
-              setShowCropper(
-                false
-              )
-            }
-            onCropComplete={
-              handleCropped
-            }
-            shape="circle"
-            aspectRatio={1}
-          />
-        )}
+      {showCropper && rawAvatarFile && <CropperModal file={rawAvatarFile} onClose={() => setShowCropper(false)} onCropComplete={handleCropped} shape="circle" aspectRatio={1} />}
     </main>
   );
 }

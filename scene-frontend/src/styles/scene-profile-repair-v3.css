@@ -1,0 +1,5 @@
+/* SCENE_PROFILE_REPAIR_V3 */
+.scene-profile-logs-error{max-width:960px;margin:8px auto 15px;padding:11px 15px;background:#231921;border:1px solid #854d75;border-radius:9px;color:#f2cfe9;font-size:13px}
+.scene-profile-mode-strip{position:relative;display:flex;justify-content:flex-end;align-items:center;gap:9px;min-height:42px}
+.scene-profile-mode-strip button{background:#231529;border:1px solid #7d3ba0;border-radius:10px;color:#d7a3fb;padding:8px 13px;font:600 12px Inter,system-ui;cursor:pointer}
+.scene-profile-mode-strip span{color:#999;font-size:11px}

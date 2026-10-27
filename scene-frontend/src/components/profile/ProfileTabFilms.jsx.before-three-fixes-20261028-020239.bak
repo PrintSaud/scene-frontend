@@ -1,0 +1,17 @@
+// SCENE_WEB_PROFILE_BATCH2 — web adaptation of mobile Films
+import React,{useMemo,useState} from "react";
+import {useNavigate} from "react-router-dom";
+import useTranslate from "../../utils/useTranslate";
+import getPosterUrl from "../../utils/getPosterUrl";
+import "../../styles/scene-profile-batch2.css";
+// SCENE_PROFILE_REPAIR_FILMS_V3
+const mid=v=>Number(v?.tmdbId??v?.movie?.tmdbId??v?.movie?.id??v?.movieId??v?.id)||null;
+const date=v=>{const d=new Date(v||0).getTime();return Number.isFinite(d)?d:0};
+const title=v=>v?.title||v?.movie?.title||v?.movieTitle||"Movie";
+const review=v=>{const r=String(v?.review?.text??v?.review??"").trim();return Boolean(r&&!['__media__','[GIF ONLY]','[IMAGE ONLY]'].includes(r)||v?.gif||v?.image)};
+export default function ProfileTabFilms({logs=[],favorites=[],profileUserId,customPosters={}}){
+ const t=useTranslate();const nav=useNavigate();const [sort,setSort]=useState("added"),[direction,setDirection]=useState("desc"),[query,setQuery]=useState("");
+ const favs=new Set((Array.isArray(favorites)?favorites:[]).map(x=>Number(x?.tmdbId??x?.id??x)).filter(Boolean));
+ const films=useMemo(()=>{const seen=new Set();let arr=(Array.isArray(logs)?logs:[]).filter(l=>{const id=mid(l);if(!id||seen.has(id))return false;seen.add(id);return true;});if(sort==="favorites")arr=arr.filter(x=>favs.has(mid(x)));arr=arr.filter(x=>title(x).toLowerCase().includes(query.trim().toLowerCase()));const sign=direction==="asc"?1:-1;return arr.sort((a,b)=>{const val=x=>sort==="rating"?Number(x?.rating||0):date(x?.watchedAt||x?.createdAt);return (val(a)-val(b))*sign;});},[logs,sort,direction,query,favorites]);
+ return <section className="scene-b2"><div className="scene-b2-toolbar"><input aria-label="Search films" value={query} onChange={e=>setQuery(e.target.value)} placeholder={t("Search films...")}/><select aria-label="Sort films" value={sort} onChange={e=>setSort(e.target.value)}><option value="added">{t("Recently Watched")}</option><option value="rating">{t("Rating")}</option><option value="favorites">{t("Favorites")}</option></select><button type="button" aria-label="Reverse sort" onClick={()=>setDirection(x=>x==="desc"?"asc":"desc")}>{direction==="desc"?"↓":"↑"}</button></div>{films.length?<div className="scene-b2-posters">{films.map((l,i)=>{const id=mid(l);const src=getPosterUrl(id,customPosters,l)||"/default-poster.jpg";return <div className="scene-b2-film" key={`${id}-${i}`}><button type="button" className="scene-b2-poster" onClick={()=>nav(review(l)&&l?._id?`/review/${l._id}`:`/movie/${id}`)} title={title(l)}><img loading="lazy" alt={title(l)} src={src} onError={e=>{e.currentTarget.onerror=null;e.currentTarget.src="/default-poster.jpg";}}/></button><div className="scene-b2-filmmeta"><span>{Number(l?.rating)>0?`★ ${l.rating}`:""}</span><span>{review(l)?"▤":""}</span><span>{favs.has(id)?"♥":""}</span></div></div>;})}</div>:<div className="scene-b2-empty">{t("No films to show.")}</div>}</section>;
+}

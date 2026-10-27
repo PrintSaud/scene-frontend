@@ -7,11 +7,11 @@ export default function PrivateRoute({ children }) {
     const user = stored ? JSON.parse(stored) : null;
 
     if (!user || !user.token) {
-      return <Navigate to="/login" replace />;
+      return <Navigate to="/" replace />;
     }
 
     return children;
   } catch (err) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 }

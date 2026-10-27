@@ -1,0 +1,31 @@
+/* SCENE_PROFILE_V5: align profile, tabs and tab content on desktop */
+.scene-public-profile { width:100%; min-width:0; }
+.scene-public-profile .scene-native-header,
+.scene-public-profile .scene-profile-tabs-wrap,
+.scene-public-profile .scene-profile-content {
+  width: min(100%, 1400px) !important;
+  max-width: 1400px !important;
+  box-sizing: border-box !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+.scene-public-profile .scene-native-backdrop {
+  width: 100% !important;
+  height: clamp(240px, 26vw, 410px) !important;
+  background-size: cover !important;
+  background-position: center center !important;
+}
+.scene-public-profile .scene-profile-content {
+  padding-left: clamp(16px, 2.3vw, 32px) !important;
+  padding-right: clamp(16px, 2.3vw, 32px) !important;
+}
+.scene-public-profile .scene-profile-tab[aria-selected="true"]::after {
+  background: #a855f7 !important;
+  height: 3px !important;
+}
+.scene-public-profile .scene-b2-posters { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important; }
+@media (max-width: 750px) {
+ .scene-public-profile .scene-native-backdrop { height: 205px !important; }
+ .scene-public-profile .scene-profile-content { padding-left: 12px !important; padding-right: 12px !important; }
+ .scene-public-profile .scene-b2-posters { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+}
