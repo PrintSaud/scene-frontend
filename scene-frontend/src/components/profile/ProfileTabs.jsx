@@ -32,31 +32,21 @@ export default function ProfileTabs({ activeTab, setActiveTab }) {
     <div
       ref={containerRef}
       {...bind()}
-      style={{
-        display: "flex",
-        justifyContent: "space-around",
-        borderBottom: "1px solid #333",
-        touchAction: "pan-y",
-        userSelect: "none",
-      }}
+      className="scene-profile-tabs"
+      role="tablist"
+      aria-label="Profile sections"
+      style={{ touchAction: "pan-y", userSelect: "none" }}
     >
       {tabs.map((tab) => (
         <button
+          type="button"
           key={tab}
+          className="scene-profile-tab"
+          role="tab"
+          aria-selected={activeTab === tab}
           onClick={() => setActiveTab(tab)}
-          style={{
-            background: "none",
-            border: "none",
-            padding: "12px 0",
-            fontSize: "14px",
-            fontWeight: activeTab === tab ? "bold" : "normal",
-            color: activeTab === tab ? "#fff" : "#888",
-            borderBottom: activeTab === tab ? "2px solid #fff" : "none",
-            flex: 1,
-            cursor: "pointer",
-          }}
         >
-          {t(tab)} {/* ✅ translate instantly */}
+          {tab === "Films" ? t("Movies") : t(tab)}
         </button>
       ))}
     </div>

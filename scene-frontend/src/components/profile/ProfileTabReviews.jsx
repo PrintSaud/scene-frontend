@@ -1,3 +1,5 @@
+import "../../styles/scene-profile-app-parity.css";
+// SCENE_PROFILE_APP_PARITY_BATCH1
 // src/components/profile/ProfileTabReviews.jsx
 import React from "react";
 import { FaStar, FaRegStar, FaStarHalfAlt } from "react-icons/fa";
@@ -54,7 +56,7 @@ export default function ProfileTabReviews({
     });
 
   return (
-    <div
+    <div className="scene-app-review-list"
       style={{
         display: "flex",
         flexDirection: "column",

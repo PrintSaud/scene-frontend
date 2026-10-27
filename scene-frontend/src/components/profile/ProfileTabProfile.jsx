@@ -1,3 +1,5 @@
+// SCENE_PROFILE_APP_PARITY_BATCH1
+import SceneWebProfileStats from "./SceneWebProfileStats";
 // src/components/profile/ProfileTabProfile.jsx
 import React, { useState, useMemo } from "react";
 import StarRating from "../StarRating";
@@ -125,6 +127,7 @@ export default function ProfileTabProfile({
 
   return (
     <>
+
       {/* 🎬 Favorite Movies */}
       {(favoriteMovies?.length || 0) > 0 ? (
         <div style={{ marginTop: "16px" }}>
@@ -416,6 +419,8 @@ export default function ProfileTabProfile({
           )}
         </div>
       )}
+      {/* SCENE_PROFILE_REPAIR_STATS_ORDER_V3: after favorites and recent activity */}
+      <SceneWebProfileStats logs={logs} />
     </>
   );
 }

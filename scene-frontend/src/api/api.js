@@ -203,3 +203,12 @@ export const updateProfile = (userId, data) => api.patch(`/api/users/${userId}`,
 export const searchMoviesByTitle = (query) => api.get(`/api/movies/search?q=${query}`);
 
 export default api;
+
+// SCENE_STABILIZE_V4_POSTERS: public read-only collection, no Authorization required.
+// The backend returns [{movieId, posterUrl, updatedAt}].
+export const getPublicProfilePosters = async (userId) => {
+  const response = await api.get(`/api/posters/user/${encodeURIComponent(userId)}`);
+  const rows = Array.isArray(response.data) ? response.data : [];
+  return Object.fromEntries(rows.filter(p => p && Number(p.movieId)>0 && typeof p.posterUrl === 'string')
+    .map(p => [String(p.movieId), p.posterUrl]));
+};

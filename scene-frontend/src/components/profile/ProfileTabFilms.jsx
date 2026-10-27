@@ -1,341 +1,96 @@
-// src/components/profile/ProfileTabFilms.jsx
-import React, { useState, useMemo, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import StarRating from "../StarRating";
-import { AiFillHeart } from "react-icons/ai";
-import { FaRegComment } from "react-icons/fa";
-import axios from "../../api/api";
+// SCENE_PROFILE_FILMS_TARGETED_FIX_20261028
+import React, {useMemo, useState} from "react";
+import {useNavigate} from "react-router-dom";
 import useTranslate from "../../utils/useTranslate";
-import getPosterUrl from "../../utils/getPosterUrl";
+import "../../styles/scene-profile-batch2.css";
 
-const FALLBACK_POSTER = "/default-poster.jpg";
-
-function toTmdbIdAny(x) {
-  const id =
-    x?.tmdbId ??
-    x?.movie?.tmdbId ??
-    x?.movie?.id ??
-    x?.movieId ??
-    x?.id ??
-    (typeof x === "number" || (typeof x === "string" && /^\d+$/.test(x)) ? x : null);
-  const n = Number(id);
-  return Number.isFinite(n) ? n : null;
+const movieId = v => Number(v?.tmdbId ?? v?.movie?.tmdbId ?? v?.movie?.id ?? v?.movieId ?? v?.id) || null;
+const watchedAt = v => new Date(v?.watchedAt || v?.createdAt || 0).getTime() || 0;
+const movieTitle = v => v?.title || v?.movie?.title || "Movie";
+const hasReview = v => {
+  const text = String(v?.review?.text ?? v?.review ?? "").trim();
+  return Boolean((text && !["__media__", "[GIF ONLY]", "[IMAGE ONLY]"].includes(text)) || v?.gif || v?.image);
+};
+const validPoster = value => {
+  if (typeof value !== "string" || !value.trim()) return null;
+  const x = value.trim();
+  if (/^https?:\/\//i.test(x)) return x;
+  if (/^\/\//.test(x)) return `https:${x}`;
+  if (x.startsWith("/")) return `https://image.tmdb.org/t/p/w500${x}`;
+  return null;
+};
+const fallbackPosters = (log, customPosters, id) => {
+  const possible = [
+    customPosters?.[id],
+    log?.posterOverride,
+    log?.poster,
+    log?.movie?.posterOverride,
+    log?.movie?.poster,
+    log?.movie?.poster_path,
+    log?.movie?.posterPath,
+    log?.poster_path,
+    "/default-poster.jpg"
+  ];
+  const results = possible.map((p, i) => i === possible.length-1 ? p : validPoster(p)).filter(Boolean);
+  return [...new Set(results)];
+};
+function FilmPoster({log, customPosters, id}) {
+  const sources = useMemo(() => fallbackPosters(log, customPosters, id), [log, customPosters, id]);
+  const [index, setIndex] = useState(0);
+  return <img key={`${id}-${sources[0]}`} loading="lazy" alt={movieTitle(log)}
+    src={sources[Math.min(index, sources.length-1)]}
+    onError={() => setIndex(n => Math.min(n + 1, sources.length-1))} />;
 }
-
-// ✅ Poster with shimmer that ALWAYS resolves
-function Poster({ src, alt, onClick }) {
-  const [loaded, setLoaded] = useState(false);
-  const [error, setError] = useState(false);
-
-  const showSrc = !error && src ? src : FALLBACK_POSTER;
-
-  return (
-    <div
-      style={{
-        position: "relative",
-        width: "100%",
-        aspectRatio: "2/3",
-        borderRadius: "6px",
-        overflow: "hidden",
-        cursor: "pointer",
-      }}
-      onClick={onClick}
-    >
-      {/* Purple shimmer until load/error */}
-      {!loaded && (
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            borderRadius: "6px",
-            background:
-              "linear-gradient(90deg, #3a0d60 25%, #B327F6 50%, #3a0d60 75%)",
-            backgroundSize: "200% 100%",
-            animation: "shimmer 1.2s infinite",
-          }}
-        />
-      )}
-
-      <img
-        src={showSrc}
-        alt={alt}
-        loading="lazy"
-        onLoad={() => setLoaded(true)}
-        onError={() => {
-          setError(true);
-          setLoaded(true);
-        }}
-        style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          borderRadius: "6px",
-          display: "block",
-        }}
-      />
-
-      <style>
-        {`
-          @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-          }
-        `}
-      </style>
-    </div>
-  );
-}
-
-export default function ProfileTabFilms({
-  logs = [],
-  favorites = [],
-  profileUserId,
-  customPosters = {},
-}) {
-  const t = useTranslate();
-  const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
-  const [sortType, setSortType] = useState("added");
-  const [order, setOrder] = useState("desc");
-  const [customPostersState, setCustomPostersState] = useState({});
-  const [lsFavorites, setLsFavorites] = useState([]);
-
-  // Favorites from LS
-  useEffect(() => {
-    try {
-      const stored = JSON.parse(localStorage.getItem("user"));
-      const favs = Array.isArray(stored?.favorites) ? stored.favorites : [];
-      setLsFavorites(favs);
-    } catch {
-      setLsFavorites([]);
+export default function ProfileTabFilms({logs=[], favorites=[], customPosters={}}) {
+  const t=useTranslate();
+  const navigate=useNavigate();
+  const [sort,setSort]=useState("added");
+  const [direction,setDirection]=useState("desc");
+  const [query,setQuery]=useState("");
+  const favs=new Set((Array.isArray(favorites)?favorites:[]).map(x=>Number(x?.tmdbId??x?.id??x)).filter(Boolean));
+  const films=useMemo(()=>{
+    // Latest watched log per film, regardless of the API response order.
+    const mostRecent=new Map();
+    for (const log of Array.isArray(logs)?logs:[]) {
+      const id=movieId(log);
+      if (!id) continue;
+      const existing=mostRecent.get(id);
+      if (!existing || watchedAt(log)>watchedAt(existing)) mostRecent.set(id,log);
     }
-  }, []);
-
-  const effectiveFavorites = favorites?.length ? favorites : lsFavorites;
-  const favIds = useMemo(
-    () => (effectiveFavorites || []).map((f) => Number(f)).filter(Number.isFinite),
-    [effectiveFavorites]
-  );
-  const isFav = useCallback((tmdbId) => favIds.includes(Number(tmdbId)), [favIds]);
-
-  // Simulated loading
-  useEffect(() => {
-    if ((logs?.length || 0) > 100) {
-      setIsLoading(true);
-      const t = setTimeout(() => setIsLoading(false), 1000);
-      return () => clearTimeout(t);
-    }
-    setIsLoading(false);
-  }, [logs]);
-
-  // Custom posters fetch
-  useEffect(() => {
-    const fetchCustomPosters = async () => {
-      try {
-        const user = JSON.parse(localStorage.getItem("user"));
-        const token = user?.token;
-        const movieIds = logs.map(toTmdbIdAny).filter(Boolean);
-        const uniqueIds = [...new Set(movieIds)];
-        if (uniqueIds.length === 0) return;
-
-        const { data } = await axios.post(
-          "/api/posters/batch",
-          { userId: profileUserId, movieIds: uniqueIds },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        if (data && typeof data === "object") {
-          setCustomPostersState(data);
-        }
-      } catch (err) {
-        console.error("❌ Failed to load custom posters", err);
-      }
-    };
-    if (profileUserId) fetchCustomPosters();
-  }, [logs, profileUserId]);
-
-  // Sorting
-  const sortedLogs = useMemo(() => {
-    const base = Array.isArray(logs) ? [...logs] : [];
-    if (sortType === "favorites") {
-      return base.filter((lg) => {
-        const id = toTmdbIdAny(lg);
-        return id && isFav(id);
-      });
-    }
-    base.sort((a, b) => {
-      let valA = 0,
-        valB = 0;
-      switch (sortType) {
-        case "rating":
-          valA = Number(a.rating || 0);
-          valB = Number(b.rating || 0);
-          break;
-        case "release":
-          valA = new Date(a.movie?.release_date || 0).getTime();
-          valB = new Date(b.movie?.release_date || 0).getTime();
-          break;
-        case "runtime":
-          valA = Number(a.movie?.runtime || 0);
-          valB = Number(b.movie?.runtime || 0);
-          break;
-        default:
-          valA = new Date(a.createdAt || a.watchedAt || 0).getTime();
-          valB = new Date(b.createdAt || b.watchedAt || 0).getTime();
-      }
-      const dir = order === "asc" ? 1 : -1;
-      return (valA - valB) * dir;
+    let arr=[...mostRecent.values()];
+    if (sort==="favorites") arr=arr.filter(log=>favs.has(movieId(log)));
+    const term=query.trim().toLowerCase();
+    if (term) arr=arr.filter(log=>movieTitle(log).toLowerCase().includes(term));
+    const sign=direction==="asc"?1:-1;
+    return arr.sort((a,b)=>{
+      const value=x=>sort==="rating"?Number(x?.rating??0):watchedAt(x);
+      return (value(a)-value(b))*sign;
     });
-    return base;
-  }, [logs, sortType, order, isFav]);
-
-  if (isLoading) {
-    return (
-      <div
-        className="films-grid"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))",
-          gap: "6px",
-          padding: "0",
-        }}
-      >
-        {Array.from({ length: 12 }).map((_, i) => (
-          <div
-            key={i}
-            style={{
-              position: "relative",
-              width: "100%",
-              aspectRatio: "2/3",
-              borderRadius: "6px",
-              overflow: "hidden",
-              background:
-                "linear-gradient(90deg, #3a0d60 25%, #B327F6 50%, #3a0d60 75%)",
-              backgroundSize: "200% 100%",
-              animation: "shimmer 1.2s infinite",
-            }}
-          />
-        ))}
-  
-        <style>
-          {`
-            @keyframes shimmer {
-              0% { background-position: 200% 0; }
-              100% { background-position: -200% 0; }
-            }
-  
-            @media (max-width: 480px) {
-              .films-grid {
-                grid-template-columns: repeat(3, 1fr) !important;
-              }
-            }
-          `}
-        </style>
-      </div>
-    );
-  }
-  
-
-  return (
-    <>
-      {/* Controls */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          flexWrap: "wrap",
-          gap: "8px",
-          marginBottom: "8px",
-        }}
-      >
-        <select
-          value={sortType}
-          onChange={(e) => setSortType(e.target.value)}
-          style={{
-            background: "#111",
-            color: "#fff",
-            border: "1px solid #333",
-            borderRadius: "6px",
-            padding: "6px 10px",
-            fontSize: "13px",
-            minWidth: "130px",
-          }}
-        >
-          <option value="added">{t("Recently Added")}</option>
-          <option value="rating">{t("Rating")}</option>
-          <option value="release">{t("Release Date")}</option>
-          <option value="runtime">{t("Runtime")}</option>
-          <option value="favorites">{t("Favorites")}</option>
-        </select>
-        <select
-          value={order}
-          onChange={(e) => setOrder(e.target.value)}
-          disabled={sortType === "favorites"}
-          style={{
-            background: "#111",
-            color: "#fff",
-            border: "1px solid #333",
-            borderRadius: "6px",
-            padding: "6px 10px",
-            fontSize: "13px",
-            minWidth: "130px",
-          }}
-        >
-          <option value="desc">⬇ {t("Descending")}</option>
-          <option value="asc">⬆ {t("Ascending")}</option>
-        </select>
-      </div>
-
-      {/* Grid */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))",
-          gap: "6px",
-        }}
-      >
-        {sortedLogs.map((lg) => {
-          const movieId = toTmdbIdAny(lg);
-
-          const posterUrl = getPosterUrl({
-            tmdbId: lg.tmdbId || lg.movie?.tmdbId,
-            posterPath: lg.poster_path || lg.movie?.poster_path,
-            override:
-              customPostersState[movieId] ||
-              lg.posterOverride ||
-              lg.movie?.posterOverride,
-          });
-
-          const favorite = isFav(movieId);
-          const hasReview = !!(lg.review && lg.review.trim().length > 0);
-
-          return (
-            <div key={lg._id} style={{ position: "relative" }}>
-              <Poster
-                src={posterUrl}
-                alt={lg.title || t("Poster")}
-                onClick={() => navigate(`/movie/${movieId}`)}
-              />
-
-              {/* Rating + Icons */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "4px",
-                  padding: "2px 4px 0 4px",
-                  fontSize: "10px",
-                  color: "#aaa",
-                  fontFamily: "Inter",
-                }}
-              >
-                <StarRating rating={lg.rating} size={12} />
-                {hasReview && <FaRegComment size={9} />}
-                {favorite && <AiFillHeart size={11} color="#B327F6" />}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </>
-  );
+  },[logs,sort,direction,query,favorites]);
+  return <section className="scene-b2">
+    <div className="scene-b2-toolbar">
+      <input aria-label="Search films" value={query} onChange={e=>setQuery(e.target.value)} placeholder={t("Search films...")}/>
+      <select aria-label="Sort films" value={sort} onChange={e=>setSort(e.target.value)}>
+        <option value="added">{t("Recently Watched")}</option>
+        <option value="rating">{t("Rating")}</option>
+        <option value="favorites">{t("Favorites")}</option>
+      </select>
+      <button type="button" aria-label="Reverse sort" onClick={()=>setDirection(x=>x==="desc"?"asc":"desc")}>{direction==="desc"?"↓":"↑"}</button>
+    </div>
+    {films.length?<div className="scene-b2-posters">{films.map(log=>{
+      const id=movieId(log);
+      const rating=Number(log?.rating);
+      return <div className="scene-b2-film" key={id}>
+        <button type="button" className="scene-b2-poster" title={movieTitle(log)}
+          onClick={()=>navigate(hasReview(log)&&log?._id?`/review/${log._id}`:`/movie/${id}`)}>
+          <FilmPoster log={log} customPosters={customPosters} id={id}/>
+        </button>
+        <div className="scene-b2-filmmeta">
+          <span title="Your rating (out of 5)">{Number.isFinite(rating)&&rating>0?`★ ${rating}/5`:""}</span>
+          <span>{hasReview(log)?"▤":""}</span>
+          <span>{favs.has(id)?"♥":""}</span>
+        </div>
+      </div>;
+    })}</div>:<div className="scene-b2-empty">{t("No films to show.")}</div>}
+  </section>;
 }
