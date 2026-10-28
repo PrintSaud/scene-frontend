@@ -8,6 +8,7 @@ import { ArrowLeft, ArrowRight, Mail, Lock, UserRound, Building2, Film, CheckCir
 import { useNavigate } from "react-router-dom";
 import CropperModal from "../components/CropperModal";
 import defaultAvatar from "../assets/default-avatar.jpg";
+import OrganizationApplicationForm from "../components/OrganizationApplicationForm";
 
 const TMDB_POSTER_BASE = "https://image.tmdb.org/t/p/w342";
 const POSTER_ROWS = [
@@ -506,24 +507,7 @@ export default function SignupPage() {
                 <div className="scene-signup-login">Already have an account? <button type="button" onClick={() => navigate("/login")}>Log in</button></div>
               </>
             ) : (
-              <div className="scene-signup-org-preview">
-                <button type="button" className="scene-signup-text-back" onClick={() => setShowOrgPreview(false)}><ArrowLeft size={16} /> Back to signup</button>
-                <div className="scene-signup-org-symbol"><Building2 size={26}/></div>
-                <span className="scene-signup-kicker">SCENE STUDIO</span>
-                <h2>For the people behind the stories.</h2>
-                <p>Give your cinema club or film organization a home on Scene. Publish articles, showcase short films, curate lists and grow your community.</p>
-                <div className="scene-signup-org-features">
-                  <span><CheckCircle2 size={16}/> Organization profile</span>
-                  <span><CheckCircle2 size={16}/> Articles & film lists</span>
-                  <span><CheckCircle2 size={16}/> Short films & members</span>
-                  <span><CheckCircle2 size={16}/> Scene Studio dashboard</span>
-                </div>
-                <div className="scene-signup-info">
-                  <Film size={19}/>
-                  <span>Organization applications are coming soon. This is a preview; no application is being collected yet.</span>
-                </div>
-                <button type="button" className="scene-signup-primary" onClick={() => setShowOrgPreview(false)}>Return to Scene signup <ArrowRight size={17}/></button>
-              </div>
+              <OrganizationApplicationForm onBack={() => setShowOrgPreview(false)} />
             )}
           </div>
           <p className="scene-signup-footer">Movies · TV · Reviews · Friends · AI</p>

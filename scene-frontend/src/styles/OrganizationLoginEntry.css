@@ -1,0 +1,65 @@
+
+.scene-org-login-entry {
+  margin-top: 24px;
+  width: 100%;
+  text-align: center;
+}
+
+.scene-org-login-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.scene-org-login-divider::before,
+.scene-org-login-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(255,255,255,0.12);
+}
+
+.scene-org-login-divider span {
+  color: #a99bb8;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  white-space: nowrap;
+}
+
+.scene-org-login-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 54px;
+  padding: 14px 18px;
+  border: 1px solid rgba(175,107,246,0.35);
+  border-radius: 14px;
+  background: rgba(142,64,220,0.09);
+  color: #e9dcfa;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.scene-org-login-button:hover {
+  background: rgba(142,64,220,0.2);
+  border-color: #b57aff;
+}
+
+.scene-org-login-button:focus-visible {
+  outline: 2px solid #b57aff;
+  outline-offset: 3px;
+}
+
+.scene-org-login-entry p {
+  margin: 12px 0 0;
+  color: #93869f;
+  font-size: 11px;
+  line-height: 1.5;
+}

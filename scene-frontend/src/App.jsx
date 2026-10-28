@@ -56,6 +56,9 @@ import OgReviewPage from "./pages/OgReviewPage";
 import SettingsPage from "./pages/SettingsPage"; // ✅ new
 import GetScenePage from "./pages/GetScenePage";
 
+import OrganizationLogin from "./pages/OrganizationLogin";
+import SceneStudio from "./pages/SceneStudio";
+
 import DeleteAccountPage from "./pages/DeleteAccountPage";
 function App() {
   const location = useLocation();
@@ -162,6 +165,15 @@ function App() {
             <Route path="/profile/:id" element={<ProfilePage />} />
             <Route path="/profile/" element={<ProfilePage />} />
             <Route path="/review/:id" element={<ReviewPage />} />
+            <Route
+  path="/studio/login"
+  element={<OrganizationLogin />}
+/>
+
+<Route
+  path="/studio"
+  element={<SceneStudio />}
+/>
             <Route path="/film-reviews/:movieId/:userId" element={<FilmReviewsPage />} />
             <Route path="/movie/:id/friends" element={<MovieFriendsPage />} />
             <Route path="/replies/:id" element={<RepliesPage />} />

@@ -1,0 +1,16 @@
+/* Scoped to organization application; leaves ordinary Scene signup styling intact. */
+.scene-org-apply { width: 100%; }
+.scene-org-apply-form { margin-top: 24px; text-align: left; }
+.scene-org-apply .scene-signup-field { display: flex; flex-direction: column; gap: 7px; }
+.scene-org-apply .scene-signup-field > span, .scene-org-apply-label { font-size: 13px; font-weight: 650; color: #e9deef; }
+.scene-org-apply-textarea { width: 100%; box-sizing: border-box; resize: vertical; min-height: 95px; padding: 12px 14px; border: 1px solid rgba(180,148,206,.32); border-radius: 12px; background: rgba(255,255,255,.04); color: #fff; font: inherit; }
+.scene-org-apply-textarea:focus { outline: 2px solid #a855f7; outline-offset: 1px; }
+.scene-org-apply-file-group { display: flex; flex-direction: column; gap: 8px; }
+.scene-org-apply-file { cursor: pointer; display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px dashed rgba(180,148,206,.5); border-radius: 12px; color: #cbbbd7; min-height: 54px; overflow-wrap: anywhere; font-size: 13px; }
+.scene-org-apply-file:hover, .scene-org-apply-file:focus-within { background: rgba(168,85,247,.09); }
+.scene-org-apply-logo-preview { width: 42px; height: 42px; border-radius: 9px; object-fit: cover; }
+.scene-org-apply-clear { color: #d8b4fe; border: 0; background: transparent; display: inline-flex; align-items: center; gap: 5px; align-self: flex-start; cursor: pointer; font-size: 12px; }
+.scene-org-apply-spin { animation: scene-org-spin 1s linear infinite; }
+.scene-org-apply-success-icon { color: #a855f7; margin: 16px 0; }
+@keyframes scene-org-spin { to { transform: rotate(360deg); } }
+@media(max-width: 600px) { .scene-org-apply-form { margin-top: 18px; } }

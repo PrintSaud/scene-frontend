@@ -1,3 +1,4 @@
+import "../styles/OrganizationLoginEntry.css";
 // src/pages/LoginPage.jsx
 
 import { useState } from "react";
@@ -313,6 +314,22 @@ export default function LoginPage() {
             >
               Create your account
             </button>
+<div className="scene-org-login-entry">
+  <div className="scene-org-login-divider">
+    <span>PART OF AN ORGANIZATION?</span>
+  </div>
+  <button
+    type="button"
+    className="scene-org-login-button"
+    onClick={() => window.location.assign("/studio/login")}
+  >
+    <span>▦</span>
+    Log in as an Organization
+    <span>→</span>
+  </button>
+  <p>Cinema clubs · Studios · Festivals · Film organizations</p>
+</div>
+
 
             <div className="scene-login-support">
               <span>Need help?</span>
