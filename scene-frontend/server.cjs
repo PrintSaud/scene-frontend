@@ -1,6 +1,7 @@
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
+const sceneSocialCards = require("./social-preview.cjs");
 
 const PORT = process.env.PORT || 8080;
 const DIST_DIR = path.join(__dirname, "dist");
@@ -108,6 +109,9 @@ async function handleReviewBot(req, res, reviewId) {
 const server = http.createServer(async (req, res) => {
   const requestUrl = new URL(req.url, `http://${req.headers.host || "localhost"}`);
   const pathname = requestUrl.pathname;
+
+  // Review/profile social previews and their composed PNG artwork.
+  if (await sceneSocialCards.handle(req, res, pathname)) return;
 
   if (req.method !== "GET" && req.method !== "HEAD") {
     res.writeHead(405, { "Content-Type": "text/plain; charset=utf-8" });
