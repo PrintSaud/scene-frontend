@@ -149,23 +149,14 @@ function svgStars(rating, y) {
   }).join("");
 }
 function imageSvg(kind, data) {
-  const isProfile = kind === "profile";
-  const username = "@" + usernameFor(kind,data);
-  const heading = isProfile ? "" : displayTitle(kind, data);
-  const bio = isProfile ? plain(data.bio, 125) : "";
-  // Keep all visible text toward the lower-left, leaving the selected backdrop as the hero.
-  const gradient = `<defs><linearGradient id="shade" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#000" stop-opacity="0"/><stop offset=".43" stop-color="#000" stop-opacity=".03"/><stop offset="1" stop-color="#000" stop-opacity=".88"/></linearGradient></defs><rect width="1200" height="630" fill="url(#shade)"/>`;
-  const userY = isProfile ? 475 : 450;
-  const user = `<text x="70" y="${userY}" fill="#fff" font-size="${username.length > 25 ? 42 : 52}" font-weight="700" font-family="Arial, sans-serif">${XML(username)}</text>`;
-  let details;
-  if (isProfile) {
-    const first = bio.slice(0,65), second = bio.slice(65,125).trim();
-    details = bio ? `<text x="70" y="548" font-size="30" fill="#f1edf5" font-family="Arial, sans-serif">${XML(first)}</text>${second ? `<text x="70" y="587" font-size="30" fill="#f1edf5" font-family="Arial, sans-serif">${XML(second)}</text>` : ""}` : "";
-  } else {
-    const short = heading.length > 48 ? heading.slice(0,47).trimEnd() + "…" : heading;
-    details = `<text x="70" y="515" font-size="${short.length > 33 ? 32 : 40}" fill="#fff" font-weight="600" font-family="Arial, sans-serif">${XML(short)}</text>${svgStars(ratingFor(data), 535)}`;
+  // Profile: backdrop only. Reviews: backdrop + Scene's purple five-star rating.
+  if (kind === "profile") {
+    return Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630"></svg>');
   }
-  return Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">${gradient}${user}${details}</svg>`);
+  const stars = svgStars(ratingFor(data), 535);
+  // A restrained gradient keeps the stars readable against any selected backdrop.
+  const gradient = `<defs><linearGradient id="shade" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#000" stop-opacity="0"/><stop offset=".65" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".65"/></linearGradient></defs><rect width="1200" height="630" fill="url(#shade)"/>`;
+  return Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">${gradient}${stars}</svg>`);
 }
 async function fetchImage(url) {
   if (!url) return null;
