@@ -153,7 +153,7 @@ function imageSvg(kind, data) {
   if (kind === "profile") {
     return Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630"></svg>');
   }
-  const stars = svgStars(ratingFor(data), 535);
+  const stars = svgStars(ratingFor(data), 445);
   // A restrained gradient keeps the stars readable against any selected backdrop.
   const gradient = `<defs><linearGradient id="shade" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#000" stop-opacity="0"/><stop offset=".65" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".65"/></linearGradient></defs><rect width="1200" height="630" fill="url(#shade)"/>`;
   return Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">${gradient}${stars}</svg>`);
