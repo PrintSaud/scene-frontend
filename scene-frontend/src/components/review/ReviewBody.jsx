@@ -4,7 +4,7 @@ export default function ReviewBody({ review }) {
   return (
     <div style={{ padding: "0 16px" }}>
       {review.review ? (
-        <p style={{ 
+        <p dir="auto" style={{ textAlign: "start",
           marginTop: 8, 
           fontFamily: "Inter, sans-serif", 
           fontSize: 12,  // 🔹 Slightly smaller font than default (you can set to 13 if you want even smaller)

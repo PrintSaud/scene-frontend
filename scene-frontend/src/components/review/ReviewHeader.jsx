@@ -340,8 +340,8 @@ export default function ReviewHeader({
         )}
 
         {review.review && review.review !== "__media__" && (
-          <p
-            style={{
+          <p dir="auto"
+            style={{ textAlign: "start",
               marginTop: 8,
               fontFamily: "Inter, sans-serif",
               fontSize: 14,

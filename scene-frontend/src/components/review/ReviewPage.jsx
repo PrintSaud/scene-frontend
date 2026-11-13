@@ -280,8 +280,8 @@ export default function ReviewPage() {
 
                       {/* Text comment */}
                       {r.text && (
-                        <span
-                          style={{
+                        <span dir="auto"
+                          style={{ textAlign: "start",
                             fontSize: 14,
                             color: "#ddd",
                             fontFamily: "Inter, sans-serif",
