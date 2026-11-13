@@ -47,7 +47,23 @@ export default function ProfileHeader({user, logs = [], isOwner, isFollowing, ha
       <div className="scene-native-name"><div className="scene-native-display">{user?.name||""}</div><div className="scene-native-username">@{user?.username}</div></div>
       {!isOwner && <button type="button" className="scene-native-follow" onClick={()=>guest?showLogin():handleFollow?.(user._id)}>{isFollowing?t("Following"):t("Follow")}</button>}
     </div>
-    {user?.bio && <p className="scene-native-bio">{user.bio}</p>}
+    {user?.bio && (
+      <p
+        className="scene-native-bio"
+        dir="auto"
+        style={{
+          marginInline: 16,
+          width: "auto",
+          maxWidth: "none",
+          boxSizing: "border-box",
+          textAlign: "start",
+          whiteSpace: "pre-wrap",
+          overflowWrap: "anywhere",
+        }}
+      >
+        {user.bio}
+      </p>
+    )}
     <div className="scene-native-counts">
       <button type="button" onClick={()=>guest?showLogin():navigate(`/profile/${user._id}/following`)}><strong>{user?.following?.length||0}</strong><span>{t("Following")}</span></button>
       <button type="button" onClick={()=>guest?showLogin():navigate(`/profile/${user._id}/followers`)}><strong>{user?.followers?.length||0}</strong><span>{t("Followers")}</span></button>
