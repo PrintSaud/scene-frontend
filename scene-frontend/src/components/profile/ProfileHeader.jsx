@@ -43,27 +43,63 @@ export default function ProfileHeader({user, logs = [], isOwner, isFollowing, ha
       </div>
       <button type="button" className="scene-native-avatar-btn" onClick={()=>setAvatarOpen(true)} aria-label="Enlarge profile photo"><img src={user?.avatar||AVATAR} alt={`${user?.username||"User"} avatar`} onError={e=>{e.currentTarget.onerror=null;e.currentTarget.src=AVATAR}} /></button>
     </div>
-    <div className="scene-native-identity">
-      <div className="scene-native-name"><div className="scene-native-display">{user?.name||""}</div><div className="scene-native-username">@{user?.username}</div></div>
-      {!isOwner && <button type="button" className="scene-native-follow" onClick={()=>guest?showLogin():handleFollow?.(user._id)}>{isFollowing?t("Following"):t("Follow")}</button>}
-    </div>
-    {user?.bio && (
-      <p
-        className="scene-native-bio"
-        dir="auto"
+    <div
+      className="scene-native-identity"
+      style={{
+        height: "auto",
+        maxHeight: "none",
+        overflow: "visible",
+        alignItems: "flex-start",
+        gap: 12,
+      }}
+    >
+      <div
+        className="scene-native-name"
         style={{
-          marginInline: 16,
-          width: "auto",
-          maxWidth: "none",
-          boxSizing: "border-box",
-          textAlign: "start",
-          whiteSpace: "pre-wrap",
-          overflowWrap: "anywhere",
+          flex: "1 1 0",
+          minWidth: 0,
+          maxWidth: "100%",
+          height: "auto",
+          maxHeight: "none",
+          overflow: "visible",
         }}
       >
-        {user.bio}
-      </p>
-    )}
+        <div className="scene-native-display">
+          {user?.name || ""}
+        </div>
+
+        <div className="scene-native-username">
+          @{user?.username}
+        </div>
+
+        {user?.bio && (
+          <p
+            className="scene-native-profile-bio-v2"
+            dir="auto"
+            style={{
+              display: "block",
+              margin: "4px 0 0",
+              padding: 0,
+              width: "100%",
+              height: "auto",
+              maxHeight: "none",
+              overflow: "visible",
+              textOverflow: "clip",
+              whiteSpace: "pre-wrap",
+              overflowWrap: "anywhere",
+              textAlign: "start",
+              fontSize: 14,
+              lineHeight: 1.5,
+              color: "#b5b5b5",
+            }}
+          >
+            {user.bio}
+          </p>
+        )}
+      </div>
+      {!isOwner && <button type="button" className="scene-native-follow" style={{ flexShrink: 0 }} onClick={()=>guest?showLogin():handleFollow?.(user._id)}>{isFollowing?t("Following"):t("Follow")}</button>}
+    </div>
+
     <div className="scene-native-counts">
       <button type="button" onClick={()=>guest?showLogin():navigate(`/profile/${user._id}/following`)}><strong>{user?.following?.length||0}</strong><span>{t("Following")}</span></button>
       <button type="button" onClick={()=>guest?showLogin():navigate(`/profile/${user._id}/followers`)}><strong>{user?.followers?.length||0}</strong><span>{t("Followers")}</span></button>
