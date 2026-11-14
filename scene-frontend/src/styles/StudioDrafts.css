@@ -1,0 +1,297 @@
+/* SCENE STUDIO DRAFTS */
+
+.sdr-page {
+  color: #f5f5f5;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding-bottom: 35px;
+}
+
+.sdr-page * {
+  box-sizing: border-box;
+}
+
+.sdr-page button {
+  font: inherit;
+  cursor: pointer;
+}
+
+.sdr-heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.sdr-heading > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.sdr-heading h1 {
+  margin: 0 0 5px;
+  font-size: 28px;
+  letter-spacing: -.7px;
+}
+
+.sdr-heading p {
+  color: #929292;
+  font-size: 13px;
+  margin: 0;
+}
+
+.sdr-back {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid #333;
+  color: #eee;
+  background: #181818;
+  flex-shrink: 0;
+}
+
+.sdr-new {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 11px 16px;
+  background: #9333ea;
+  border: 1px solid #a855f7;
+  color: #fff;
+  border-radius: 10px;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  white-space: nowrap;
+}
+
+.sdr-local-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 13px 15px;
+  background: #151119;
+  border: 1px solid #35263f;
+  border-radius: 10px;
+  color: #b4a0c7;
+  font-size: 12px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.sdr-local-note svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.sdr-count {
+  color: #888;
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+
+.sdr-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sdr-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid #292929;
+  background: #111;
+  border-radius: 13px;
+}
+
+.sdr-card:hover {
+  border-color: #4c385a;
+}
+
+.sdr-open {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  color: #eee;
+}
+
+.sdr-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  color: #c084fc;
+  background: #271a34;
+}
+
+.sdr-card-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.sdr-type {
+  color: #bc8ce7;
+  font-size: 9px;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.sdr-card-body strong {
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: start;
+}
+
+.sdr-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  color: #858585;
+  font-size: 11px;
+}
+
+.sdr-meta span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.sdr-edit {
+  color: #c084fc;
+  font-size: 12px;
+  margin: 0 9px;
+}
+
+.sdr-delete {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #303030;
+  border-radius: 9px;
+  background: #191919;
+  color: #888;
+}
+
+.sdr-delete:hover {
+  color: #fca5a5;
+  border-color: #733;
+  background: #2a1717;
+}
+
+.sdr-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  padding: 60px 24px;
+  background: #111;
+  border: 1px solid #292929;
+  border-radius: 15px;
+}
+
+.sdr-empty-icon {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 20px;
+  background: #23192e;
+  color: #c084fc;
+}
+
+.sdr-empty h2 {
+  font-size: 18px;
+  margin: 5px 0 0;
+}
+
+.sdr-empty p {
+  color: #999;
+  font-size: 13px;
+  line-height: 1.6;
+  max-width: 320px;
+  margin: 0 0 10px;
+}
+
+.sdr-error {
+  padding: 12px;
+  margin-bottom: 14px;
+  background: #2a1717;
+  color: #fca5a5;
+  border-radius: 9px;
+  font-size: 13px;
+}
+
+.sdr-skeleton {
+  height: 90px;
+  border-radius: 13px;
+  background: linear-gradient(
+    100deg, #171717 20%, #242424 50%, #171717 80%
+  );
+  background-size: 200% 100%;
+  animation: sdr-shimmer 1.4s infinite;
+}
+
+@keyframes sdr-shimmer {
+  to { background-position: -200% 0; }
+}
+
+.sdr-page button:focus-visible {
+  outline: 2px solid #a855f7;
+  outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+  .sdr-heading {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .sdr-heading h1 {
+    font-size: 23px;
+  }
+
+  .sdr-card {
+    padding: 11px;
+  }
+
+  .sdr-icon {
+    width: 39px;
+    height: 39px;
+  }
+
+  .sdr-edit {
+    display: none;
+  }
+
+  .sdr-card-body strong {
+    font-size: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sdr-skeleton {
+    animation: none;
+  }
+}

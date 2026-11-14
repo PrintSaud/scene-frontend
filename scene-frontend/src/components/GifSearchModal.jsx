@@ -213,3 +213,5 @@ export default function GifSearchModal({ onSelect, onClose }) {
 </div>
 );
 }
+
+export { API_KEY };
